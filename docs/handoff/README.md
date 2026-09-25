@@ -26,14 +26,14 @@ This package is a build-ready brief for a coding agent such as GPT-6 Sol or Clau
 
 US and English at launch; first-party products; one warehouse/fulfillment adapter; USD; web storefront; no mobile app; no marketplace or grocery substitutions. Initial load-test assumptions are 100k variants, 100k accounts, 500 peak dynamic requests/s, 20 checkout attempts/s, and 50 voice sessions. These are sizing hypotheses, not measured capacity.
 
-The first deliverable is a runnable vertical slice: browse a seeded product, add it to cart, complete a Stripe test-mode purchase, see the order, initiate an eligible return through text or voice, confirm the exact quote, and see the return/refund status. Live voice requires provider credentials; a local text and transcript simulator must be usable without them.
+The first deliverable is a runnable vertical slice: sign in, browse a seeded product, add it to cart, complete a Stripe test-mode purchase, see the order, initiate an eligible return through text or voice, confirm the exact quote, and see the return/refund status. Live voice requires provider credentials; a local text and transcript simulator must be usable without them.
 
 ## Minimum accounts and secrets for connected demonstrations
 
 - Stripe **test-mode** account and webhook signing secret.
 - LiveKit Cloud project, Deepgram, Cartesia, and an LLM provider account for actual spoken conversations.
-- Pinecone index and embeddings provider for hosted policy retrieval.
+- Pinecone project and API key (required in every environment, including local development; each developer uses their own namespace).
 - AWS account only for cloud deployment; local Docker development must not require it.
-- Optional TypeSafe Jev access and optional treg account for later experiments. Neither blocks the main path.
+- Optional TypeSafe Jev access for a later experiment. It does not block the main path.
 
 Document each variable in `.env.example` with a fake placeholder; never include live credentials in Git or prompts.

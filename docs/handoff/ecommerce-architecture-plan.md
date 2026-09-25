@@ -27,14 +27,13 @@ Use three separately scaled application areas from the beginning: commerce API, 
 | Commerce | Python + FastAPI + Pydantic + SQLAlchemy + Alembic | Typed endpoints, domain rules, transactions, migrations |
 | AI orchestration | LangGraph + LangChain | Intent routing, typed tools, retrieval, confirmation and handoff |
 | Bounded decision model, optional | TypeSafe Jev behind a server-side decision adapter | Classify support intent and triage ambiguous requests among fixed choices; validate on our data before rollout |
-| External data connector, optional | treg behind an allowlisted integration adapter | Pilot supplier/catalog enrichment from approved providers where a direct integration is unavailable |
 | Model | Claude Sonnet 5 as an initial candidate through a LangChain provider adapter | Benchmark against a faster model; use task accuracy and latency to select production routing |
 | Voice transport | LiveKit Cloud + React client + Python LiveKit Agents workers | WebRTC audio, interruptions, session management |
 | Speech recognition | Deepgram Flux | Streaming speech-to-text and turn completion |
 | Speech generation | Cartesia Sonic 3.6, pinned production snapshot | Streaming text-to-speech; verify chosen voice and locales |
 | Transactional data | Aurora PostgreSQL, or RDS PostgreSQL for a smaller pilot | Orders, cart, inventory reservations, payments, returns, audit records |
 | Cache | Managed Redis | Cache only; no authoritative carts, payment state, conversation history, or inventory reservations |
-| Product search | Managed OpenSearch | Exact product codes, keyword search, facets, filtering, optional semantic retrieval |
+| Product search | Managed OpenSearch + Pinecone | OpenSearch for exact product codes, keyword search, facets, and filtering; Pinecone for meaning-based retrieval; merged with reciprocal rank fusion |
 | Policy retrieval | Pinecone | Versioned policy/help documents with metadata filters and citations |
 | Durable business workflows | Temporal Cloud + Python workers | Checkout coordination, return labels, warehouse wait states, refund retries |
 | Events | Transactional outbox + EventBridge + SQS | Publish committed changes, feed search, notifications, integrations |
@@ -71,7 +70,6 @@ flowchart TD
   WF --> WORK["Business workers"]
   WORK --> DB
   WORK --> EXT["Stripe + fulfillment"]
-  WORK -->|"Optional enrichment"| TREG["treg integration adapter"]
   DB --> OUT["Outbox publisher"]
   OUT --> EVENTS["EventBridge + SQS"]
   EVENTS --> SEARCH
@@ -87,7 +85,7 @@ Share graph definitions and tool contracts as a Python package. Compile the grap
 |---|---|---|
 | Catalog | Product, Variant, Category, Media | Variant IDs remain stable despite changed names |
 | Pricing | Price, Promotion, TaxQuote | Server computes final totals using currency-safe decimal/minor-unit arithmetic |
-| Cart | Cart, CartItem | Persist durable carts in PostgreSQL; authenticate merges |
+| Cart | Cart, CartItem | Persist durable carts in PostgreSQL; carts belong to signed-in customers only (no guest carts or merges) |
 | Inventory | StockLocation, InventoryBalance, Reservation | Atomic availability checks; reservation expiry and oversell protection |
 | Checkout | CheckoutAttempt, checkout workflow reference | Repeated submissions resolve to the same attempt |
 | Orders | Order, OrderLine, fulfillment status | Store purchase-time price, tax, seller, and policy references |
@@ -127,13 +125,13 @@ When the user interrupts, cancel unneeded speech and generation. Track which wor
 
 Example: “I want to return the headphones I bought last week.”
 
-1. Verify the signed-in session. Guests can receive public help, but must verify their order before accessing personal data.
+1. Verify the signed-in session. There is no guest access; every visitor signs in first.
 2. Call `list_my_orders()` using identity injected by backend code. If several items match, display cards and ask the customer to choose.
 3. Call `get_return_options(order_id, line_id, quantity, reason)`. Backend rules evaluate delivery date, product category, merchant policy, prior returns, condition, and fraud/manual-review flags.
 4. Retrieve policy text for explanation, filtering by market, category, seller, effective dates, and policy version. Use the transaction's applicable policy, including any explicitly defined later exceptions.
 5. Show a structured quote: selected item, quantity, expected refund, deductions if any, return method, refund destination, and whether inspection is required. A quote is not a refund.
 6. Obtain explicit confirmation tied to that quote. A screen button is the reliable default. Spoken confirmation can be supported with a clear read-back and transaction-bound confirmation state; ambiguous audio asks again.
-7. Call `confirm_return(quote_id, confirmation_token, idempotency_key)`. Recheck identity, quote expiry, policy, quantity, and current return state. The token is bound to the authenticated customer and exact quoted terms.
+7. The browser's Confirm button (or the app-controlled voice-confirmation step, never the model) calls `POST /v1/returns/confirm` with `quote_id`, `confirmation_token`, and `idempotency_key`. The model only calls `propose_return(quote_id)`, which pauses the graph with `interrupt()`; the token never enters model context or graph state. Recheck identity, quote expiry, policy, quantity, and current return state. The token is bound to the authenticated customer and exact quoted terms.
 8. Create the return authorization and start a Temporal workflow. Generate the label or supported drop-off instructions and show status on the page. Do not claim success until the backend returns the created record.
 9. Wait for the required carrier scan, warehouse inspection, or approved instant-refund rule. Request the refund through a payment worker; follow provider status to completion or failure.
 10. Escalate exceptions with a conversation summary, selected order, policy evidence, and attempted operations so staff do not restart the conversation.
@@ -161,17 +159,16 @@ flowchart TD
   STATUS --> ANSWER
 ```
 
-Start with one controlled LangGraph and three routes, not a collection of autonomous agents. LangChain supplies provider/tool integration. LangGraph stores short-lived conversational decisions and pauses for input; Temporal owns business operations lasting beyond the conversation. Resume graph interrupts through authenticated application code. Side effects must not run again when a graph node replays. [S6–S8]
+Start with one controlled LangGraph and three routes, not a collection of autonomous agents. LangChain supplies provider/tool integration. LangGraph stores short-lived conversational decisions and pauses for input [S6]; Temporal owns business operations lasting beyond the conversation [S8]. Resume graph interrupts through authenticated application code. Side effects must not run again when a graph node replays after an interrupt. [S7]
 
-### Where Jev and treg fit
+### Where Jev fits
 
 TypeSafe's **Jev** is an early-access model for bounded, typed decisions. Given a state and predefined answer choices, it returns probabilities rather than conversational text. Use a server-side adapter to test it for high-volume `FAQ | ORDER_STATUS | RETURN | HUMAN_HELP` routing from a voice transcript, and for classifying support-case categories. If the result is ambiguous, the assistant clarifies or passes the turn to the existing LangGraph/LLM route. Jev does not speak, write the answer, access order data on its own, or determine whether a return is allowed. Provider probabilities are uncertain model outputs; measure calibration on real conversations before choosing thresholds. [S21]
 
-**treg** is a gateway/catalog for external provider APIs with server-side credential handling. Pilot it for noncritical enrichment such as importing supplier product attributes from a supported, licensed source, or gathering external catalog data for an operations review queue. Put it behind a narrow backend adapter with explicit endpoint allowlists, spend limits, timeouts, data licensing checks, and a direct-provider fallback. Its catalog is broad, but coverage does not prove that the particular carrier, supplier, or source we need is supported or meets our reliability and data-handling requirements. Our own order, inventory, price, eligibility, Stripe payment/refund, and chosen fulfillment APIs remain direct authoritative integrations. The voice agent does not receive a general-purpose treg token or open-ended MCP access. [S22]
 
-Together, an optional flow is: **voice transcript → Jev intent choice → LangGraph selects an approved action → direct commerce API**. A separate operations flow is: **approved supplier feed via treg → validate/normalize → staff review → catalog import**. No Jev or treg call is required for checkout or refund correctness. Add each only if a measured pilot improves accuracy, speed, integration time, or cost. [S21–S22]
+An optional flow is: **voice transcript → Jev intent choice → LangGraph selects an approved action → direct commerce API**. No Jev call is required for checkout or refund correctness. Adopt it only if a measured pilot improves accuracy, speed, or cost. [S21]
 
-Tools should return typed objects such as `status`, `reason_code`, `amount_minor`, `currency`, `operation_id`, and `evidence`. Examples: `search_products`, `get_product_details`, `get_order_status`, `get_return_options`, `confirm_return`, and `create_support_case`. Do not expose a general database write tool or a free-form `refund(amount)` tool to the model.
+Tools should return typed objects such as `status`, `reason_code`, `amount_minor`, `currency`, `operation_id`, and `evidence`. Examples: `search_products`, `get_product_details`, `get_order_status`, `get_return_options`, `propose_return`, and `create_support_case`. There is no model-callable confirm tool. Do not expose a general database write tool or a free-form `refund(amount)` tool to the model.
 
 Ground general answers in approved help content. Stock, current price, shipping status, and refund status come from live authorized APIs. If sources are missing or conflict, ask a clarifying question or hand off. Citations appear on screen; the voice answer uses a short natural explanation.
 
@@ -189,11 +186,9 @@ Evaluate Sonnet 5 as the initial reasoning model, then compare a fast, lower-cos
 
 ## Search and retrieval
 
-Use OpenSearch for the product catalogue because exact codes, brands, categories, price filtering, and availability filters are first-class shopping needs. Add semantic retrieval for requests such as “waterproof shoes for a rainy commute.” Merge/rank the candidates and revalidate current commercial facts at purchase time. Walmart's published research describes a hybrid keyword/neural retrieval approach; it supports this design direction without implying that our stack is Walmart's stack. [S15–S16]
+Use OpenSearch for the product catalogue because exact codes, brands, categories, price filtering, and availability filters are first-class shopping needs. Add semantic retrieval through Pinecone for requests such as “waterproof shoes for a rainy commute.” Merge/rank the candidates and revalidate current commercial facts at purchase time. Walmart's published research describes a hybrid keyword/neural retrieval approach; it supports this design direction without implying that our stack is Walmart's stack. [S15–S16]
 
 Pinecone holds approved policy/help text and its embeddings. Ingest from an authoritative content source, preserve document/section IDs and effective dates, and support update/deletion propagation. Filter before retrieval, rerank a small candidate set when it improves evaluated quality, and cite the source. Track freshness. Do not embed every customer's order history as the main lookup method. [S17]
-
-For a smaller first release, consolidating help retrieval into OpenSearch or PostgreSQL vector search may reduce operations. The proposed separate Pinecone service is justified when policy retrieval needs independent tuning and ownership. Algolia is a managed alternative to OpenSearch if fast merchandising setup matters more than direct search-engine control. [S18]
 
 ## Guardrails and privacy at the relevant boundaries
 
@@ -244,7 +239,7 @@ Illustrative 10–14 week pilot with 3–5 experienced engineers and available d
 | Voice integration | Weeks 9–10 | Captions, interruption, shared conversation, reconnection, return cards |
 | Pilot hardening | Weeks 11–14 | Load/failure tests, accessibility, security checks, eval gates and limited rollout |
 
-After the purchase-and-return slice works, run two small optional spikes: compare Jev routing with the current LangGraph/LLM router on the same labeled transcripts, including low-confidence and noisy speech; and test one licensed external feed through treg against a direct integration. Include total latency, error rate, cost, and operational burden. Do not make either a pilot dependency.
+After the purchase-and-return slice works, run one small optional spike: compare Jev routing with the current LangGraph/LLM router on the same labeled transcripts, including low-confidence and noisy speech. Include total latency, error rate, cost, and operational burden. Do not make it a pilot dependency.
 
 Build the first complete vertical slice around a single product purchase followed by a voice-assisted return. Expand product breadth after the payment/return state transitions are reliable.
 
@@ -265,7 +260,7 @@ All accessed September 24, 2026. Sources document capabilities; the recommendati
 - S5: [Claude model overview](https://platform.claude.com/docs/en/models/overview)
 - S6: [LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence)
 - S7: [LangGraph interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts)
-- S8: [Temporal documentation](https://docs.temporal.io/)
+- S8: [Temporal activity definition](https://docs.temporal.io/activity-definition)
 - S9: [Stripe refunds](https://docs.stripe.com/refunds)
 - S10: [Stripe webhook behavior](https://docs.stripe.com/webhooks), [idempotent requests](https://docs.stripe.com/api/idempotent_requests), and [AWS transactional outbox pattern](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html)
 - S11: [Medusa architecture](https://docs.medusajs.com/learn/introduction/architecture)
@@ -279,4 +274,3 @@ All accessed September 24, 2026. Sources document capabilities; the recommendati
 - S19: [ECS load balancing](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-load-balancing.html)
 - S20: [Aurora Global Database](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-global-database.html)
 - S21: [TypeSafe AI introduction to Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) and [TypeSafe AI documentation](https://docs.typesafe.ai/)
-- S22: [treg API reference](https://treg.to/docs)

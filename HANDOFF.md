@@ -15,8 +15,9 @@
 | Build plan | ✅ Done: `docs/PLAN_ai-commerce-build.md` |
 | Step 0: project folder, docs unzipped, `CLAUDE.md`, `.gitignore`, `.gitattributes` | ✅ Done |
 | First Git commit, pushed to GitHub | ✅ Done: **public** repo `https://github.com/taroserigano777/ai-commerce`, branch `main` |
-| Step 1: fix the handoff docs | ⬜ Next |
-| Steps 2–8: build | ⬜ Not started |
+| Step 1: fix the handoff docs | ✅ Done (2026-09-25, Windows laptop) |
+| Step 2: Milestone 1 | 🟡 In progress |
+| Steps 3–8: build | ⬜ Not started |
 | Application code | ⬜ None yet |
 
 ---
@@ -31,7 +32,7 @@ ai-commerce/
 ├── .gitattributes                 ← forces Linux (LF) line endings
 └── docs/
     ├── PLAN_ai-commerce-build.md  ← THE plan (steps 0–8, about 40 days)
-    └── handoff/                   ← original 8 docs, not yet edited
+    └── handoff/                   ← the 8 docs, updated in Step 1 to match the plan
         ├── README.md
         ├── MASTER_PROMPT.md
         ├── AGENTS.md
