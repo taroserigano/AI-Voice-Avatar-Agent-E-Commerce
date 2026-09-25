@@ -16,9 +16,9 @@
 | Step 0: project folder, docs unzipped, `CLAUDE.md`, `.gitignore`, `.gitattributes` | ✅ Done |
 | First Git commit, pushed to GitHub | ✅ Done: **public** repo `https://github.com/taroserigano777/ai-commerce`, branch `main` |
 | Step 1: fix the handoff docs | ✅ Done (2026-09-25, Windows laptop) |
-| Step 2: Milestone 1 | 🟡 In progress |
+| Step 2: Milestone 1 (sign-in and shopping foundation) | ✅ Built and tested locally (2026-09-25). Pinecone semantic search is waiting on a free index slot; see Open items. |
 | Steps 3–8: build | ⬜ Not started |
-| Application code | ⬜ None yet |
+| Application code | ✅ Milestone 1: see README.md |
 
 ---
 
@@ -79,9 +79,11 @@ ai-commerce/
 
    To use a different email, just set a different value.
 
-2. **Personal AWS account ID** (12 digits). It is needed for Terraform's `allowed_account_ids`, but only in Step 7.
+2. **Pinecone index slot.** The Pinecone project is at its 5-index limit and none of the existing indexes uses hosted embeddings. Decision (2026-09-25): free one slot (delete an old index or upgrade), then set `PINECONE_INDEX_NAME=ai-commerce` in `.env` and run `pnpm reindex`; the app creates its own index. Until then search is keyword-only and says so. The app refuses to write to any index it didn't create.
 
-3. **Accounts and keys** to get before the steps that need them:
+3. **Personal AWS account ID** (12 digits). It is needed for Terraform's `allowed_account_ids`, but only in Step 7.
+
+4. **Accounts and keys** to get before the steps that need them:
    - Stripe test mode, plus the Stripe CLI, and Stripe Tax with a test state registration.
    - Pinecone.
    - An LLM key (start with Claude Sonnet 5).
@@ -116,17 +118,30 @@ git config user.name  "taroserigano777"
 
 ---
 
+## Milestone 1 build notes (2026-09-25, Windows laptop)
+
+Built natively on Windows (Git Bash/PowerShell, Docker Desktop), not inside WSL; everything ran fine from `C:\...`. Choices made while building, beyond the plan:
+
+| Topic | Choice | Why |
+|---|---|---|
+| Outbox worker location | `services/commerce/src/commerce/outbox/`, run with `pnpm dev:outbox` | It shares the commerce models and database; a separate `workers/outbox` package would duplicate them. |
+| SQLAlchemy | Pinned to 2.0.54, not 2.1 | The OTel SQLAlchemy instrumentation supports < 2.1; with 2.1 there were no database spans. |
+| FastAPI route guard | Walks nested routers and cross-checks against the OpenAPI schema | FastAPI 0.141 no longer flattens included routers, so a naive check passed vacuously. |
+| Sessions | Server-side sessions in PostgreSQL; the cookie holds a random token, only its SHA-256 is stored | Sign-out and password reset can end sessions immediately. |
+| Back after sign-out | Inline script re-checks the session on back/forward loads | Next's dev server sends `no-cache` (not `no-store`), so Back could show a private page. Production sends `no-store`; the guard covers both. |
+| Search latency | Pinecone gets a 250 ms budget (`SEMANTIC_TIMEOUT_MS`); after that, keyword results are returned | Keeps search p95 under the 300 ms target when Pinecone is slow. |
+| Tracing start | Traces start at the Next.js server render, not the browser | The plan keeps browser tracing minimal; real-browser LCP/INP are sent as metrics instead. |
+| Brand | "Larkspur": original name, logo, and placeholder art | README forbids copying another retailer. |
+
+Known gaps to pick up later: sign-in rate limiting trusts `X-Forwarded-For` (fine behind the ALB; tighten in Step 7); the Cognito OIDC adapter and password-reset email are unverified or missing; the search baseline was recorded keyword-only and should be re-recorded once Pinecone is connected.
+
+---
+
 ## Next steps, in order
 
-1. **Clone on Windows** and set the repo Git email (see "Moving to the Windows laptop").
-2. **Step 1.** Edit `docs/handoff/*.md` to match the plan. The plan's Step 1 table lists every edit. The exit check is:
-
-   ```bash
-   grep -riE "treg|pgvector|PostgreSQL vector search|deterministic substitute" docs/handoff
-   ```
-
-   It must find nothing. Commit.
-3. **Step 2 (Milestone 1).** Build sign-in first, then the shopping foundation, monitoring, and search evals. Follow the plan.
+1. ~~Clone on Windows.~~ Done. ~~Step 1 (fix the handoff docs).~~ Done. ~~Step 2 (Milestone 1).~~ Done.
+2. **Free a Pinecone slot**, set `PINECONE_INDEX_NAME=ai-commerce`, run `pnpm reindex`, then `pnpm eval:search --record-baseline` to record the hybrid baseline.
+3. **Step 3 (Milestone 2): checkout and orders.** Needs a Stripe test-mode account, the Stripe CLI, and Stripe Tax with a test state registration.
 
 ---
 

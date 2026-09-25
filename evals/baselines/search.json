@@ -1,0 +1,138 @@
+{
+  "ran_at": "2026-09-25T22:32:58+00:00",
+  "split": "all",
+  "queries": 54,
+  "backends_seen": {
+    "keyword=ok": 54,
+    "semantic=unavailable": 54
+  },
+  "overall": {
+    "ndcg@10": 0.9084,
+    "recall@10": 0.8843,
+    "mrr": 0.9259
+  },
+  "by_type": {
+    "keyword": {
+      "ndcg@10": 0.9813,
+      "recall@10": 0.9828,
+      "mrr": 0.9828
+    },
+    "semantic": {
+      "ndcg@10": 0.8074,
+      "recall@10": 0.75,
+      "mrr": 0.8409
+    },
+    "sku": {
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0
+    },
+    "typo": {
+      "ndcg@10": 0.9159,
+      "recall@10": 0.875,
+      "mrr": 1.0
+    }
+  },
+  "worst": [
+    {
+      "id": "q32",
+      "type": "semantic",
+      "query": "grow vegetables at home",
+      "top": [
+        "harbor-home-linen-sheets",
+        "harbor-home-throw-blanket",
+        "harbor-home-glass-containers",
+        "harbor-home-scented-candle"
+      ],
+      "ndcg@10": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "id": "q36",
+      "type": "semantic",
+      "query": "weights for home gym",
+      "top": [
+        "harbor-home-linen-sheets",
+        "harbor-home-throw-blanket",
+        "harbor-home-glass-containers",
+        "harbor-home-scented-candle"
+      ],
+      "ndcg@10": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "id": "q54",
+      "type": "semantic",
+      "query": "present for someone who loves the outdoors",
+      "top": [],
+      "ndcg@10": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "id": "q10",
+      "type": "keyword",
+      "query": "webcam for video calls",
+      "top": [
+        "lumen-tablet-10",
+        "lumen-hd-webcam"
+      ],
+      "ndcg@10": 0.6309297535714574,
+      "recall@10": 1.0,
+      "mrr": 0.5
+    },
+    {
+      "id": "q30",
+      "type": "semantic",
+      "query": "light for camping at night",
+      "top": [
+        "pebble-pine-puzzle-1000",
+        "summit-forge-headlamp",
+        "tempo-resistance-bands",
+        "lumen-hd-webcam",
+        "summit-forge-camp-chair"
+      ],
+      "ndcg@10": 0.6309297535714574,
+      "recall@10": 1.0,
+      "mrr": 0.5
+    },
+    {
+      "id": "q03",
+      "type": "semantic",
+      "query": "noise cancelling headphones for travel",
+      "top": [
+        "sonora-arc-wireless-headphones",
+        "sonora-studio-wired-headphones",
+        "sonora-kids-headphones"
+      ],
+      "ndcg@10": 0.8262346571285599,
+      "recall@10": 0.5,
+      "mrr": 1.0
+    },
+    {
+      "id": "q12",
+      "type": "semantic",
+      "query": "kettle for pour over coffee",
+      "top": [
+        "kettleworth-gooseneck-kettle",
+        "sonora-arc-wireless-headphones"
+      ],
+      "ndcg@10": 0.8262346571285599,
+      "recall@10": 0.5,
+      "mrr": 1.0
+    },
+    {
+      "id": "q18",
+      "type": "semantic",
+      "query": "something to keep coffee hot",
+      "top": [
+        "kettleworth-french-press"
+      ],
+      "ndcg@10": 0.8262346571285599,
+      "recall@10": 0.5,
+      "mrr": 1.0
+    }
+  ]
+}

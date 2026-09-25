@@ -1,0 +1,54 @@
+{"id": "q01", "query": "wireless headphones", "type": "keyword", "relevant": {"sonora-arc-wireless-headphones": 2, "sonora-pulse-wireless-earbuds": 1, "sonora-studio-wired-headphones": 1, "sonora-kids-headphones": 1}, "split": "dev"}
+{"id": "q02", "query": "waterproof shoes for rain", "type": "semantic", "relevant": {"stridewell-rain-boots": 2, "stridewell-trail-runner-gtx": 2, "driftwood-rain-shell": 1}, "split": "dev"}
+{"id": "q03", "query": "noise cancelling headphones for travel", "type": "semantic", "relevant": {"sonora-arc-wireless-headphones": 2, "sonora-pulse-wireless-earbuds": 1}, "split": "dev"}
+{"id": "q04", "query": "earbuds for running", "type": "semantic", "relevant": {"sonora-pulse-wireless-earbuds": 2}, "split": "test"}
+{"id": "q05", "query": "bluetooth speaker", "type": "keyword", "relevant": {"lumen-beam-bluetooth-speaker": 2}, "split": "dev"}
+{"id": "q06", "query": "speaker for the beach", "type": "semantic", "relevant": {"lumen-beam-bluetooth-speaker": 2}, "split": "dev"}
+{"id": "q07", "query": "smart light bulbs", "type": "keyword", "relevant": {"lumen-glow-smart-bulb-4pk": 2}, "split": "dev"}
+{"id": "q08", "query": "tablet for kids", "type": "semantic", "relevant": {"lumen-tablet-10": 2, "sonora-kids-headphones": 1}, "split": "test"}
+{"id": "q09", "query": "portable phone charger", "type": "semantic", "relevant": {"lumen-power-bank-20k": 2}, "split": "dev"}
+{"id": "q10", "query": "webcam for video calls", "type": "keyword", "relevant": {"lumen-hd-webcam": 2}, "split": "dev"}
+{"id": "q11", "query": "headphones for kids", "type": "keyword", "relevant": {"sonora-kids-headphones": 2}, "split": "dev"}
+{"id": "q12", "query": "kettle for pour over coffee", "type": "semantic", "relevant": {"kettleworth-gooseneck-kettle": 2, "kettleworth-french-press": 1}, "split": "test"}
+{"id": "q13", "query": "cast iron pan", "type": "keyword", "relevant": {"kettleworth-cast-iron-skillet": 2}, "split": "dev"}
+{"id": "q14", "query": "kitchen knife", "type": "keyword", "relevant": {"kettleworth-chef-knife": 2}, "split": "dev"}
+{"id": "q15", "query": "linen bed sheets", "type": "keyword", "relevant": {"harbor-home-linen-sheets": 2}, "split": "dev"}
+{"id": "q16", "query": "cozy blanket for the couch", "type": "semantic", "relevant": {"harbor-home-throw-blanket": 2}, "split": "test"}
+{"id": "q17", "query": "meal prep containers", "type": "semantic", "relevant": {"harbor-home-glass-containers": 2}, "split": "dev"}
+{"id": "q18", "query": "something to keep coffee hot", "type": "semantic", "relevant": {"kettleworth-french-press": 2, "summit-forge-water-bottle": 1}, "split": "dev"}
+{"id": "q19", "query": "candle", "type": "keyword", "relevant": {"harbor-home-scented-candle": 2}, "split": "dev"}
+{"id": "q20", "query": "mixing bowls", "type": "keyword", "relevant": {"kettleworth-mixing-bowls": 2}, "split": "test"}
+{"id": "q21", "query": "rain boots", "type": "keyword", "relevant": {"stridewell-rain-boots": 2}, "split": "dev"}
+{"id": "q22", "query": "trail running shoes", "type": "keyword", "relevant": {"stridewell-trail-runner-gtx": 2, "stridewell-everyday-sneaker": 1}, "split": "dev"}
+{"id": "q23", "query": "white sneakers", "type": "keyword", "relevant": {"stridewell-everyday-sneaker": 2}, "split": "dev"}
+{"id": "q24", "query": "jacket for rainy commute", "type": "semantic", "relevant": {"driftwood-rain-shell": 2}, "split": "test"}
+{"id": "q25", "query": "warm wool sweater", "type": "keyword", "relevant": {"driftwood-merino-crew": 2}, "split": "dev"}
+{"id": "q26", "query": "t-shirt", "type": "keyword", "relevant": {"driftwood-organic-tee": 2}, "split": "dev"}
+{"id": "q27", "query": "socks for hiking", "type": "keyword", "relevant": {"driftwood-wool-socks-3pk": 2}, "split": "dev"}
+{"id": "q28", "query": "tent for two people", "type": "semantic", "relevant": {"summit-forge-2p-tent": 2}, "split": "test"}
+{"id": "q29", "query": "sleeping bag", "type": "keyword", "relevant": {"summit-forge-sleeping-bag": 2}, "split": "dev"}
+{"id": "q30", "query": "light for camping at night", "type": "semantic", "relevant": {"summit-forge-headlamp": 2}, "split": "dev"}
+{"id": "q31", "query": "insulated water bottle", "type": "keyword", "relevant": {"summit-forge-water-bottle": 2}, "split": "dev"}
+{"id": "q32", "query": "grow vegetables at home", "type": "semantic", "relevant": {"verdant-raised-garden-bed": 2, "verdant-garden-hose": 1}, "split": "test"}
+{"id": "q33", "query": "garden hose", "type": "keyword", "relevant": {"verdant-garden-hose": 2}, "split": "dev"}
+{"id": "q34", "query": "folding chair", "type": "keyword", "relevant": {"summit-forge-camp-chair": 2}, "split": "dev"}
+{"id": "q35", "query": "yoga mat", "type": "keyword", "relevant": {"tempo-yoga-mat": 2}, "split": "dev"}
+{"id": "q36", "query": "weights for home gym", "type": "semantic", "relevant": {"tempo-adjustable-dumbbells": 2, "tempo-resistance-bands": 1}, "split": "test"}
+{"id": "q37", "query": "jump rope", "type": "keyword", "relevant": {"tempo-jump-rope": 2}, "split": "dev"}
+{"id": "q38", "query": "muscle recovery after workout", "type": "semantic", "relevant": {"tempo-foam-roller": 2, "tempo-resistance-bands": 1}, "split": "dev"}
+{"id": "q39", "query": "toy blocks for toddlers", "type": "semantic", "relevant": {"pebble-pine-wooden-blocks": 2}, "split": "dev"}
+{"id": "q40", "query": "jigsaw puzzle", "type": "keyword", "relevant": {"pebble-pine-puzzle-1000": 2}, "split": "test"}
+{"id": "q41", "query": "family board game", "type": "semantic", "relevant": {"pebble-pine-board-game": 2, "pebble-pine-puzzle-1000": 1}, "split": "dev"}
+{"id": "q42", "query": "stuffed animal", "type": "keyword", "relevant": {"pebble-pine-plush-otter": 2}, "split": "dev"}
+{"id": "q43", "query": "remote control car", "type": "keyword", "relevant": {"pebble-pine-rc-car": 2}, "split": "dev"}
+{"id": "q44", "query": "sunscreen moisturizer", "type": "semantic", "relevant": {"verdant-botanicals-face-moisturizer": 2}, "split": "test"}
+{"id": "q45", "query": "plastic-free shampoo", "type": "semantic", "relevant": {"verdant-botanicals-shampoo-bar": 2}, "split": "dev"}
+{"id": "q46", "query": "electric toothbrush", "type": "keyword", "relevant": {"verdant-botanicals-electric-toothbrush": 2}, "split": "dev"}
+{"id": "q47", "query": "notebook for journaling", "type": "semantic", "relevant": {"quillmark-dotted-notebook": 2}, "split": "dev"}
+{"id": "q48", "query": "desk lamp", "type": "keyword", "relevant": {"quillmark-desk-lamp": 2}, "split": "test"}
+{"id": "q49", "query": "backpack for laptop", "type": "keyword", "relevant": {"quillmark-laptop-backpack": 2}, "split": "dev"}
+{"id": "q50", "query": "gift card", "type": "keyword", "relevant": {"larkspur-gift-card": 2}, "split": "dev"}
+{"id": "q51", "query": "headphnes", "type": "typo", "relevant": {"sonora-arc-wireless-headphones": 1, "sonora-studio-wired-headphones": 1, "sonora-kids-headphones": 1, "sonora-pulse-wireless-earbuds": 1}, "split": "dev"}
+{"id": "q52", "query": "dumbels", "type": "typo", "relevant": {"tempo-adjustable-dumbbells": 2}, "split": "test"}
+{"id": "q53", "query": "SON-ARC-WIR-HEA-MID", "type": "sku", "relevant": {"sonora-arc-wireless-headphones": 2}, "split": "dev"}
+{"id": "q54", "query": "present for someone who loves the outdoors", "type": "semantic", "relevant": {"summit-forge-headlamp": 1, "summit-forge-water-bottle": 1, "summit-forge-2p-tent": 1, "summit-forge-sleeping-bag": 1, "driftwood-wool-socks-3pk": 1, "larkspur-gift-card": 1}, "split": "dev"}

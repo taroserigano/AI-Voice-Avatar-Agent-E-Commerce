@@ -1,0 +1,86 @@
+# OTel Collector: receive from every service, remove personal data, sample, export.
+# Services already scrub in-process (packages/telemetry); this is the second, central layer.
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+        cors:
+          allowed_origins: ["http://localhost:3000"]
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 400
+
+  # Drop attributes that identify a person outright, whatever their value.
+  attributes/drop-pii:
+    actions:
+      - { key: enduser.id, action: delete }
+      - { key: user.email, action: delete }
+      - { key: user.name, action: delete }
+      - { key: user.full_name, action: delete }
+      - { key: http.request.header.cookie, action: delete }
+      - { key: http.request.header.authorization, action: delete }
+      - { key: http.response.header.set_cookie, action: delete }
+
+  # Mask emails (plain or URL-encoded) and card-like digit runs anywhere they remain.
+  transform/redact:
+    error_mode: ignore
+    trace_statements:
+      - context: span
+        statements:
+          - replace_all_patterns(attributes, "value", "[A-Za-z0-9._%+-]+(@|%40)[A-Za-z0-9.-]+\\.[A-Za-z]{2,}", "[REDACTED_EMAIL]")
+          - replace_all_patterns(attributes, "value", "\\b(?:\\d[ -]?){12,18}\\d\\b", "[REDACTED_NUMBER]")
+          - replace_pattern(name, "[A-Za-z0-9._%+-]+(@|%40)[A-Za-z0-9.-]+\\.[A-Za-z]{2,}", "[REDACTED_EMAIL]")
+      - context: spanevent
+        statements:
+          - replace_all_patterns(attributes, "value", "[A-Za-z0-9._%+-]+(@|%40)[A-Za-z0-9.-]+\\.[A-Za-z]{2,}", "[REDACTED_EMAIL]")
+          - replace_all_patterns(attributes, "value", "\\b(?:\\d[ -]?){12,18}\\d\\b", "[REDACTED_NUMBER]")
+    log_statements:
+      - context: log
+        statements:
+          - replace_pattern(body, "[A-Za-z0-9._%+-]+(@|%40)[A-Za-z0-9.-]+\\.[A-Za-z]{2,}", "[REDACTED_EMAIL]")
+          - replace_pattern(body, "\\b(?:\\d[ -]?){12,18}\\d\\b", "[REDACTED_NUMBER]")
+          - replace_all_patterns(attributes, "value", "[A-Za-z0-9._%+-]+(@|%40)[A-Za-z0-9.-]+\\.[A-Za-z]{2,}", "[REDACTED_EMAIL]")
+
+  # Keep every error, money operation, and voice confirmation; sample the rest.
+  tail_sampling:
+    decision_wait: 10s
+    policies:
+      - name: errors
+        type: status_code
+        status_code: { status_codes: [ERROR] }
+      - name: money-and-voice
+        type: string_attribute
+        string_attribute: { key: app.critical, values: ["money", "voice_confirmation"] }
+      - name: baseline
+        type: probabilistic
+        probabilistic:
+          sampling_percentage: ${env:OTEL_BASELINE_SAMPLING_PERCENT}
+
+  batch: {}
+
+exporters:
+  otlp/lgtm:
+    endpoint: lgtm:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, attributes/drop-pii, transform/redact, tail_sampling, batch]
+      exporters: [otlp/lgtm]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlp/lgtm]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, attributes/drop-pii, transform/redact, batch]
+      exporters: [otlp/lgtm]

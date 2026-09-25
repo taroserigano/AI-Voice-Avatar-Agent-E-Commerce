@@ -1,0 +1,44 @@
+[project]
+name = "ai-commerce"
+version = "0.1.0"
+description = "AI commerce monorepo (Python workspace root)"
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["services/commerce", "packages/telemetry"]
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "ruff==0.16.9",
+    "mypy==2.3.1",
+    "types-redis",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "SIM"]
+ignore = [
+    "S101", # assert is fine in tests
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S105", "S106", "S311", "S603", "S607"]
+"**/seed/**" = ["S105", "S106"]
+"scripts/generate_placeholders.py" = ["E501"]  # inline SVG markup
+
+[tool.ruff.lint.isort]
+known-first-party = ["commerce", "ai_commerce_telemetry", "tests"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]

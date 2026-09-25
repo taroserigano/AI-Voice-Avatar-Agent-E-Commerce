@@ -1,0 +1,89 @@
+# Local infrastructure. The apps (web, commerce API, outbox worker) run on the host with
+# `pnpm dev`; see the README. Pinecone is always the real cloud service, so it isn't here.
+name: ai-commerce
+
+services:
+  postgres:
+    image: postgres:17.11-alpine
+    environment:
+      POSTGRES_USER: commerce
+      POSTGRES_PASSWORD: commerce
+      POSTGRES_DB: commerce
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U commerce -d commerce"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:8.6-alpine
+    # Cache only: no persistence, so nothing authoritative can hide here.
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  opensearch:
+    image: opensearchproject/opensearch:3.8.0
+    environment:
+      discovery.type: single-node
+      DISABLE_SECURITY_PLUGIN: "true"
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+      OPENSEARCH_JAVA_OPTS: -Xms1g -Xmx1g
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+      nofile: { soft: 65536, hard: 65536 }
+    ports: ["9200:9200"]
+    volumes:
+      - osdata:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=2s || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+
+  temporal:
+    # Temporal CLI dev server with its web UI on :8233. Used from Milestone 2.
+    image: temporalio/temporal:1.9.1
+    # The image's default user can't write to a fresh named volume; local dev only.
+    user: "0:0"
+    command: ["server", "start-dev", "--ip", "0.0.0.0", "--db-filename", "/data/temporal.db"]
+    ports: ["7233:7233", "8233:8233"]
+    volumes:
+      - temporaldata:/data
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.161.0
+    command: ["--config=/etc/otelcol/config.yaml"]
+    environment:
+      # Local default keeps every trace so you can find them in Grafana; the cloud uses 10.
+      OTEL_BASELINE_SAMPLING_PERCENT: ${OTEL_BASELINE_SAMPLING_PERCENT:-100}
+    volumes:
+      - ./otel/collector.yaml:/etc/otelcol/config.yaml:ro
+    ports:
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+    depends_on: [lgtm]
+
+  lgtm:
+    # Grafana + Tempo + Loki + Prometheus in one container. Development only.
+    image: grafana/otel-lgtm:0.34.0
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+    ports: ["3001:3000"]
+    volumes:
+      - ./grafana/dashboards:/otel-lgtm/ai-commerce-dashboards:ro
+      - ./grafana/provisioning/dashboards.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/ai-commerce.yaml:ro
+
+volumes:
+  pgdata:
+  osdata:
+  temporaldata:

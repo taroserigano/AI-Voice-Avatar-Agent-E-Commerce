@@ -1,0 +1,37 @@
+"""Import every model so SQLAlchemy metadata (and Alembic autogenerate) sees all tables."""
+
+from commerce.auth.models import AuthSession, PasswordResetToken, Role, User
+from commerce.cart.models import Cart, CartItem
+from commerce.catalog.models import (
+    Category,
+    InventoryBalance,
+    PolicyClass,
+    Price,
+    Product,
+    StockLocation,
+    Variant,
+)
+from commerce.db import Base
+from commerce.orders.models import Order, OrderLine, OrderStatus
+from commerce.outbox.models import OutboxEvent
+
+__all__ = [
+    "AuthSession",
+    "Base",
+    "Cart",
+    "CartItem",
+    "Category",
+    "InventoryBalance",
+    "Order",
+    "OrderLine",
+    "OrderStatus",
+    "OutboxEvent",
+    "PasswordResetToken",
+    "PolicyClass",
+    "Price",
+    "Product",
+    "Role",
+    "StockLocation",
+    "User",
+    "Variant",
+]

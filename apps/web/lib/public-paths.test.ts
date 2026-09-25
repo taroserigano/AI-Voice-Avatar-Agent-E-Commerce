@@ -1,0 +1,22 @@
+import { describe, expect, it } from "vitest";
+import { isPublicPath } from "./public-paths";
+
+describe("isPublicPath", () => {
+  it.each([
+    "/sign-in",
+    "/sign-up",
+    "/forgot-password",
+    "/reset-password",
+    "/privacy",
+    "/terms",
+    "/accessibility",
+    "/api/v1/auth/sign-in",
+    "/_next/static/chunk.js",
+    "/images/products/sonora-arc-wireless-headphones.svg",
+  ])("%s is public", (path) => expect(isPublicPath(path)).toBe(true));
+
+  it.each(["/", "/cart", "/search", "/products/0b6c", "/orders", "/c/electronics", "/sign-inx", "/privacyx"])(
+    "%s needs sign-in",
+    (path) => expect(isPublicPath(path)).toBe(false),
+  );
+});
