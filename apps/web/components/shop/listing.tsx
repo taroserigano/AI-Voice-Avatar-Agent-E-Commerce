@@ -173,7 +173,7 @@ export function Listing({
   return (
     <div>
       {category ? (
-        <CategoryBanner category={category} total={page.total} images={page.items.slice(0, 3).map((p) => p.image_path)} />
+        <CategoryBanner category={category} total={page.total} images={[...new Set(page.items.map((p) => p.image_path))].slice(0, 3)} />
       ) : (
         <SearchHeader heading={heading} total={page.total} query={params.q?.trim()} />
       )}
