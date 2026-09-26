@@ -215,7 +215,7 @@ def main() -> int:
 
     baseline_path = BASELINES / f"planner-{args.provider}.json"
     if args.record_baseline:
-        baseline_path.write_text(json.dumps(result, indent=2) + "\n", "utf-8")
+        baseline_path.write_text(json.dumps(result, indent=2) + "\n", "utf-8", newline="\n")
         print(f"recorded {baseline_path.relative_to(EVALS.parent)}")
     elif baseline_path.exists():
         baseline = json.loads(baseline_path.read_text("utf-8"))
