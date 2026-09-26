@@ -1,7 +1,8 @@
 # 8. Assistant v2 — implementation
 
-Status: **P3 retrieval package and P4 planner service done** (2026-09-26). P0-P2 and the
-commerce side of P3/P4 wait for the catalog-stores commit.
+Status: **P3 retrieval package, P4 planner service, and the P0/P1 streaming package are done**
+(2026-09-26). Wiring them into `services/assistant` (P0-P2) and the commerce side of P3/P4
+wait for the catalog-stores commit.
 
 ## Tasks
 
@@ -47,6 +48,34 @@ P3 retrieval: `packages/retrieval` (`ai_commerce_retrieval`), a new uv workspace
   - Every collection is now created in strict mode, locally too, and indexes the fields its corpus filters on (`CORPUS_FILTERS`).
   - Reopening a collection adds indexes that were declared later.
   - Tests cover both behaviors.
+
+P0/P1 streaming: `packages/assistant-stream` (`ai_commerce_stream`), a new uv workspace member
+- [x] `events.py`: typed v2 events.
+  - Types: `turn.start`, `signals`, `agent.handoff`, `plan`, `tool.start`, `tool.progress`, `tool.end`, `text.delta`, `card`, `quote`, `ask`, `citations`, `done`, `error`, `resumed`.
+  - Every event carries `v`, `turn_id`, `agent` and `ts`.
+  - The JSON schema is exported for `packages/contracts`.
+- [x] `sse.py`: v2 encoding with `id:` and a `: ping` heartbeat.
+  - `to_v1` / `encode_v1` produce **exactly** the bytes of today's `turns.sse()`, checked by a golden test.
+  - Clients opt in with `X-Assistant-Stream: 2`.
+- [x] `store.py`: `assistant_turns` and `assistant_turn_events` in PostgreSQL.
+  - A partial unique index allows only one running turn per conversation.
+  - Turns left running by a dead process are reaped after 10 minutes.
+  - Finished turns are purged after 30 days.
+- [x] `runner.py`: `TurnRunner`.
+  - Turns run in a worker thread, detached from the HTTP connection.
+  - `follow()` replays events after `Last-Event-ID` (a `resumed` event comes first), then tails live ones with heartbeats. A follower in another process polls the store.
+  - A second turn on the same conversation gets `TurnInProgress` (409, with the running turn's ID).
+  - `cancel()` ends the turn with `done(status="canceled")`, and failures end it with a generic `error`.
+  - Another customer gets `TurnNotFound`.
+- [x] `responses.py`: `sse_response()` (Starlette `StreamingResponse` with no-store and no-buffering headers)
+- [x] Tests: 14 against real PostgreSQL.
+  - Resuming continues exactly where the client left off, and a disconnect doesn't stop the turn.
+  - One running turn per conversation, cross-customer isolation, cancel, failure, stale reaping, heartbeats, the v1 view, purge, and the v1 golden bytes.
+- [x] `ai_commerce_planner.stream_bridge`: `planner_producer()` turns a planner run into a turn.
+  - It streams `plan`, `tool.*`, a basket `card`, `text.delta` and `done`.
+  - `reverify_basket()` re-checks the planner's basket with the gateway's own catalog view, so tampered prices and injected items are fixed or dropped.
+  - Tested end to end over both transports through PostgreSQL.
+- [ ] Alembic: the assistant's migration history creates these two tables (after the merge)
 
 P4 shopping planner: `services/planner` (`ai_commerce_planner`), a new uv workspace member
 - [x] `constraints.py`: code parses budget, allergens, required tags and servings from the goal.

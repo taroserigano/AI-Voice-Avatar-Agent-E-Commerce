@@ -13,7 +13,9 @@ from tests.fakes import FakeCatalog
 
 pytestmark = [
     pytest.mark.openai,
-    pytest.mark.skipif(os.environ.get("PLANNER_LIVE_MODEL") != "1", reason="set PLANNER_LIVE_MODEL=1"),
+    pytest.mark.skipif(
+        os.environ.get("PLANNER_LIVE_MODEL") != "1", reason="set PLANNER_LIVE_MODEL=1"
+    ),
 ]
 
 
@@ -22,7 +24,9 @@ def test_real_model_plans_a_basket_that_code_accepts() -> None:
     catalog = FakeCatalog()
 
     events = list(
-        run_planner(PlannerRequest(goal="Three nut-free dinners for 2 under $30"), catalog, settings)
+        run_planner(
+            PlannerRequest(goal="Three nut-free dinners for 2 under $30"), catalog, settings
+        )
     )
 
     done = events[-1]

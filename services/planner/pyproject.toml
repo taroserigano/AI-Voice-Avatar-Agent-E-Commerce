@@ -16,7 +16,11 @@ dependencies = [
     "fastapi==0.141.1",
     "uvicorn==0.54.0",
     "pyjwt==2.10.1",
+    "ai-commerce-stream",
 ]
+
+[tool.uv.sources]
+ai-commerce-stream = { workspace = true }
 
 [project.scripts]
 planner-a2a = "ai_commerce_planner.a2a_server:main"
@@ -31,5 +35,6 @@ packages = ["src/ai_commerce_planner"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = [
+    "integration: needs PostgreSQL (pnpm local:up)",
     "openai: calls the real OpenAI API (costs money; opt in with PLANNER_LIVE_MODEL=1)",
 ]

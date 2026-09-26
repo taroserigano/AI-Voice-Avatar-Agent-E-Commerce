@@ -13,6 +13,7 @@ members = [
     "ai-commerce",
     "ai-commerce-planner",
     "ai-commerce-retrieval",
+    "ai-commerce-stream",
     "ai-commerce-telemetry",
     "commerce",
 ]
@@ -69,6 +70,7 @@ version = "0.1.0"
 source = { editable = "services/planner" }
 dependencies = [
     { name = "a2a-sdk", extra = ["http-server"] },
+    { name = "ai-commerce-stream" },
     { name = "deepagents" },
     { name = "fastapi" },
     { name = "httpx" },
@@ -85,6 +87,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "a2a-sdk", extras = ["http-server"], specifier = "==1.1.5" },
+    { name = "ai-commerce-stream", editable = "packages/assistant-stream" },
     { name = "deepagents", specifier = "==0.7.19" },
     { name = "fastapi", specifier = "==0.141.1" },
     { name = "httpx", specifier = "==0.28.1" },
@@ -119,6 +122,25 @@ requires-dist = [
     { name = "pydantic", specifier = "==2.13.5" },
     { name = "pydantic-settings", specifier = "==2.15.0" },
     { name = "qdrant-client", specifier = "==1.19.1" },
+]
+
+[[package]]
+name = "ai-commerce-stream"
+version = "0.1.0"
+source = { editable = "packages/assistant-stream" }
+dependencies = [
+    { name = "psycopg", extra = ["binary"] },
+    { name = "pydantic" },
+    { name = "sqlalchemy" },
+    { name = "starlette" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "psycopg", extras = ["binary"], specifier = "==3.3.6" },
+    { name = "pydantic", specifier = "==2.13.5" },
+    { name = "sqlalchemy", specifier = "==2.0.54" },
+    { name = "starlette", specifier = ">=1.0" },
 ]
 
 [[package]]
