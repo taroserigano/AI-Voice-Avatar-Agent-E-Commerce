@@ -2,7 +2,7 @@ import { cn } from "@/lib/cn";
 import Link from "next/link";
 
 /**
- * The Larkspur mark: a flower spike (florets that shrink toward a marigold bud) on a
+ * The Serigan Mart mark: a flower spike (florets that shrink toward a marigold bud) on a
  * rounded violet tile. Pure geometry, no gradients or ids, so it can render many times per page.
  */
 export function LogoMark({ inverted = false, className }: { inverted?: boolean; className?: string }) {
@@ -46,13 +46,13 @@ export function Logo({
         inverted ? "text-white" : "text-ink",
         className,
       )}
-      aria-label="Larkspur home"
+      aria-label="Serigan Mart home"
     >
       <LogoMark
         inverted={inverted}
         className="transition-transform duration-300 ease-spring group-hover:-rotate-6 motion-reduce:group-hover:rotate-0"
       />
-      <span aria-hidden="true">Larkspur</span>
+      <span aria-hidden="true">Serigan Mart</span>
     </Link>
   );
 }

@@ -44,7 +44,7 @@ export function SignUpForm({ returnTo, minPasswordLength }: { returnTo: string; 
 
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-eyebrow text-brand-700">Join Larkspur</p>
+      <p className="text-xs font-semibold uppercase tracking-eyebrow text-brand-700">Join Serigan Mart</p>
       <h1 className="mt-2 font-display text-3xl font-semibold text-ink">Create your account</h1>
       <p className="mt-2 text-muted">It takes one short form.</p>
       <div ref={errorRef} tabIndex={-1} className="outline-none">

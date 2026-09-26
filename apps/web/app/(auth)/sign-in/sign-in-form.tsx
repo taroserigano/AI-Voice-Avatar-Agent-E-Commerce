@@ -86,7 +86,7 @@ export function SignInForm({ returnTo }: { returnTo: string }) {
 
       <div className="mt-8 flex items-center gap-3 text-sm text-muted">
         <span aria-hidden="true" className="h-px flex-1 bg-line" />
-        <span>New to Larkspur?</span>
+        <span>New to Serigan Mart?</span>
         <span aria-hidden="true" className="h-px flex-1 bg-line" />
       </div>
       <ButtonLink href={`/sign-up${withReturn}`} variant="outline" size="lg" className="mt-4 w-full">

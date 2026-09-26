@@ -44,7 +44,7 @@ export function Header({
               name="q"
               type="search"
               defaultValue={query}
-              placeholder="Search everything at Larkspur"
+              placeholder="Search everything at Serigan Mart"
               autoComplete="off"
               enterKeyHint="search"
               className="h-12 w-full rounded-full border border-line bg-sunken/70 pl-11 pr-14 text-base text-ink shadow-2xs inset-shadow-well transition-[background-color,border-color,box-shadow] duration-200 ease-snappy placeholder:text-muted hover:border-line-strong hover:bg-sunken focus-visible:border-brand-600 focus-visible:bg-raised focus-visible:outline-2 focus-visible:outline-transparent focus-visible:ring-4 focus-visible:ring-brand-500/20 sm:pr-28 [&::-webkit-search-cancel-button]:hidden"

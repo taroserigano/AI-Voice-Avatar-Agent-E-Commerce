@@ -74,7 +74,7 @@ def line_message(elig: LineEligibility, rules: PolicyRules) -> str:
     if elig.eligible:
         return {
             RefundTiming.INSTANT: "Refunded to your original payment method as soon as the "
-            "carrier or a Larkspur store scans your package.",
+            "carrier or a Serigan Mart store scans your package.",
             RefundTiming.AFTER_RECEIPT: "Refunded to your original payment method once our "
             "warehouse receives and checks the item.",
             RefundTiming.AFTER_INSPECTION: "Refunded to your original payment method after our "

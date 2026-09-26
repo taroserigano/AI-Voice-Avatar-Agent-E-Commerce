@@ -50,7 +50,7 @@ export function AccountMenu({ displayName, email }: { displayName: string; email
         >
           {initial}
         </span>
-        <span>
+        <span className="max-sm:sr-only">
           <span className="sr-only">Account menu for </span>
           Hi, {firstName}
         </span>

@@ -189,7 +189,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                       <span className={policy.tone === "final" ? "font-medium text-danger-700" : undefined}>{policy.detail}</span>
                     </TrustItem>
                     <TrustItem icon={LockIcon} title="Secure checkout">
-                      Checkout is handled by Stripe. Larkspur never stores your card number.
+                      Checkout is handled by Stripe. Serigan Mart never stores your card number.
                     </TrustItem>
                   </ul>
                 }

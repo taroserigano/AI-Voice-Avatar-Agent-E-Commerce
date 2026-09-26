@@ -85,7 +85,7 @@ export default async function HomePage() {
 
       <Hero firstName={firstName} picks={heroPicks} />
 
-      <section aria-label="Why shop with Larkspur" className="-mt-8 sm:-mt-14">
+      <section aria-label="Why shop with Serigan Mart" className="-mt-8 sm:-mt-14">
         <ul className="grid gap-px overflow-hidden rounded-3xl border border-line bg-line shadow-xs sm:grid-cols-2 lg:grid-cols-4">
           {VALUE_PROPS.map(({ icon: ItemIcon, title, body, soon }) => (
             <li key={title} className="flex gap-4 bg-raised p-5 sm:block sm:p-6">
@@ -356,7 +356,7 @@ function DepartmentTile({
 
 function PromoRow() {
   return (
-    <section aria-label="More from Larkspur" className="grid gap-4 lg:grid-cols-2 lg:gap-6">
+    <section aria-label="More from Serigan Mart" className="grid gap-4 lg:grid-cols-2 lg:gap-6">
       <div className="relative isolate flex min-h-64 flex-col justify-between gap-8 overflow-hidden rounded-3xl bg-accent-50 p-7 ring-1 ring-inset ring-accent-100 sm:p-10">
         <div
           aria-hidden="true"
@@ -364,7 +364,7 @@ function PromoRow() {
         />
         {/* eslint-disable-next-line @next/next/no-img-element -- local SVG illustrations */}
         <img
-          src="/images/products/larkspur-gift-card.svg"
+          src="/images/products/serigan-mart-gift-card.svg"
           alt=""
           width={640}
           height={640}
@@ -374,7 +374,7 @@ function PromoRow() {
         <div className="max-w-xs">
           <p className="text-xs font-semibold uppercase tracking-eyebrow text-accent-800">Gift cards</p>
           <h2 className="mt-3 font-display text-2xl font-semibold text-ink sm:text-3xl">Give them the choice.</h2>
-          <p className="mt-2 text-base text-ink-soft">Larkspur gift cards, good for everything in the store.</p>
+          <p className="mt-2 text-base text-ink-soft">Serigan Mart gift cards, good for everything in the store.</p>
         </div>
         <div>
           <ButtonLink href="/c/gift-cards" variant="outline">
@@ -401,7 +401,7 @@ function PromoRow() {
           <p className="text-xs font-semibold uppercase tracking-eyebrow text-accent-300">Coming soon</p>
           <h2 className="mt-3 font-display text-2xl font-semibold text-white sm:text-3xl">Help by text or voice.</h2>
           <p className="mt-2 text-base text-brand-200">
-            Ask the Larkspur assistant about products, orders, and returns, typing or talking. It&apos;s in the works.
+            Ask the Serigan Mart assistant about products, orders, and returns, typing or talking. It&apos;s in the works.
           </p>
         </div>
         <p className="text-sm text-brand-300">Until then, your orders live in one place.</p>

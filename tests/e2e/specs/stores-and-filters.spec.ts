@@ -12,10 +12,10 @@ test.describe("stores and diet filters", () => {
     const list = page.getByRole("list", { name: "Store list" });
     await expect(list.getByRole("listitem")).toHaveCount(10);
 
-    const map = page.locator("iframe[title^='Map showing'], [aria-label='Map of all Larkspur stores']").first();
+    const map = page.locator("iframe[title^='Map showing'], [aria-label='Map of all Serigan Mart stores']").first();
     await expect(map).toBeVisible();
 
-    const plano = list.getByRole("listitem").filter({ hasText: "Larkspur Plano Legacy" });
+    const plano = list.getByRole("listitem").filter({ hasText: "Serigan Mart Plano Legacy" });
     await plano.getByRole("button", { name: "Show on map" }).click();
     await expect(plano.getByRole("button", { name: "Shown on map" })).toHaveAttribute("aria-pressed", "true");
     await expect(plano.getByRole("link", { name: /Directions/ })).toHaveAttribute("href", /google\.com\/maps\/dir/);

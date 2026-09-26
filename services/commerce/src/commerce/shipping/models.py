@@ -1,7 +1,7 @@
 """Outbound shipments and their tracking history.
 
 Shipping is simulated until a carrier integration exists: carriers are fictional
-("Larkspur Ground", "Swiftline Parcel") and the storefront labels tracking as simulated.
+("Serigan Mart Ground", "Swiftline Parcel") and the storefront labels tracking as simulated.
 """
 
 from __future__ import annotations

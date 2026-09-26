@@ -1,6 +1,6 @@
-# Larkspur design system
+# Serigan Mart design system
 
-This is the guide for anyone restyling a Larkspur page. Tokens live in `apps/web/app/globals.css` (Tailwind v4 `@theme`). Primitives live in `apps/web/components/ui/*`, icons in `apps/web/components/icons.tsx`, and the logo in `apps/web/components/logo.tsx`. Copy the class strings below as written.
+This is the guide for anyone restyling a Serigan Mart page. Tokens live in `apps/web/app/globals.css` (Tailwind v4 `@theme`). Primitives live in `apps/web/components/ui/*`, icons in `apps/web/components/icons.tsx`, and the logo in `apps/web/components/logo.tsx`. Copy the class strings below as written.
 
 ## 1. Direction and principles
 
@@ -273,7 +273,7 @@ Icons are on a 24px grid with 1.75px strokes and `currentColor`. Available icons
     <form role="search" action="/search" className="relative flex-1 max-w-2xl">
       <label htmlFor="site-search" className="sr-only">Search products</label>
       <SearchIcon className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
-      <input id="site-search" name="q" type="search" placeholder="Search everything at Larkspur"
+      <input id="site-search" name="q" type="search" placeholder="Search everything at Serigan Mart"
         className="h-12 w-full rounded-full border border-transparent bg-sunken pl-11 pr-28 text-base text-ink placeholder:text-muted transition focus-visible:border-brand-600 focus-visible:bg-raised focus-visible:outline-transparent focus-visible:ring-4 focus-visible:ring-brand-500/20" />
       <button type="submit" className={buttonClasses("primary", "sm", "absolute right-1.5 top-1/2 -translate-y-1/2")}>Search</button>
     </form>
@@ -344,7 +344,7 @@ For a light alternative, use `bg-mesh-light text-ink` with an eyebrow in `text-b
     <nav aria-label="Legal"><h2 className="font-sans text-sm font-semibold text-white">Legal</h2>
       <ul className="mt-4 space-y-1 text-sm"><li><Link className="inline-flex min-h-11 items-center hover:text-white underline-offset-4 hover:underline" href="/privacy">Privacy</Link></li></ul></nav>
   </div>
-  <div className="border-t border-white/10"><p className={containerClasses("default", "py-6 text-xs text-brand-300")}>© Larkspur (demo store)</p></div>
+  <div className="border-t border-white/10"><p className={containerClasses("default", "py-6 text-xs text-brand-300")}>© Serigan Mart (demo store)</p></div>
 </footer>
 ```
 

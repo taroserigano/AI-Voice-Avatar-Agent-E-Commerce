@@ -1,4 +1,4 @@
-"""Store locator: the Larkspur stores, their hours, and whether each is open right now."""
+"""Store locator: the Serigan Mart stores, their hours, and whether each is open right now."""
 
 from __future__ import annotations
 

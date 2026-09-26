@@ -45,7 +45,7 @@ export default function NotFound() {
             id="not-found-search"
             name="q"
             type="search"
-            placeholder="Search everything at Larkspur"
+            placeholder="Search everything at Serigan Mart"
             className="h-13 w-full rounded-full border border-control bg-raised pl-11 pr-28 text-base text-ink shadow-sm placeholder:text-subtle transition focus-visible:border-brand-600 focus-visible:outline-transparent focus-visible:ring-4 focus-visible:ring-brand-500/20"
           />
           <button type="submit" className={buttonClasses("primary", "sm", "absolute right-2 top-1/2 -translate-y-1/2")}>

@@ -636,12 +636,12 @@ _HANDWRITTEN: tuple[ProductSeed, ...] = (
     ),
     # --- Gift Cards (final sale) ---
     ProductSeed(
-        "larkspur-gift-card",
-        "Larkspur Gift Card",
-        "Larkspur",
+        "serigan-mart-gift-card",
+        "Serigan Mart Gift Card",
+        "Serigan Mart",
         "gift-cards",
         2500,
-        "A digital Larkspur gift card delivered by email. Gift cards are final sale and "
+        "A digital Serigan Mart gift card delivered by email. Gift cards are final sale and "
         "can't be returned.",
         (
             VariantSeed("25", "$25", 999, price_cents=2500, attributes={"value": "$25"}),
@@ -713,12 +713,12 @@ _ENRICHMENT: dict[str, tuple[str, tuple[str, ...]]] = {
     "quillmark-gel-pens-12pk": ("pens", ()),
     "quillmark-desk-lamp": ("desk-lamp", ("energy-efficient", "usb-c")),
     "quillmark-laptop-backpack": ("backpack", ("water-resistant",)),
-    "larkspur-gift-card": ("gift-card", ()),
+    "serigan-mart-gift-card": ("gift-card", ()),
 }
 
-# Products with a photoreal 3D render (apps/web/public/images/products-3d/, made with the
-# scripts in docs/design). Everything else uses its illustration in images/products/.
-_RENDERED_3D = frozenset(
+# Products with a studio-style packshot photo (apps/web/public/images/products-photo/, generated
+# with OpenAI gpt-image-2.5). Everything else uses its illustration in images/products/.
+_PHOTOGRAPHED = frozenset(
     {
         "verdant-botanicals-face-moisturizer",
         "verdant-botanicals-shampoo-bar",
@@ -732,7 +732,7 @@ HANDWRITTEN_PRODUCTS: tuple[ProductSeed, ...] = tuple(
         p,
         product_type=_ENRICHMENT[p.slug][0],
         tags=_ENRICHMENT[p.slug][1],
-        image_path=f"/images/products-3d/{p.slug}.webp" if p.slug in _RENDERED_3D else None,
+        image_path=f"/images/products-photo/{p.slug}.png" if p.slug in _PHOTOGRAPHED else None,
     )
     for p in _HANDWRITTEN
 )

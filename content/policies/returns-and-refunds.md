@@ -31,7 +31,7 @@ warehouse inspects them**, which usually takes 3–5 business days after they ar
 ## When your refund is issued
 
 - **Instant refund:** an item under $25 that doesn't need inspection is refunded as soon
-  as the carrier scans your return package (or a Larkspur store scans it at drop-off).
+  as the carrier scans your return package (or a Serigan Mart store scans it at drop-off).
 - **Everything else:** refunded after the warehouse receives and inspects the item.
 
 Refunds always go back to **the original payment method**. We don't issue store credit.
@@ -54,7 +54,7 @@ Your bank may take a few business days to show the refund.
 2. Tell us why you're returning it and its condition. We'll show you exactly what you'll get
    back before you confirm.
 3. Confirm the return. You'll get a prepaid return label.
-4. Drop the package with the carrier, or at any Larkspur store's return drop-off. A store
+4. Drop the package with the carrier, or at any Serigan Mart store's return drop-off. A store
    drop-off counts the same as a carrier scan.
 
 For fresh or frozen food, choose the item and tell us what was wrong; there's nothing to

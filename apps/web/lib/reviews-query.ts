@@ -94,7 +94,7 @@ export function draftFrom(review: Pick<ReviewOut, "rating" | "title" | "body"> |
   return { rating: review?.rating ?? null, title: review?.title ?? "", body: review?.body ?? "" };
 }
 
-/** "Alice W." → "AW"; "Larkspur shopper" → "LS"; "" → "?". */
+/** "Alice W." → "AW"; "Serigan Mart shopper" → "SS"; "" → "?". */
 export function initials(name: string): string {
   const letters = name
     .split(/\s+/)

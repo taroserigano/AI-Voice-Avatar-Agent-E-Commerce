@@ -105,7 +105,7 @@ export function Footer({ categories }: { categories: CategoryOut[] }) {
             "flex flex-col gap-2 py-6 text-xs text-brand-300 sm:flex-row sm:items-center sm:justify-between",
           )}
         >
-          <p>© Larkspur (demo store)</p>
+          <p>© Serigan Mart (demo store)</p>
           <p>Product names, prices, and sample reviews are illustrative test data.</p>
         </div>
       </div>

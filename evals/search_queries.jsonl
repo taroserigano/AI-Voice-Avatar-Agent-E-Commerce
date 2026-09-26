@@ -47,11 +47,11 @@
 {"id": "q47", "query": "notebook for journaling", "type": "semantic", "relevant": {"quillmark-dotted-notebook": 2}, "split": "dev"}
 {"id": "q48", "query": "desk lamp", "type": "keyword", "relevant": {"quillmark-desk-lamp": 2}, "split": "test"}
 {"id": "q49", "query": "backpack for laptop", "type": "keyword", "relevant": {"quillmark-laptop-backpack": 2}, "split": "dev"}
-{"id": "q50", "query": "gift card", "type": "keyword", "relevant": {"larkspur-gift-card": 2}, "split": "dev"}
+{"id": "q50", "query": "gift card", "type": "keyword", "relevant": {"serigan-mart-gift-card": 2}, "split": "dev"}
 {"id": "q51", "query": "headphnes", "type": "typo", "relevant": {"sonora-arc-wireless-headphones": 1, "sonora-studio-wired-headphones": 1, "sonora-kids-headphones": 1, "sonora-pulse-wireless-earbuds": 1}, "split": "dev"}
 {"id": "q52", "query": "dumbels", "type": "typo", "relevant": {"tempo-adjustable-dumbbells": 2}, "split": "test"}
 {"id": "q53", "query": "SON-ARC-WIR-HEA-MID", "type": "sku", "relevant": {"sonora-arc-wireless-headphones": 2}, "split": "dev"}
-{"id": "q54", "query": "present for someone who loves the outdoors", "type": "semantic", "relevant": {"summit-forge-headlamp": 1, "summit-forge-water-bottle": 1, "summit-forge-2p-tent": 1, "summit-forge-sleeping-bag": 1, "driftwood-wool-socks-3pk": 1, "larkspur-gift-card": 1}, "split": "dev"}
+{"id": "q54", "query": "present for someone who loves the outdoors", "type": "semantic", "relevant": {"summit-forge-headlamp": 1, "summit-forge-water-bottle": 1, "summit-forge-2p-tent": 1, "summit-forge-sleeping-bag": 1, "driftwood-wool-socks-3pk": 1, "serigan-mart-gift-card": 1}, "split": "dev"}
 {"id": "a01", "query": "nonfat organic milk", "type": "attribute", "relevant_rule": {"product_type": ["milk"], "tags": ["organic", "fat-free"]}, "split": "dev"}
 {"id": "a02", "query": "sugar free yogurt", "type": "attribute", "relevant_rule": {"product_type": ["yogurt"], "tags": ["sugar-free"]}, "split": "dev"}
 {"id": "a03", "query": "lactose free milk", "type": "attribute", "relevant_rule": {"product_type": ["milk"], "tags": ["lactose-free"]}, "split": "dev"}

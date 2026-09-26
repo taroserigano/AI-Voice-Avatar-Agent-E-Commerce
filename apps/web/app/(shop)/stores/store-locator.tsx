@@ -37,16 +37,16 @@ type GoogleMaps = {
 declare global {
   interface Window {
     google?: { maps: GoogleMaps };
-    __larkspurMapsReady?: () => void;
+    __seriganMartMapsReady?: () => void;
   }
 }
 
 let mapsPromise: Promise<GoogleMaps> | null = null;
 function loadGoogleMaps(key: string): Promise<GoogleMaps> {
   mapsPromise ??= new Promise((resolve, reject) => {
-    window.__larkspurMapsReady = () => (window.google ? resolve(window.google.maps) : reject(new Error("no maps")));
+    window.__seriganMartMapsReady = () => (window.google ? resolve(window.google.maps) : reject(new Error("no maps")));
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&v=weekly&callback=__larkspurMapsReady`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&v=weekly&callback=__seriganMartMapsReady`;
     script.async = true;
     script.onerror = () => reject(new Error("Google Maps failed to load"));
     document.head.appendChild(script);
@@ -100,7 +100,7 @@ function InteractiveMap({
   }, [selected]);
 
   if (failed) return <EmbeddedMap store={selected} />;
-  return <div ref={el} role="region" aria-label="Map of all Larkspur stores" className="h-full min-h-80 w-full" />;
+  return <div ref={el} role="region" aria-label="Map of all Serigan Mart stores" className="h-full min-h-80 w-full" />;
 }
 
 // --- Keyless embed: one store at a time -------------------------------------------------

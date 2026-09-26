@@ -1,4 +1,4 @@
-# Larkspur: AI commerce demo
+# Serigan Mart: AI commerce demo
 
 A portfolio-quality online store with an AI shopping assistant. Everything sits behind
 sign-in: browse and search a catalog, keep a cart, and (in later milestones) check out with

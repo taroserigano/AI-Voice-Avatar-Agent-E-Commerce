@@ -65,7 +65,7 @@ ai-commerce/
 | 12 | AWS | **Taro's personal AWS account only, never RealPage's.** Use a CLI profile named `personal`, and pin Terraform with `allowed_account_ids`. |
 | 13 | Sign-in mechanism | **Extremely simple: check the email and password only, no additional layer.** No rate limiting, CAPTCHA, password reset, or Cognito/OIDC. The session cookie and the sign-in wall stay. Decided 2026-09-25. |
 | 14 | Catalog size and detail | **A large catalog (about 2,000 products)** with enough detail for LLM product Q&A ("non fat organic milk, not regular milk", "sugar free yogurt"): product type, controlled diet/feature tags, nutrition facts, ingredients, allergens, specs. Plus scripted Q&A and return/refund conversations for the assistant evals. Decided 2026-09-26. |
-| 15 | Stores | **10 Larkspur stores around Dallas, shown on a Google map.** Store locator only: online orders still ship from one warehouse and there's no store pickup. Decided 2026-09-26. |
+| 15 | Stores | **10 Serigan Mart stores around Dallas, shown on a Google map.** Store locator only: online orders still ship from one warehouse and there's no store pickup. Decided 2026-09-26. |
 | 16 | Local services | **No containers needed:** `pnpm local:up` runs PostgreSQL and OpenSearch natively. The app reads `COMMERCE_DATABASE_URL`, never the shared `.env`'s `DATABASE_URL` (another project's database). Decided 2026-09-26. |
 
 | 17 | Sandbox policy additions | **Accepted by Taro (2026-09-26):** a *perishable* return class (fresh and frozen food isn't sent back; spoiled or damaged items reported within 7 days of delivery are refunded without a return), a store return drop-off counts as the carrier scan, and shipping is $5.99, free at $35 after discounts. In the sandbox policy table in `docs/handoff/PRODUCT_REQUIREMENTS.md` and in `content/policies/`. |
@@ -137,7 +137,7 @@ Built natively on Windows (Git Bash/PowerShell, Docker Desktop), not inside WSL;
 | Back after sign-out | Inline script re-checks the session on back/forward loads | Next's dev server sends `no-cache` (not `no-store`), so Back could show a private page. Production sends `no-store`; the guard covers both. |
 | Search latency | Pinecone gets a 250 ms budget (`SEMANTIC_TIMEOUT_MS`); after that, keyword results are returned | Keeps search p95 under the 300 ms target when Pinecone is slow. |
 | Tracing start | Traces start at the Next.js server render, not the browser | The plan keeps browser tracing minimal; real-browser LCP/INP are sent as metrics instead. |
-| Brand | "Larkspur": original name, logo, and placeholder art | README forbids copying another retailer. |
+| Brand | "Serigan Mart": original name, logo, and placeholder art | README forbids copying another retailer. |
 
 Known gaps to pick up later: the search baseline was recorded keyword-only and should be re-recorded once Pinecone is connected.
 

@@ -21,7 +21,7 @@ export default function PrivacyPage() {
         <div role="note" className="mt-8 flex gap-3 rounded-2xl border border-brand-100 bg-brand-50 p-5 text-brand-900">
           <InfoIcon className="mt-0.5 text-brand-600" />
           <p className="leading-relaxed">
-            <strong className="font-semibold">Sandbox notice:</strong> Larkspur is a portfolio demonstration. This page
+            <strong className="font-semibold">Sandbox notice:</strong> Serigan Mart is a portfolio demonstration. This page
             describes how the demo handles data; a real privacy policy must be written and approved before any live use.
           </p>
         </div>

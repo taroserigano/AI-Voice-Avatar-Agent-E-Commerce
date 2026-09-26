@@ -87,7 +87,7 @@ DEV_ORDERS: tuple[OrderSpec, ...] = (
     ),
     OrderSpec(
         "alice-gift-card", "alice@example.com", OrderStatus.DELIVERED, 6, 6,
-        (LineSpec("larkspur-gift-card", "50", 1),),
+        (LineSpec("serigan-mart-gift-card", "50", 1),),
         "Gift card: final sale, never returnable.",
     ),
     OrderSpec(

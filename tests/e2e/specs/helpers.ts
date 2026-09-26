@@ -14,7 +14,8 @@ export async function signIn(page: Page, user: { email: string; password: string
 export async function signInFromScratch(page: Page, user: { email: string; password: string; name: string }) {
   await page.goto("/sign-in");
   await signIn(page, user);
-  await expect(page.getByText(`Hi, ${user.name}`)).toBeVisible();
+  // The account menu button; on phones the greeting is screen-reader text beside the avatar.
+  await expect(page.locator("summary", { hasText: `Hi, ${user.name}` })).toBeVisible();
 }
 
 /** Empty a user's cart through the API (via the web origin, with the page's cookie). */

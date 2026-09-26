@@ -41,12 +41,12 @@ _OTHER_CARDS = (("visa", "1881"), ("amex", "0005"), ("discover", "1117"))
 
 # Where each shopper's packages go (city only; no street addresses are stored).
 _CITIES = {"alice@example.com": "Austin, TX", "bob@example.com": "Seattle, WA"}
-_WAREHOUSE = "Larkspur Fulfillment Center, Fort Worth, TX"
+_WAREHOUSE = "Serigan Mart Fulfillment Center, Fort Worth, TX"
 _HUBS = {
     "Austin, TX": ("Dallas, TX", "Round Rock, TX"),
     "Seattle, WA": ("Denver, CO", "Kent, WA"),
 }
-_CARRIERS = (("Larkspur Ground", "Ground", "LG"), ("Swiftline Parcel", "2-Day", "SW"))
+_CARRIERS = (("Serigan Mart Ground", "Ground", "LG"), ("Swiftline Parcel", "2-Day", "SW"))
 
 POLICY_SUMMARY = (
     "Return most items within 30 days of delivery for a refund to the original payment "
@@ -192,7 +192,7 @@ def _upsert_shipment(db: Session, order: Order, email: str, now: datetime) -> No
         return
     rng = _rng("shipment", order.id)
     carrier, service, prefix = (
-        ("Larkspur E-Gift", "Email", "EG")
+        ("Serigan Mart E-Gift", "Email", "EG")
         if _is_digital(order)
         else _CARRIERS[rng.randrange(len(_CARRIERS))]
     )

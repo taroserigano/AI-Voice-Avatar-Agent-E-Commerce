@@ -127,7 +127,7 @@ def test_return_options_follow_the_sandbox_policy(alice: TestClient, db: Session
     gift = make_order(
         db,
         "alice@example.com",
-        [L("larkspur-gift-card", "50")],
+        [L("serigan-mart-gift-card", "50")],
         placed_days_ago=6,
         delivered_days_ago=6,
     )
@@ -155,7 +155,7 @@ def test_return_options_follow_the_sandbox_policy(alice: TestClient, db: Session
     )
 
     assert options(alice, old)["Gooseneck Electric Kettle"]["reason"] == "outside_window"
-    assert options(alice, gift)["Larkspur Gift Card"]["reason"] == "final_sale"
+    assert options(alice, gift)["Serigan Mart Gift Card"]["reason"] == "final_sale"
     assert options(alice, moving)["Grip Yoga Mat, 6 mm"]["reason"] == "not_delivered"
 
     body = alice.get(f"/v1/orders/{audio}/return-options").json()
@@ -376,7 +376,7 @@ def test_tracking_scans_are_in_time_order_and_gift_cards_are_emailed(
     gift = make_order(
         db,
         "alice@example.com",
-        [L("larkspur-gift-card", "50")],
+        [L("serigan-mart-gift-card", "50")],
         placed_days_ago=6,
         delivered_days_ago=6,
     )

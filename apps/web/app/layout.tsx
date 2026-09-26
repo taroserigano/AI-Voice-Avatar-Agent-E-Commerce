@@ -21,8 +21,8 @@ const bricolage = Bricolage_Grotesque({
 });
 
 export const metadata: Metadata = {
-  title: { default: "Larkspur", template: "%s · Larkspur" },
-  description: "Larkspur: everyday essentials, with a shopping assistant that helps by text or voice.",
+  title: { default: "Serigan Mart", template: "%s · Serigan Mart" },
+  description: "Serigan Mart: everyday essentials, with a shopping assistant that helps by text or voice.",
   // Everything behind sign-in: tell crawlers not to index.
   robots: { index: false, follow: false },
 };

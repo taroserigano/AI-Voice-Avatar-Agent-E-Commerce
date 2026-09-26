@@ -11,7 +11,7 @@ export default function AccessibilityPage() {
       </header>
 
       <p className="mt-6 text-lg leading-relaxed text-ink-soft">
-        Larkspur aims to meet the Web Content Accessibility Guidelines (WCAG) 2.2 at level AA. Every page works with a
+        Serigan Mart aims to meet the Web Content Accessibility Guidelines (WCAG) 2.2 at level AA. Every page works with a
         keyboard, shows where focus is, and labels its controls for screen readers. Sign-in works with password managers
         and allows pasting.
       </p>

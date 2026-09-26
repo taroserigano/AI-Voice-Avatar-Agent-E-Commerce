@@ -50,7 +50,7 @@ def author_name(display_name: str) -> str:
     """ "Alice Rivera" -> "Alice R."; shows enough to feel human without a full name."""
     parts = display_name.split()
     if not parts:
-        return "Larkspur shopper"
+        return "Serigan Mart shopper"
     if len(parts) == 1:
         return parts[0]
     return f"{parts[0]} {parts[-1][0].upper()}."

@@ -15,7 +15,7 @@ export default async function StoresPage() {
     <div>
       <h1 className="text-2xl font-bold">Stores near Dallas</h1>
       <p className="mt-1 text-muted">
-        {stores.length} Larkspur stores around Dallas-Fort Worth. Drop off a packaged return at any of them.
+        {stores.length} Serigan Mart stores around Dallas-Fort Worth. Drop off a packaged return at any of them.
       </p>
       <p className="mt-1 text-sm text-muted">Demo locations for this sandbox store; the addresses and phone numbers are made up.</p>
       <StoreLocator stores={stores} mapsKey={mapsKey} />

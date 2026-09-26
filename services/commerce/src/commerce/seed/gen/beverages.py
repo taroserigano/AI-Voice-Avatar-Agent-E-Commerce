@@ -397,7 +397,7 @@ def soda() -> list[ProductSeed]:
         out += _rows([(
             STORE_BRAND, title, "soda", n, [S("12PK", "12 x 12 fl oz cans", 4.99, 144), S("2L", "2 liter bottle", 1.49, 67.6)], f"{sweet}, {flav}.", (),
             ("vegan", "gluten-free", *(["caffeine-free"] if not mg else [])), {"Caffeine": f"{mg} mg per 12 fl oz can" if mg else "Caffeine free"},
-            f"Larkspur Kitchen {title.lower()}." + ("" if mg else " Caffeine free."),
+            f"Serigan Mart Kitchen {title.lower()}." + ("" if mg else " Caffeine free."),
         )], DRINK_CLAIMS)  # fmt: skip
     return out
 

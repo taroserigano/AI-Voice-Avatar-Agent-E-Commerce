@@ -76,7 +76,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen bg-canvas lg:grid lg:grid-cols-[minmax(0,1.08fr)_minmax(0,1fr)] lg:p-3">
       {/* ---------- Brand panel: compact band on phones, tall collage panel on desktop ---------- */}
       <aside
-        aria-label="About Larkspur"
+        aria-label="About Serigan Mart"
         className="relative isolate overflow-hidden bg-mesh-dark text-white focus-inverse lg:sticky lg:top-3 lg:h-[calc(100dvh-1.5rem)] lg:rounded-4xl"
       >
         {/* soft light bloom behind the collage */}

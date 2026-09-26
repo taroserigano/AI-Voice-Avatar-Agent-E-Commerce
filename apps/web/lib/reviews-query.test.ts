@@ -114,7 +114,7 @@ describe("display helpers", () => {
 
   it("builds avatar initials from the shortened display name", () => {
     expect(initials("Alice W.")).toBe("AW");
-    expect(initials("Larkspur shopper")).toBe("LS");
+    expect(initials("Serigan Mart shopper")).toBe("SS");
     expect(initials("Cher")).toBe("C");
     expect(initials("  ")).toBe("?");
   });

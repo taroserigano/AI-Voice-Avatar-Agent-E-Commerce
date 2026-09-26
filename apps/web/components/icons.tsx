@@ -1,5 +1,5 @@
 /**
- * Larkspur icon set: original inline SVGs on a 24px grid, 1.75px round strokes, `currentColor`.
+ * Serigan Mart icon set: original inline SVGs on a 24px grid, 1.75px round strokes, `currentColor`.
  *
  * - Decorative by default (`aria-hidden`). Pass `title` to make an icon a labelled image
  *   (only when the icon is the sole content of something meaningful and there's no other label).

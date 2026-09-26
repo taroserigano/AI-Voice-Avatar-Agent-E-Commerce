@@ -72,7 +72,7 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
 
       <footer className="border-t border-line bg-raised">
         <div className={containerClasses("default", "flex flex-wrap items-center justify-between gap-4 py-6 text-sm text-muted")}>
-          <p>© Larkspur (demo store). A portfolio demonstration, not a real store.</p>
+          <p>© Serigan Mart (demo store). A portfolio demonstration, not a real store.</p>
           <Link href="/sign-in" className="inline-flex min-h-11 items-center font-medium text-brand-700 underline decoration-brand-300 underline-offset-4 hover:decoration-brand-700">
             Sign in to shop
           </Link>

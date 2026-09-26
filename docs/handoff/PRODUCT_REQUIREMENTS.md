@@ -40,7 +40,7 @@ These fixed rules apply in development and tests. A responsible owner sets real 
 | Not returnable | "Final sale" category (for example, gift cards) |
 | Needs inspection | "Electronics" category |
 | Perishable | Fresh and frozen food (Dairy & Eggs, Fresh Produce, Meat & Seafood, Bakery & Bread, Frozen) isn't sent back: a damaged or spoiled item reported within 7 days of delivery is refunded without a return shipment; after 7 days it isn't refundable |
-| Instant refund | Items under $25 that don't need inspection: refund when the carrier scans the package, or a Larkspur store scans it at return drop-off |
+| Instant refund | Items under $25 that don't need inspection: refund when the carrier scans the package, or a Serigan Mart store scans it at return drop-off |
 | Other refunds | Refund after warehouse inspection |
 | Restocking fee | None |
 | Shipping refund | Only when the whole order is returned |
@@ -53,7 +53,7 @@ The customer-facing wording lives in `content/policies/` (versioned, with effect
 
 ### Stores
 
-A store locator lists the Larkspur stores around Dallas-Fort Worth (demo locations) on a Google map, with address, phone, hours, open-now status, services, and directions. Any store accepts packaged returns at its return drop-off. Stores don't sell online inventory or hold orders for pickup; online orders ship from one warehouse.
+A store locator lists the Serigan Mart stores around Dallas-Fort Worth (demo locations) on a Google map, with address, phone, hours, open-now status, services, and directions. Any store accepts packaged returns at its return drop-off. Stores don't sell online inventory or hold orders for pickup; online orders ship from one warehouse.
 
 ### Help and voice
 

@@ -39,7 +39,7 @@ DEPT_CODES: dict[str, str] = {
     "office": "OFF",
 }
 
-STORE_BRAND = "Larkspur Kitchen"  # the store's own grocery brand
+STORE_BRAND = "Serigan Mart Kitchen"  # the store's own grocery brand
 
 # The nine major US food allergens, spelled the way ``allergens`` uses them.
 ALLERGENS = ("milk", "egg", "fish", "shellfish", "tree nuts", "peanuts", "wheat", "soy", "sesame")

@@ -160,7 +160,7 @@ export function ProductReviews({
           <h2 id="reviews-heading" className="font-display text-2xl font-semibold text-ink sm:text-3xl">
             Ratings &amp; reviews
           </h2>
-          <p className="mt-2 text-base text-muted">Honest takes from Larkspur shoppers, good and bad.</p>
+          <p className="mt-2 text-base text-muted">Honest takes from Serigan Mart shoppers, good and bad.</p>
         </div>
       </div>
 

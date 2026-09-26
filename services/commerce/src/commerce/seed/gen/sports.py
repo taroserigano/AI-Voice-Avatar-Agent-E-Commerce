@@ -14,7 +14,7 @@ from commerce.seed.gen.common import Size, cents, item, options, slugify
 
 CAT = "sports"
 TEMPO = "Tempo Athletics"  # fitness, premium
-LARKSPUR = "Larkspur Sport"  # store brand, value
+OWN_BRAND = "Serigan Mart Sport"  # store brand, value
 COURTLINE = "Courtline"  # balls and racquets
 SPOKEHAVEN = "Spokehaven"  # bikes
 
@@ -68,7 +68,7 @@ def fitness() -> list[ProductSeed]:
         P(TEMPO, "yoga-mat", "Extra Thick Yoga Mat, 10 mm",
           "Extra-thick 10 mm foam mat that cushions knees and joints for yoga, Pilates, and floor exercises. Includes a carry strap.",
           one(29.99), [], {"Thickness": "10 mm", "Size": "72 x 24 in", "Material": "NBR foam", "Latex": "Latex free"}),
-        P(LARKSPUR, "yoga-mat", "Yoga Mat, 4 mm",
+        P(OWN_BRAND, "yoga-mat", "Yoga Mat, 4 mm",
           "Lightweight 4 mm non-slip yoga mat for beginners and travel.",
           one(12.99), [], {"Thickness": "4 mm", "Size": "68 x 24 in", "Material": "PVC-free TPE"}),
         P(TEMPO, "yoga-mat", "Natural Rubber Pro Yoga Mat, 5 mm",
@@ -77,13 +77,13 @@ def fitness() -> list[ProductSeed]:
         P(TEMPO, "yoga-block", "Cork Yoga Blocks, 2-Pack",
           "Two firm, sustainable cork yoga blocks for support and alignment in standing and seated poses.",
           one(24.99, "2 blocks", "2PK"), [], {"Material": "Cork", "Size": "9 x 6 x 4 in"}),
-        P(LARKSPUR, "yoga-block", "Foam Yoga Blocks, 2-Pack",
+        P(OWN_BRAND, "yoga-block", "Foam Yoga Blocks, 2-Pack",
           "Lightweight high-density foam yoga blocks.",
           one(9.99, "2 blocks", "2PK"), [], {"Material": "EVA foam", "Size": "9 x 6 x 4 in"}),
         P(TEMPO, "yoga-strap", "Cotton Yoga Strap, 8 ft",
           "Durable cotton yoga strap with a metal D-ring buckle for stretching and flexibility.",
           one(8.99), ["machine-washable"], {"Length": "8 ft", "Material": "Cotton"}),
-        P(LARKSPUR, "dumbbells", "Neoprene Dumbbells, Pair",
+        P(OWN_BRAND, "dumbbells", "Neoprene Dumbbells, Pair",
           "Pair of neoprene-coated dumbbells with a comfortable grip and hexagon ends that won't roll. Choose your weight.",
           weights("pair", (3, 12.99), (5, 16.99), (8, 22.99), (10, 27.99), (12, 32.99), (15, 39.99)), [],
           {"Material": "Cast iron, neoprene coating", "Sold as": "Pair"}),
@@ -98,7 +98,7 @@ def fitness() -> list[ProductSeed]:
         P(TEMPO, "resistance-bands", "Resistance Tube Set with Handles, 11-Piece",
           "Five stackable resistance tubes (10-50 lb) with handles, ankle straps, and a door anchor for full-body workouts.",
           one(29.99, "11 pieces", "11PC"), [], {"Resistance": "10-50 lb each, stackable to 150 lb", "Pieces": "11"}),
-        P(LARKSPUR, "resistance-bands", "Fabric Booty Bands, 3-Pack",
+        P(OWN_BRAND, "resistance-bands", "Fabric Booty Bands, 3-Pack",
           "Three non-slip fabric loop bands in light, medium, and heavy that won't roll up during glute workouts. Latex free.",
           one(12.99, "3 bands", "3PK"), ["machine-washable"], {"Resistance": "Light, medium, heavy", "Material": "Fabric (latex free)"}),
         P(TEMPO, "resistance-bands", "Pull-Up Assist Bands, Set of 4",
@@ -111,7 +111,7 @@ def fitness() -> list[ProductSeed]:
         P(TEMPO, "medicine-ball", "Soft Medicine Ball",
           "Soft-shell medicine ball for slams, wall balls, and core throws.",
           weights("", (6, 24.99), (10, 32.99), (14, 39.99)), [], {"Diameter": "14 in", "Shell": "Soft vinyl"}),
-        P(LARKSPUR, "jump-rope", "Basic PVC Jump Rope",
+        P(OWN_BRAND, "jump-rope", "Basic PVC Jump Rope",
           "Adjustable 9 ft PVC jump rope with foam handles.",
           one(6.99), [], {"Length": "9 ft adjustable", "Handles": "Foam"}),
         P(TEMPO, "jump-rope", "Weighted Jump Rope, 1 lb",
@@ -133,13 +133,13 @@ def fitness() -> list[ProductSeed]:
           "Vacuum-insulated stainless bottle with a leak-proof straw lid that keeps drinks cold 24 hours. BPA free; lid is dishwasher safe.",
           [Size("20OZ", "20 oz", cents(19.99)), Size("32OZ", "32 oz", cents(24.99)), Size("40OZ", "40 oz", cents(29.99))],
           ["bpa-free"], {"Material": "18/8 stainless steel", "Keeps cold": "24 hours", "Keeps hot": "12 hours", "Lid": "Straw lid, leak proof"}),
-        P(LARKSPUR, "water-bottle", "Squeeze Sports Bottles, 24 oz, 2-Pack",
+        P(OWN_BRAND, "water-bottle", "Squeeze Sports Bottles, 24 oz, 2-Pack",
           "BPA-free squeezable sports bottles with a push-pull cap. Dishwasher safe.",
           one(9.99, "2 bottles", "2PK"), ["bpa-free", "dishwasher-safe"], {"Material": "BPA-free LDPE plastic", "Capacity": "24 oz", "Insulated": "No"}),
         P(TEMPO, "water-bottle", "Glass Water Bottle with Silicone Sleeve, 20 oz",
           "Borosilicate glass bottle with a protective silicone sleeve and a bamboo lid. BPA free.",
           one(17.99), ["bpa-free", "dishwasher-safe"], {"Material": "Borosilicate glass", "Capacity": "20 oz", "Insulated": "No"}),
-        P(LARKSPUR, "water-bottle", "Kids' Insulated Water Bottle, 14 oz",
+        P(OWN_BRAND, "water-bottle", "Kids' Insulated Water Bottle, 14 oz",
           "Leak-proof insulated kids' bottle with a flip-up straw that keeps water cold for 12 hours. BPA free.",
           one(12.99), ["bpa-free", "kids"], {"Material": "Stainless steel", "Capacity": "14 oz", "Keeps cold": "12 hours"}),
         P(TEMPO, "water-bottle", "Half-Gallon Water Bottle with Time Markers, 64 oz",
@@ -219,7 +219,7 @@ def bikes_balls_racquets() -> list[ProductSeed]:
         P(TEMPO, "swim-goggles", "Mirrored Competition Swim Goggles",
           "Low-profile racing goggles with mirrored anti-fog lenses and four nose-bridge sizes.",
           one(24.99), ["waterproof"], {"Lens": "Mirrored anti-fog, UV protection", "Fit": "Adult"}),
-        P(LARKSPUR, "swim-goggles", "Kids' Swim Goggles, 2-Pack",
+        P(OWN_BRAND, "swim-goggles", "Kids' Swim Goggles, 2-Pack",
           "Two pairs of comfortable anti-fog kids' goggles with soft silicone seals. Ages 3-12.",
           one(12.99, "2 pairs", "2PK"), ["kids", "waterproof"], {"Lens": "Anti-fog", "Ages": "3-12"}),
         P(TEMPO, "swim-cap", "Silicone Swim Cap",

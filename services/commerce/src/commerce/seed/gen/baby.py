@@ -15,7 +15,7 @@ from commerce.seed.gen.common import PANTRY, Size, cents, food, item, options, s
 CAT = "baby"
 SNUGGLEBEE = "Snugglebee"  # mainstream
 LITTLE_FERN = "Little Fern"  # sensitive, plant-based, premium
-LARKSPUR = "Larkspur Baby"  # store brand, value
+OWN_BRAND = "Serigan Mart Baby"  # store brand, value
 SPROUT = "Sprout & Spoon"  # organic baby food
 
 GENTLE = ["hypoallergenic", "fragrance-free", "sensitive-skin"]
@@ -110,7 +110,7 @@ def diapering() -> list[ProductSeed]:
           "Hypoallergenic diapers made with plant-based materials and no fragrance, lotion, latex, or chlorine bleaching. Dermatologist tested for sensitive skin.",
           diaper_sizes(34.99, scale=0.9), [*GENTLE, "dye-free"],
           {"Wetness indicator": "Yes", "Lotion": "None", "Fragrance": "None", "Chlorine": "Totally chlorine-free processing", "Latex": "Latex free"}),
-        P(LARKSPUR, "diapers", "Everyday Diapers",
+        P(OWN_BRAND, "diapers", "Everyday Diapers",
           "Value disposable diapers with a wetness indicator and stretchy sides. Hypoallergenic and fragrance free.",
           diaper_sizes(19.99), ["hypoallergenic", "fragrance-free"],
           {"Wetness indicator": "Yes", "Lotion": "None", "Fragrance": "None"}),
@@ -126,7 +126,7 @@ def diapering() -> list[ProductSeed]:
           "Plant-based pull-on training pants with no fragrance, lotion, or chlorine bleaching. Hypoallergenic.",
           [Size(s.replace("-", ""), f"{s}, {n} pants", cents(17.99)) for s, n in zip(training, (24, 22, 20), strict=True)],
           [*GENTLE], {"Wetness graphics": "No", "Fragrance": "None"}),
-        P(LARKSPUR, "training-pants", "Training Pants",
+        P(OWN_BRAND, "training-pants", "Training Pants",
           "Value pull-on training pants with easy tear-away sides for potty training.",
           [Size(s.replace("-", ""), f"{s}, {n} pants", cents(11.99)) for s, n in zip(training, (26, 23, 20), strict=True)],
           ["fragrance-free"], {"Wetness graphics": "No", "Fragrance": "None"}),
@@ -147,11 +147,11 @@ def diapering() -> list[ProductSeed]:
           "Baby wipes made of 99% purified water and a drop of fruit extract on plant-based fibers. Fragrance free, hypoallergenic, and gentle enough for newborns.",
           sz(("4PK", "4 packs of 60 (240 wipes)", 11.99), ("12PK", "12 packs of 60 (720 wipes)", 31.99)),
           [*GENTLE, "plant-based", "biodegradable"], {"Scent": "Unscented", "Ingredients": "99% water, fruit extract", "Fiber": "Plant-based"}),
-        P(LARKSPUR, "baby-wipes", "Fragrance-Free Baby Wipes",
+        P(OWN_BRAND, "baby-wipes", "Fragrance-Free Baby Wipes",
           "Value baby wipes with no fragrance or alcohol for sensitive skin.",
           sz(("3PK", "3 packs of 80 (240 wipes)", 4.99), ("8PK", "8 packs of 80 (640 wipes)", 12.99)),
           [*GENTLE], {"Scent": "Unscented", "Alcohol": "Alcohol free"}),
-        P(LARKSPUR, "baby-wipes", "Baby Wipes, Cucumber & Aloe",
+        P(OWN_BRAND, "baby-wipes", "Baby Wipes, Cucumber & Aloe",
           "Value baby wipes with aloe and a light cucumber scent.",
           sz(("3PK", "3 packs of 80 (240 wipes)", 4.99)),
           [], {"Scent": "Cucumber", "Alcohol": "Alcohol free"}),
@@ -167,7 +167,7 @@ def bath_and_skin() -> list[ProductSeed]:
           "Tear-free, sulfate-free 2-in-1 wash with oat and no fragrance, dyes, or parabens. Hypoallergenic and pediatrician tested for sensitive skin.",
           sz(("12OZ", "12 fl oz", 10.99)), ["tear-free", "sulfate-free", "cruelty-free", "vegan", *GENTLE],
           {"Scent": "Unscented", "Use": "Hair and body"}),
-        P(LARKSPUR, "baby-wash", "Tear-Free Baby Shampoo",
+        P(OWN_BRAND, "baby-wash", "Tear-Free Baby Shampoo",
           "Value tear-free baby shampoo that is as gentle to eyes as pure water.",
           sz(("15OZ", "15 fl oz", 3.99)), ["tear-free"], {"Scent": "Classic baby", "Use": "Hair"}),
         P(SNUGGLEBEE, "baby-lotion", "Daily Moisture Baby Lotion",
@@ -176,10 +176,10 @@ def bath_and_skin() -> list[ProductSeed]:
         P(LITTLE_FERN, "baby-lotion", "Fragrance-Free Baby Lotion with Colloidal Oat",
           "Rich baby lotion with oat and shea butter and no fragrance, dyes, or parabens. Hypoallergenic for dry, sensitive skin.",
           sz(("12OZ", "12 fl oz", 10.99)), ["cruelty-free", *GENTLE], {"Scent": "Unscented"}),
-        P(LARKSPUR, "baby-lotion", "Baby Lotion, Fragrance-Free",
+        P(OWN_BRAND, "baby-lotion", "Baby Lotion, Fragrance-Free",
           "Value fragrance-free baby lotion for daily moisture.",
           sz(("15OZ", "15 fl oz", 4.49)), ["fragrance-free", "hypoallergenic"], {"Scent": "Unscented"}),
-        P(LARKSPUR, "baby-oil", "Pure Baby Oil",
+        P(OWN_BRAND, "baby-oil", "Pure Baby Oil",
           "Mineral oil baby oil for massage and dry skin, with a light baby scent.",
           sz(("14OZ", "14 fl oz", 3.99)), [], {"Scent": "Classic baby"}),
         P(SNUGGLEBEE, "diaper-cream", "Maximum Strength Diaper Rash Cream, 40% Zinc Oxide",
@@ -188,7 +188,7 @@ def bath_and_skin() -> list[ProductSeed]:
         P(LITTLE_FERN, "diaper-cream", "Daily Diaper Cream, 10% Zinc Oxide, Fragrance-Free",
           "Everyday diaper cream with 10% zinc oxide and calendula that wipes on and off easily. No fragrance or dyes.",
           sz(("3OZ", "3 oz tube", 9.99)), ["cruelty-free", *GENTLE], {"Zinc oxide": "10%", "Strength": "Daily"}),
-        P(LARKSPUR, "diaper-cream", "Baby Healing Ointment",
+        P(OWN_BRAND, "diaper-cream", "Baby Healing Ointment",
           "Petrolatum ointment that protects chapped skin, cheeks, and diaper areas. Fragrance free.",
           sz(("7OZ", "7 oz jar", 7.99)), ["fragrance-free"], {"Zinc oxide": "None (petrolatum based)"}),
     ]
@@ -204,7 +204,7 @@ def feeding_and_gear() -> list[ProductSeed]:
           "Tempered glass baby bottles with silicone sleeves and slow-flow nipples. Dishwasher and sterilizer safe.",
           sz(("4PK", "4 bottles", 24.99)),
           ["bpa-free", "dishwasher-safe"], {"Material": "Tempered glass", "Anti-colic": "No", "Nipple": "Silicone"}),
-        P(LARKSPUR, "baby-bottles", "Baby Bottles, 9 oz, 3-Pack",
+        P(OWN_BRAND, "baby-bottles", "Baby Bottles, 9 oz, 3-Pack",
           "Value BPA-free baby bottles with medium-flow nipples. Top-rack dishwasher safe.",
           sz(("3PK", "3 bottles", 9.99)),
           ["bpa-free", "dishwasher-safe"], {"Material": "BPA-free polypropylene", "Anti-colic": "No", "Nipple": "Silicone"}),
@@ -212,7 +212,7 @@ def feeding_and_gear() -> list[ProductSeed]:
           "Squeezable, unbreakable medical-grade silicone bottle with a wide neck for easy cleaning. BPA free and dishwasher safe.",
           sz(("8OZ", "8 oz bottle", 16.99)),
           ["bpa-free", "dishwasher-safe"], {"Material": "Medical-grade silicone", "Anti-colic": "Yes"}),
-        P(LARKSPUR, "bottle-brush", "Bottle Brush Set with Nipple Cleaner",
+        P(OWN_BRAND, "bottle-brush", "Bottle Brush Set with Nipple Cleaner",
           "Bottle brush with a built-in nipple cleaner and drying stand.",
           one(6.99), ["bpa-free"], {"Material": "BPA-free plastic, nylon bristles"}),
         with_options(SNUGGLEBEE, "pacifier", "Orthodontic Pacifiers, 2-Pack",
@@ -224,13 +224,13 @@ def feeding_and_gear() -> list[ProductSeed]:
         P(SNUGGLEBEE, "sippy-cup", "Spill-Proof Sippy Cups, 9 oz, 2-Pack",
           "Spill-proof sippy cups with soft spouts and easy-grip handles for ages 6 months and up. BPA free and top-rack dishwasher safe.",
           sz(("2PK", "2 cups", 7.99)), ["bpa-free", "dishwasher-safe"], {"Age": "6 months+", "Capacity": "9 oz"}),
-        P(LARKSPUR, "bibs", "Waterproof Silicone Bibs, 2-Pack",
+        P(OWN_BRAND, "bibs", "Waterproof Silicone Bibs, 2-Pack",
           "Soft silicone bibs with a food-catching pocket that wipe clean. BPA free and dishwasher safe.",
           sz(("2PK", "2 bibs", 9.99)), ["bpa-free", "dishwasher-safe", "waterproof"], {"Material": "Silicone"}),
         P(LITTLE_FERN, "swaddle", "Organic Cotton Muslin Swaddle Blankets, 3-Pack",
           "Breathable 47 x 47 in organic cotton muslin swaddles that get softer with each wash. Machine washable.",
           sz(("3PK", "3 blankets", 29.99)), ["organic", "machine-washable"], {"Material": "100% organic cotton muslin", "Size": "47 x 47 in"}),
-        P(LARKSPUR, "baby-towel", "Hooded Baby Towels, 2-Pack",
+        P(OWN_BRAND, "baby-towel", "Hooded Baby Towels, 2-Pack",
           "Soft cotton terry hooded towels for after bath time. Machine washable.",
           sz(("2PK", "2 towels", 12.99)), ["machine-washable"], {"Material": "100% cotton terry", "Size": "30 x 30 in"}),
     ]
@@ -276,7 +276,7 @@ def baby_food() -> list[ProductSeed]:
     for title, n, ing, stage in jars:
         big = "Stage 2" in title
         out.append(food(
-            category=CAT, product_type="baby-food", brand=LARKSPUR, title=title,
+            category=CAT, product_type="baby-food", brand=OWN_BRAND, title=title,
             sizes=sz(("2PK", f"2 tubs ({'4' if big else '2'} oz each)", 1.99 if big else 1.49)),
             nutrition=n, ingredients=ing, tags=["gluten-free", "non-gmo"],
             claims=("no-added-sugar", "fat-free", "low-sodium"),
@@ -297,7 +297,7 @@ def baby_food() -> list[ProductSeed]:
         (SPROUT, "Organic Teething Wafers, Apple", N("2 wafers (4 g)", 15, 0, 0, 0, 3, 0, 0, 0, 0),
          "Organic jasmine rice flour, organic apple juice powder, organic sweet potato powder.",
          (), ["organic", "gluten-free", "vegan", "non-gmo"], "Sitter (6+ months)", 3.99, "12 packs of 2 wafers"),
-        (LARKSPUR, "Teething Biscuits", N("1 biscuit (11 g)", 45, 1, 0, 25, 8, 0, 2, 2, 1),
+        (OWN_BRAND, "Teething Biscuits", N("1 biscuit (11 g)", 45, 1, 0, 25, 8, 0, 2, 2, 1),
          "Wheat flour, sugar, palm oil, whole wheat flour, baking soda, thiamine, iron.",
          ("wheat",), [], "Crawler (8+ months)", 2.99, "24 biscuits"),
     ]  # fmt: skip

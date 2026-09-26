@@ -17,7 +17,7 @@ CAT = "pet"
 MEADOWBROOK = "Meadowbrook Pet"  # mainstream dog and cat food
 TRAILHOUND = "Trailhound"  # premium, grain-free and limited ingredient
 WHISKERWELL = "Whiskerwell"  # cat food and litter
-LARKSPUR = "Larkspur Pet"  # store brand, value
+OWN_BRAND = "Serigan Mart Pet"  # store brand, value
 WAGWORKS = "Wagworks"  # toys, beds, leashes, bags
 
 
@@ -156,12 +156,12 @@ def dog_food() -> list[ProductSeed]:
              "Small, nutrient-dense kibble for small dogs, with no grains.", "Small breed (up to 25 lb)", grain_free=True, kcal="410 kcal/cup"),
         Food(TRAILHOUND, "dog-food", "Wholesome Grains Adult Dry Dog Food, Beef & Brown Rice", "Adult", "Beef", ga(25, 15, 4, 10), kibble_th,
              "Real beef with brown rice, oats, and barley for dogs who do well on grains.", "All breed sizes", kcal="370 kcal/cup"),
-        # Larkspur Pet: value
-        Food(LARKSPUR, "dog-food", "Complete Nutrition Adult Dry Dog Food, Beef Flavor", "Adult", "Beef and chicken by-product meal", ga(21, 10, 4.5, 12), bags((18, 15.99), (40, 28.99)),
+        # Serigan Mart Pet: value
+        Food(OWN_BRAND, "dog-food", "Complete Nutrition Adult Dry Dog Food, Beef Flavor", "Adult", "Beef and chicken by-product meal", ga(21, 10, 4.5, 12), bags((18, 15.99), (40, 28.99)),
              "Value adult dog food made with whole grain corn and 23 vitamins and minerals.", "All breed sizes", kcal="335 kcal/cup"),
-        Food(LARKSPUR, "dog-food", "Complete Nutrition Puppy Dry Dog Food, Chicken Flavor", "Puppy", "Chicken by-product meal", ga(27, 12, 4, 12), bags((16, 16.99)),
+        Food(OWN_BRAND, "dog-food", "Complete Nutrition Puppy Dry Dog Food, Chicken Flavor", "Puppy", "Chicken by-product meal", ga(27, 12, 4, 12), bags((16, 16.99)),
              "Value puppy food with DHA and calcium for growing puppies.", "All breed sizes", kcal="350 kcal/cup"),
-        Food(LARKSPUR, "dog-food", "Complete Nutrition Senior Dry Dog Food, Chicken Flavor", "Senior (7+ years)", "Chicken by-product meal", ga(22, 8, 5, 12), bags((16, 16.99)),
+        Food(OWN_BRAND, "dog-food", "Complete Nutrition Senior Dry Dog Food, Chicken Flavor", "Senior (7+ years)", "Chicken by-product meal", ga(22, 8, 5, 12), bags((16, 16.99)),
              "Value senior dog food with fewer calories and added glucosamine.", "All breed sizes", kcal="310 kcal/cup"),
         # Wet dog food
         Food(MEADOWBROOK, "dog-food", "Chunks in Gravy Wet Dog Food Variety Pack, 12 x 13 oz", "Adult", "Chicken, beef, and lamb", ga(8, 5, 1.5, 78),
@@ -176,7 +176,7 @@ def dog_food() -> list[ProductSeed]:
              sz(("6PK", "6 cans x 13 oz", 21.99)), "Lamb and pumpkin pâté with one animal protein for sensitive dogs.", form="Wet (canned)", grain_free=True, limited=True),
         Food(TRAILHOUND, "dog-food", "Small Breed Grain-Free Wet Dog Food Trays, Chicken, 12 x 3.5 oz", "Adult", "Chicken", ga(9, 5, 1, 82),
              sz(("12PK", "12 trays x 3.5 oz", 17.99)), "Single-serve trays of chicken in broth sized for small dogs.", breed="Small breed (up to 25 lb)", form="Wet (trays)", grain_free=True),
-        Food(LARKSPUR, "dog-food", "Classic Loaf Wet Dog Food, Beef", "Adult", "Beef and meat by-products", ga(8, 5, 1.5, 78),
+        Food(OWN_BRAND, "dog-food", "Classic Loaf Wet Dog Food, Beef", "Adult", "Beef and meat by-products", ga(8, 5, 1.5, 78),
              sz(("1CAN", "1 can (13.2 oz)", 1.29), ("12PK", "12 cans x 13.2 oz", 14.49)), "Value beef loaf in a pull-top can.", form="Wet (canned)"),
         # Dog treats
         Food(MEADOWBROOK, "dog-treats", "Dental Chews for Dogs", "Adult (9+ months)", "Chicken flavor (rice and potato based)", ga(8, 3, 3, 16),
@@ -186,7 +186,7 @@ def dog_food() -> list[ProductSeed]:
              sz(("12OZ", "12 oz bag", 14.99), ("24OZ", "24 oz bag", 24.99)), "Single-ingredient chicken breast jerky, slow roasted in the USA.", form="Jerky", grain_free=True, limited=True),
         Food(MEADOWBROOK, "dog-treats", "Soft & Chewy Training Treats, Chicken", "All life stages", "Chicken", ga(18, 8, 2, 28),
              sz(("4OZ", "4 oz pouch (about 150 treats)", 5.99)), "Tiny soft training treats with only 3 calories each, ideal for repetition.", form="Soft treat", kcal="3 kcal/treat"),
-        Food(LARKSPUR, "dog-treats", "Peanut Butter Dog Biscuits", "Adult", "Peanut butter (wheat based)", ga(14, 6, 5, 12),
+        Food(OWN_BRAND, "dog-treats", "Peanut Butter Dog Biscuits", "Adult", "Peanut butter (wheat based)", ga(14, 6, 5, 12),
              sz(("4LB", "4 lb box", 8.99)), "Crunchy oven-baked biscuits made with wheat flour and peanut butter.", form="Biscuit"),
         Food(TRAILHOUND, "dog-treats", "Beef Rawhide-Free Chew Rolls, 10 Count", "Adult", "Beef", ga(40, 6, 3, 18),
              sz(("10CT", "10 rolls", 16.99)), "Long-lasting rawhide-free chews wrapped in real beef for strong chewers.", form="Chew", grain_free=True),
@@ -211,9 +211,9 @@ def cat_food() -> list[ProductSeed]:
              "One animal protein and a short ingredient list for cats with sensitive stomachs.", grain_free=True, limited=True, kcal="380 kcal/cup"),
         Food(MEADOWBROOK, "cat-food", "Adult Dry Cat Food, Chicken & Rice", "Adult (1-7 years)", "Chicken", ga(30, 12, 4, 12), bags((3.5, 9.99), (16, 29.99)),
              "Real chicken is the first ingredient, with taurine for heart and eye health.", kcal="370 kcal/cup"),
-        Food(LARKSPUR, "cat-food", "Complete Adult Dry Cat Food, Ocean Fish Flavor", "Adult (1-7 years)", "Fish meal and chicken by-product meal", ga(30, 11, 4, 12), bags((16, 15.99)),
+        Food(OWN_BRAND, "cat-food", "Complete Adult Dry Cat Food, Ocean Fish Flavor", "Adult (1-7 years)", "Fish meal and chicken by-product meal", ga(30, 11, 4, 12), bags((16, 15.99)),
              "Value adult cat food with taurine and 25 vitamins and minerals.", kcal="350 kcal/cup"),
-        Food(LARKSPUR, "cat-food", "Indoor Adult Dry Cat Food, Chicken", "Adult (1-7 years)", "Chicken by-product meal", ga(30, 10, 6, 12), bags((6.3, 7.99), (16, 16.99)),
+        Food(OWN_BRAND, "cat-food", "Indoor Adult Dry Cat Food, Chicken", "Adult (1-7 years)", "Chicken by-product meal", ga(30, 10, 6, 12), bags((6.3, 7.99), (16, 16.99)),
              "Value indoor cat food with fiber for hairball control.", kcal="345 kcal/cup"),
         # Wet
         Food(WHISKERWELL, "cat-food", "Pâté Wet Cat Food Variety Pack", "Adult (1-7 years)", "Chicken, salmon, and turkey", ga(10, 5, 1.5, 78),
@@ -226,7 +226,7 @@ def cat_food() -> list[ProductSeed]:
              sz(("24PK", "24 cans x 3 oz", 22.99)), "Flaked skipjack tuna in broth with no grains.", form="Wet (canned)", grain_free=True),
         Food(WHISKERWELL, "cat-food", "Hairball Control Wet Cat Food, Chicken, 12 x 3 oz", "Adult (1-7 years)", "Chicken", ga(10, 4, 2.5, 78),
              sz(("12PK", "12 cans x 3 oz", 12.99)), "Chicken pâté with added fiber to help reduce hairballs.", form="Wet (canned)"),
-        Food(LARKSPUR, "cat-food", "Classic Pâté Wet Cat Food Variety Pack, 24 x 5.5 oz", "Adult (1-7 years)", "Chicken, fish, and beef", ga(9, 5, 1.5, 78),
+        Food(OWN_BRAND, "cat-food", "Classic Pâté Wet Cat Food Variety Pack, 24 x 5.5 oz", "Adult (1-7 years)", "Chicken, fish, and beef", ga(9, 5, 1.5, 78),
              sz(("24PK", "24 cans x 5.5 oz", 19.99)), "Value pâté in chicken, ocean fish, and beef flavors.", form="Wet (canned)"),
         # Treats
         Food(WHISKERWELL, "cat-treats", "Crunchy Cat Treats, Salmon", "Adult (1+ years)", "Salmon", ga(30, 17, 4, 12),
@@ -256,15 +256,15 @@ def litter() -> list[ProductSeed]:
           "Plant-based clumping litter made from corn and grass seed that is lightweight, flushable where permitted, and biodegradable. No added fragrance.",
           sz(("10LB", "10 lb bag", 16.99), ("20LB", "20 lb bag", 29.99)), ["plant-based", "biodegradable", "fragrance-free"],
           {"Material": "Corn and grass seed", "Clumping": "Yes", "Scent": "Unscented", "Lightweight": "Yes"}),
-        P(LARKSPUR, "cat-litter", "Clumping Cat Litter, Unscented",
+        P(OWN_BRAND, "cat-litter", "Clumping Cat Litter, Unscented",
           "Value clumping clay litter with no added fragrance.",
           sz(("35LB", "35 lb jug", 12.99)), ["fragrance-free"],
           {**clay, "Clumping": "Yes", "Scent": "Unscented", "Lightweight": "No"}),
-        P(LARKSPUR, "cat-litter", "Non-Clumping Clay Cat Litter, Unscented",
+        P(OWN_BRAND, "cat-litter", "Non-Clumping Clay Cat Litter, Unscented",
           "Budget non-clumping clay litter that absorbs moisture. Change fully every week.",
           sz(("25LB", "25 lb bag", 6.99)), ["fragrance-free"],
           {"Material": "Clay", "Clumping": "No", "Scent": "Unscented", "Lightweight": "No"}),
-        P(LARKSPUR, "cat-litter", "Pine Pellet Cat Litter",
+        P(OWN_BRAND, "cat-litter", "Pine Pellet Cat Litter",
           "Non-clumping pellets of reclaimed pine that absorb and break down into sawdust. Biodegradable, with a natural pine smell and no added fragrance.",
           sz(("20LB", "20 lb bag", 9.99)), ["biodegradable", "recycled-materials"],
           {"Material": "Reclaimed pine", "Clumping": "No", "Scent": "Natural pine (no added fragrance)", "Lightweight": "Yes"}),
@@ -309,7 +309,7 @@ def toys_beds_gear() -> list[ProductSeed]:
         P(WAGWORKS, "pet-bed", "Felt Cat Cave Bed",
           "Cozy hooded cave bed made of wool-blend felt for cats who like to hide.",
           sz(("EA", "Each", 29.99)), [], {"For": "Cats", "Material": "Wool-blend felt", "Size": "16 in"}),
-        P(LARKSPUR, "pet-bed", "Bolster Dog Bed",
+        P(OWN_BRAND, "pet-bed", "Bolster Dog Bed",
           "Value rectangular dog bed with plush bolster sides and a machine-washable cover.",
           sz(("MD", "Medium, 28 x 22 in", 19.99), ("LG", "Large, 36 x 27 in", 29.99)),
           ["machine-washable"], {"For": "Dogs", "Fill": "Polyester fiber"}),
@@ -337,7 +337,7 @@ def toys_beds_gear() -> list[ProductSeed]:
           "Extra-thick, leak-proof poop bags on 18 rolls that fit most dispensers. Unscented.",
           sz(("270CT", "270 bags (18 rolls)", 12.99)), ["fragrance-free"],
           {"Count": "270", "Material": "Polyethylene", "Scent": "Unscented"}),
-        P(LARKSPUR, "poop-bags", "Dog Waste Bags with Dispenser, Lavender Scented, 300 Count",
+        P(OWN_BRAND, "poop-bags", "Dog Waste Bags with Dispenser, Lavender Scented, 300 Count",
           "Value lavender-scented waste bags on 20 rolls with a leash-clip dispenser.",
           sz(("300CT", "300 bags (20 rolls)", 8.99)), [],
           {"Count": "300", "Material": "Polyethylene", "Scent": "Lavender"}),
@@ -345,7 +345,7 @@ def toys_beds_gear() -> list[ProductSeed]:
           "Rust-resistant stainless steel bowls with non-skid rubber bases. Dishwasher safe.",
           sz(("SM", "Small, 2 cups each", 12.99), ("LG", "Large, 6 cups each", 17.99)),
           ["dishwasher-safe"], {"Material": "Stainless steel"}),
-        P(LARKSPUR, "puppy-pads", "Puppy Training Pads",
+        P(OWN_BRAND, "puppy-pads", "Puppy Training Pads",
           "Five-layer leak-proof training pads with a quick-dry top and a built-in attractant. 22 x 22 in.",
           sz(("50CT", "50 pads", 14.99), ("100CT", "100 pads", 24.99)), [],
           {"Size": "22 x 22 in", "Layers": "5"}),

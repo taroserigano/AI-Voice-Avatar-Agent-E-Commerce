@@ -14,7 +14,7 @@ from commerce.seed.gen.common import Size, cents, item
 CAT = "toys"
 PEBBLE = "Pebble & Pine"  # wooden toys, puzzles, games: premium, eco
 STACKWISE = "Stackwise"  # building bricks
-LARKSPUR = "Larkspur Play"  # store brand, value
+OWN_BRAND = "Serigan Mart Play"  # store brand, value
 DOODLEBUG = "Doodlebug Art Co."  # art supplies
 CURIO = "Curio Labs"  # STEM
 ZOOMTRAX = "Zoomtrax"  # RC and action figures
@@ -57,7 +57,7 @@ def puzzle(
 # fmt: off
 def puzzles_and_games() -> list[ProductSeed]:
     return [
-        puzzle(LARKSPUR, "Farm Animals 24-Piece Floor Puzzle", 24, "3+", 9.99, "24 x 18 in", "farm animals with extra-large pieces for small hands"),
+        puzzle(OWN_BRAND, "Farm Animals 24-Piece Floor Puzzle", 24, "3+", 9.99, "24 x 18 in", "farm animals with extra-large pieces for small hands"),
         puzzle(PEBBLE, "Ocean Friends 100-Piece Kids' Puzzle", 100, "5+", 9.99, "19 x 14 in", "whales, turtles, and fish in a coral reef"),
         puzzle(PEBBLE, "Garden Party 300-Piece Puzzle", 300, "8+", 14.99, "24 x 18 in", "a summer garden party, with large-format pieces"),
         puzzle(PEBBLE, "Mountain Lake 500-Piece Puzzle", 500, "10+", 16.99, "20 x 15 in", "a mountain lake at sunrise"),
@@ -67,25 +67,25 @@ def puzzles_and_games() -> list[ProductSeed]:
         T(PEBBLE, "board-game", "Treasure Isles Family Board Game",
           "Race around the islands collecting treasure and trading maps in this family board game for 2-6 players ages 8 and up.",
           24.99, "8+", K, players="2-6", play_time="30-45 minutes"),
-        T(LARKSPUR, "board-game", "Hoot Hoot Owl Matching Game",
+        T(OWN_BRAND, "board-game", "Hoot Hoot Owl Matching Game",
           "A cooperative first board game where preschoolers match colors to help the owls fly home. No reading required.",
           12.99, "3+", K, players="2-4", play_time="15 minutes"),
         T(PEBBLE, "board-game", "Fox & Hen Two-Player Strategy Game",
           "A quick, tactical two-player strategy game with a wooden board and pieces.",
           29.99, "10+", [], players="2", play_time="20 minutes"),
-        T(LARKSPUR, "board-game", "Wooden Chess & Checkers Set",
+        T(OWN_BRAND, "board-game", "Wooden Chess & Checkers Set",
           "Two-in-one folding wooden board with chess pieces and checkers, stored inside the board.",
           24.99, "6+", [], players="2", play_time="Varies"),
         T(PEBBLE, "party-game", "Quick Sketch Drawing Party Game",
           "Fast-paced drawing and guessing party game with 400 prompts and dry-erase boards for teams.",
           19.99, "12+", [], players="4-10", play_time="30 minutes"),
-        T(LARKSPUR, "card-game", "Color Clash Card Game",
+        T(OWN_BRAND, "card-game", "Color Clash Card Game",
           "Classic match-the-color-or-number card game with wild cards, for 2-10 players.",
           7.99, "7+", K, players="2-10", play_time="15-30 minutes"),
         T(PEBBLE, "board-game", "Wordsmith Letter Tile Game",
           "Build crossword-style words from letter tiles in this word game for 2-4 players.",
           19.99, "8+", [], players="2-4", play_time="30 minutes"),
-        T(LARKSPUR, "card-game", "Classic Playing Cards, 2 Decks",
+        T(OWN_BRAND, "card-game", "Classic Playing Cards, 2 Decks",
           "Two standard 52-card decks with jokers, plastic-coated for smooth shuffling.",
           4.99, "6+", [], players="1+", play_time="Varies"),
     ]
@@ -114,16 +114,16 @@ def building_plush_dolls() -> list[ProductSeed]:
         T(PEBBLE, "plush-toy", "Plush Unicorn, 14 in",
           "Soft 14-inch plush unicorn with a sparkly horn and rainbow mane.",
           16.99, "3+", K, size="14 in"),
-        T(LARKSPUR, "plush-toy", "Jumbo Plush Golden Retriever, 36 in",
+        T(OWN_BRAND, "plush-toy", "Jumbo Plush Golden Retriever, 36 in",
           "Giant 36-inch plush golden retriever for cuddling and lounging.",
           39.99, "3+", K, size="36 in"),
-        T(LARKSPUR, "doll", "18-Inch Doll with Outfit and Hairbrush",
+        T(OWN_BRAND, "doll", "18-Inch Doll with Outfit and Hairbrush",
           "18-inch soft-body doll with long brushable hair, a removable outfit, shoes, and a hairbrush.",
           24.99, "3+", K, size="18 in"),
-        T(LARKSPUR, "doll", "Baby Doll with Bottle and Blanket, 12 in",
+        T(OWN_BRAND, "doll", "Baby Doll with Bottle and Blanket, 12 in",
           "Soft-bodied 12-inch baby doll with a pretend bottle and blanket.",
           14.99, "2+", K, size="12 in"),
-        T(LARKSPUR, "doll", "Fashion Doll with Accessories, 11.5 in",
+        T(OWN_BRAND, "doll", "Fashion Doll with Accessories, 11.5 in",
           "Poseable 11.5-inch fashion doll with two outfits and accessories.",
           9.99, "3+", K, size="11.5 in"),
         T(PEBBLE, "dollhouse", "Wooden Dollhouse with 16 Furniture Pieces",
@@ -196,25 +196,25 @@ def rc_art_stem() -> list[ProductSeed]:
 
 def outdoor_and_baby() -> list[ProductSeed]:
     return [
-        T(LARKSPUR, "outdoor-toy", "Automatic Bubble Machine",
+        T(OWN_BRAND, "outdoor-toy", "Automatic Bubble Machine",
           "Battery-powered bubble machine that blows hundreds of bubbles a minute; includes 8 oz of bubble solution.",
           19.99, "3+", K, power="4 AA batteries (not included)"),
-        T(LARKSPUR, "outdoor-toy", "Water Blasters, 4-Pack",
+        T(OWN_BRAND, "outdoor-toy", "Water Blasters, 4-Pack",
           "Four pump-action foam water blasters that shoot up to 25 feet.",
           14.99, "6+", K, range="Up to 25 ft"),
         T(ZOOMTRAX, "scooter", "3-Wheel Kick Scooter with Light-Up Wheels",
           "Lean-to-steer three-wheel scooter with light-up wheels and an adjustable handlebar. Holds up to 110 lb.",
           39.99, "3-5", K, weight_limit="110 lb"),
-        T(LARKSPUR, "outdoor-toy", "Playground Balls, 8.5 in, 3-Pack",
+        T(OWN_BRAND, "outdoor-toy", "Playground Balls, 8.5 in, 3-Pack",
           "Three bouncy 8.5-inch rubber playground balls with a hand pump.",
           12.99, "3+", K, size="8.5 in"),
         T(PEBBLE, "baby-toy", "Wooden Stacking Rings",
           "Classic stacking toy with smooth hardwood rings finished in water-based, child-safe paint.",
           14.99, "12 months+", K, material="Hardwood, water-based paint"),
-        T(LARKSPUR, "baby-toy", "Soft Stacking Blocks, 12 Pieces",
+        T(OWN_BRAND, "baby-toy", "Soft Stacking Blocks, 12 Pieces",
           "Squishy fabric blocks with textures, crinkle, and a rattle that are safe to mouth.",
           14.99, "6 months+", K, pieces="12"),
-        T(LARKSPUR, "baby-toy", "Musical Light-Up Baby Piano",
+        T(OWN_BRAND, "baby-toy", "Musical Light-Up Baby Piano",
           "Kick-and-play piano mat with lights, songs, and animal sounds for tummy time and sitting babies.",
           19.99, "6 months+", K, power="3 AA batteries (included)"),
         T(PEBBLE, "baby-toy", "Wooden Activity Cube",

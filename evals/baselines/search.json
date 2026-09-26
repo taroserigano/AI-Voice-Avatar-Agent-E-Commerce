@@ -60,10 +60,10 @@
       "query": "grow vegetables at home",
       "top": [
         "curio-labs-crystal-growing-science-kit",
-        "larkspur-kitchen-vegetable-broth",
-        "larkspur-kitchen-vegetable-oil",
+        "serigan-mart-kitchen-vegetable-broth",
+        "serigan-mart-kitchen-vegetable-oil",
         "sonora-audio-room-wi-fi-and-bluetooth-home-speaker",
-        "larkspur-kitchen-frozen-mixed-vegetables"
+        "serigan-mart-kitchen-frozen-mixed-vegetables"
       ],
       "ndcg@10": 0.0,
       "recall@10": 0.0,
@@ -75,7 +75,7 @@
       "query": "weights for home gym",
       "top": [
         "tempo-athletics-rubber-hex-dumbbell-single",
-        "larkspur-home-quick-dry-cotton-bath-towel-set-6-piece",
+        "serigan-mart-home-quick-dry-cotton-bath-towel-set-6-piece",
         "harbor-home-turkish-cotton-bath-towels-white",
         "harbor-home-turkish-cotton-bath-towels-stone",
         "harbor-home-turkish-cotton-bath-towels-navy"
@@ -91,7 +91,7 @@
       "top": [
         "pressmark-pm-20xl-high-yield-black-and-tri-color-ink-combo-pack",
         "rootwell-plant-foods-organic-extra-firm-tofu",
-        "larkspur-kitchen-chicken-flavor-ramen-noodle-soup",
+        "serigan-mart-kitchen-chicken-flavor-ramen-noodle-soup",
         "puddlejump-toddler-short-sleeve-tees-4-pack",
         "wagworks-durable-rubber-chew-toy-for-dogs"
       ],
@@ -104,10 +104,10 @@
       "type": "semantic",
       "query": "sunscreen moisturizer",
       "top": [
-        "larkspur-basics-moisturizing-shampoo-coconut",
-        "larkspur-basics-moisturizing-conditioner-coconut",
+        "serigan-mart-basics-moisturizing-shampoo-coconut",
+        "serigan-mart-basics-moisturizing-conditioner-coconut",
         "solstice-beauty-moisturizing-satin-lipstick",
-        "larkspur-basics-sunscreen-spray-spf-30",
+        "serigan-mart-basics-sunscreen-spray-spf-30",
         "snugglebee-daily-moisture-baby-lotion"
       ],
       "ndcg@10": 0.0,
@@ -134,7 +134,7 @@
       "type": "semantic",
       "query": "plastic-free shampoo",
       "top": [
-        "larkspur-baby-tear-free-baby-shampoo",
+        "serigan-mart-baby-tear-free-baby-shampoo",
         "clearwell-skin-fragrance-free-gentle-shampoo",
         "verdant-botanicals-curl-defining-sulfate-free-shampoo",
         "verdant-botanicals-color-care-sulfate-free-shampoo",
