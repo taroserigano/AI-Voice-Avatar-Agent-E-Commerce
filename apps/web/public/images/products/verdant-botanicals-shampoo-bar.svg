@@ -1,14 +1,100 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Rosemary Mint Shampoo Bar illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Rosemary Mint Shampoo Bar">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0f766e"/>
-      <stop offset="1" stop-color="#0f766e" stop-opacity=".72"/>
+    <radialGradient id="verdant-botanicals-shampoo-bar-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#EFFBF8"/>
+      <stop offset="1" stop-color="#D3EFE8"/>
+    </radialGradient>
+    <filter id="verdant-botanicals-shampoo-bar-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <filter id="verdant-botanicals-shampoo-bar-soft" filterUnits="userSpaceOnUse" x="0" y="0" width="640" height="640">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+    <linearGradient id="verdant-botanicals-shampoo-bar-woodtop" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e2b688"/>
+      <stop offset=".5" stop-color="#c99461"/>
+      <stop offset="1" stop-color="#a8723f"/>
+    </linearGradient>
+    <linearGradient id="verdant-botanicals-shampoo-bar-woodside" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b17b47"/>
+      <stop offset="1" stop-color="#7a4b26"/>
+    </linearGradient>
+    <linearGradient id="verdant-botanicals-shampoo-bar-recess" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9c6939"/>
+      <stop offset="1" stop-color="#b98450"/>
+    </linearGradient>
+    <linearGradient id="verdant-botanicals-shampoo-bar-soaptop" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e3f2e3"/>
+      <stop offset="1" stop-color="#afd3b6"/>
+    </linearGradient>
+    <linearGradient id="verdant-botanicals-shampoo-bar-soapfront" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a8cfb0"/>
+      <stop offset="1" stop-color="#6c9f7e"/>
     </linearGradient>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <rect x="290" y="210" width="60" height="30" rx="6" fill="#fff"/><rect x="270" y="240" width="100" height="120" rx="22" fill="#fff"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Rosemary Mint Shampoo</tspan><tspan x="320" dy="40">Bar</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Verdant Botanicals</text>
+  <rect width="640" height="640" fill="url(#verdant-botanicals-shampoo-bar-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="322" cy="414" rx="200" ry="20" fill="#1e1b4b" fill-opacity=".16" filter="url(#verdant-botanicals-shampoo-bar-shadow)"/>
+  <g transform="translate(0 -66)">
+    <path d="M110 390C110 430 128 450 160 450H480C512 450 530 430 530 390L530 414C530 454 512 474 480 474H160C128 474 110 454 110 414Z" fill="url(#verdant-botanicals-shampoo-bar-woodside)"/>
+    <path d="M140 466C200 470 420 470 500 464M124 450C200 458 420 458 516 448" stroke="#5f3a1c" stroke-width="1.2" stroke-opacity=".3" fill="none"/>
+    <path d="M160 330H480C512 330 530 350 530 390C530 430 512 450 480 450H160C128 450 110 430 110 390C110 350 128 330 160 330Z" fill="url(#verdant-botanicals-shampoo-bar-woodtop)"/>
+    <path d="M170 346H470C496 346 510 362 510 390C510 418 496 434 470 434H170C144 434 130 418 130 390C130 362 144 346 170 346Z" fill="url(#verdant-botanicals-shampoo-bar-recess)"/>
+    <g stroke-linecap="round">
+      <path d="M150 362H490M140 377H500M138 392H502M140 407H500M150 422H490" stroke="#6f431f" stroke-width="7" stroke-opacity=".35"/>
+      <path d="M150 359H490M140 374H500M138 389H502M140 404H500M150 419H490" stroke="#dcae7e" stroke-width="6"/>
+      <path d="M160 357H300M150 372H280M148 387H260" stroke="#f3d3ad" stroke-width="1.5" stroke-opacity=".8"/>
+    </g>
+    <path d="M140 338C220 332 300 334 360 336M122 360C128 346 140 338 156 336" stroke="#f4d6b0" stroke-width="2" stroke-opacity=".7" fill="none" stroke-linecap="round"/>
+    <path d="M300 338C360 342 420 340 470 338M520 372C522 380 522 400 518 412" stroke="#8f5c2f" stroke-width="1.2" stroke-opacity=".5" fill="none"/>
+    <ellipse cx="326" cy="404" rx="118" ry="14" fill="#4a2a10" fill-opacity=".45" filter="url(#verdant-botanicals-shampoo-bar-soft)"/>
+    <path d="M212 336C212 348 222 356 236 356H404C418 356 428 348 428 336V384C428 398 418 406 404 406H236C222 406 212 398 212 384Z" fill="url(#verdant-botanicals-shampoo-bar-soapfront)"/>
+    <path d="M236 282H404C418 282 428 290 428 302V336C428 348 418 356 404 356H236C222 356 212 348 212 336V302C212 290 222 282 236 282Z" fill="url(#verdant-botanicals-shampoo-bar-soaptop)"/>
+    <path d="M226 294C230 288 236 286 244 286H330" stroke="#fff" stroke-width="3.5" stroke-opacity=".8" stroke-linecap="round" fill="none"/>
+    <path d="M214 338C216 350 224 356 236 357" stroke="#fff" stroke-width="2" stroke-opacity=".6" fill="none"/>
+    <path d="M320 300C298 308 294 330 316 342C338 330 342 308 320 300Z" fill="none" stroke="#86b894" stroke-width="3"/>
+    <path d="M321 302C300 310 297 330 317 341" fill="none" stroke="#f3faf3" stroke-width="1.2" stroke-opacity=".8"/>
+    <path d="M318 312V340" stroke="#86b894" stroke-width="2"/>
+    <g fill="#4d7a5a" fill-opacity=".55">
+      <circle cx="244" cy="310" r="1.6"/><circle cx="262" cy="330" r="1.3"/><circle cx="280" cy="298" r="1.4"/><circle cx="366" cy="304" r="1.6"/><circle cx="388" cy="326" r="1.3"/><circle cx="404" cy="300" r="1.2"/><circle cx="352" cy="340" r="1.4"/><circle cx="236" cy="340" r="1.2"/><circle cx="410" cy="342" r="1.5"/>
+      <circle cx="240" cy="378" r="1.5"/><circle cx="268" cy="392" r="1.3"/><circle cx="300" cy="370" r="1.4"/><circle cx="334" cy="388" r="1.6"/><circle cx="370" cy="372" r="1.3"/><circle cx="398" cy="394" r="1.4"/><circle cx="418" cy="370" r="1.2"/>
+    </g>
+    <g fill="#8a6a45" fill-opacity=".5">
+      <circle cx="256" cy="296" r="1.1"/><circle cx="296" cy="344" r="1.2"/><circle cx="378" cy="290" r="1.1"/><circle cx="398" cy="314" r="1"/><circle cx="254" cy="366" r="1.1"/><circle cx="352" cy="398" r="1.1"/><circle cx="386" cy="382" r="1"/>
+    </g>
+    <path d="M364 482C420 450 490 404 556 364" stroke="#3e2a14" stroke-width="7" stroke-opacity=".18" stroke-linecap="round" fill="none" filter="url(#verdant-botanicals-shampoo-bar-soft)"/>
+    <path d="M364 482C420 450 490 404 556 364" stroke="#7a6a3e" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    <g fill="#8fb39a">
+      <ellipse cx="395.9" cy="475.3" rx="15.6" ry="3.2" transform="rotate(17 395.9 475.3)"/>
+      <ellipse cx="409.1" cy="467.0" rx="15.2" ry="3.2" transform="rotate(17 409.1 467.0)"/>
+      <ellipse cx="422.2" cy="458.6" rx="14.8" ry="3.2" transform="rotate(17 422.2 458.6)"/>
+      <ellipse cx="435.4" cy="450.2" rx="14.3" ry="3.2" transform="rotate(17 435.4 450.2)"/>
+      <ellipse cx="448.5" cy="441.9" rx="13.9" ry="3.2" transform="rotate(17 448.5 441.9)"/>
+      <ellipse cx="461.7" cy="433.5" rx="13.5" ry="3.2" transform="rotate(17 461.7 433.5)"/>
+      <ellipse cx="474.8" cy="425.2" rx="13.0" ry="3.2" transform="rotate(17 474.8 425.2)"/>
+      <ellipse cx="487.9" cy="416.8" rx="12.6" ry="3.2" transform="rotate(17 487.9 416.8)"/>
+      <ellipse cx="501.1" cy="408.5" rx="12.1" ry="3.2" transform="rotate(17 501.1 408.5)"/>
+      <ellipse cx="514.2" cy="400.1" rx="11.7" ry="3.2" transform="rotate(17 514.2 400.1)"/>
+      <ellipse cx="527.4" cy="391.7" rx="11.3" ry="3.2" transform="rotate(17 527.4 391.7)"/>
+      <ellipse cx="540.5" cy="383.4" rx="10.8" ry="3.2" transform="rotate(17 540.5 383.4)"/>
+      <ellipse cx="553.7" cy="375.0" rx="10.4" ry="3.2" transform="rotate(17 553.7 375.0)"/>
+    </g>
+    <g fill="#4f7d5b">
+      <ellipse cx="385.3" cy="457.9" rx="15.6" ry="3.2" transform="rotate(-79 385.3 457.9)"/>
+      <ellipse cx="398.7" cy="450.0" rx="15.2" ry="3.2" transform="rotate(-79 398.7 450.0)"/>
+      <ellipse cx="412.2" cy="442.2" rx="14.8" ry="3.2" transform="rotate(-79 412.2 442.2)"/>
+      <ellipse cx="425.6" cy="434.3" rx="14.3" ry="3.2" transform="rotate(-79 425.6 434.3)"/>
+      <ellipse cx="439.0" cy="426.4" rx="13.9" ry="3.2" transform="rotate(-79 439.0 426.4)"/>
+      <ellipse cx="452.5" cy="418.5" rx="13.5" ry="3.2" transform="rotate(-79 452.5 418.5)"/>
+      <ellipse cx="465.9" cy="410.6" rx="13.0" ry="3.2" transform="rotate(-79 465.9 410.6)"/>
+      <ellipse cx="479.3" cy="402.7" rx="12.6" ry="3.2" transform="rotate(-79 479.3 402.7)"/>
+      <ellipse cx="492.8" cy="394.8" rx="12.1" ry="3.2" transform="rotate(-79 492.8 394.8)"/>
+      <ellipse cx="506.2" cy="387.0" rx="11.7" ry="3.2" transform="rotate(-79 506.2 387.0)"/>
+      <ellipse cx="519.6" cy="379.1" rx="11.3" ry="3.2" transform="rotate(-79 519.6 379.1)"/>
+      <ellipse cx="533.1" cy="371.2" rx="10.8" ry="3.2" transform="rotate(-79 533.1 371.2)"/>
+      <ellipse cx="546.5" cy="363.3" rx="10.4" ry="3.2" transform="rotate(-79 546.5 363.3)"/>
+      <ellipse cx="558" cy="360" rx="9" ry="3" transform="rotate(-31 558 360)"/>
+    </g>
+    <path d="M384 450l2 -12M398 442l2 -12M412 434l2 -12M426 426l2 -12M440 418l2 -12M454 410l2 -12" stroke="#b9d6c1" stroke-width="1" stroke-opacity=".7" stroke-linecap="round"/>
+  </g>
 </svg>

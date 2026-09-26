@@ -1,14 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Cedar Raised Garden Bed, 4 x 2 ft illustration">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#15803d"/>
-      <stop offset="1" stop-color="#15803d" stop-opacity=".72"/>
-    </linearGradient>
-  </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M320 180l110 170H210z" fill="#fff"/><path d="M320 260l40 90h-80z" fill-opacity=".25" fill="#000"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Cedar Raised Garden Bed,</tspan><tspan x="320" dy="40">4 x 2 ft</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Verdant Grounds</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Cedar Raised Garden Bed, 4 x 2 ft">
+<defs>
+<radialGradient id="verdant-raised-garden-bed-bg" gradientUnits="userSpaceOnUse" cx="320" cy="240" r="520"><stop offset="0" stop-color="#F0FAF4"/><stop offset="1" stop-color="#D6EEDF"/></radialGradient>
+<filter id="verdant-raised-garden-bed-shadow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+<linearGradient id="verdant-raised-garden-bed-front" gradientUnits="userSpaceOnUse" x1="0" y1="270" x2="0" y2="450"><stop offset="0" stop-color="#CF8150"/><stop offset="1" stop-color="#A3582F"/></linearGradient>
+<linearGradient id="verdant-raised-garden-bed-right" gradientUnits="userSpaceOnUse" x1="400" y1="0" x2="530" y2="0"><stop offset="0" stop-color="#98522C"/><stop offset="1" stop-color="#7A4022"/></linearGradient>
+<linearGradient id="verdant-raised-garden-bed-rim" gradientUnits="userSpaceOnUse" x1="110" y1="210" x2="530" y2="340"><stop offset="0" stop-color="#F0BA8A"/><stop offset="1" stop-color="#D89662"/></linearGradient>
+<linearGradient id="verdant-raised-garden-bed-soil" gradientUnits="userSpaceOnUse" x1="0" y1="230" x2="0" y2="350"><stop offset="0" stop-color="#3B2518"/><stop offset="1" stop-color="#5E3D28"/></linearGradient>
+<linearGradient id="verdant-raised-garden-bed-leaf" gradientUnits="userSpaceOnUse" x1="0" y1="-40" x2="0" y2="0"><stop offset="0" stop-color="#8CD062"/><stop offset="1" stop-color="#3E8A30"/></linearGradient>
+<linearGradient id="verdant-raised-garden-bed-leaf2" gradientUnits="userSpaceOnUse" x1="-20" y1="-40" x2="20" y2="0"><stop offset="0" stop-color="#A6DC78"/><stop offset="0.6" stop-color="#5BA844"/><stop offset="1" stop-color="#2F7327"/></linearGradient>
+<g id="verdant-raised-garden-bed-sprout"><ellipse cx="0" cy="0" rx="9" ry="3.5" fill="#2A190F"/><path d="M0 0Q-2 -14 0 -26" fill="none" stroke="#5E9A3E" stroke-width="3" stroke-linecap="round"/><path d="M0 -24C-10 -36 -25 -33 -28 -24C-18 -18 -7 -18 0 -24Z" fill="url(#verdant-raised-garden-bed-leaf)"/><path d="M0 -26C8 -40 23 -39 28 -30C19 -23 8 -23 0 -26Z" fill="url(#verdant-raised-garden-bed-leaf)"/><path d="M-2 -25C-10 -29 -18 -28 -24 -25M2 -27C9 -32 17 -33 23 -31" fill="none" stroke="#D8F2B8" stroke-opacity=".6" stroke-width="1"/></g>
+<g id="verdant-raised-garden-bed-leafy"><ellipse cx="0" cy="0" rx="18" ry="5" fill="#2A190F"/><path d="M0 -2C-30 -6 -38 -26 -30 -34C-18 -30 -6 -18 0 -2Z" fill="url(#verdant-raised-garden-bed-leaf2)"/><path d="M0 -2C30 -6 38 -26 30 -34C18 -30 6 -18 0 -2Z" fill="url(#verdant-raised-garden-bed-leaf2)"/><path d="M0 -2C-18 -18 -18 -44 -6 -50C4 -40 6 -20 0 -2Z" fill="url(#verdant-raised-garden-bed-leaf2)"/><path d="M0 -2C16 -20 22 -44 12 -52C0 -42 -4 -20 0 -2Z" fill="url(#verdant-raised-garden-bed-leaf2)"/><path d="M0 -2C-6 -20 -2 -38 4 -42" fill="none" stroke="#E4F7C8" stroke-opacity=".55" stroke-width="1.2"/></g>
+</defs>
+<rect width="640" height="640" fill="url(#verdant-raised-garden-bed-bg)"/>
+<circle cx="320" cy="310" r="210" fill="#fff" fill-opacity=".45"/>
+<ellipse cx="330" cy="436" rx="210" ry="20" fill="#1e1b4b" fill-opacity=".16" filter="url(#verdant-raised-garden-bed-shadow)"/>
+<path d="M241.1 218.5L507.7 272.9V290.9L241.1 236.5Z" fill="#A65E36"/>
+<path d="M132.3 267.1L241.1 218.5V236.5L132.3 285.1Z" fill="#7F4324"/>
+<path d="M132.3 285.1L241.1 236.5L507.7 290.9L398.9 349.5Z" fill="url(#verdant-raised-garden-bed-soil)"/>
+<g fill="#7A5438" fill-opacity=".55"><ellipse cx="324.1" cy="289.4" rx="1.7" ry="1.2"/><ellipse cx="305.6" cy="289" rx="1.7" ry="1.9"/><ellipse cx="334.1" cy="303.1" rx="2.1" ry="1.8"/><ellipse cx="315.9" cy="323.7" rx="2.5" ry="1.2"/><ellipse cx="328.6" cy="320.7" rx="2.6" ry="1.5"/><ellipse cx="184.7" cy="294" rx="3.4" ry="2"/><ellipse cx="212.8" cy="271.3" rx="3.4" ry="1.2"/><ellipse cx="303.9" cy="285.4" rx="2.8" ry="1.3"/><ellipse cx="285" cy="248.2" rx="2.4" ry="1.2"/><ellipse cx="314.1" cy="304.3" rx="1.8" ry="1.8"/><ellipse cx="264.1" cy="290.7" rx="1.7" ry="1.9"/><ellipse cx="292.1" cy="257.5" rx="2.4" ry="1.2"/><ellipse cx="336.8" cy="304.4" rx="3" ry="1.7"/><ellipse cx="192.9" cy="283" rx="2.4" ry="1.1"/><ellipse cx="189.9" cy="268.1" rx="2.9" ry="1.6"/><ellipse cx="422.3" cy="330.8" rx="2.4" ry="1.5"/><ellipse cx="340.5" cy="272.6" rx="2.4" ry="1.4"/><ellipse cx="228.5" cy="290.6" rx="3" ry="1.1"/><ellipse cx="287.8" cy="265.3" rx="3.2" ry="2"/><ellipse cx="473" cy="303" rx="3" ry="1.6"/><ellipse cx="282.8" cy="319.6" rx="2.1" ry="1.4"/><ellipse cx="232.5" cy="279.8" rx="2.9" ry="1.7"/><ellipse cx="307.5" cy="255.8" rx="1.5" ry="1.4"/><ellipse cx="336.5" cy="301.4" rx="1.7" ry="2"/><ellipse cx="348.8" cy="272.1" rx="2.7" ry="1.5"/><ellipse cx="252" cy="254.6" rx="3.3" ry="1.3"/><ellipse cx="155.6" cy="279.2" rx="2.9" ry="1.7"/><ellipse cx="403" cy="285.4" rx="2" ry="1.8"/><ellipse cx="181.3" cy="294.1" rx="1.7" ry="1"/><ellipse cx="365.9" cy="279.3" rx="3.2" ry="1.1"/><ellipse cx="269.7" cy="314.4" rx="2.1" ry="1.5"/><ellipse cx="188.1" cy="271.9" rx="2" ry="1.3"/><ellipse cx="357.9" cy="329.4" rx="1.8" ry="1"/><ellipse cx="308.1" cy="321.1" rx="2.3" ry="1.1"/><ellipse cx="304.9" cy="295.7" rx="1.5" ry="1.8"/><ellipse cx="333" cy="278.3" rx="2.2" ry="1.9"/><ellipse cx="393" cy="300.2" rx="2" ry="1.4"/><ellipse cx="248.7" cy="247.2" rx="1.7" ry="1.1"/><ellipse cx="215.1" cy="282.3" rx="1.6" ry="1.6"/><ellipse cx="290.5" cy="295.1" rx="2.6" ry="1.9"/><ellipse cx="319" cy="298.6" rx="1.7" ry="1.9"/><ellipse cx="363.1" cy="303.5" rx="3.3" ry="1.7"/><ellipse cx="359.7" cy="267.6" rx="3.3" ry="1.4"/><ellipse cx="341.4" cy="283" rx="3.1" ry="1.9"/><ellipse cx="385.3" cy="272.1" rx="2.8" ry="1.8"/><ellipse cx="257.9" cy="309.8" rx="3.4" ry="1.6"/></g>
+<path d="M241.1 236.5L507.7 290.9" stroke="#1E120A" stroke-opacity=".4" stroke-width="3"/>
+<use href="#verdant-raised-garden-bed-sprout" transform="translate(242.5 258.2) scale(1)"/><use href="#verdant-raised-garden-bed-leafy" transform="translate(309.3 274.5) scale(0.95)"/><use href="#verdant-raised-garden-bed-sprout" transform="translate(376 290.7) scale(1)"/><use href="#verdant-raised-garden-bed-leafy" transform="translate(440.1 306.3) scale(0.85)"/>
+<use href="#verdant-raised-garden-bed-leafy" transform="translate(204.8 280.4) scale(1.05)"/><use href="#verdant-raised-garden-bed-sprout" transform="translate(271.5 296.6) scale(1.15)"/><use href="#verdant-raised-garden-bed-leafy" transform="translate(338.3 312.9) scale(1.1)"/><use href="#verdant-raised-garden-bed-sprout" transform="translate(399.7 327.8) scale(1.1)"/>
+<path d="M110 270L400 340V450L110 380Z" fill="url(#verdant-raised-garden-bed-front)"/>
+<path d="M400 340L530 270V380L400 450Z" fill="url(#verdant-raised-garden-bed-right)"/>
+<g stroke="#6E3417" stroke-opacity=".7" stroke-width="2.5"><path d="M110 307L400 377M110 343L400 413M400 377L530 307M400 413L530 343"/></g>
+<g stroke="#F2B585" stroke-opacity=".4" stroke-width="1.2"><path d="M110 309.5L400 379.5M110 345.5L400 415.5"/></g>
+<g fill="none" stroke="#7E3F1D" stroke-opacity=".3" stroke-width="1.2">
+<path d="M130 289Q190 306.5 250 318M270 317Q325 333.5 380 344M160 334Q245 358 330 376M124 362Q172 376.5 220 385M250 392Q320 412 390 426M180 312Q205 321 230 324"/>
+<path d="M420 348Q460 330 510 300M430 380Q470 360 520 334M412 420Q450 402 500 374"/>
+</g>
+<path d="M400 340V450" stroke="#F2B585" stroke-opacity=".35" stroke-width="2"/>
+<g fill="#5A2C12" fill-opacity=".7"><circle cx="392" cy="352" r="2"/><circle cx="392" cy="388" r="2"/><circle cx="392" cy="424" r="2"/><circle cx="118" cy="283" r="2"/><circle cx="118" cy="319" r="2"/><circle cx="118" cy="355" r="2"/><circle cx="410" cy="349" r="1.8"/><circle cx="410" cy="385" r="1.8"/><circle cx="410" cy="421" r="1.8"/></g>
+<path d="M110 270L240 210L530 270L400 340ZM132.3 267.1L398.9 331.5L507.7 272.9L241.1 218.5Z" fill="url(#verdant-raised-garden-bed-rim)" fill-rule="evenodd"/>
+<path d="M110 270L400 340L530 270" fill="none" stroke="#FAD2AE" stroke-opacity=".7" stroke-width="1.5"/>
+<path d="M128 262L236 214" stroke="#fff" stroke-opacity=".35" stroke-width="2.5" stroke-linecap="round"/>
 </svg>

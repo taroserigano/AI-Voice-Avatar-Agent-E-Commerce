@@ -1,14 +1,117 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Harbor Lights 1000-Piece Puzzle illustration">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Harbor Lights 1000-Piece Puzzle">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#7c3aed"/>
-      <stop offset="1" stop-color="#7c3aed" stop-opacity=".72"/>
+    <radialGradient id="pebble-pine-puzzle-1000-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F7F4FF"/>
+      <stop offset="1" stop-color="#E4DDFB"/>
+    </radialGradient>
+    <filter id="pebble-pine-puzzle-1000-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="pebble-pine-puzzle-1000-sky" x1="0" y1="188" x2="0" y2="312" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2b2874"/>
+      <stop offset=".45" stop-color="#6d3a9a"/>
+      <stop offset=".78" stop-color="#df6f96"/>
+      <stop offset="1" stop-color="#f9ad6c"/>
     </linearGradient>
+    <linearGradient id="pebble-pine-puzzle-1000-sea" x1="0" y1="310" x2="0" y2="372" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5a4a9e"/>
+      <stop offset=".3" stop-color="#34357f"/>
+      <stop offset="1" stop-color="#1b1f55"/>
+    </linearGradient>
+    <radialGradient id="pebble-pine-puzzle-1000-sun" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#fff1c2"/>
+      <stop offset=".5" stop-color="#ffc47a" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#ffc47a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="pebble-pine-puzzle-1000-beam" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#fff6d0" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#fff6d0" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="pebble-pine-puzzle-1000-top" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4b5ab0"/>
+      <stop offset="1" stop-color="#34418a"/>
+    </linearGradient>
+    <linearGradient id="pebble-pine-puzzle-1000-side" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#232c68"/>
+      <stop offset="1" stop-color="#161c47"/>
+    </linearGradient>
+    <linearGradient id="pebble-pine-puzzle-1000-gloss" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="pebble-pine-puzzle-1000-grid" x="142" y="188" width="46" height="46" patternUnits="userSpaceOnUse">
+      <path d="M46 0V17C40 15 36 19 36 23C36 27 40 31 46 29V46M0 46H17C15 40 19 36 23 36C27 36 31 40 29 46H46" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="1"/>
+    </pattern>
+    <clipPath id="pebble-pine-puzzle-1000-art">
+      <rect x="142" y="188" width="296" height="184" rx="4"/>
+    </clipPath>
+    <path id="pebble-pine-puzzle-1000-piece" d="M0 0L22 0C24 0 25 -2 23 -5C19 -10 22 -18 30 -18C38 -18 41 -10 37 -5C35 -2 36 0 38 0L60 0L60 22C60 24 58 25 55 23C50 19 42 22 42 30C42 38 50 41 55 37C58 35 60 36 60 38L60 60L38 60C36 60 35 62 37 65C41 70 38 78 30 78C22 78 19 70 23 65C25 62 24 60 22 60L0 60L0 38C0 36 2 35 5 37C10 41 18 38 18 30C18 22 10 19 5 23C2 25 0 24 0 22Z" transform="translate(-30 -30)"/>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <rect x="240" y="210" width="70" height="70" rx="10" fill="#fff"/><rect x="330" y="210" width="70" height="70" rx="10" fill="#fff" fill-opacity=".8"/><rect x="285" y="290" width="70" height="70" rx="10" fill="#fff" fill-opacity=".9"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Harbor Lights 1000-Piece</tspan><tspan x="320" dy="40">Puzzle</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Pebble &amp; Pine</text>
+  <rect width="640" height="640" fill="url(#pebble-pine-puzzle-1000-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <g transform="translate(-25.6 -36) scale(1.08)">
+    <ellipse cx="316" cy="430" rx="190" ry="20" fill="#1e1b4b" opacity=".16" filter="url(#pebble-pine-puzzle-1000-blur)"/>
+
+    <!-- box -->
+    <path d="M130 176L450 176L494 146L174 146Z" fill="url(#pebble-pine-puzzle-1000-top)"/>
+    <path d="M140 172L178 150" stroke="#fff" stroke-opacity=".3" stroke-width="2" stroke-linecap="round"/>
+    <path d="M450 176L494 146L494 390L450 420Z" fill="url(#pebble-pine-puzzle-1000-side)"/>
+    <path d="M462 200L482 186L482 250L462 264Z" fill="#f2b56b" fill-opacity=".85"/>
+    <rect x="130" y="176" width="320" height="244" fill="#27316e"/>
+    <path d="M130 176H450" stroke="#fff" stroke-opacity=".35" stroke-width="2"/>
+
+    <!-- box art: harbor at dusk -->
+    <g clip-path="url(#pebble-pine-puzzle-1000-art)">
+      <rect x="142" y="188" width="296" height="124" fill="url(#pebble-pine-puzzle-1000-sky)"/>
+      <circle cx="176" cy="204" r="1.4" fill="#fff"/><circle cx="212" cy="214" r="1" fill="#fff"/><circle cx="262" cy="200" r="1.3" fill="#fff"/><circle cx="318" cy="210" r="1" fill="#fff"/><circle cx="352" cy="198" r="1.4" fill="#fff"/><circle cx="410" cy="206" r="1" fill="#fff"/>
+      <circle cx="300" cy="310" r="44" fill="url(#pebble-pine-puzzle-1000-sun)"/>
+      <circle cx="300" cy="312" r="16" fill="#ffe3a3"/>
+      <rect x="142" y="310" width="296" height="62" fill="url(#pebble-pine-puzzle-1000-sea)"/>
+      <path d="M282 318H318M288 326H312M292 334H308M294 342H306" stroke="#ffd79a" stroke-opacity=".75" stroke-width="2" stroke-linecap="round"/>
+      <!-- town -->
+      <path d="M142 312V270H156V258L166 250L176 258V280H188V262H204V252L214 244L224 252V284H236V274H248V312Z" fill="#2a2360"/>
+      <g fill="#ffd166">
+        <rect x="146" y="278" width="4" height="5"/><rect x="161" y="264" width="4" height="5"/><rect x="168" y="276" width="4" height="5"/><rect x="192" y="270" width="4" height="5"/><rect x="198" y="290" width="4" height="5"/><rect x="210" y="258" width="4" height="5"/><rect x="216" y="276" width="4" height="5"/><rect x="240" y="286" width="4" height="5"/><rect x="152" y="296" width="4" height="5"/>
+      </g>
+      <path d="M150 318V330M168 318V334M196 318V330M214 318V336M242 318V328" stroke="#ffd166" stroke-opacity=".5" stroke-width="2" stroke-linecap="round"/>
+      <path d="M246 312H292" stroke="#2a2360" stroke-width="3"/>
+      <path d="M254 312V318M270 312V318M286 312V318" stroke="#2a2360" stroke-width="2"/>
+      <!-- sailboat -->
+      <path d="M330 338H362L356 346H336Z" fill="#221d4f"/>
+      <path d="M346 336V300L364 334Z" fill="#fde7c4"/>
+      <path d="M344 336V308L332 334Z" fill="#f4b99a"/>
+      <!-- lighthouse -->
+      <path d="M160 264L398 236L398 250Z" fill="url(#pebble-pine-puzzle-1000-beam)"/>
+      <path d="M370 318C376 300 390 294 404 296C420 292 434 300 438 312V318Z" fill="#1d1a45"/>
+      <path d="M392 298L396 246H408L412 298Z" fill="#f5f2ff"/>
+      <path d="M393.4 282L394.5 268H409.5L410.6 282Z" fill="#e0525f"/>
+      <path d="M395.3 258L395.8 250H408.2L408.7 258Z" fill="#e0525f"/>
+      <rect x="394" y="236" width="16" height="10" rx="2" fill="#ffe29a"/>
+      <circle cx="402" cy="241" r="12" fill="#fff3c4" fill-opacity=".35"/>
+      <path d="M392 236L402 228L412 236Z" fill="#2a2360"/>
+      <rect x="142" y="188" width="296" height="184" fill="url(#pebble-pine-puzzle-1000-grid)"/>
+    </g>
+    <!-- lower band -->
+    <rect x="156" y="386" width="120" height="14" rx="7" fill="#f2b56b"/>
+    <rect x="288" y="386" width="48" height="14" rx="7" fill="#fff" fill-opacity=".3"/>
+    <use xlink:href="#pebble-pine-puzzle-1000-piece" href="#pebble-pine-puzzle-1000-piece" transform="translate(420 394) scale(.2)" fill="#f5f2ff"/>
+    <path d="M186 176L140 420H150L200 176Z" fill="url(#pebble-pine-puzzle-1000-gloss)"/>
+
+    <!-- loose pieces -->
+    <g transform="translate(168 454)">
+      <use xlink:href="#pebble-pine-puzzle-1000-piece" href="#pebble-pine-puzzle-1000-piece" transform="translate(0 5) scale(.86 .5) rotate(18)" fill="#9c5b53"/>
+      <use xlink:href="#pebble-pine-puzzle-1000-piece" href="#pebble-pine-puzzle-1000-piece" transform="scale(.86 .5) rotate(18)" fill="#ef8a8f"/>
+    </g>
+    <g transform="translate(262 474)">
+      <use xlink:href="#pebble-pine-puzzle-1000-piece" href="#pebble-pine-puzzle-1000-piece" transform="translate(0 5) scale(.86 .5) rotate(-24)" fill="#12163d"/>
+      <use xlink:href="#pebble-pine-puzzle-1000-piece" href="#pebble-pine-puzzle-1000-piece" transform="scale(.86 .5) rotate(-24)" fill="#34357f"/>
+      <path d="M-10 -2H10M-6 4H6" stroke="#ffd79a" stroke-width="2" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(470 452)">
+      <use xlink:href="#pebble-pine-puzzle-1000-piece" href="#pebble-pine-puzzle-1000-piece" transform="translate(0 5) scale(.86 .5) rotate(52)" fill="#3f2466"/>
+      <use xlink:href="#pebble-pine-puzzle-1000-piece" href="#pebble-pine-puzzle-1000-piece" transform="scale(.86 .5) rotate(52)" fill="#7b4aa8"/>
+      <circle cx="-4" cy="-3" r="1.4" fill="#fff"/><circle cx="8" cy="2" r="1" fill="#fff"/>
+    </g>
+  </g>
 </svg>

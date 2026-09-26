@@ -1,10 +1,11 @@
 "use client";
 
+import { SignOutIcon } from "@/components/icons";
 import { browserApi } from "@/lib/api-browser";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
-export function SignOutButton({ className }: { className?: string }) {
+export function SignOutButton({ className, showIcon = true }: { className?: string; showIcon?: boolean }) {
   const [pending, setPending] = useState(false);
   const client = useQueryClient();
   async function signOut() {
@@ -15,7 +16,8 @@ export function SignOutButton({ className }: { className?: string }) {
     window.location.replace("/sign-in");
   }
   return (
-    <button type="button" onClick={signOut} disabled={pending} className={className}>
+    <button type="button" onClick={signOut} disabled={pending} aria-busy={pending || undefined} className={className}>
+      {showIcon ? <SignOutIcon /> : null}
       {pending ? "Signing out…" : "Sign out"}
     </button>
   );

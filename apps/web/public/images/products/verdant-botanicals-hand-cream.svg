@@ -1,14 +1,78 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Shea Butter Hand Cream Trio illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Shea Butter Hand Cream Trio">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0f766e"/>
-      <stop offset="1" stop-color="#0f766e" stop-opacity=".72"/>
+    <radialGradient id="verdant-botanicals-hand-cream-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#EFFBF8"/>
+      <stop offset="1" stop-color="#D3EFE8"/>
+    </radialGradient>
+    <filter id="verdant-botanicals-hand-cream-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <filter id="verdant-botanicals-hand-cream-drop" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+    <linearGradient id="verdant-botanicals-hand-cream-tube" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ece6dc"/>
+      <stop offset=".25" stop-color="#fffdf9"/>
+      <stop offset=".65" stop-color="#f3eee6"/>
+      <stop offset="1" stop-color="#cdc4b6"/>
     </linearGradient>
+    <linearGradient id="verdant-botanicals-hand-cream-crimp" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f1ece3"/>
+      <stop offset=".3" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#d2c9bb"/>
+    </linearGradient>
+    <linearGradient id="verdant-botanicals-hand-cream-peach" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fbd3bf"/>
+      <stop offset=".35" stop-color="#f6c0a5"/>
+      <stop offset="1" stop-color="#dc9474"/>
+    </linearGradient>
+    <linearGradient id="verdant-botanicals-hand-cream-mint" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#cfeee0"/>
+      <stop offset=".35" stop-color="#b3e3cf"/>
+      <stop offset="1" stop-color="#72b99c"/>
+    </linearGradient>
+    <linearGradient id="verdant-botanicals-hand-cream-lav" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#e2d8f5"/>
+      <stop offset=".35" stop-color="#cdbfec"/>
+      <stop offset="1" stop-color="#9c86cf"/>
+    </linearGradient>
+    <path id="verdant-botanicals-hand-cream-body" d="M-58 22L58 22C58 120 40 200 37 250L33 262L-33 262L-37 250C-40 200 -58 120 -58 22Z"/>
+    <path id="verdant-botanicals-hand-cream-cap" d="M-38 262H38V306C38 314 30 318 22 318H-22C-30 318 -38 314 -38 306Z"/>
+    <path id="verdant-botanicals-hand-cream-band" d="M-53 128C-52 150 -50 170 -47 186L47 186C50 170 52 150 53 128Z"/>
+    <g id="verdant-botanicals-hand-cream-detail">
+      <rect x="-61" y="0" width="122" height="24" rx="3" fill="url(#verdant-botanicals-hand-cream-crimp)"/>
+      <path d="M-58 5H58M-58 9H58M-58 13H58M-58 17H58" stroke="#b9ae9d" stroke-width="1" stroke-opacity=".6"/>
+      <path d="M-58 24H58" stroke="#b9ae9d" stroke-width="1.5" stroke-opacity=".7"/>
+      <path d="M-40 34C-40 110 -30 190 -24 244" stroke="#fff" stroke-width="7" stroke-linecap="round" fill="none"/>
+      <path d="M-26 262H26" stroke="#000" stroke-opacity=".12" stroke-width="2"/>
+      <path d="M-28 270V304" stroke="#fff" stroke-opacity=".55" stroke-width="5" stroke-linecap="round"/>
+      <path d="M-38 276H38" stroke="#000" stroke-opacity=".1" stroke-width="1.5"/>
+      <path d="M0 140C-10 146 -12 162 -1 172C10 162 10 146 0 140Z" fill="#fff" fill-opacity=".9"/>
+      <path d="M-1 150V172" stroke="#fff" stroke-width="1.2"/>
+      <rect x="-20" y="206" width="40" height="3" rx="1.5" fill="#cfc6b8"/>
+    </g>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <rect x="290" y="210" width="60" height="30" rx="6" fill="#fff"/><rect x="270" y="240" width="100" height="120" rx="22" fill="#fff"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Shea Butter Hand Cream</tspan><tspan x="320" dy="40">Trio</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Verdant Botanicals</text>
+  <rect width="640" height="640" fill="url(#verdant-botanicals-hand-cream-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="320" cy="500" rx="150" ry="18" fill="#1e1b4b" fill-opacity=".16" filter="url(#verdant-botanicals-hand-cream-shadow)"/>
+  <g transform="translate(286 484) rotate(-15) scale(1.1) translate(0 -318)">
+    <use href="#verdant-botanicals-hand-cream-body" fill="url(#verdant-botanicals-hand-cream-tube)"/>
+    <use href="#verdant-botanicals-hand-cream-band" fill="url(#verdant-botanicals-hand-cream-peach)"/>
+    <use href="#verdant-botanicals-hand-cream-cap" fill="url(#verdant-botanicals-hand-cream-peach)"/>
+    <use href="#verdant-botanicals-hand-cream-detail"/>
+  </g>
+  <g transform="translate(354 484) rotate(15) scale(1.1) translate(0 -318)">
+    <use href="#verdant-botanicals-hand-cream-body" fill="url(#verdant-botanicals-hand-cream-tube)"/>
+    <use href="#verdant-botanicals-hand-cream-band" fill="url(#verdant-botanicals-hand-cream-lav)"/>
+    <use href="#verdant-botanicals-hand-cream-cap" fill="url(#verdant-botanicals-hand-cream-lav)"/>
+    <use href="#verdant-botanicals-hand-cream-detail"/>
+    <use href="#verdant-botanicals-hand-cream-body" fill="#1e1b4b" fill-opacity=".06"/>
+  </g>
+  <use href="#verdant-botanicals-hand-cream-body" transform="translate(330 500) scale(1.2) translate(0 -318)" fill="#1e1b4b" fill-opacity=".2" filter="url(#verdant-botanicals-hand-cream-drop)"/>
+  <g transform="translate(320 500) scale(1.2) translate(0 -318)">
+    <use href="#verdant-botanicals-hand-cream-body" fill="url(#verdant-botanicals-hand-cream-tube)"/>
+    <use href="#verdant-botanicals-hand-cream-band" fill="url(#verdant-botanicals-hand-cream-mint)"/>
+    <use href="#verdant-botanicals-hand-cream-cap" fill="url(#verdant-botanicals-hand-cream-mint)"/>
+    <use href="#verdant-botanicals-hand-cream-detail"/>
+  </g>
 </svg>

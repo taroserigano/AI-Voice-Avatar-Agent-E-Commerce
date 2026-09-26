@@ -1,6 +1,90 @@
 {
   "components": {
     "schemas": {
+      "ActivityOut": {
+        "properties": {
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_sample": {
+            "description": "Seeded demo activity; label it on screen",
+            "title": "Is Sample",
+            "type": "boolean"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "title": "Occurred At",
+            "type": "string"
+          },
+          "order_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order Id"
+          },
+          "product": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ActivityProduct"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": {
+            "$ref": "#/components/schemas/EventType"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "occurred_at",
+          "product",
+          "order_id",
+          "data",
+          "is_sample"
+        ],
+        "title": "ActivityOut",
+        "type": "object"
+      },
+      "ActivityProduct": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "image_path": {
+            "title": "Image Path",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "image_path"
+        ],
+        "title": "ActivityProduct",
+        "type": "object"
+      },
       "CartLineOut": {
         "properties": {
           "available": {
@@ -151,6 +235,22 @@
         "title": "CategoryOut",
         "type": "object"
       },
+      "EventType": {
+        "enum": [
+          "signed_in",
+          "searched",
+          "viewed_product",
+          "added_to_cart",
+          "placed_order",
+          "order_delivered",
+          "started_return",
+          "refund_issued",
+          "wrote_review",
+          "contacted_support"
+        ],
+        "title": "EventType",
+        "type": "string"
+      },
       "FacetValue": {
         "properties": {
           "count": {
@@ -220,6 +320,106 @@
         "title": "LegStatus",
         "type": "string"
       },
+      "LineReturnOption": {
+        "properties": {
+          "currency": {
+            "title": "Currency",
+            "type": "string"
+          },
+          "eligible": {
+            "title": "Eligible",
+            "type": "boolean"
+          },
+          "image_path": {
+            "title": "Image Path",
+            "type": "string"
+          },
+          "inspection_required": {
+            "title": "Inspection Required",
+            "type": "boolean"
+          },
+          "max_refund_minor": {
+            "description": "Refund if every returnable unit is sent back now; computed by the server",
+            "title": "Max Refund Minor",
+            "type": "integer"
+          },
+          "message": {
+            "description": "Plain-language explanation, written by the server",
+            "title": "Message",
+            "type": "string"
+          },
+          "order_line_id": {
+            "format": "uuid",
+            "title": "Order Line Id",
+            "type": "string"
+          },
+          "product_title": {
+            "title": "Product Title",
+            "type": "string"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "type": "integer"
+          },
+          "reason": {
+            "$ref": "#/components/schemas/Reason"
+          },
+          "refund_timing": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RefundTiming"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "returnable_quantity": {
+            "title": "Returnable Quantity",
+            "type": "integer"
+          },
+          "returned_quantity": {
+            "description": "Units already in returns that weren't rejected",
+            "title": "Returned Quantity",
+            "type": "integer"
+          },
+          "variant_name": {
+            "title": "Variant Name",
+            "type": "string"
+          },
+          "window_ends_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Window Ends At"
+          }
+        },
+        "required": [
+          "order_line_id",
+          "product_title",
+          "variant_name",
+          "image_path",
+          "quantity",
+          "returned_quantity",
+          "returnable_quantity",
+          "eligible",
+          "reason",
+          "message",
+          "window_ends_at",
+          "inspection_required",
+          "refund_timing",
+          "max_refund_minor",
+          "currency"
+        ],
+        "title": "LineReturnOption",
+        "type": "object"
+      },
       "MessageOut": {
         "properties": {
           "message": {
@@ -255,6 +455,24 @@
             "title": "Discount Minor",
             "type": "integer"
           },
+          "estimated_delivery_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "While it's still on its way",
+            "title": "Estimated Delivery At"
+          },
+          "has_open_return": {
+            "description": "A return for this order is still in progress",
+            "title": "Has Open Return",
+            "type": "boolean"
+          },
           "id": {
             "format": "uuid",
             "title": "Id",
@@ -271,10 +489,55 @@
             "title": "Lines",
             "type": "array"
           },
+          "payment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PaymentOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "placed_at": {
             "format": "date-time",
             "title": "Placed At",
             "type": "string"
+          },
+          "preview_images": {
+            "description": "Up to 4 line images, for the order list",
+            "items": {
+              "type": "string"
+            },
+            "title": "Preview Images",
+            "type": "array"
+          },
+          "return_window_ends_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest time any item can still be returned; null if nothing can be",
+            "title": "Return Window Ends At"
+          },
+          "returns": {
+            "items": {
+              "$ref": "#/components/schemas/ReturnOut"
+            },
+            "title": "Returns",
+            "type": "array"
+          },
+          "shipments": {
+            "items": {
+              "$ref": "#/components/schemas/ShipmentOut"
+            },
+            "title": "Shipments",
+            "type": "array"
           },
           "shipping_minor": {
             "title": "Shipping Minor",
@@ -303,12 +566,19 @@
           "total_minor",
           "item_count",
           "placed_at",
+          "delivered_at",
+          "preview_images",
+          "estimated_delivery_at",
+          "return_window_ends_at",
+          "has_open_return",
           "subtotal_minor",
           "discount_minor",
           "tax_minor",
           "shipping_minor",
-          "delivered_at",
-          "lines"
+          "lines",
+          "payment",
+          "shipments",
+          "returns"
         ],
         "title": "OrderDetail",
         "type": "object"
@@ -394,6 +664,36 @@
             "title": "Currency",
             "type": "string"
           },
+          "delivered_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delivered At"
+          },
+          "estimated_delivery_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "While it's still on its way",
+            "title": "Estimated Delivery At"
+          },
+          "has_open_return": {
+            "description": "A return for this order is still in progress",
+            "title": "Has Open Return",
+            "type": "boolean"
+          },
           "id": {
             "format": "uuid",
             "title": "Id",
@@ -407,6 +707,27 @@
             "format": "date-time",
             "title": "Placed At",
             "type": "string"
+          },
+          "preview_images": {
+            "description": "Up to 4 line images, for the order list",
+            "items": {
+              "type": "string"
+            },
+            "title": "Preview Images",
+            "type": "array"
+          },
+          "return_window_ends_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest time any item can still be returned; null if nothing can be",
+            "title": "Return Window Ends At"
           },
           "status": {
             "$ref": "#/components/schemas/OrderStatus"
@@ -422,10 +743,150 @@
           "currency",
           "total_minor",
           "item_count",
-          "placed_at"
+          "placed_at",
+          "delivered_at",
+          "preview_images",
+          "estimated_delivery_at",
+          "return_window_ends_at",
+          "has_open_return"
         ],
         "title": "OrderSummary",
         "type": "object"
+      },
+      "PaymentMethodOut": {
+        "description": "Where refunds go: always the order's original payment method.",
+        "properties": {
+          "card_brand": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Card Brand"
+          },
+          "card_last4": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Card Last4"
+          },
+          "is_simulated": {
+            "description": "Seed/simulator payment, not a real Stripe charge",
+            "title": "Is Simulated",
+            "type": "boolean"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/PaymentProvider"
+          }
+        },
+        "required": [
+          "provider",
+          "card_brand",
+          "card_last4",
+          "is_simulated"
+        ],
+        "title": "PaymentMethodOut",
+        "type": "object"
+      },
+      "PaymentOut": {
+        "properties": {
+          "amount_minor": {
+            "title": "Amount Minor",
+            "type": "integer"
+          },
+          "captured_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured At"
+          },
+          "card_brand": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Card Brand"
+          },
+          "card_last4": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Card Last4"
+          },
+          "currency": {
+            "title": "Currency",
+            "type": "string"
+          },
+          "is_simulated": {
+            "description": "Seed/simulator payment, not a real Stripe charge",
+            "title": "Is Simulated",
+            "type": "boolean"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/PaymentProvider"
+          },
+          "refunded_minor": {
+            "title": "Refunded Minor",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PaymentStatus"
+          }
+        },
+        "required": [
+          "provider",
+          "card_brand",
+          "card_last4",
+          "is_simulated",
+          "status",
+          "amount_minor",
+          "refunded_minor",
+          "currency",
+          "captured_at"
+        ],
+        "title": "PaymentOut",
+        "type": "object"
+      },
+      "PaymentProvider": {
+        "enum": [
+          "stripe",
+          "simulated"
+        ],
+        "title": "PaymentProvider",
+        "type": "string"
+      },
+      "PaymentStatus": {
+        "enum": [
+          "succeeded",
+          "partially_refunded",
+          "refunded",
+          "failed"
+        ],
+        "title": "PaymentStatus",
+        "type": "string"
       },
       "PolicyClass": {
         "description": "How the sandbox return policy treats a category (see PRODUCT_REQUIREMENTS.md).",
@@ -478,6 +939,22 @@
             "title": "Price Minor",
             "type": "integer"
           },
+          "rating_average": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Mean review rating to one decimal; null with no reviews",
+            "title": "Rating Average"
+          },
+          "rating_count": {
+            "title": "Rating Count",
+            "type": "integer"
+          },
           "slug": {
             "title": "Slug",
             "type": "string"
@@ -509,6 +986,8 @@
           "currency",
           "in_stock",
           "variant_count",
+          "rating_average",
+          "rating_count",
           "description",
           "variants",
           "as_of"
@@ -594,6 +1073,22 @@
             "title": "Price Minor",
             "type": "integer"
           },
+          "rating_average": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Mean review rating to one decimal; null with no reviews",
+            "title": "Rating Average"
+          },
+          "rating_count": {
+            "title": "Rating Count",
+            "type": "integer"
+          },
           "slug": {
             "title": "Slug",
             "type": "string"
@@ -617,10 +1112,518 @@
           "price_minor",
           "currency",
           "in_stock",
-          "variant_count"
+          "variant_count",
+          "rating_average",
+          "rating_count"
         ],
         "title": "ProductSummary",
         "type": "object"
+      },
+      "RatingBucket": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "stars": {
+            "title": "Stars",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "stars",
+          "count"
+        ],
+        "title": "RatingBucket",
+        "type": "object"
+      },
+      "RatingSummary": {
+        "properties": {
+          "average": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Mean rating to one decimal; null with no reviews",
+            "title": "Average"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "distribution": {
+            "description": "One bucket per star value, 5 down to 1",
+            "items": {
+              "$ref": "#/components/schemas/RatingBucket"
+            },
+            "title": "Distribution",
+            "type": "array"
+          }
+        },
+        "required": [
+          "average",
+          "count",
+          "distribution"
+        ],
+        "title": "RatingSummary",
+        "type": "object"
+      },
+      "Reason": {
+        "description": "Same codes as the assistant eval set (evals/assistant/returns.jsonl).",
+        "enum": [
+          "within_window",
+          "perishable_within_7_days",
+          "not_delivered",
+          "canceled",
+          "final_sale",
+          "outside_window",
+          "perishable_past_7_days",
+          "fully_returned"
+        ],
+        "title": "Reason",
+        "type": "string"
+      },
+      "RefundOut": {
+        "properties": {
+          "amount_minor": {
+            "title": "Amount Minor",
+            "type": "integer"
+          },
+          "currency": {
+            "title": "Currency",
+            "type": "string"
+          },
+          "failure_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Failure Reason"
+          },
+          "requested_at": {
+            "format": "date-time",
+            "title": "Requested At",
+            "type": "string"
+          },
+          "settled_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Settled At"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RefundStatus"
+          }
+        },
+        "required": [
+          "status",
+          "amount_minor",
+          "currency",
+          "requested_at",
+          "settled_at",
+          "failure_reason"
+        ],
+        "title": "RefundOut",
+        "type": "object"
+      },
+      "RefundStatus": {
+        "enum": [
+          "not_requested",
+          "requested",
+          "pending",
+          "succeeded",
+          "failed",
+          "requires_action",
+          "canceled"
+        ],
+        "title": "RefundStatus",
+        "type": "string"
+      },
+      "RefundTiming": {
+        "enum": [
+          "instant",
+          "after_receipt",
+          "after_inspection",
+          "no_return_needed"
+        ],
+        "title": "RefundTiming",
+        "type": "string"
+      },
+      "ReturnItemOut": {
+        "properties": {
+          "condition": {
+            "title": "Condition",
+            "type": "string"
+          },
+          "image_path": {
+            "title": "Image Path",
+            "type": "string"
+          },
+          "order_line_id": {
+            "format": "uuid",
+            "title": "Order Line Id",
+            "type": "string"
+          },
+          "product_title": {
+            "title": "Product Title",
+            "type": "string"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "type": "integer"
+          },
+          "refund_minor": {
+            "title": "Refund Minor",
+            "type": "integer"
+          },
+          "variant_name": {
+            "title": "Variant Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_line_id",
+          "product_title",
+          "variant_name",
+          "image_path",
+          "quantity",
+          "refund_minor",
+          "condition"
+        ],
+        "title": "ReturnItemOut",
+        "type": "object"
+      },
+      "ReturnOptions": {
+        "properties": {
+          "as_of": {
+            "format": "date-time",
+            "title": "As Of",
+            "type": "string"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/LineReturnOption"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "order_id": {
+            "format": "uuid",
+            "title": "Order Id",
+            "type": "string"
+          },
+          "policy_version": {
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "refund_destination": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PaymentMethodOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "whole_order_shipping_refund_minor": {
+            "description": "Shipping refunded only if everything left in the order is returned",
+            "title": "Whole Order Shipping Refund Minor",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "order_id",
+          "policy_version",
+          "refund_destination",
+          "lines",
+          "whole_order_shipping_refund_minor",
+          "as_of"
+        ],
+        "title": "ReturnOptions",
+        "type": "object"
+      },
+      "ReturnOut": {
+        "properties": {
+          "closed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed At"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_sample": {
+            "description": "Seeded demo history; label it on screen",
+            "title": "Is Sample",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ReturnItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "refund": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RefundOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The latest refund attempt, if any"
+          },
+          "rma_number": {
+            "title": "Rma Number",
+            "type": "string"
+          },
+          "shipping_refund_minor": {
+            "title": "Shipping Refund Minor",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ReturnStatus"
+          }
+        },
+        "required": [
+          "id",
+          "rma_number",
+          "status",
+          "reason",
+          "created_at",
+          "closed_at",
+          "shipping_refund_minor",
+          "items",
+          "refund",
+          "is_sample"
+        ],
+        "title": "ReturnOut",
+        "type": "object"
+      },
+      "ReturnStatus": {
+        "enum": [
+          "requested",
+          "authorized",
+          "in_transit",
+          "received",
+          "inspected",
+          "closed",
+          "review",
+          "rejected",
+          "canceled"
+        ],
+        "title": "ReturnStatus",
+        "type": "string"
+      },
+      "ReviewIn": {
+        "description": "What a shopper submits. The author and product come from the session and the URL.",
+        "properties": {
+          "body": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          },
+          "rating": {
+            "description": "Whole stars, 1 to 5",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Rating",
+            "type": "integer"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "required": [
+          "rating"
+        ],
+        "title": "ReviewIn",
+        "type": "object"
+      },
+      "ReviewOut": {
+        "properties": {
+          "author_name": {
+            "description": "Shortened display name, e.g. \"Alice R.\"",
+            "title": "Author Name",
+            "type": "string"
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_mine": {
+            "title": "Is Mine",
+            "type": "boolean"
+          },
+          "is_sample": {
+            "description": "Seeded demo content; label it as a sample on screen",
+            "title": "Is Sample",
+            "type": "boolean"
+          },
+          "rating": {
+            "title": "Rating",
+            "type": "integer"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "verified_purchase": {
+            "description": "The author has a paid order for this product",
+            "title": "Verified Purchase",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "rating",
+          "title",
+          "body",
+          "author_name",
+          "created_at",
+          "updated_at",
+          "is_mine",
+          "verified_purchase",
+          "is_sample"
+        ],
+        "title": "ReviewOut",
+        "type": "object"
+      },
+      "ReviewPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "my_review": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReviewOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The signed-in shopper's review, if any"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/RatingSummary"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "summary",
+          "items",
+          "total",
+          "page",
+          "page_size",
+          "my_review"
+        ],
+        "title": "ReviewPage",
+        "type": "object"
+      },
+      "ReviewSort": {
+        "enum": [
+          "newest",
+          "highest",
+          "lowest"
+        ],
+        "title": "ReviewSort",
+        "type": "string"
       },
       "Role": {
         "enum": [
@@ -682,6 +1685,137 @@
         "title": "SetCartItemRequest",
         "type": "object"
       },
+      "ShipmentEventOut": {
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "title": "Occurred At",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ShipmentStatus"
+          }
+        },
+        "required": [
+          "occurred_at",
+          "status",
+          "description",
+          "location"
+        ],
+        "title": "ShipmentEventOut",
+        "type": "object"
+      },
+      "ShipmentOut": {
+        "properties": {
+          "carrier": {
+            "title": "Carrier",
+            "type": "string"
+          },
+          "delivered_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delivered At"
+          },
+          "estimated_delivery_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Delivery At"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/ShipmentEventOut"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_simulated": {
+            "title": "Is Simulated",
+            "type": "boolean"
+          },
+          "service": {
+            "title": "Service",
+            "type": "string"
+          },
+          "shipped_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shipped At"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ShipmentStatus"
+          },
+          "tracking_number": {
+            "title": "Tracking Number",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "carrier",
+          "service",
+          "tracking_number",
+          "status",
+          "shipped_at",
+          "estimated_delivery_at",
+          "delivered_at",
+          "is_simulated",
+          "events"
+        ],
+        "title": "ShipmentOut",
+        "type": "object"
+      },
+      "ShipmentStatus": {
+        "enum": [
+          "label_created",
+          "in_transit",
+          "out_for_delivery",
+          "delivered",
+          "exception"
+        ],
+        "title": "ShipmentStatus",
+        "type": "string"
+      },
       "SignInRequest": {
         "properties": {
           "email": {
@@ -736,7 +1870,8 @@
           "relevance",
           "price_asc",
           "price_desc",
-          "newest"
+          "newest",
+          "top_rated"
         ],
         "title": "SortOrder",
         "type": "string"
@@ -891,6 +2026,75 @@
         "summary": "Healthz",
         "tags": [
           "ops"
+        ]
+      }
+    },
+    "/v1/activity": {
+      "get": {
+        "description": "The signed-in shopper's own activity, newest first.",
+        "operationId": "my_activity_v1_activity_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/EventType"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ActivityOut"
+                  },
+                  "title": "Response My Activity V1 Activity Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Activity",
+        "tags": [
+          "activity"
         ]
       }
     },
@@ -1255,6 +2459,53 @@
         ]
       }
     },
+    "/v1/orders/{order_id}/return-options": {
+      "get": {
+        "description": "What each line of the order can return right now, and roughly for how much. Read-only:\nstarting a return needs a quote and the shopper's confirmation (Milestone 3a).",
+        "operationId": "get_return_options_v1_orders__order_id__return_options_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Order Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnOptions"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Return Options",
+        "tags": [
+          "orders"
+        ]
+      }
+    },
     "/v1/products": {
       "get": {
         "operationId": "products_v1_products_get",
@@ -1468,6 +2719,189 @@
         "summary": "Product Detail",
         "tags": [
           "catalog"
+        ]
+      }
+    },
+    "/v1/products/{product_id}/reviews": {
+      "get": {
+        "operationId": "list_reviews_v1_products__product_id__reviews_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "product_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Product Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ReviewSort",
+              "default": "newest"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 1000,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageOut"
+                }
+              }
+            },
+            "description": "No such product"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Reviews",
+        "tags": [
+          "reviews"
+        ]
+      }
+    },
+    "/v1/products/{product_id}/reviews/mine": {
+      "delete": {
+        "operationId": "delete_my_review_v1_products__product_id__reviews_mine_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "product_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Product Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete My Review",
+        "tags": [
+          "reviews"
+        ]
+      },
+      "put": {
+        "operationId": "put_my_review_v1_products__product_id__reviews_mine_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "product_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Product Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageOut"
+                }
+              }
+            },
+            "description": "No such product"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put My Review",
+        "tags": [
+          "reviews"
         ]
       }
     }

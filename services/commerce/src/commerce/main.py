@@ -16,12 +16,14 @@ from fastapi.dependencies.models import Dependant
 from fastapi.routing import APIRoute
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
+from commerce.activity.routes import router as activity_router
 from commerce.auth.deps import require_user
 from commerce.auth.routes import router as auth_router
 from commerce.cart.routes import router as cart_router
 from commerce.catalog.routes import router as catalog_router
 from commerce.config import get_settings
 from commerce.orders.routes import router as orders_router
+from commerce.reviews.routes import router as reviews_router
 
 # (method, path) pairs reachable without a session. The Stripe webhook joins in Milestone 2.
 PUBLIC_ROUTES: frozenset[tuple[str, str]] = frozenset(
@@ -121,6 +123,8 @@ def create_app() -> FastAPI:
     app.include_router(catalog_router, dependencies=private)
     app.include_router(cart_router, dependencies=private)
     app.include_router(orders_router, dependencies=private)
+    app.include_router(reviews_router, dependencies=private)
+    app.include_router(activity_router, dependencies=private)
 
     assert_routes_protected(app)
     return app

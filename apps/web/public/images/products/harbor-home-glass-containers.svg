@@ -1,14 +1,65 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Glass Food Storage Containers, 10-Piece illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Glass Food Storage Containers, 10-Piece">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#b45309"/>
-      <stop offset="1" stop-color="#b45309" stop-opacity=".72"/>
+    <radialGradient id="harbor-home-glass-containers-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF8EF"/>
+      <stop offset="1" stop-color="#F6E6CF"/>
+    </radialGradient>
+    <filter id="harbor-home-glass-containers-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="harbor-home-glass-containers-glass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".7"/>
+      <stop offset=".12" stop-color="#e3f3f6" stop-opacity=".35"/>
+      <stop offset=".6" stop-color="#c4e3ea" stop-opacity=".28"/>
+      <stop offset="1" stop-color="#94c4cf" stop-opacity=".55"/>
+    </linearGradient>
+    <linearGradient id="harbor-home-glass-containers-base" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a9d3dc" stop-opacity="0"/>
+      <stop offset="1" stop-color="#8fc1cc" stop-opacity=".55"/>
     </linearGradient>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M250 230h140v70a50 50 0 0 1-50 50h-40a50 50 0 0 1-50-50z" fill="#fff"/><path d="M390 250h22a22 22 0 0 1 0 44h-22" fill="none" stroke="#fff" stroke-width="14"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Glass Food Storage</tspan><tspan x="320" dy="40">Containers, 10-Piece</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Harbor Home</text>
+  <rect width="640" height="640" fill="url(#harbor-home-glass-containers-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="322" cy="480" rx="200" ry="20" fill="#1e1b4b" fill-opacity=".16" filter="url(#harbor-home-glass-containers-shadow)"/>
+  <g transform="translate(0 -18)">
+    <g transform="translate(-22 0)">
+      <!-- container A (large) -->
+      <path d="M148 408h304l-10 72q-2 12-14 12H172q-12 0-14-12z" fill="url(#harbor-home-glass-containers-glass)" stroke="#86b3be" stroke-opacity=".8" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M156 470h288l-2 10q-2 12-14 12H172q-12 0-14-12z" fill="url(#harbor-home-glass-containers-base)"/>
+      <path d="M166 470h268" stroke="#fff" stroke-opacity=".7" stroke-width="2"/>
+      <path d="M160 416l8 62" stroke="#fff" stroke-opacity=".85" stroke-width="5" stroke-linecap="round"/>
+      <path d="M180 416l5 44" stroke="#fff" stroke-opacity=".5" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M142 392h316l-22-32H164z" fill="#b5d2bc" stroke="#b5d2bc" stroke-width="6" stroke-linejoin="round"/>
+      <rect x="140" y="390" width="320" height="20" rx="7" fill="#7fa98b"/>
+      <path d="M146 392h308" stroke="#d5e8da" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="186" y="402" width="34" height="22" rx="5" fill="#6f9a7c"/>
+      <rect x="380" y="402" width="34" height="22" rx="5" fill="#6f9a7c"/>
+      <!-- container B (medium) -->
+      <path d="M176 306h248l-9 68q-2 10-12 10H197q-10 0-12-10z" fill="url(#harbor-home-glass-containers-glass)" stroke="#86b3be" stroke-opacity=".8" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M184 366h232l-1 8q-2 10-12 10H197q-10 0-12-10z" fill="url(#harbor-home-glass-containers-base)"/>
+      <path d="M192 366h216" stroke="#fff" stroke-opacity=".7" stroke-width="2"/>
+      <path d="M188 314l7 58" stroke="#fff" stroke-opacity=".85" stroke-width="5" stroke-linecap="round"/>
+      <path d="M170 290h260l-18-28H188z" fill="#f4c4b2" stroke="#f4c4b2" stroke-width="6" stroke-linejoin="round"/>
+      <rect x="168" y="288" width="264" height="20" rx="7" fill="#e28d71"/>
+      <path d="M174 290h252" stroke="#fad8cb" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="208" y="300" width="30" height="20" rx="5" fill="#cf7b61"/>
+      <rect x="362" y="300" width="30" height="20" rx="5" fill="#cf7b61"/>
+      <!-- container C (small) -->
+      <path d="M204 214h192l-7 60q-2 8-10 8H221q-8 0-10-8z" fill="url(#harbor-home-glass-containers-glass)" stroke="#86b3be" stroke-opacity=".8" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M210 266h180l-1 8q-2 8-10 8H221q-8 0-10-8z" fill="url(#harbor-home-glass-containers-base)"/>
+      <path d="M214 222l6 50" stroke="#fff" stroke-opacity=".85" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M198 198h204l-14-24H212z" fill="#b9cde6" stroke="#b9cde6" stroke-width="6" stroke-linejoin="round"/>
+      <rect x="196" y="196" width="208" height="20" rx="7" fill="#7d9dc3"/>
+      <path d="M202 198h196" stroke="#d6e3f2" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="228" y="208" width="28" height="18" rx="5" fill="#6687b0"/>
+      <rect x="344" y="208" width="28" height="18" rx="5" fill="#6687b0"/>
+    </g>
+    <!-- round container -->
+    <path d="M410 424v58a60 14 0 0 0 120 0v-58z" fill="url(#harbor-home-glass-containers-glass)" stroke="#86b3be" stroke-opacity=".8" stroke-width="2.5"/>
+    <path d="M411 470v12a59 14 0 0 0 118 0v-12a59 14 0 0 1-118 0z" fill="url(#harbor-home-glass-containers-base)"/>
+    <path d="M422 432v48" stroke="#fff" stroke-opacity=".85" stroke-width="5" stroke-linecap="round"/>
+    <path d="M404 412v10a66 16 0 0 0 132 0v-10z" fill="#d7ad49"/>
+    <ellipse cx="470" cy="412" rx="66" ry="16" fill="#f1d387"/>
+    <ellipse cx="470" cy="411" rx="50" ry="10" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="2"/>
+  </g>
 </svg>

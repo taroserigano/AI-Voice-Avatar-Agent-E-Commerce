@@ -1,14 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="High-Density Foam Roller illustration">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#c2410c"/>
-      <stop offset="1" stop-color="#c2410c" stop-opacity=".72"/>
-    </linearGradient>
-  </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <circle cx="320" cy="270" r="80" fill="none" stroke="#fff" stroke-width="16"/><path d="M240 270h160M320 190c-40 50-40 110 0 160M320 190c40 50 40 110 0 160" stroke="#fff" stroke-width="10" fill="none"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">High-Density Foam Roller</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Tempo Athletics</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="High-Density Foam Roller">
+<defs>
+<radialGradient id="tempo-foam-roller-bg" gradientUnits="userSpaceOnUse" cx="320" cy="240" r="520"><stop offset="0" stop-color="#FFF6EF"/><stop offset="1" stop-color="#F8DFCB"/></radialGradient>
+<filter id="tempo-foam-roller-shadow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+<linearGradient id="tempo-foam-roller-body" gradientUnits="userSpaceOnUse" x1="0" y1="-100" x2="0" y2="100"><stop offset="0" stop-color="#789DF5"/><stop offset="0.28" stop-color="#416DDD"/><stop offset="0.7" stop-color="#2446AB"/><stop offset="1" stop-color="#152C75"/></linearGradient>
+<linearGradient id="tempo-foam-roller-face" gradientUnits="userSpaceOnUse" x1="-40" y1="-100" x2="40" y2="100"><stop offset="0" stop-color="#5A85EE"/><stop offset="1" stop-color="#2B51BD"/></linearGradient>
+<linearGradient id="tempo-foam-roller-core" gradientUnits="userSpaceOnUse" x1="-20" y1="-48" x2="20" y2="48"><stop offset="0" stop-color="#F3F5F8"/><stop offset="1" stop-color="#9BA3AE"/></linearGradient>
+<clipPath id="tempo-foam-roller-clip"><path d="M0 -100H290A40 100 0 0 1 290 100H0Z"/></clipPath>
+</defs>
+<rect width="640" height="640" fill="url(#tempo-foam-roller-bg)"/>
+<circle cx="335" cy="305" r="210" fill="#fff" fill-opacity=".45"/>
+<ellipse cx="353" cy="410" rx="175" ry="20" fill="#1e1b4b" fill-opacity=".16" filter="url(#tempo-foam-roller-shadow)" transform="rotate(-17.7 353 410)"/>
+<g transform="translate(185 350) rotate(-17.7)">
+<path d="M0 -100H290A40 100 0 0 1 290 100H0Z" fill="url(#tempo-foam-roller-body)"/>
+<g clip-path="url(#tempo-foam-roller-clip)">
+<g fill="#fff" fill-opacity=".1"><rect x="-12" y="-99.7" width="26" height="9.3" rx="4.6"/><rect x="24" y="-99.7" width="26" height="9.3" rx="4.6"/><rect x="60" y="-99.7" width="26" height="9.3" rx="4.6"/><rect x="96" y="-99.7" width="26" height="9.3" rx="4.6"/><rect x="132" y="-99.7" width="26" height="9.3" rx="4.6"/><rect x="168" y="-99.7" width="26" height="9.3" rx="4.6"/><rect x="204" y="-99.7" width="26" height="9.3" rx="4.6"/><rect x="240" y="-99.7" width="26" height="9.3" rx="4.6"/><rect x="276" y="-99.7" width="26" height="9.3" rx="4.6"/><rect x="6" y="-84.4" width="26" height="20.1" rx="5"/><rect x="42" y="-84.4" width="26" height="20.1" rx="5"/><rect x="78" y="-84.4" width="26" height="20.1" rx="5"/><rect x="114" y="-84.4" width="26" height="20.1" rx="5"/><rect x="150" y="-84.4" width="26" height="20.1" rx="5"/><rect x="186" y="-84.4" width="26" height="20.1" rx="5"/><rect x="222" y="-84.4" width="26" height="20.1" rx="5"/><rect x="258" y="-84.4" width="26" height="20.1" rx="5"/><rect x="294" y="-84.4" width="26" height="20.1" rx="5"/><rect x="-12" y="-54.4" width="26" height="27.4" rx="5"/><rect x="24" y="-54.4" width="26" height="27.4" rx="5"/><rect x="60" y="-54.4" width="26" height="27.4" rx="5"/><rect x="96" y="-54.4" width="26" height="27.4" rx="5"/><rect x="132" y="-54.4" width="26" height="27.4" rx="5"/><rect x="168" y="-54.4" width="26" height="27.4" rx="5"/><rect x="204" y="-54.4" width="26" height="27.4" rx="5"/><rect x="240" y="-54.4" width="26" height="27.4" rx="5"/><rect x="276" y="-54.4" width="26" height="27.4" rx="5"/><rect x="6" y="-15" width="26" height="30" rx="5"/><rect x="42" y="-15" width="26" height="30" rx="5"/><rect x="78" y="-15" width="26" height="30" rx="5"/><rect x="114" y="-15" width="26" height="30" rx="5"/><rect x="150" y="-15" width="26" height="30" rx="5"/><rect x="186" y="-15" width="26" height="30" rx="5"/><rect x="222" y="-15" width="26" height="30" rx="5"/><rect x="258" y="-15" width="26" height="30" rx="5"/><rect x="294" y="-15" width="26" height="30" rx="5"/><rect x="-12" y="27" width="26" height="27.4" rx="5"/><rect x="24" y="27" width="26" height="27.4" rx="5"/><rect x="60" y="27" width="26" height="27.4" rx="5"/><rect x="96" y="27" width="26" height="27.4" rx="5"/><rect x="132" y="27" width="26" height="27.4" rx="5"/><rect x="168" y="27" width="26" height="27.4" rx="5"/><rect x="204" y="27" width="26" height="27.4" rx="5"/><rect x="240" y="27" width="26" height="27.4" rx="5"/><rect x="276" y="27" width="26" height="27.4" rx="5"/><rect x="6" y="64.3" width="26" height="20.1" rx="5"/><rect x="42" y="64.3" width="26" height="20.1" rx="5"/><rect x="78" y="64.3" width="26" height="20.1" rx="5"/><rect x="114" y="64.3" width="26" height="20.1" rx="5"/><rect x="150" y="64.3" width="26" height="20.1" rx="5"/><rect x="186" y="64.3" width="26" height="20.1" rx="5"/><rect x="222" y="64.3" width="26" height="20.1" rx="5"/><rect x="258" y="64.3" width="26" height="20.1" rx="5"/><rect x="294" y="64.3" width="26" height="20.1" rx="5"/><rect x="-12" y="90.5" width="26" height="9.3" rx="4.6"/><rect x="24" y="90.5" width="26" height="9.3" rx="4.6"/><rect x="60" y="90.5" width="26" height="9.3" rx="4.6"/><rect x="96" y="90.5" width="26" height="9.3" rx="4.6"/><rect x="132" y="90.5" width="26" height="9.3" rx="4.6"/><rect x="168" y="90.5" width="26" height="9.3" rx="4.6"/><rect x="204" y="90.5" width="26" height="9.3" rx="4.6"/><rect x="240" y="90.5" width="26" height="9.3" rx="4.6"/><rect x="276" y="90.5" width="26" height="9.3" rx="4.6"/></g>
+<path d="M-8 -98.5h18M28 -98.5h18M64 -98.5h18M100 -98.5h18M136 -98.5h18M172 -98.5h18M208 -98.5h18M244 -98.5h18M280 -98.5h18M10 -83.2h18M46 -83.2h18M82 -83.2h18M118 -83.2h18M154 -83.2h18M190 -83.2h18M226 -83.2h18M262 -83.2h18M298 -83.2h18M-8 -53.2h18M28 -53.2h18M64 -53.2h18M100 -53.2h18M136 -53.2h18M172 -53.2h18M208 -53.2h18M244 -53.2h18M280 -53.2h18M10 -13.8h18M46 -13.8h18M82 -13.8h18M118 -13.8h18M154 -13.8h18M190 -13.8h18M226 -13.8h18M262 -13.8h18M298 -13.8h18" stroke="#fff" stroke-opacity=".35" stroke-width="1.5" stroke-linecap="round"/>
+</g>
+<path d="M14 -80H280" stroke="#fff" stroke-opacity=".22" stroke-width="6" stroke-linecap="round"/>
+<ellipse cx="0" cy="0" rx="40" ry="100" fill="url(#tempo-foam-roller-face)"/>
+<ellipse cx="0" cy="0" rx="36" ry="94" fill="none" stroke="#1D3C97" stroke-opacity=".35" stroke-width="2" stroke-dasharray="6 5"/>
+<ellipse cx="0" cy="0" rx="21" ry="50" fill="url(#tempo-foam-roller-core)"/>
+<ellipse cx="1" cy="1" rx="15" ry="41" fill="#1B1F2A"/>
+<path d="M-6 -36A15 41 0 0 0 -6 38" fill="none" stroke="#6C7584" stroke-opacity=".6" stroke-width="3"/>
+<path d="M-30 -52A40 100 0 0 1 -6 -99" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/>
+</g>
 </svg>

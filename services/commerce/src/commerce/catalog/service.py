@@ -43,6 +43,7 @@ from commerce.metrics import (
     search_requests,
 )
 from commerce.money import DEFAULT_CURRENCY
+from commerce.reviews.service import rating_stats_subquery, round_average
 from commerce.search.keyword import get_keyword_index
 from commerce.search.rrf import reciprocal_rank_fusion
 from commerce.search.semantic import get_semantic_index
@@ -102,11 +103,20 @@ def _apply_filters[T: tuple[Any, ...]](
     return stmt
 
 
-def _base(stats: Subquery, candidate_ids: list[uuid.UUID] | None) -> Select[Any]:
+def _base(stats: Subquery, ratings: Subquery, candidate_ids: list[uuid.UUID] | None) -> Select[Any]:
     stmt = (
-        select(Product, Category, stats.c.min_price, stats.c.available, stats.c.variant_count)
+        select(
+            Product,
+            Category,
+            stats.c.min_price,
+            stats.c.available,
+            stats.c.variant_count,
+            ratings.c.rating_avg,
+            func.coalesce(ratings.c.rating_count, 0).label("rating_count"),
+        )
         .join(Category, Category.id == Product.category_id)
         .join(stats, stats.c.product_id == Product.id)
+        .outerjoin(ratings, ratings.c.product_id == Product.id)
         .where(Product.is_active.is_(True))
     )
     if candidate_ids is not None:
@@ -226,6 +236,7 @@ def list_products(
 ) -> ProductPage:
     started = time.perf_counter()
     stats = _stats_subquery()
+    ratings = rating_stats_subquery()
     meta: SearchMeta | None = None
     candidate_ids: list[uuid.UUID] | None = None
     rank: dict[uuid.UUID, int] = {}
@@ -244,7 +255,7 @@ def list_products(
             candidate_ids.append(pid)
             rank[pid] = i
 
-    stmt = _apply_filters(_base(stats, candidate_ids), stats, filters)
+    stmt = _apply_filters(_base(stats, ratings, candidate_ids), stats, filters)
     start = (page - 1) * page_size
 
     if candidate_ids is not None:
@@ -258,6 +269,8 @@ def list_products(
             rows.sort(key=lambda r: (-r.min_price, r[0].title))
         elif sort == SortOrder.NEWEST:
             rows.sort(key=lambda r: r[0].created_at, reverse=True)
+        elif sort == SortOrder.TOP_RATED:
+            rows.sort(key=lambda r: (-(r.rating_avg or 0), -r.rating_count, r[0].title))
         total = len(rows)
         rows = rows[start : start + page_size]
     else:
@@ -266,6 +279,11 @@ def list_products(
             SortOrder.PRICE_ASC: (stats.c.min_price.asc(), Product.title),
             SortOrder.PRICE_DESC: (stats.c.min_price.desc(), Product.title),
             SortOrder.NEWEST: (Product.created_at.desc(), Product.title),
+            SortOrder.TOP_RATED: (
+                func.coalesce(ratings.c.rating_avg, 0).desc(),
+                func.coalesce(ratings.c.rating_count, 0).desc(),
+                Product.title,
+            ),
         }.get(sort, (Category.sort_order, Product.title))
         total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
         rows = list(db.execute(stmt.order_by(*order_by).offset(start).limit(page_size)).all())
@@ -282,8 +300,10 @@ def list_products(
             currency=DEFAULT_CURRENCY,
             in_stock=int(available) > 0,
             variant_count=int(variant_count),
+            rating_average=round_average(rating_avg),
+            rating_count=int(rating_count),
         )
-        for p, c, min_price, available, variant_count in rows
+        for p, c, min_price, available, variant_count, rating_avg, rating_count in rows
     ]
     facets = _facets(db, stats, candidate_ids, filters)
 
@@ -372,6 +392,12 @@ def get_product(db: Session, product_id: uuid.UUID) -> ProductDetail | None:
         )
     if not variants:
         return None
+    ratings = rating_stats_subquery()
+    rating = db.execute(
+        select(ratings.c.rating_avg, ratings.c.rating_count).where(
+            ratings.c.product_id == product.id
+        )
+    ).first()
     return ProductDetail(
         id=product.id,
         slug=product.slug,
@@ -383,6 +409,8 @@ def get_product(db: Session, product_id: uuid.UUID) -> ProductDetail | None:
         currency=DEFAULT_CURRENCY,
         in_stock=any(v.in_stock for v in variants),
         variant_count=len(variants),
+        rating_average=round_average(rating.rating_avg) if rating else None,
+        rating_count=int(rating.rating_count) if rating else 0,
         description=product.description,
         variants=variants,
         as_of=utcnow(),

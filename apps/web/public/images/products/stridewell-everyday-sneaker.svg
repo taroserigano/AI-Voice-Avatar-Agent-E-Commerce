@@ -1,14 +1,99 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Everyday Canvas Sneakers illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Everyday Canvas Sneakers">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#be185d"/>
-      <stop offset="1" stop-color="#be185d" stop-opacity=".72"/>
+    <radialGradient id="stridewell-everyday-sneaker-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF4F8"/>
+      <stop offset="1" stop-color="#F6DCE7"/>
+    </radialGradient>
+    <filter id="stridewell-everyday-sneaker-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <filter id="stridewell-everyday-sneaker-soft" filterUnits="userSpaceOnUse" x="0" y="0" width="640" height="640">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <linearGradient id="stridewell-everyday-sneaker-canvas" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fffbf2"/>
+      <stop offset=".5" stop-color="#f5ecdb"/>
+      <stop offset="1" stop-color="#dccdb2"/>
     </linearGradient>
+    <linearGradient id="stridewell-everyday-sneaker-shade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".35"/>
+      <stop offset=".45" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#7a6a52" stop-opacity=".26"/>
+    </linearGradient>
+    <linearGradient id="stridewell-everyday-sneaker-tongue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f3e9d6"/>
+      <stop offset="1" stop-color="#d9caae"/>
+    </linearGradient>
+    <linearGradient id="stridewell-everyday-sneaker-inside" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3f372f"/>
+      <stop offset="1" stop-color="#6b5f53"/>
+    </linearGradient>
+    <linearGradient id="stridewell-everyday-sneaker-lining" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a7c6a"/>
+      <stop offset="1" stop-color="#3f372f"/>
+    </linearGradient>
+    <linearGradient id="stridewell-everyday-sneaker-insole" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5e5246"/>
+      <stop offset="1" stop-color="#8a7c69"/>
+    </linearGradient>
+    <linearGradient id="stridewell-everyday-sneaker-sole" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".7" stop-color="#f4f2ee"/>
+      <stop offset="1" stop-color="#d4cfc7"/>
+    </linearGradient>
+    <linearGradient id="stridewell-everyday-sneaker-cap" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".6" stop-color="#f6f4f0"/>
+      <stop offset="1" stop-color="#d6d0c6"/>
+    </linearGradient>
+    <pattern id="stridewell-everyday-sneaker-weave" width="5" height="5" patternUnits="userSpaceOnUse">
+      <path d="M0 1.5H5M0 4H5" stroke="#a8977a" stroke-width=".7" stroke-opacity=".18"/>
+      <path d="M1.5 0V5M4 0V5" stroke="#fff" stroke-width=".7" stroke-opacity=".4"/>
+    </pattern>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M262 200l-52 30 22 44 30-14v110h116V260l30 14 22-44-52-30c-8 20-28 32-58 32s-50-12-58-32z" fill="#fff"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Everyday Canvas Sneakers</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Stridewell</text>
+  <rect width="640" height="640" fill="url(#stridewell-everyday-sneaker-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="319" cy="348" rx="229" ry="22" transform="rotate(19 319 348)" fill="#1e1b4b" fill-opacity=".16" filter="url(#stridewell-everyday-sneaker-shadow)"/>
+  <path d="M123 271c-7 17 11 53 22 67c12 13 31 10 46 14c15 5 30 9 45 14c15 5 30 10 45 16c14 6 29 12 43 19c14 6 28 14 43 20c14 7 28 13 43 18c15 5 28 15 47 10c20-5 62-22 69-40c8-18-11-53-22-68c-10-15-27-16-41-23c-15-6-30-11-45-15c-15-5-30-9-45-14c-16-4-31-8-47-12c-15-4-30-9-45-13c-16-5-31-9-46-14c-15-5-26-19-45-15c-18 3-59 19-67 36Z" fill="#1e1b4b" fill-opacity=".22" filter="url(#stridewell-everyday-sneaker-shadow)"/>
+  <path d="M117 265c3 15 7 50 15 62c9 13 24 10 36 14c12 4 25 8 37 12c13 3 25 7 38 11c12 4 24 9 36 14c12 5 23 10 35 15c12 6 23 11 35 17c12 5 23 11 35 16c12 5 24 10 36 13c13 2 24 9 41 3c17-6 49-27 59-39c11-13 3-26 3-33c-1-8-4-11-6-15c-2-4-5-6-8-9c-3-3-7-4-8-9c-2-6-2-23 0-26c1-3 5 6 8 9c3 3 6 6 8 10c2 4 5 6 6 14c0 8 8 21-3 33c-10 12-42 34-59 40c-17 6-28-1-41-4c-12-3-24-8-36-12c-12-5-23-11-35-17c-12-5-23-11-35-16c-12-6-23-11-35-16c-12-5-24-10-36-14c-13-4-25-7-38-11c-12-4-25-7-37-11c-12-5-27-2-36-14c-8-13-12-56-15-62c-2-7-2 10 0 25Z" fill="url(#stridewell-everyday-sneaker-sole)"/>
+  <path d="M117 240c-7 16 7 49 15 62c9 12 24 9 36 14c12 4 25 7 37 11c13 4 25 7 38 11c12 4 24 9 36 14c12 5 23 10 35 16c12 5 23 11 35 16c12 6 23 12 35 17c12 4 24 9 36 12c13 3 24 10 41 4c17-6 52-23 59-40c8-17-7-47-15-61c-8-14-21-17-32-23c-12-6-24-10-36-14c-12-5-25-8-37-12c-13-3-25-7-38-10c-12-4-25-7-37-10c-13-4-25-7-38-11c-12-3-25-7-37-11c-13-4-25-8-37-12c-12-4-22-15-38-11c-16 5-51 21-58 38Z" fill="#fbfaf7"/>
+  <path d="M117 249c3 10 7 49 15 62c9 13 24 9 36 14c12 4 25 8 37 11c13 4 25 7 38 11c12 5 24 9 36 14c12 5 23 10 35 16c12 5 23 11 35 16c12 6 23 12 35 17c12 5 24 10 36 12c13 3 24 10 41 4c17-6 49-28 59-40c11-12 3-25 3-33c-1-8-4-11-6-15c-3-4-7-8-8-9" fill="none" stroke="#2f3f6b" stroke-width="3.6" stroke-linecap="round"/>
+  <path d="M117 254c3 10 7 49 15 62c9 13 24 10 36 14c12 4 25 8 37 11c13 4 25 7 38 11c12 5 24 9 36 14c12 5 23 10 35 16c12 5 23 11 35 16c12 6 23 12 35 17c12 5 24 10 36 12c13 3 24 10 41 4c17-6 49-28 59-40c11-12 3-25 3-33c-1-8-4-10-6-15c-3-4-7-8-8-9" fill="none" stroke="#c8423b" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M114 276c2 4 7 19 12 24c5 6 12 8 19 10c6 3 13 5 20 7c7 2 14 4 20 6c7 2 14 5 21 7c6 2 13 4 20 6c7 2 14 3 20 6c7 2 14 4 20 7c7 3 13 6 20 8c6 3 13 6 19 9c6 3 13 6 19 9c7 2 13 6 19 9c7 3 13 6 19 9c7 3 13 6 19 9c7 3 14 5 21 7c6 2 16 6 20 7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  <path id="stridewell-everyday-sneaker-upper" d="M117 175c5-23 31-13 43-12c13 1 22 12 33 17c11 4 21 8 31 10c10 3 21 4 31 5c10 2 19 1 30 3c10 3 21 9 32 14c10 4 22 8 32 13c11 5 22 11 33 16c11 5 22 10 33 16c11 5 21 11 32 17c10 6 21 11 31 18c10 8 21 11 28 25c7 13 22 42 14 58c-7 17-41 33-58 39c-16 6-27-1-40-4c-13-3-25-8-37-12c-12-5-23-11-35-17c-12-5-23-11-35-16c-12-5-23-11-35-15c-12-5-24-10-36-14c-13-4-25-8-38-11c-12-4-24-8-37-12c-12-4-27 9-36-14c-8-23-20-102-16-124Z" fill="url(#stridewell-everyday-sneaker-canvas)"/>
+  <use href="#stridewell-everyday-sneaker-upper" fill="url(#stridewell-everyday-sneaker-weave)"/>
+  <use href="#stridewell-everyday-sneaker-upper" fill="url(#stridewell-everyday-sneaker-shade)"/>
+  <path d="M114 258c5 6 17 28 29 36c11 9 26 10 39 14c13 4 26 7 39 11c13 4 27 6 40 11c12 5 25 11 37 17c13 6 25 12 37 18c13 6 25 13 37 19c13 6 26 12 39 16c13 4 25 10 41 10c15 0 41-9 50-11" fill="none" stroke="#8c7f6c" stroke-width="7" stroke-opacity=".28" filter="url(#stridewell-everyday-sneaker-soft)"/>
+  <clipPath id="stridewell-everyday-sneaker-open"><path d="M117 174c3-8 21-12 29-13c8-1 14 2 21 5c7 3 13 7 20 10c6 4 13 7 19 10c6 2 13 3 19 5c6 1 12 3 19 4c6 1 12 0 18 1c7 0 20-9 19 0c-1 10-17 47-25 57c-7 9-13 1-19 1c-7 1-13 2-20 1c-6 0-13-1-19-3c-6-1-13-1-19-4c-6-2-13-6-19-11c-6-4-12-9-18-14c-5-5-12-8-16-16c-4-9-12-25-9-33Z"/></clipPath>
+  <path d="M117 174c3-8 21-12 29-13c8-1 14 2 21 5c7 3 13 7 20 10c6 4 13 7 19 10c6 2 13 3 19 5c6 1 12 3 19 4c6 1 12 0 18 1c7 0 20-9 19 0c-1 10-17 47-25 57c-7 9-13 1-19 1c-7 1-13 2-20 1c-6 0-13-1-19-3c-6-1-13-1-19-4c-6-2-13-6-19-11c-6-4-12-9-18-14c-5-5-12-8-16-16c-4-9-12-25-9-33Z" fill="url(#stridewell-everyday-sneaker-inside)"/>
+  <g clip-path="url(#stridewell-everyday-sneaker-open)"><path d="M117 176c6-8 26-13 37-14c10 0 18 7 27 11c9 4 17 10 26 13c8 3 16 5 25 7c8 1 16 2 25 3c8 0 20-5 25 1c4 6 4 28 0 34c-5 5-17-1-25-1c-9-1-17-2-25-3c-9-2-17-4-25-7c-9-3-17-9-26-13c-9-4-17-11-27-11c-11 1-31 17-37 14c-6-4-6-27 0-34Z" fill="url(#stridewell-everyday-sneaker-lining)"/><path d="M123 274c-6 13 15 12 23 16c8 4 17 6 26 9c9 2 17 5 26 8c9 3 18 5 27 8c9 3 20 22 26 8c6-13 11-72 8-88c-3-15-17-5-26-8c-9-3-17-6-26-9c-9-3-12-18-26-8c-14 9-52 50-58 64Z" fill="url(#stridewell-everyday-sneaker-insole)"/><path d="M117 174c2 5 5 24 9 33c4 8 11 11 16 16c6 5 12 10 18 14c6 5 13 9 19 11c6 3 13 3 19 4c6 2 13 3 19 3c7 1 13 0 20-1c6 0 16-1 19-1" fill="none" stroke="#2a241e" stroke-width="16" stroke-opacity=".35" filter="url(#stridewell-everyday-sneaker-soft)"/></g>
+  <path d="M117 174c2 5 5 24 9 33c4 8 11 11 16 16c6 5 12 10 18 14c6 5 13 9 19 11c6 3 13 3 19 4c6 2 13 3 19 3c7 1 13 0 20-1c6 0 16-1 19-1" fill="none" stroke="#d8ccb6" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M117 172c2 6 5 25 9 33c4 8 11 11 16 17c6 5 12 10 18 14c6 4 13 8 19 11c6 2 13 3 19 4c6 1 13 3 19 3c7 0 13-1 20-2c6 0 16-1 19-1" fill="none" stroke="#fffdf7" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M117 174c5-2 21-12 29-13c8-1 14 2 21 5c7 3 13 7 20 10c6 4 13 7 19 10c6 2 13 3 19 5c6 1 12 3 19 4c6 1 12 0 18 1c7 0 16 0 19 0" fill="none" stroke="#e9dfcc" stroke-width="3" stroke-linecap="round"/>
+  <path d="M432 272c0-13-17-10-26-15c-8-5-17-9-26-14c-8-5-17-10-26-14c-8-5-17-8-26-12c-8-4-17-8-26-11c-8-4-19-8-26-10c-6-2-9-3-13-2c-4 0-8 2-11 7c-2 6-3 17-3 25c1 8-1 17 4 23c5 6 17 7 26 11c8 4 17 8 25 13c8 4 17 9 25 13c9 5 17 11 25 17c9 5 17 11 25 16c8 5 17 24 25 16c9-8 27-50 28-63Z" fill="url(#stridewell-everyday-sneaker-tongue)"/>
+  <path d="M263 195c-2 1-9 2-11 7c-2 5-2 18-2 22" fill="none" stroke="#fffdf7" stroke-width="2" stroke-linecap="round"/>
+  <path d="M279 196c5 2 18 7 27 11c9 4 17 7 26 11c9 4 18 8 27 12c9 5 18 10 26 14c9 5 18 10 27 15c8 5 21 13 26 15" fill="none" stroke="#cdbfa6" stroke-width="4" stroke-linecap="round"/>
+  <path d="M254 253c5 2 18 8 26 12c9 4 17 9 26 14c9 4 17 9 26 14c8 5 17 11 25 16c9 6 17 11 25 17c9 5 22 13 26 16" fill="none" stroke="#cdbfa6" stroke-width="4" stroke-linecap="round"/>
+  <path d="M254 253c5 2 18 8 26 12c9 4 17 9 26 14c9 4 17 9 26 14c8 5 17 11 25 16c9 6 17 11 25 17c9 5 22 13 26 16" fill="none" stroke="#fffdf7" stroke-width="1.5" stroke-linecap="round" transform="translate(-1.5 -1.5)"/>
+  <path d="M253 272c4 2 18 8 27 13c9 4 17 9 26 13c9 5 18 10 26 15c9 5 18 11 26 16c9 6 18 12 26 17c9 5 23 12 27 15" fill="none" stroke="#b3a58d" stroke-width="1.2" stroke-dasharray="3 2.5"/>
+  <path d="M284 199c4 2 18 7 27 11c10 4 19 7 28 11c9 4 18 8 28 12c9 4 18 9 27 14c9 4 18 8 27 13c9 5 22 13 27 16" fill="none" stroke="#b3a58d" stroke-width="1.2" stroke-dasharray="3 2.5"/>
+  <path d="M256 254c0 2 1 9 1 15c0 5 0 10 1 15c0 5 1 10 1 15c1 6 1 11 2 16c0 5 1 10 2 15c1 4 2 11 2 13" fill="none" stroke="#b3a58d" stroke-width="1.2" stroke-dasharray="3 2.5"/>
+  <path d="M263 257c0 2 1 9 1 14c0 6 0 11 1 16c0 5 0 11 1 16c0 5 1 10 1 15c1 5 2 10 3 15c0 4 2 11 2 13" fill="none" stroke="#b3a58d" stroke-width="1.2" stroke-dasharray="3 2.5"/>
+  <path d="M274 252Q298 230 322 215M296 203Q298 231 300 266M300 266Q324 242 348 227M322 215Q324 243 325 279M325 279Q350 256 375 241M348 227Q350 257 351 296M351 296Q376 272 401 256M375 241Q375 273 376 312M376 312Q401 288 427 271M401 256Q401 288 401 329M274 252Q285 224 296 203" fill="none" stroke="#a79a86" stroke-width="7.5" stroke-linecap="round" stroke-opacity=".55"/>
+  <path d="M274 252Q298 230 322 215M296 203Q298 231 300 266M300 266Q324 242 348 227M322 215Q324 243 325 279M325 279Q350 256 375 241M348 227Q350 257 351 296M351 296Q376 272 401 256M375 241Q375 273 376 312M376 312Q401 288 427 271M401 256Q401 288 401 329M274 252Q285 224 296 203" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+  <path d="M270 252a4 4 0 1 0 8 0a4 4 0 1 0-8 0M296 266a4 4 0 1 0 8 0a4 4 0 1 0-8 0M321 279a4 4 0 1 0 8 0a4 4 0 1 0-8 0M347 296a4 4 0 1 0 8 0a4 4 0 1 0-8 0M372 312a4 4 0 1 0 8 0a4 4 0 1 0-8 0M397 329a4 4 0 1 0 8 0a4 4 0 1 0-8 0M292 203a4 4 0 1 0 8 0a4 4 0 1 0-8 0M318 215a4 4 0 1 0 8 0a4 4 0 1 0-8 0M344 227a4 4 0 1 0 8 0a4 4 0 1 0-8 0M371 241a4 4 0 1 0 8 0a4 4 0 1 0-8 0M397 256a4 4 0 1 0 8 0a4 4 0 1 0-8 0M423 271a4 4 0 1 0 8 0a4 4 0 1 0-8 0" fill="#aeb3bb" stroke="#7d838d" stroke-width="1"/>
+  <path d="M285 226c-14 -16 -30 -10 -24 2c4 8 16 4 24 -2M285 226c10 -18 28 -16 24 -4c-3 8 -16 6 -24 4M285 226c-6 12 -14 24 -24 30M285 226c2 14 -2 28 -8 38" fill="none" stroke="#a79a86" stroke-width="7.5" stroke-linecap="round" stroke-opacity=".5"/>
+  <path d="M285 226c-14 -16 -30 -10 -24 2c4 8 16 4 24 -2M285 226c10 -18 28 -16 24 -4c-3 8 -16 6 -24 4M285 226c-6 12 -14 24 -24 30M285 226c2 14 -2 28 -8 38" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="284.9" cy="225.8" r="4" fill="#f4f1ec"/>
+  <path d="M472 287c-2-1-4 2-6 5c-2 3-5 7-8 12c-3 5-6 12-8 19c-3 7-6 15-9 22c-2 8-5 16-7 24c-2 8-4 15-5 22c-1 7-2 14-2 18c-1 3-2 2 0 3c1 1 6 1 9 2c3 0 6 0 9 1c3 0 6 1 9 1c4 0 7-1 11-1c3-1 7-1 10-2c4-1 8-2 12-4c4-2 7-1 12-6c6-5 18-16 21-26c4-10 3-25 2-32c-1-7-4-8-6-12c-1-4-3-8-6-11c-2-3-4-6-7-8c-2-3-4-6-7-8c-2-2-5-4-8-6c-2-2-5-4-8-6c-2-2-6-7-8-7Z" fill="url(#stridewell-everyday-sneaker-cap)"/>
+  <path d="M472 287c-1 1-4 2-6 5c-2 3-5 7-8 12c-3 5-6 12-8 19c-3 7-6 15-9 22c-2 8-5 16-7 24c-2 8-4 15-5 22c-1 7-2 14-2 18c-1 3 0 3 0 3" fill="none" stroke="#cfc6b8" stroke-width="2"/>
+  <path d="M465 284c-1 0-4 1-6 4c-2 3-5 7-8 13c-3 5-6 11-8 18c-3 7-6 15-9 23c-2 7-5 16-7 24c-2 7-4 15-5 22c-1 7-2 15-2 18" fill="none" stroke="#b3a58d" stroke-width="1.2" stroke-dasharray="3 2.5"/>
+  <path d="M454 351c2 1 7 4 10 5c3 2 6 3 10 5c3 1 6 2 10 4c3 1 6 3 10 5c3 1 9 3 11 3" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  <path d="M444 410L446 401M453 411L454 403M463 411L464 403M472 410L473 403M483 408L483 402M494 403L495 398" stroke="#d9d1c4" stroke-width="1.4"/>
+  <path d="M112 252L139 293L139 268L112 225Z" fill="#fbfaf7" stroke="#d6cec1" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M120.6 261.9l10 -3" stroke="#2f3f6b" stroke-width="3" stroke-linecap="round"/>
+  <path d="M120.6 266.9l10 -3" stroke="#c8423b" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M400 371c1-1 4-5 6-7c2-3 4-6 7-8c2-3 5-6 6-8" fill="none" stroke="#b9a988" stroke-width="2" stroke-opacity=".6" stroke-linecap="round"/>
+  <path d="M413 353c1-1 5-5 7-7c2-3 5-5 7-7c2-3 6-6 7-7" fill="none" stroke="#b9a988" stroke-width="2" stroke-opacity=".6" stroke-linecap="round"/>
+  <path d="M129 254c3 2 11 8 17 12c6 3 13 6 19 9c6 2 12 4 18 5c7 2 13 4 19 5c6 2 13 3 19 4c6 1 15 2 18 2" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-opacity=".7" filter="url(#stridewell-everyday-sneaker-soft)"/>
 </svg>

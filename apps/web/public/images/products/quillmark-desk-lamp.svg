@@ -1,14 +1,75 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Adjustable LED Desk Lamp illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Adjustable LED Desk Lamp">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#475569"/>
-      <stop offset="1" stop-color="#475569" stop-opacity=".72"/>
+    <radialGradient id="quillmark-desk-lamp-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F4F6F9"/>
+      <stop offset="1" stop-color="#DEE4EC"/>
+    </radialGradient>
+    <filter id="quillmark-desk-lamp-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="quillmark-desk-lamp-beam" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff6d2" stop-opacity=".85"/>
+      <stop offset="1" stop-color="#fff6d2" stop-opacity="0"/>
     </linearGradient>
+    <radialGradient id="quillmark-desk-lamp-pool" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#fff3c4" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#fff3c4" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="quillmark-desk-lamp-base" x1="148" y1="0" x2="332" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5b616b"/>
+      <stop offset=".35" stop-color="#3a3f47"/>
+      <stop offset="1" stop-color="#1f2328"/>
+    </linearGradient>
+    <linearGradient id="quillmark-desk-lamp-top" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6a707a"/>
+      <stop offset="1" stop-color="#2e3238"/>
+    </linearGradient>
+    <linearGradient id="quillmark-desk-lamp-shade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#666c76"/>
+      <stop offset=".35" stop-color="#3f444c"/>
+      <stop offset="1" stop-color="#1d2025"/>
+    </linearGradient>
+    <radialGradient id="quillmark-desk-lamp-steel" cx=".35" cy=".35" r=".7">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".5" stop-color="#bfc6ce"/>
+      <stop offset="1" stop-color="#6f7780"/>
+    </radialGradient>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <rect x="250" y="200" width="140" height="170" rx="10" fill="#fff"/><path d="M275 240h90M275 270h90M275 300h60" stroke="#94a3b8" stroke-width="10" stroke-linecap="round"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Adjustable LED Desk Lamp</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Quillmark</text>
+  <rect width="640" height="640" fill="url(#quillmark-desk-lamp-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <g transform="translate(-16 0)">
+    <!-- light -->
+    <ellipse cx="468" cy="486" rx="136" ry="22" fill="url(#quillmark-desk-lamp-pool)"/>
+    <path d="M416 300 520 286 604 486H340z" fill="url(#quillmark-desk-lamp-beam)"/>
+  </g>
+  <ellipse cx="228" cy="494" rx="110" ry="18" fill="#1e1b4b" fill-opacity=".16" filter="url(#quillmark-desk-lamp-shadow)"/>
+  <g transform="translate(-16 0)">
+    <!-- base -->
+    <path d="M148 466v16a92 22 0 0 0 184 0v-16z" fill="url(#quillmark-desk-lamp-base)"/>
+    <ellipse cx="240" cy="466" rx="92" ry="22" fill="url(#quillmark-desk-lamp-top)"/>
+    <path d="M160 460a92 22 0 0 1 90-16" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="200" cy="474" r="5" fill="#8fd1a8"/>
+    <rect x="226" y="438" width="28" height="26" rx="6" fill="#2b2f35"/>
+    <!-- lower arm -->
+    <path d="M252 450 312 256" stroke="#8d949d" stroke-width="4" stroke-linecap="round"/>
+    <path d="M240 446 300 252" stroke="#373c43" stroke-width="15" stroke-linecap="round"/>
+    <path d="M236 438 294 250" stroke="#7a818b" stroke-opacity=".6" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="240" cy="446" r="14" fill="#2b2f35"/>
+    <circle cx="240" cy="446" r="6" fill="url(#quillmark-desk-lamp-steel)"/>
+    <!-- upper arm -->
+    <path d="M306 264 456 216" stroke="#8d949d" stroke-width="4" stroke-linecap="round"/>
+    <path d="M300 252 452 204" stroke="#373c43" stroke-width="13" stroke-linecap="round"/>
+    <path d="M300 246 448 199" stroke="#7a818b" stroke-opacity=".6" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="300" cy="252" r="16" fill="#2b2f35"/>
+    <circle cx="300" cy="252" r="7" fill="url(#quillmark-desk-lamp-steel)"/>
+    <!-- head -->
+    <g transform="translate(462 206) rotate(-8)">
+      <path d="M-18 6h36l34 86q-52 14-104 0z" fill="url(#quillmark-desk-lamp-shade)"/>
+      <path d="M-14 12-44 88" stroke="#fff" stroke-opacity=".22" stroke-width="3" stroke-linecap="round"/>
+      <ellipse cx="0" cy="92" rx="52" ry="11" fill="#fff8dc"/>
+      <ellipse cx="0" cy="92" rx="36" ry="7" fill="#fff"/>
+    </g>
+    <circle cx="456" cy="206" r="12" fill="#2b2f35"/>
+    <circle cx="456" cy="206" r="5" fill="url(#quillmark-desk-lamp-steel)"/>
+  </g>
 </svg>

@@ -18,6 +18,18 @@ export type UserOut = Schemas["UserOut"];
 export type SearchMeta = Schemas["SearchMeta"];
 export type OrderSummary = Schemas["OrderSummary"];
 export type OrderDetail = Schemas["OrderDetail"];
+export type ReviewIn = Schemas["ReviewIn"];
+export type ReviewOut = Schemas["ReviewOut"];
+export type ReviewPage = Schemas["ReviewPage"];
+export type ReviewSort = Schemas["ReviewSort"];
+export type RatingSummary = Schemas["RatingSummary"];
+export type SortOrder = Schemas["SortOrder"];
+export type ReturnOptions = Schemas["ReturnOptions"];
+export type LineReturnOption = Schemas["LineReturnOption"];
+export type PaymentOut = Schemas["PaymentOut"];
+export type ShipmentOut = Schemas["ShipmentOut"];
+export type ReturnOut = Schemas["ReturnOut"];
+export type ActivityOut = Schemas["ActivityOut"];
 
 export function createCommerceClient(options: ClientOptions) {
   return createClient<paths>(options);

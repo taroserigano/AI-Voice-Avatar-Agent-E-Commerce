@@ -1,14 +1,72 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Mini Volume-Limited Kids Headphones illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Mini Volume-Limited Kids Headphones">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2563eb"/>
-      <stop offset="1" stop-color="#2563eb" stop-opacity=".72"/>
+    <radialGradient id="sonora-kids-headphones-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F1F3FF"/>
+      <stop offset="1" stop-color="#DCE1FB"/>
+    </radialGradient>
+    <filter id="sonora-kids-headphones-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="sonora-kids-headphones-band" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d4f75f"/>
+      <stop offset=".45" stop-color="#9bdc2c"/>
+      <stop offset="1" stop-color="#5c9f12"/>
+    </linearGradient>
+    <linearGradient id="sonora-kids-headphones-shellL" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d6f866"/>
+      <stop offset=".45" stop-color="#9ad92d"/>
+      <stop offset="1" stop-color="#5a9b10"/>
+    </linearGradient>
+    <linearGradient id="sonora-kids-headphones-shellR" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b9ea45"/>
+      <stop offset=".5" stop-color="#84c21f"/>
+      <stop offset="1" stop-color="#4c870c"/>
+    </linearGradient>
+    <radialGradient id="sonora-kids-headphones-plate" cx=".35" cy=".3" r=".8">
+      <stop offset="0" stop-color="#ecfcb0"/>
+      <stop offset=".6" stop-color="#bff05a"/>
+      <stop offset="1" stop-color="#97d52e"/>
+    </radialGradient>
+    <linearGradient id="sonora-kids-headphones-pad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".5" stop-color="#eeede4"/>
+      <stop offset="1" stop-color="#c9c7b8"/>
+    </linearGradient>
+    <linearGradient id="sonora-kids-headphones-grape" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a78bfa"/>
+      <stop offset="1" stop-color="#6d4bc9"/>
     </linearGradient>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M250 270a70 70 0 0 1 140 0" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round"/><rect x="228" y="262" width="36" height="64" rx="14" fill="#fff"/><rect x="376" y="262" width="36" height="64" rx="14" fill="#fff"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Mini Volume-Limited Kids</tspan><tspan x="320" dy="40">Headphones</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Sonora Audio</text>
+  <rect width="640" height="640" fill="url(#sonora-kids-headphones-bg)"/>
+  <circle cx="320" cy="296" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="320" cy="484" rx="180" ry="18" fill="#1e1b4b" opacity=".16" filter="url(#sonora-kids-headphones-blur)"/>
+
+  <!-- band cushion -->
+  <path d="M218 280C214 190 262 130 320 130C378 130 426 190 422 280L406 280C408 204 372 154 320 154C268 154 232 204 234 280Z" fill="url(#sonora-kids-headphones-pad)"/>
+  <path d="M234 240C240 188 274 160 320 158" fill="none" stroke="#c9c7b8" stroke-width="1.5" stroke-dasharray="4 5"/>
+  <!-- band -->
+  <path d="M176 300C170 150 240 90 320 90C400 90 470 150 464 300L424 300C428 176 382 130 320 130C258 130 212 176 216 300Z" fill="url(#sonora-kids-headphones-band)"/>
+  <path d="M188 236C198 158 250 104 320 102" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="5" stroke-linecap="round"/>
+  <path d="M204 262C210 176 258 118 320 116C382 118 430 176 436 262" fill="none" stroke="#5c9f12" stroke-opacity=".45" stroke-width="1.5" stroke-dasharray="5 5"/>
+
+  <!-- left cup -->
+  <ellipse cx="224" cy="392" rx="50" ry="76" fill="url(#sonora-kids-headphones-pad)"/>
+  <ellipse cx="196" cy="392" rx="66" ry="80" fill="url(#sonora-kids-headphones-shellL)"/>
+  <ellipse cx="192" cy="390" rx="46" ry="58" fill="url(#sonora-kids-headphones-plate)"/>
+  <path d="M192 364L199.6 380.5L217.6 382.4L204.1 394.5L208.1 412.3L192 403.1L175.9 412.3L179.9 394.5L166.4 382.4L184.4 380.5Z" fill="#fff" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M142 350C150 326 170 312 196 310" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="5" stroke-linecap="round"/>
+  <rect x="172" y="460" width="40" height="12" rx="6" fill="url(#sonora-kids-headphones-grape)"/>
+
+  <!-- right cup -->
+  <ellipse cx="416" cy="392" rx="50" ry="76" fill="url(#sonora-kids-headphones-pad)"/>
+  <ellipse cx="444" cy="392" rx="66" ry="80" fill="url(#sonora-kids-headphones-shellR)"/>
+  <ellipse cx="448" cy="390" rx="46" ry="58" fill="url(#sonora-kids-headphones-plate)" opacity=".85"/>
+  <circle cx="448" cy="390" r="14" fill="url(#sonora-kids-headphones-grape)"/>
+  <circle cx="443" cy="385" r="4" fill="#fff" fill-opacity=".6"/>
+  <path d="M404 342C412 324 426 314 444 312" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- sliders -->
+  <rect x="182" y="288" width="28" height="30" rx="10" fill="#6fae18"/>
+  <rect x="186" y="291" width="10" height="24" rx="5" fill="#fff" fill-opacity=".3"/>
+  <rect x="430" y="288" width="28" height="30" rx="10" fill="#5a9510"/>
 </svg>

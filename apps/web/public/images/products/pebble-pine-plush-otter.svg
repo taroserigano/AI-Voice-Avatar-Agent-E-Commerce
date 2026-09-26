@@ -1,14 +1,105 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Plush Otter Stuffed Animal illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Plush Otter Stuffed Animal">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#7c3aed"/>
-      <stop offset="1" stop-color="#7c3aed" stop-opacity=".72"/>
+    <radialGradient id="pebble-pine-plush-otter-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F7F4FF"/>
+      <stop offset="1" stop-color="#E4DDFB"/>
+    </radialGradient>
+    <filter id="pebble-pine-plush-otter-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <radialGradient id="pebble-pine-plush-otter-fur" cx=".35" cy=".25" r=".85">
+      <stop offset="0" stop-color="#c4966a"/>
+      <stop offset=".55" stop-color="#9a6b45"/>
+      <stop offset="1" stop-color="#6b4529"/>
+    </radialGradient>
+    <radialGradient id="pebble-pine-plush-otter-head" cx=".38" cy=".3" r=".8">
+      <stop offset="0" stop-color="#c99d71"/>
+      <stop offset=".6" stop-color="#9f704a"/>
+      <stop offset="1" stop-color="#76502f"/>
+    </radialGradient>
+    <linearGradient id="pebble-pine-plush-otter-tail" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8f6240"/>
+      <stop offset="1" stop-color="#5e3d23"/>
+    </linearGradient>
+    <radialGradient id="pebble-pine-plush-otter-cream" cx=".4" cy=".3" r=".8">
+      <stop offset="0" stop-color="#fbf0dc"/>
+      <stop offset="1" stop-color="#e3c8a0"/>
+    </radialGradient>
+    <linearGradient id="pebble-pine-plush-otter-shell" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd6d0"/>
+      <stop offset="1" stop-color="#f19b95"/>
     </linearGradient>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <rect x="240" y="210" width="70" height="70" rx="10" fill="#fff"/><rect x="330" y="210" width="70" height="70" rx="10" fill="#fff" fill-opacity=".8"/><rect x="285" y="290" width="70" height="70" rx="10" fill="#fff" fill-opacity=".9"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Plush Otter Stuffed</tspan><tspan x="320" dy="40">Animal</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Pebble &amp; Pine</text>
+  <rect width="640" height="640" fill="url(#pebble-pine-plush-otter-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="330" cy="494" rx="170" ry="18" fill="#1e1b4b" opacity=".16" filter="url(#pebble-pine-plush-otter-blur)"/>
+
+  <g transform="translate(-18 0)">
+    <!-- tail -->
+    <path d="M402 432C452 448 500 444 526 414C538 400 530 386 516 392C494 410 452 418 410 404Z" fill="url(#pebble-pine-plush-otter-tail)"/>
+    <path d="M430 426C460 432 488 426 508 408" fill="none" stroke="#c4966a" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- body -->
+    <path d="M320 250C392 250 432 322 434 392C436 452 392 482 320 482C248 482 204 452 206 392C208 322 248 250 320 250Z" fill="url(#pebble-pine-plush-otter-fur)"/>
+    <ellipse cx="320" cy="390" rx="76" ry="86" fill="url(#pebble-pine-plush-otter-cream)"/>
+    <path d="M292 380C296 388 296 396 292 402M348 380C344 388 344 396 348 402M318 420C322 428 322 436 318 442" fill="none" stroke="#d4b286" stroke-opacity=".7" stroke-width="2" stroke-linecap="round"/>
+    <path d="M226 350C220 372 218 392 222 414" fill="none" stroke="#d2a57a" stroke-opacity=".5" stroke-width="4" stroke-linecap="round"/>
+    <!-- sewn tag -->
+    <path d="M212 424L230 420L234 444L216 448Z" fill="#fff"/>
+    <path d="M214 428L228 425" stroke="#c7b9e8" stroke-width="1.5"/>
+
+    <!-- feet -->
+    <ellipse cx="268" cy="472" rx="34" ry="24" transform="rotate(-12 268 472)" fill="#8a5c3a"/>
+    <ellipse cx="266" cy="474" rx="24" ry="16" transform="rotate(-12 266 474)" fill="url(#pebble-pine-plush-otter-cream)"/>
+    <ellipse cx="266" cy="478" rx="9" ry="6" fill="#7a5034"/>
+    <circle cx="252" cy="466" r="3.6" fill="#7a5034"/><circle cx="264" cy="462" r="3.6" fill="#7a5034"/><circle cx="276" cy="464" r="3.6" fill="#7a5034"/>
+    <ellipse cx="372" cy="472" rx="34" ry="24" transform="rotate(12 372 472)" fill="#7e5333"/>
+    <ellipse cx="374" cy="474" rx="24" ry="16" transform="rotate(12 374 474)" fill="url(#pebble-pine-plush-otter-cream)"/>
+    <ellipse cx="374" cy="478" rx="9" ry="6" fill="#7a5034"/>
+    <circle cx="364" cy="464" r="3.6" fill="#7a5034"/><circle cx="376" cy="462" r="3.6" fill="#7a5034"/><circle cx="388" cy="466" r="3.6" fill="#7a5034"/>
+
+    <!-- arms holding a shell -->
+    <ellipse cx="282" cy="330" rx="22" ry="46" transform="rotate(-42 282 330)" fill="#a2734b"/>
+    <ellipse cx="358" cy="330" rx="22" ry="46" transform="rotate(42 358 330)" fill="#855a38"/>
+    <path d="M300 356C300 330 340 330 340 356L334 364H306Z" fill="url(#pebble-pine-plush-otter-shell)"/>
+    <path d="M320 336V362M310 340L306 360M330 340L334 360" stroke="#e08079" stroke-width="1.5" stroke-linecap="round"/>
+    <rect x="310" y="360" width="20" height="7" rx="3.5" fill="#f19b95"/>
+    <ellipse cx="302" cy="354" rx="15" ry="12" fill="#b4845a"/>
+    <ellipse cx="338" cy="354" rx="15" ry="12" fill="#946541"/>
+    <path d="M296 350C298 346 302 344 306 344" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- ears -->
+    <circle cx="218" cy="186" r="16" fill="#8a5c3a"/>
+    <circle cx="220" cy="188" r="8" fill="#5e3d23"/>
+    <circle cx="422" cy="186" r="16" fill="#7a5034"/>
+    <circle cx="420" cy="188" r="8" fill="#5e3d23"/>
+
+    <!-- head -->
+    <ellipse cx="320" cy="210" rx="114" ry="88" fill="url(#pebble-pine-plush-otter-head)"/>
+    <path d="M248 148C268 130 296 122 322 122" fill="none" stroke="#e0b88c" stroke-opacity=".6" stroke-width="5" stroke-linecap="round"/>
+    <path d="M300 128C304 124 310 122 316 122M330 124C334 126 336 130 336 134" fill="none" stroke="#6b4529" stroke-opacity=".3" stroke-width="2" stroke-linecap="round"/>
+    <!-- muzzle -->
+    <ellipse cx="292" cy="246" rx="42" ry="30" fill="url(#pebble-pine-plush-otter-cream)"/>
+    <ellipse cx="348" cy="246" rx="42" ry="30" fill="url(#pebble-pine-plush-otter-cream)"/>
+    <ellipse cx="320" cy="216" rx="30" ry="22" fill="#e9d2ae" fill-opacity=".6"/>
+    <!-- eyes -->
+    <circle cx="272" cy="198" r="14" fill="#1d1410"/>
+    <circle cx="267" cy="193" r="4.8" fill="#fff"/>
+    <circle cx="277" cy="203" r="2" fill="#fff" fill-opacity=".7"/>
+    <circle cx="368" cy="198" r="14" fill="#1d1410"/>
+    <circle cx="363" cy="193" r="4.8" fill="#fff"/>
+    <circle cx="373" cy="203" r="2" fill="#fff" fill-opacity=".7"/>
+    <!-- cheeks -->
+    <ellipse cx="258" cy="240" rx="15" ry="9" fill="#f4a09a" fill-opacity=".5"/>
+    <ellipse cx="382" cy="240" rx="15" ry="9" fill="#f4a09a" fill-opacity=".5"/>
+    <!-- nose and mouth -->
+    <path d="M306 226C306 220 334 220 334 226C334 234 326 240 320 240C314 240 306 234 306 226Z" fill="#3a2418"/>
+    <ellipse cx="314" cy="225" rx="5" ry="2.6" fill="#fff" fill-opacity=".45"/>
+    <path d="M320 240V250M306 252C312 258 318 256 320 250C322 256 328 258 334 252" fill="none" stroke="#3a2418" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <g fill="#6b4529" fill-opacity=".55">
+      <circle cx="286" cy="240" r="2"/><circle cx="280" cy="250" r="2"/><circle cx="292" cy="252" r="2"/>
+      <circle cx="354" cy="240" r="2"/><circle cx="360" cy="250" r="2"/><circle cx="348" cy="252" r="2"/>
+    </g>
+    <path d="M272 244L226 234M272 252L224 254M274 260L232 272M368 244L414 234M368 252L416 254M366 260L408 272" stroke="#5e3d23" stroke-opacity=".45" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
 </svg>

@@ -1,14 +1,75 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Nesting Stainless Mixing Bowls, Set of 5 illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Nesting Stainless Mixing Bowls, Set of 5">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#b45309"/>
-      <stop offset="1" stop-color="#b45309" stop-opacity=".72"/>
+    <radialGradient id="kettleworth-mixing-bowls-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF8EF"/>
+      <stop offset="1" stop-color="#F6E6CF"/>
+    </radialGradient>
+    <filter id="kettleworth-mixing-bowls-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="kettleworth-mixing-bowls-outer" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8d959e"/>
+      <stop offset=".16" stop-color="#f4f6f8"/>
+      <stop offset=".34" stop-color="#b6bdc5"/>
+      <stop offset=".52" stop-color="#e6eaee"/>
+      <stop offset=".78" stop-color="#8b939c"/>
+      <stop offset="1" stop-color="#6a727b"/>
     </linearGradient>
+    <linearGradient id="kettleworth-mixing-bowls-under" x1="0" y1="0" x2="0" y2="1">
+      <stop offset=".4" stop-color="#3b4048" stop-opacity="0"/>
+      <stop offset="1" stop-color="#3b4048" stop-opacity=".35"/>
+    </linearGradient>
+    <linearGradient id="kettleworth-mixing-bowls-inner" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5f6771"/>
+      <stop offset=".1" stop-color="#8d959f"/>
+      <stop offset=".3" stop-color="#eef1f4"/>
+      <stop offset=".55" stop-color="#c3cad2"/>
+      <stop offset=".8" stop-color="#9aa2ac"/>
+      <stop offset="1" stop-color="#dde2e7"/>
+    </linearGradient>
+    <linearGradient id="kettleworth-mixing-bowls-rim" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".45" stop-color="#dfe4e9"/>
+      <stop offset="1" stop-color="#7f8791"/>
+    </linearGradient>
+    <radialGradient id="kettleworth-mixing-bowls-floor" cx=".4" cy=".4" r=".7">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".6" stop-color="#c9d0d7" stop-opacity=".8"/>
+      <stop offset="1" stop-color="#9aa2ac" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M250 230h140v70a50 50 0 0 1-50 50h-40a50 50 0 0 1-50-50z" fill="#fff"/><path d="M390 250h22a22 22 0 0 1 0 44h-22" fill="none" stroke="#fff" stroke-width="14"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Nesting Stainless Mixing</tspan><tspan x="320" dy="40">Bowls, Set of 5</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Kettleworth</text>
+  <rect width="640" height="640" fill="url(#kettleworth-mixing-bowls-bg)"/>
+  <circle cx="320" cy="310" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="315" cy="478" rx="215" ry="20" fill="#1e1b4b" fill-opacity=".16" filter="url(#kettleworth-mixing-bowls-shadow)"/>
+  <g transform="translate(6 -10)">
+    <path d="M114 286C117.2 382 193 406 272 406C351 406 426.8 382 430 286z" fill="url(#kettleworth-mixing-bowls-outer)"/>
+    <path d="M114 286C117.2 382 193 406 272 406C351 406 426.8 382 430 286z" fill="url(#kettleworth-mixing-bowls-under)"/>
+    <path d="M142.4 322Q177.2 388 256.2 400" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="5.3" stroke-linecap="round"/>
+    <ellipse cx="272" cy="286" rx="160" ry="55.2" fill="url(#kettleworth-mixing-bowls-rim)"/>
+    <ellipse cx="272" cy="287" rx="154" ry="52" fill="url(#kettleworth-mixing-bowls-inner)"/>
+    <ellipse cx="272" cy="308" rx="122" ry="41" fill="#2f343b" fill-opacity=".45"/>
+    <ellipse cx="272" cy="302" rx="125" ry="42.5" fill="url(#kettleworth-mixing-bowls-rim)"/>
+    <ellipse cx="272" cy="303" rx="119" ry="39.5" fill="url(#kettleworth-mixing-bowls-inner)"/>
+    <ellipse cx="272" cy="322" rx="86" ry="29" fill="#2f343b" fill-opacity=".45"/>
+    <ellipse cx="272" cy="316" rx="89" ry="30.5" fill="url(#kettleworth-mixing-bowls-rim)"/>
+    <ellipse cx="272" cy="317" rx="83" ry="27.5" fill="url(#kettleworth-mixing-bowls-inner)"/>
+    <ellipse cx="268" cy="322" rx="44" ry="13" fill="url(#kettleworth-mixing-bowls-floor)"/>
+    <path d="M120.1 271.1A158 54 0 0 1 212.8 235.9" fill="none" stroke="#fff" stroke-opacity="1" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M154.7 290.7A122 41 0 0 1 226.3 264" fill="none" stroke="#fff" stroke-opacity="1" stroke-width="3" stroke-linecap="round"/>
+    <path d="M189.3 308A86 29 0 0 1 239.8 289.1" fill="none" stroke="#fff" stroke-opacity="1" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M386 404C387.5 453.6 424 466 462 466C500 466 536.5 453.6 538 404z" fill="url(#kettleworth-mixing-bowls-outer)"/>
+    <path d="M386 404C387.5 453.6 424 466 462 466C500 466 536.5 453.6 538 404z" fill="url(#kettleworth-mixing-bowls-under)"/>
+    <path d="M399.7 422.6Q416.4 456.7 454.4 462.9" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="462" cy="404" rx="78" ry="27.2" fill="url(#kettleworth-mixing-bowls-rim)"/>
+    <ellipse cx="462" cy="405" rx="72" ry="24" fill="url(#kettleworth-mixing-bowls-inner)"/>
+    <ellipse cx="458" cy="416" rx="30" ry="9" fill="url(#kettleworth-mixing-bowls-floor)"/>
+    <path d="M388.9 396.8A76 26 0 0 1 433.5 379.9" fill="none" stroke="#fff" stroke-opacity="1" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M114 440C115.1 475.2 141 484 168 484C195 484 220.9 475.2 222 440z" fill="url(#kettleworth-mixing-bowls-outer)"/>
+    <path d="M114 440C115.1 475.2 141 484 168 484C195 484 220.9 475.2 222 440z" fill="url(#kettleworth-mixing-bowls-under)"/>
+    <path d="M123.7 453.2Q135.6 477.4 162.6 481.8" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="168" cy="440" rx="56" ry="20.2" fill="url(#kettleworth-mixing-bowls-rim)"/>
+    <ellipse cx="168" cy="441" rx="50" ry="17" fill="url(#kettleworth-mixing-bowls-inner)"/>
+    <ellipse cx="165" cy="449" rx="21" ry="6" fill="url(#kettleworth-mixing-bowls-floor)"/>
+    <path d="M116.1 434.8A54 19 0 0 1 147.8 422.4" fill="none" stroke="#fff" stroke-opacity="1" stroke-width="2" stroke-linecap="round"/>
+  </g>
 </svg>

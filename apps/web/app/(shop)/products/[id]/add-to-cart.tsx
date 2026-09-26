@@ -1,16 +1,56 @@
 "use client";
 
+import { CartIcon, CheckIcon } from "@/components/icons";
 import { Button, ButtonLink } from "@/components/ui/button";
+import { PillSelect } from "@/components/reviews/pill-select";
 import { Notice } from "@/components/ui/notice";
-import { useSetCartItem } from "@/lib/cart-query";
+import { CART_KEY, useSetCartItem } from "@/lib/cart-query";
+import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/format";
-import type { ProductDetail } from "@ai-commerce/contracts";
+import type { CartOut, ProductDetail } from "@ai-commerce/contracts";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { CART_KEY } from "@/lib/cart-query";
-import type { CartOut } from "@ai-commerce/contracts";
+import { useState, type ReactNode } from "react";
 
-export function AddToCart({ product }: { product: ProductDetail }) {
+/** Variant attribute key → a friendlier legend ("color" → "Color"). */
+function optionLabel(product: ProductDetail): string {
+  const keys = new Set(product.variants.flatMap((v) => Object.keys(v.attributes)));
+  const [key] = keys;
+  if (keys.size === 1 && key) {
+    return key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, " ");
+  }
+  return "Option";
+}
+
+function StockStatus({ inStock, available }: { inStock: boolean; available: number }) {
+  const low = inStock && available <= 5;
+  return (
+    <p
+      className={cn(
+        "inline-flex items-center gap-2 text-sm font-semibold",
+        !inStock ? "text-danger-700" : low ? "text-warning-700" : "text-success-700",
+      )}
+    >
+      <span className="relative flex size-2.5" aria-hidden="true">
+        {inStock && !low ? (
+          <span className="absolute inline-flex size-full animate-ping rounded-full bg-success-600 opacity-40 motion-reduce:hidden" />
+        ) : null}
+        <span
+          className={cn(
+            "relative inline-flex size-2.5 rounded-full",
+            !inStock ? "bg-danger-600" : low ? "bg-warning-600" : "bg-success-600",
+          )}
+        />
+      </span>
+      {inStock ? (low ? `Only ${available} left in stock` : "In stock") : "Out of stock"}
+    </p>
+  );
+}
+
+/**
+ * Price, stock, option chips, quantity, and Add to cart. `trust` renders between the result
+ * message and the price-freshness note (server-rendered policy copy).
+ */
+export function AddToCart({ product, trust }: { product: ProductDetail; trust?: ReactNode }) {
   const firstInStock = product.variants.find((v) => v.in_stock) ?? product.variants[0];
   const [variantId, setVariantId] = useState(firstInStock?.id ?? "");
   const [quantity, setQuantity] = useState(1);
@@ -21,6 +61,7 @@ export function AddToCart({ product }: { product: ProductDetail }) {
   const variant = product.variants.find((v) => v.id === variantId) ?? firstInStock;
   if (!variant) return null;
   const maxQty = Math.min(10, variant.available);
+  const prices = new Set(product.variants.map((v) => v.price_minor));
 
   async function add() {
     if (!variant) return;
@@ -37,24 +78,33 @@ export function AddToCart({ product }: { product: ProductDetail }) {
   }
 
   return (
-    <div className="mt-4">
-      <p className="text-3xl font-bold">{formatMoney(variant.price_minor, variant.currency)}</p>
-      <p className={`mt-1 font-medium ${variant.in_stock ? "text-emerald-800" : "text-red-800"}`}>
-        {variant.in_stock
-          ? variant.available <= 5
-            ? `Only ${variant.available} left in stock`
-            : "In stock"
-          : "Out of stock"}
-      </p>
+    <div>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+        <p className="font-display text-4xl font-semibold tabular-nums tracking-tight text-ink">
+          {formatMoney(variant.price_minor, variant.currency)}
+          {prices.size > 1 ? <span className="sr-only"> for {variant.name}</span> : null}
+        </p>
+        <StockStatus inStock={variant.in_stock} available={variant.available} />
+      </div>
 
       {product.variants.length > 1 ? (
-        <fieldset className="mt-5">
-          <legend className="font-semibold">Option: {variant.name}</legend>
-          <div className="mt-2 flex flex-wrap gap-2">
+        <fieldset className="mt-7">
+          <legend className="text-sm font-semibold text-ink">
+            {optionLabel(product)}: <span className="font-normal text-muted">{variant.name}</span>
+          </legend>
+          <div className="mt-3 flex flex-wrap gap-2">
             {product.variants.map((v) => (
               <label
                 key={v.id}
-                className={`flex min-h-11 cursor-pointer items-center rounded-full border px-4 text-sm font-medium has-[:checked]:border-brand-700 has-[:checked]:bg-brand-50 has-[:focus-visible]:outline has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-brand-600 ${v.in_stock ? "border-stone-400" : "border-dashed border-stone-300 text-muted"}`}
+                className={cn(
+                  "group relative flex min-h-11 cursor-pointer select-none items-center gap-2 rounded-full bg-raised px-4 text-sm font-medium text-ink",
+                  "ring-1 ring-inset transition-[box-shadow,background-color,color] duration-150 ease-snappy",
+                  "has-checked:bg-brand-50 has-checked:text-brand-900 has-checked:ring-2 has-checked:ring-brand-600",
+                  "has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus",
+                  v.in_stock
+                    ? "ring-line-strong hover:ring-neutral-500"
+                    : "text-muted ring-line-strong [background-image:repeating-linear-gradient(135deg,transparent_0_6px,var(--color-neutral-100)_6px_7px)]",
+                )}
               >
                 <input
                   type="radio"
@@ -68,8 +118,9 @@ export function AddToCart({ product }: { product: ProductDetail }) {
                   }}
                   className="sr-only"
                 />
-                {v.name}
-                {!v.in_stock ? <span className="ml-1">(out of stock)</span> : null}
+                <CheckIcon className="hidden size-4 text-brand-700 group-has-checked:block" />
+                <span className={v.in_stock ? undefined : "line-through decoration-neutral-400"}>{v.name}</span>
+                {!v.in_stock ? <span className="text-xs">(out of stock)</span> : null}
               </label>
             ))}
           </div>
@@ -77,43 +128,59 @@ export function AddToCart({ product }: { product: ProductDetail }) {
       ) : null}
 
       {variant.in_stock ? (
-        <div className="mt-5 flex flex-wrap items-end gap-3">
-          <div>
-            <label htmlFor="quantity" className="block text-sm font-semibold">
+        <div className="mt-7 flex items-end gap-3">
+          <div className="w-24 shrink-0">
+            <label htmlFor="quantity" className="block text-sm font-semibold text-ink">
               Quantity
             </label>
-            <select
+            <PillSelect
               id="quantity"
               value={quantity}
               onChange={(e) => setQuantity(Number(e.target.value))}
-              className="mt-1 min-h-11 rounded-lg border border-stone-400 bg-white px-3"
+              wrapperClassName="mt-2"
+              className="min-h-13 pl-5 tabular-nums"
             >
               {Array.from({ length: maxQty }, (_, i) => i + 1).map((n) => (
                 <option key={n} value={n}>
                   {n}
                 </option>
               ))}
-            </select>
+            </PillSelect>
           </div>
-          <Button size="lg" onClick={add} disabled={setItem.isPending}>
+          <Button size="lg" onClick={add} loading={setItem.isPending} className="min-w-0 flex-1">
+            {setItem.isPending ? null : <CartIcon className="size-5" />}
             {setItem.isPending ? "Adding…" : "Add to cart"}
           </Button>
         </div>
-      ) : null}
+      ) : (
+        <p className="mt-7 rounded-2xl bg-sunken px-5 py-4 text-sm text-ink-soft">
+          {product.variants.length > 1
+            ? `This option is out of stock right now. ${product.variants.some((v) => v.in_stock) ? "Try another option above." : "Check back soon."}`
+            : "This item is out of stock right now. Check back soon."}
+        </p>
+      )}
 
-      <div className="mt-4 min-h-12">
+      <div aria-live="polite" className="empty:hidden [&:not(:empty)]:mt-4">
         {message ? (
-          <Notice tone={message.tone}>
-            {message.text}{" "}
-            {message.tone === "success" ? (
-              <ButtonLink href="/cart" variant="ghost" size="sm" className="ml-1 underline">
-                View cart
-              </ButtonLink>
-            ) : null}
+          <Notice
+            tone={message.tone}
+            className="animate-fade-in"
+            action={
+              message.tone === "success" ? (
+                <ButtonLink href="/cart" variant="outline" size="sm">
+                  View cart
+                </ButtonLink>
+              ) : undefined
+            }
+          >
+            {message.text}
           </Notice>
         ) : null}
       </div>
-      <p className="text-xs text-muted">
+
+      {trust}
+
+      <p className="mt-5 text-xs text-muted">
         Price and stock checked{" "}
         {/* Server and browser may be in different time zones; the browser's rendering wins. */}
         <time dateTime={product.as_of} suppressHydrationWarning>

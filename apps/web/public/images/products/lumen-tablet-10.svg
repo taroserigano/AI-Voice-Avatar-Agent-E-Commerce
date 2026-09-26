@@ -1,14 +1,74 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Lumen Tab 10 Tablet, 64 GB illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Lumen Tab 10 Tablet, 64 GB">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2563eb"/>
-      <stop offset="1" stop-color="#2563eb" stop-opacity=".72"/>
+    <radialGradient id="lumen-tablet-10-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F1F3FF"/>
+      <stop offset="1" stop-color="#DCE1FB"/>
+    </radialGradient>
+    <filter id="lumen-tablet-10-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="lumen-tablet-10-alu" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e9ecf3"/>
+      <stop offset=".5" stop-color="#a9b0bf"/>
+      <stop offset="1" stop-color="#6c7384"/>
     </linearGradient>
+    <linearGradient id="lumen-tablet-10-bezel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2a2d36"/>
+      <stop offset="1" stop-color="#0e1015"/>
+    </linearGradient>
+    <linearGradient id="lumen-tablet-10-sky" x1="0" y1="0" x2=".4" y2="1">
+      <stop offset="0" stop-color="#231c6e"/>
+      <stop offset=".6" stop-color="#4b2596"/>
+      <stop offset="1" stop-color="#7a2f9e"/>
+    </linearGradient>
+    <linearGradient id="lumen-tablet-10-w1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f472b6"/>
+      <stop offset=".6" stop-color="#fb7185"/>
+      <stop offset="1" stop-color="#fdba74"/>
+    </linearGradient>
+    <linearGradient id="lumen-tablet-10-w2" x1="0" y1="0" x2="1" y2=".4">
+      <stop offset="0" stop-color="#22d3ee"/>
+      <stop offset=".55" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="lumen-tablet-10-w3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#c4b5fd"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <radialGradient id="lumen-tablet-10-sun" cx=".4" cy=".35" r=".7">
+      <stop offset="0" stop-color="#fff7cc"/>
+      <stop offset="1" stop-color="#fbbf24"/>
+    </radialGradient>
+    <linearGradient id="lumen-tablet-10-glare" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="lumen-tablet-10-screen">
+      <rect x="124" y="174" width="392" height="252" rx="10"/>
+    </clipPath>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M250 270a70 70 0 0 1 140 0" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round"/><rect x="228" y="262" width="36" height="64" rx="14" fill="#fff"/><rect x="376" y="262" width="36" height="64" rx="14" fill="#fff"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Lumen Tab 10 Tablet, 64</tspan><tspan x="320" dy="40">GB</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Lumen Labs</text>
+  <rect width="640" height="640" fill="url(#lumen-tablet-10-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="324" cy="458" rx="200" ry="16" fill="#1e1b4b" opacity=".16" filter="url(#lumen-tablet-10-blur)"/>
+
+  <!-- device -->
+  <rect x="440" y="145" width="44" height="8" rx="3" fill="url(#lumen-tablet-10-alu)"/>
+  <rect x="106" y="156" width="440" height="300" rx="32" fill="#5b6273"/>
+  <rect x="100" y="150" width="440" height="300" rx="32" fill="url(#lumen-tablet-10-alu)"/>
+  <rect x="103" y="153" width="434" height="294" rx="29" fill="url(#lumen-tablet-10-bezel)"/>
+  <circle cx="320" cy="164" r="3.5" fill="#262a35"/>
+  <circle cx="319" cy="163" r="1.2" fill="#6b8cff"/>
+
+  <!-- wallpaper -->
+  <g clip-path="url(#lumen-tablet-10-screen)">
+    <rect x="124" y="174" width="392" height="252" fill="url(#lumen-tablet-10-sky)"/>
+    <circle cx="238" cy="232" r="36" fill="url(#lumen-tablet-10-sun)"/>
+    <circle cx="238" cy="232" r="54" fill="#fde68a" fill-opacity=".18"/>
+    <circle cx="438" cy="236" r="84" fill="url(#lumen-tablet-10-w3)" fill-opacity=".75"/>
+    <path d="M124 318C186 266 246 300 318 262C396 220 456 212 516 190L516 300C452 306 404 360 322 380C246 398 186 380 124 402Z" fill="url(#lumen-tablet-10-w2)" fill-opacity=".9"/>
+    <path d="M124 372C198 316 282 390 382 342C452 308 488 274 516 282L516 426L124 426Z" fill="url(#lumen-tablet-10-w1)"/>
+    <path d="M124 404C210 368 300 420 400 392C450 378 490 364 516 370L516 426L124 426Z" fill="#fb923c" fill-opacity=".55"/>
+    <path d="M124 174H300L196 426H124Z" fill="url(#lumen-tablet-10-glare)"/>
+  </g>
+  <path d="M132 150C116 152 104 164 102 180" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="2" stroke-linecap="round"/>
 </svg>

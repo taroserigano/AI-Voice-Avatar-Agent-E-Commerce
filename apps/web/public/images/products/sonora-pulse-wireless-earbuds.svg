@@ -1,14 +1,102 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Pulse Wireless Earbuds illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Pulse Wireless Earbuds">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2563eb"/>
-      <stop offset="1" stop-color="#2563eb" stop-opacity=".72"/>
+    <radialGradient id="sonora-pulse-wireless-earbuds-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F1F3FF"/>
+      <stop offset="1" stop-color="#DCE1FB"/>
+    </radialGradient>
+    <filter id="sonora-pulse-wireless-earbuds-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="sonora-pulse-wireless-earbuds-body" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5f6571"/>
+      <stop offset=".3" stop-color="#4a4f5a"/>
+      <stop offset=".75" stop-color="#33373f"/>
+      <stop offset="1" stop-color="#1e2127"/>
+    </linearGradient>
+    <linearGradient id="sonora-pulse-wireless-earbuds-bodyv" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity="0"/>
+      <stop offset=".7" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".28"/>
+    </linearGradient>
+    <linearGradient id="sonora-pulse-wireless-earbuds-rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7b818d"/>
+      <stop offset="1" stop-color="#474b55"/>
+    </linearGradient>
+    <linearGradient id="sonora-pulse-wireless-earbuds-lid" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6c727e"/>
+      <stop offset=".5" stop-color="#454a54"/>
+      <stop offset="1" stop-color="#2a2d34"/>
+    </linearGradient>
+    <linearGradient id="sonora-pulse-wireless-earbuds-lidin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#15171b"/>
+      <stop offset="1" stop-color="#34373f"/>
+    </linearGradient>
+    <linearGradient id="sonora-pulse-wireless-earbuds-bud" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#737a87"/>
+      <stop offset=".45" stop-color="#474c57"/>
+      <stop offset="1" stop-color="#23262d"/>
+    </linearGradient>
+    <linearGradient id="sonora-pulse-wireless-earbuds-tip" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4a4e57"/>
+      <stop offset="1" stop-color="#1b1d22"/>
+    </linearGradient>
+    <linearGradient id="sonora-pulse-wireless-earbuds-steel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#eef1f6"/>
+      <stop offset="1" stop-color="#8a92a3"/>
     </linearGradient>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M250 270a70 70 0 0 1 140 0" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round"/><rect x="228" y="262" width="36" height="64" rx="14" fill="#fff"/><rect x="376" y="262" width="36" height="64" rx="14" fill="#fff"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Pulse Wireless Earbuds</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Sonora Audio</text>
+  <rect width="640" height="640" fill="url(#sonora-pulse-wireless-earbuds-bg)"/>
+  <circle cx="320" cy="310" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="324" cy="462" rx="200" ry="18" fill="#1e1b4b" opacity=".16" filter="url(#sonora-pulse-wireless-earbuds-blur)"/>
+
+  <g transform="translate(250 300) scale(1.12 .88) translate(-250 -300)">
+  <!-- open lid -->
+  <path d="M136 292C130 214 176 156 250 156C324 156 370 214 364 292Z" fill="url(#sonora-pulse-wireless-earbuds-lid)"/>
+  <path d="M152 290C148 226 186 174 250 174C314 174 352 226 348 290Z" fill="url(#sonora-pulse-wireless-earbuds-lidin)"/>
+  <path d="M146 250C150 206 184 168 236 162" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="206" cy="240" rx="24" ry="30" fill="#0f1114" fill-opacity=".6"/>
+  <ellipse cx="294" cy="240" rx="24" ry="30" fill="#0f1114" fill-opacity=".6"/>
+  <rect x="226" y="262" width="48" height="10" rx="5" fill="url(#sonora-pulse-wireless-earbuds-steel)"/>
+
+  <!-- case body -->
+  <path d="M130 300L130 392C130 444 166 470 216 470L284 470C334 470 370 444 370 392L370 300Z" fill="url(#sonora-pulse-wireless-earbuds-body)"/>
+  <path d="M130 300L130 392C130 444 166 470 216 470L284 470C334 470 370 444 370 392L370 300Z" fill="url(#sonora-pulse-wireless-earbuds-bodyv)"/>
+  <path d="M146 318L146 392C146 420 156 438 172 450" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="250" cy="352" r="6" fill="#86efac" fill-opacity=".3"/>
+  <circle cx="250" cy="352" r="2.8" fill="#dcfce7"/>
+  <rect x="238" y="446" width="24" height="5" rx="2.5" fill="#1a1c21" fill-opacity=".6"/>
+
+  <!-- rim and cradle -->
+  <ellipse cx="250" cy="300" rx="120" ry="30" fill="url(#sonora-pulse-wireless-earbuds-rim)"/>
+  <ellipse cx="250" cy="302" rx="106" ry="21" fill="#1b1d22"/>
+  <ellipse cx="206" cy="303" rx="28" ry="12" fill="#0b0c0f"/>
+  <ellipse cx="294" cy="303" rx="28" ry="12" fill="#0b0c0f"/>
+  <circle cx="200" cy="304" r="2.2" fill="#d6b56a"/>
+  <circle cx="212" cy="304" r="2.2" fill="#d6b56a"/>
+  <circle cx="288" cy="304" r="2.2" fill="#d6b56a"/>
+  <circle cx="300" cy="304" r="2.2" fill="#d6b56a"/>
+  <path d="M140 296C150 282 190 272 236 270" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="2.5" stroke-linecap="round"/>
+
+  </g>
+  <!-- back earbud -->
+  <g transform="translate(500 388) rotate(16)">
+    <rect x="-11" y="4" width="22" height="74" rx="11" fill="url(#sonora-pulse-wireless-earbuds-bud)"/>
+    <rect x="-7" y="66" width="14" height="7" rx="3.5" fill="url(#sonora-pulse-wireless-earbuds-steel)"/>
+    <ellipse cx="0" cy="0" rx="30" ry="28" fill="url(#sonora-pulse-wireless-earbuds-bud)"/>
+    <ellipse cx="-24" cy="-12" rx="16" ry="19" transform="rotate(-30 -24 -12)" fill="url(#sonora-pulse-wireless-earbuds-tip)"/>
+    <ellipse cx="-30" cy="-16" rx="6" ry="8" transform="rotate(-30 -30 -16)" fill="#0c0d10"/>
+    <path d="M-10 -22C0 -27 14 -24 22 -16" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <!-- front earbud -->
+  <g transform="translate(420 408) rotate(-18)">
+    <rect x="-11" y="4" width="22" height="74" rx="11" fill="url(#sonora-pulse-wireless-earbuds-bud)"/>
+    <path d="M-6 16L-6 62" stroke="#fff" stroke-opacity=".3" stroke-width="3" stroke-linecap="round"/>
+    <rect x="-7" y="66" width="14" height="7" rx="3.5" fill="url(#sonora-pulse-wireless-earbuds-steel)"/>
+    <ellipse cx="0" cy="0" rx="30" ry="28" fill="url(#sonora-pulse-wireless-earbuds-bud)"/>
+    <ellipse cx="-24" cy="-12" rx="16" ry="19" transform="rotate(-30 -24 -12)" fill="url(#sonora-pulse-wireless-earbuds-tip)"/>
+    <ellipse cx="-30" cy="-16" rx="6" ry="8" transform="rotate(-30 -30 -16)" fill="#0c0d10"/>
+    <circle cx="10" cy="4" r="6" fill="#2b2e35"/>
+    <circle cx="10" cy="4" r="2" fill="#9ca3af"/>
+    <path d="M-10 -22C0 -27 14 -24 22 -16" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/>
+  </g>
 </svg>

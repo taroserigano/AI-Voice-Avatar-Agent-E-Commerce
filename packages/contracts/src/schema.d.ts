@@ -21,6 +21,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Activity
+         * @description The signed-in shopper's own activity, newest first.
+         */
+        get: operations["my_activity_v1_activity_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/auth/me": {
         parameters: {
             query?: never;
@@ -191,6 +211,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/orders/{order_id}/return-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Return Options
+         * @description What each line of the order can return right now, and roughly for how much. Read-only:
+         *     starting a return needs a quote and the shopper's confirmation (Milestone 3a).
+         */
+        get: operations["get_return_options_v1_orders__order_id__return_options_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/products": {
         parameters: {
             query?: never;
@@ -225,10 +266,83 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/products/{product_id}/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Reviews */
+        get: operations["list_reviews_v1_products__product_id__reviews_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/products/{product_id}/reviews/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Put My Review */
+        put: operations["put_my_review_v1_products__product_id__reviews_mine_put"];
+        post?: never;
+        /** Delete My Review */
+        delete: operations["delete_my_review_v1_products__product_id__reviews_mine_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ActivityOut */
+        ActivityOut: {
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Is Sample
+             * @description Seeded demo activity; label it on screen
+             */
+            is_sample: boolean;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /** Order Id */
+            order_id: string | null;
+            product: components["schemas"]["ActivityProduct"] | null;
+            type: components["schemas"]["EventType"];
+        };
+        /** ActivityProduct */
+        ActivityProduct: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Image Path */
+            image_path: string;
+            /** Title */
+            title: string;
+        };
         /** CartLineOut */
         CartLineOut: {
             /** Available */
@@ -301,6 +415,11 @@ export interface components {
             /** Slug */
             slug: string;
         };
+        /**
+         * EventType
+         * @enum {string}
+         */
+        EventType: "signed_in" | "searched" | "viewed_product" | "added_to_cart" | "placed_order" | "order_delivered" | "started_return" | "refund_issued" | "wrote_review" | "contacted_support";
         /** FacetValue */
         FacetValue: {
             /** Count */
@@ -327,6 +446,49 @@ export interface components {
          * @enum {string}
          */
         LegStatus: "ok" | "unavailable" | "disabled";
+        /** LineReturnOption */
+        LineReturnOption: {
+            /** Currency */
+            currency: string;
+            /** Eligible */
+            eligible: boolean;
+            /** Image Path */
+            image_path: string;
+            /** Inspection Required */
+            inspection_required: boolean;
+            /**
+             * Max Refund Minor
+             * @description Refund if every returnable unit is sent back now; computed by the server
+             */
+            max_refund_minor: number;
+            /**
+             * Message
+             * @description Plain-language explanation, written by the server
+             */
+            message: string;
+            /**
+             * Order Line Id
+             * Format: uuid
+             */
+            order_line_id: string;
+            /** Product Title */
+            product_title: string;
+            /** Quantity */
+            quantity: number;
+            reason: components["schemas"]["Reason"];
+            refund_timing: components["schemas"]["RefundTiming"] | null;
+            /** Returnable Quantity */
+            returnable_quantity: number;
+            /**
+             * Returned Quantity
+             * @description Units already in returns that weren't rejected
+             */
+            returned_quantity: number;
+            /** Variant Name */
+            variant_name: string;
+            /** Window Ends At */
+            window_ends_at: string | null;
+        };
         /** MessageOut */
         MessageOut: {
             /** Message */
@@ -341,6 +503,16 @@ export interface components {
             /** Discount Minor */
             discount_minor: number;
             /**
+             * Estimated Delivery At
+             * @description While it's still on its way
+             */
+            estimated_delivery_at: string | null;
+            /**
+             * Has Open Return
+             * @description A return for this order is still in progress
+             */
+            has_open_return: boolean;
+            /**
              * Id
              * Format: uuid
              */
@@ -349,11 +521,26 @@ export interface components {
             item_count: number;
             /** Lines */
             lines: components["schemas"]["OrderLineOut"][];
+            payment: components["schemas"]["PaymentOut"] | null;
             /**
              * Placed At
              * Format: date-time
              */
             placed_at: string;
+            /**
+             * Preview Images
+             * @description Up to 4 line images, for the order list
+             */
+            preview_images: string[];
+            /**
+             * Return Window Ends At
+             * @description Latest time any item can still be returned; null if nothing can be
+             */
+            return_window_ends_at: string | null;
+            /** Returns */
+            returns: components["schemas"]["ReturnOut"][];
+            /** Shipments */
+            shipments: components["schemas"]["ShipmentOut"][];
             /** Shipping Minor */
             shipping_minor: number;
             status: components["schemas"]["OrderStatus"];
@@ -404,6 +591,18 @@ export interface components {
         OrderSummary: {
             /** Currency */
             currency: string;
+            /** Delivered At */
+            delivered_at: string | null;
+            /**
+             * Estimated Delivery At
+             * @description While it's still on its way
+             */
+            estimated_delivery_at: string | null;
+            /**
+             * Has Open Return
+             * @description A return for this order is still in progress
+             */
+            has_open_return: boolean;
             /**
              * Id
              * Format: uuid
@@ -416,10 +615,68 @@ export interface components {
              * Format: date-time
              */
             placed_at: string;
+            /**
+             * Preview Images
+             * @description Up to 4 line images, for the order list
+             */
+            preview_images: string[];
+            /**
+             * Return Window Ends At
+             * @description Latest time any item can still be returned; null if nothing can be
+             */
+            return_window_ends_at: string | null;
             status: components["schemas"]["OrderStatus"];
             /** Total Minor */
             total_minor: number;
         };
+        /**
+         * PaymentMethodOut
+         * @description Where refunds go: always the order's original payment method.
+         */
+        PaymentMethodOut: {
+            /** Card Brand */
+            card_brand: string | null;
+            /** Card Last4 */
+            card_last4: string | null;
+            /**
+             * Is Simulated
+             * @description Seed/simulator payment, not a real Stripe charge
+             */
+            is_simulated: boolean;
+            provider: components["schemas"]["PaymentProvider"];
+        };
+        /** PaymentOut */
+        PaymentOut: {
+            /** Amount Minor */
+            amount_minor: number;
+            /** Captured At */
+            captured_at: string | null;
+            /** Card Brand */
+            card_brand: string | null;
+            /** Card Last4 */
+            card_last4: string | null;
+            /** Currency */
+            currency: string;
+            /**
+             * Is Simulated
+             * @description Seed/simulator payment, not a real Stripe charge
+             */
+            is_simulated: boolean;
+            provider: components["schemas"]["PaymentProvider"];
+            /** Refunded Minor */
+            refunded_minor: number;
+            status: components["schemas"]["PaymentStatus"];
+        };
+        /**
+         * PaymentProvider
+         * @enum {string}
+         */
+        PaymentProvider: "stripe" | "simulated";
+        /**
+         * PaymentStatus
+         * @enum {string}
+         */
+        PaymentStatus: "succeeded" | "partially_refunded" | "refunded" | "failed";
         /**
          * PolicyClass
          * @description How the sandbox return policy treats a category (see PRODUCT_REQUIREMENTS.md).
@@ -455,6 +712,13 @@ export interface components {
              * @description Lowest current variant price
              */
             price_minor: number;
+            /**
+             * Rating Average
+             * @description Mean review rating to one decimal; null with no reviews
+             */
+            rating_average: number | null;
+            /** Rating Count */
+            rating_count: number;
             /** Slug */
             slug: string;
             /** Title */
@@ -499,6 +763,13 @@ export interface components {
              * @description Lowest current variant price
              */
             price_minor: number;
+            /**
+             * Rating Average
+             * @description Mean review rating to one decimal; null with no reviews
+             */
+            rating_average: number | null;
+            /** Rating Count */
+            rating_count: number;
             /** Slug */
             slug: string;
             /** Title */
@@ -506,6 +777,215 @@ export interface components {
             /** Variant Count */
             variant_count: number;
         };
+        /** RatingBucket */
+        RatingBucket: {
+            /** Count */
+            count: number;
+            /** Stars */
+            stars: number;
+        };
+        /** RatingSummary */
+        RatingSummary: {
+            /**
+             * Average
+             * @description Mean rating to one decimal; null with no reviews
+             */
+            average: number | null;
+            /** Count */
+            count: number;
+            /**
+             * Distribution
+             * @description One bucket per star value, 5 down to 1
+             */
+            distribution: components["schemas"]["RatingBucket"][];
+        };
+        /**
+         * Reason
+         * @description Same codes as the assistant eval set (evals/assistant/returns.jsonl).
+         * @enum {string}
+         */
+        Reason: "within_window" | "perishable_within_7_days" | "not_delivered" | "canceled" | "final_sale" | "outside_window" | "perishable_past_7_days" | "fully_returned";
+        /** RefundOut */
+        RefundOut: {
+            /** Amount Minor */
+            amount_minor: number;
+            /** Currency */
+            currency: string;
+            /** Failure Reason */
+            failure_reason: string | null;
+            /**
+             * Requested At
+             * Format: date-time
+             */
+            requested_at: string;
+            /** Settled At */
+            settled_at: string | null;
+            status: components["schemas"]["RefundStatus"];
+        };
+        /**
+         * RefundStatus
+         * @enum {string}
+         */
+        RefundStatus: "not_requested" | "requested" | "pending" | "succeeded" | "failed" | "requires_action" | "canceled";
+        /**
+         * RefundTiming
+         * @enum {string}
+         */
+        RefundTiming: "instant" | "after_receipt" | "after_inspection" | "no_return_needed";
+        /** ReturnItemOut */
+        ReturnItemOut: {
+            /** Condition */
+            condition: string;
+            /** Image Path */
+            image_path: string;
+            /**
+             * Order Line Id
+             * Format: uuid
+             */
+            order_line_id: string;
+            /** Product Title */
+            product_title: string;
+            /** Quantity */
+            quantity: number;
+            /** Refund Minor */
+            refund_minor: number;
+            /** Variant Name */
+            variant_name: string;
+        };
+        /** ReturnOptions */
+        ReturnOptions: {
+            /**
+             * As Of
+             * Format: date-time
+             */
+            as_of: string;
+            /** Lines */
+            lines: components["schemas"]["LineReturnOption"][];
+            /**
+             * Order Id
+             * Format: uuid
+             */
+            order_id: string;
+            /** Policy Version */
+            policy_version: string;
+            refund_destination: components["schemas"]["PaymentMethodOut"] | null;
+            /**
+             * Whole Order Shipping Refund Minor
+             * @description Shipping refunded only if everything left in the order is returned
+             */
+            whole_order_shipping_refund_minor: number;
+        };
+        /** ReturnOut */
+        ReturnOut: {
+            /** Closed At */
+            closed_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Is Sample
+             * @description Seeded demo history; label it on screen
+             */
+            is_sample: boolean;
+            /** Items */
+            items: components["schemas"]["ReturnItemOut"][];
+            /** Reason */
+            reason: string;
+            /** @description The latest refund attempt, if any */
+            refund: components["schemas"]["RefundOut"] | null;
+            /** Rma Number */
+            rma_number: string;
+            /** Shipping Refund Minor */
+            shipping_refund_minor: number;
+            status: components["schemas"]["ReturnStatus"];
+        };
+        /**
+         * ReturnStatus
+         * @enum {string}
+         */
+        ReturnStatus: "requested" | "authorized" | "in_transit" | "received" | "inspected" | "closed" | "review" | "rejected" | "canceled";
+        /**
+         * ReviewIn
+         * @description What a shopper submits. The author and product come from the session and the URL.
+         */
+        ReviewIn: {
+            /** Body */
+            body?: string | null;
+            /**
+             * Rating
+             * @description Whole stars, 1 to 5
+             */
+            rating: number;
+            /** Title */
+            title?: string | null;
+        };
+        /** ReviewOut */
+        ReviewOut: {
+            /**
+             * Author Name
+             * @description Shortened display name, e.g. "Alice R."
+             */
+            author_name: string;
+            /** Body */
+            body: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Mine */
+            is_mine: boolean;
+            /**
+             * Is Sample
+             * @description Seeded demo content; label it as a sample on screen
+             */
+            is_sample: boolean;
+            /** Rating */
+            rating: number;
+            /** Title */
+            title: string | null;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /**
+             * Verified Purchase
+             * @description The author has a paid order for this product
+             */
+            verified_purchase: boolean;
+        };
+        /** ReviewPage */
+        ReviewPage: {
+            /** Items */
+            items: components["schemas"]["ReviewOut"][];
+            /** @description The signed-in shopper's review, if any */
+            my_review: components["schemas"]["ReviewOut"] | null;
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            summary: components["schemas"]["RatingSummary"];
+            /** Total */
+            total: number;
+        };
+        /**
+         * ReviewSort
+         * @enum {string}
+         */
+        ReviewSort: "newest" | "highest" | "lowest";
         /**
          * Role
          * @enum {string}
@@ -534,6 +1014,49 @@ export interface components {
              */
             variant_id: string;
         };
+        /** ShipmentEventOut */
+        ShipmentEventOut: {
+            /** Description */
+            description: string;
+            /** Location */
+            location: string | null;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            status: components["schemas"]["ShipmentStatus"];
+        };
+        /** ShipmentOut */
+        ShipmentOut: {
+            /** Carrier */
+            carrier: string;
+            /** Delivered At */
+            delivered_at: string | null;
+            /** Estimated Delivery At */
+            estimated_delivery_at: string | null;
+            /** Events */
+            events: components["schemas"]["ShipmentEventOut"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Simulated */
+            is_simulated: boolean;
+            /** Service */
+            service: string;
+            /** Shipped At */
+            shipped_at: string | null;
+            status: components["schemas"]["ShipmentStatus"];
+            /** Tracking Number */
+            tracking_number: string;
+        };
+        /**
+         * ShipmentStatus
+         * @enum {string}
+         */
+        ShipmentStatus: "label_created" | "in_transit" | "out_for_delivery" | "delivered" | "exception";
         /** SignInRequest */
         SignInRequest: {
             /**
@@ -560,7 +1083,7 @@ export interface components {
          * SortOrder
          * @enum {string}
          */
-        SortOrder: "relevance" | "price_asc" | "price_desc" | "newest";
+        SortOrder: "relevance" | "price_asc" | "price_desc" | "newest" | "top_rated";
         /** UserOut */
         UserOut: {
             /** Display Name */
@@ -641,6 +1164,38 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    my_activity_v1_activity_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                type?: components["schemas"]["EventType"][] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActivityOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -954,6 +1509,44 @@ export interface operations {
             };
         };
     };
+    get_return_options_v1_orders__order_id__return_options_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReturnOptions"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     products_v1_products_get: {
         parameters: {
             query?: {
@@ -1018,6 +1611,123 @@ export interface operations {
             };
             /** @description No such product */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_reviews_v1_products__product_id__reviews_get: {
+        parameters: {
+            query?: {
+                sort?: components["schemas"]["ReviewSort"];
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewPage"];
+                };
+            };
+            /** @description No such product */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_my_review_v1_products__product_id__reviews_mine_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewOut"];
+                };
+            };
+            /** @description No such product */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_my_review_v1_products__product_id__reviews_mine_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };

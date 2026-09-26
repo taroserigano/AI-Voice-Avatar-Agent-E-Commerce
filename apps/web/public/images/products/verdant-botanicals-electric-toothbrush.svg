@@ -1,14 +1,73 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Sonic Electric Toothbrush illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Sonic Electric Toothbrush">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0f766e"/>
-      <stop offset="1" stop-color="#0f766e" stop-opacity=".72"/>
+    <radialGradient id="verdant-botanicals-electric-toothbrush-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#EFFBF8"/>
+      <stop offset="1" stop-color="#D3EFE8"/>
+    </radialGradient>
+    <filter id="verdant-botanicals-electric-toothbrush-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="verdant-botanicals-electric-toothbrush-white" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#e6eeec"/>
+      <stop offset=".25" stop-color="#ffffff"/>
+      <stop offset=".6" stop-color="#eef4f3"/>
+      <stop offset="1" stop-color="#b9c9c5"/>
     </linearGradient>
+    <linearGradient id="verdant-botanicals-electric-toothbrush-mint" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#9fe3cf"/>
+      <stop offset=".3" stop-color="#8adcc4"/>
+      <stop offset="1" stop-color="#4fae93"/>
+    </linearGradient>
+    <linearGradient id="verdant-botanicals-electric-toothbrush-basetop" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#d5e1de"/>
+    </linearGradient>
+    <clipPath id="verdant-botanicals-electric-toothbrush-clip">
+      <path d="M288 460C288 470 302 474 320 474C338 474 352 470 352 460L352 260C352 236 342 222 332 214L328 204L312 204L308 214C298 222 288 236 288 260Z"/>
+    </clipPath>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <rect x="290" y="210" width="60" height="30" rx="6" fill="#fff"/><rect x="270" y="240" width="100" height="120" rx="22" fill="#fff"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Sonic Electric</tspan><tspan x="320" dy="40">Toothbrush</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Verdant Botanicals</text>
+  <rect width="640" height="640" fill="url(#verdant-botanicals-electric-toothbrush-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="320" cy="512" rx="96" ry="16" fill="#1e1b4b" fill-opacity=".16" filter="url(#verdant-botanicals-electric-toothbrush-shadow)"/>
+  <path d="M242 462L242 490C242 504 277 512 320 512C363 512 398 504 398 490L398 462Z" fill="url(#verdant-botanicals-electric-toothbrush-white)"/>
+  <path d="M242 488C242 502 277 510 320 510C363 510 398 502 398 488" stroke="#a9bab6" stroke-width="2" stroke-opacity=".6" fill="none"/>
+  <ellipse cx="320" cy="462" rx="78" ry="20" fill="url(#verdant-botanicals-electric-toothbrush-basetop)"/>
+  <ellipse cx="320" cy="462" rx="72" ry="17" fill="none" stroke="#7fd6bd" stroke-width="3"/>
+  <ellipse cx="320" cy="462" rx="72" ry="17" fill="none" stroke="#bff3e3" stroke-width="1" stroke-opacity=".9"/>
+  <ellipse cx="320" cy="464" rx="38" ry="9" fill="#b3c4c0"/>
+  <path d="M254 476C256 488 262 496 272 500" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-opacity=".9" fill="none"/>
+  <g transform="matrix(1.12 0 0 1 -38.4 0)">
+  <path d="M288 460C288 470 302 474 320 474C338 474 352 470 352 460L352 260C352 236 342 222 332 214L328 204L312 204L308 214C298 222 288 236 288 260Z" fill="url(#verdant-botanicals-electric-toothbrush-white)"/>
+  <g clip-path="url(#verdant-botanicals-electric-toothbrush-clip)">
+    <rect x="280" y="420" width="80" height="60" fill="url(#verdant-botanicals-electric-toothbrush-mint)"/>
+    <path d="M280 420H360" stroke="#fff" stroke-width="2" stroke-opacity=".7"/>
+    <path d="M288 428H352M288 436H352M288 444H352M288 452H352" stroke="#3f9a80" stroke-width="1" stroke-opacity=".35"/>
+  </g>
+  <path d="M300 242C298 300 298 380 300 450" stroke="#fff" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M344 250C346 310 346 380 344 450" stroke="#9fb3ae" stroke-width="4" stroke-opacity=".4" stroke-linecap="round" fill="none"/>
+  <rect x="310" y="286" width="20" height="40" rx="10" fill="url(#verdant-botanicals-electric-toothbrush-mint)"/>
+  <circle cx="320" cy="306" r="5" fill="none" stroke="#fff" stroke-width="2"/>
+  <path d="M320 299v6" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="320" cy="346" r="6" fill="#dfe8e6" stroke="#a9bab6" stroke-width="1"/>
+  <g fill="#7fd6bd">
+    <circle cx="320" cy="372" r="2.6"/><circle cx="320" cy="384" r="2.6"/><circle cx="320" cy="396" r="2.6" fill-opacity=".45"/>
+  </g>
+  <path d="M312 204L313.5 120C313.5 114 326.5 114 326.5 120L328 204Z" fill="url(#verdant-botanicals-electric-toothbrush-white)"/>
+  <rect x="309" y="198" width="22" height="9" rx="4" fill="url(#verdant-botanicals-electric-toothbrush-mint)"/>
+  <path d="M316 190V124" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M311 131C308 112 308 84 314 72C318 62 332 64 334 74C339 90 339 112 335 131Z" fill="url(#verdant-botanicals-electric-toothbrush-white)"/>
+  <path d="M316 124C314 110 314 90 318 78" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <g>
+    <path d="M314 74H296C293 74 292 77.5 293 79C293 80.5 295 81 296 81H314Z" fill="#e4efed" stroke="#9fbab3" stroke-width=".8"/>
+    <path d="M314 82H292C289 82 288 85.5 289 87C289 88.5 291 89 292 89H314Z" fill="#8adcc4" stroke="#5fb89d" stroke-width=".8"/>
+    <path d="M314 90H290C287 90 286 93.5 287 95C287 96.5 289 97 290 97H314Z" fill="#e4efed" stroke="#9fbab3" stroke-width=".8"/>
+    <path d="M314 98H289C286 98 285 101.5 286 103C286 104.5 288 105 289 105H314Z" fill="#8adcc4" stroke="#5fb89d" stroke-width=".8"/>
+    <path d="M314 106H290C287 106 286 109.5 287 111C287 112.5 289 113 290 113H314Z" fill="#e4efed" stroke="#9fbab3" stroke-width=".8"/>
+    <path d="M314 114H292C289 114 288 117.5 289 119C289 120.5 291 121 292 121H314Z" fill="#8adcc4" stroke="#5fb89d" stroke-width=".8"/>
+    <path d="M314 122H295C292 122 291 125.5 292 127C292 128.5 294 129 295 129H314Z" fill="#e4efed" stroke="#9fbab3" stroke-width=".8"/>
+    <path d="M300 74V129" stroke="#9fb3ae" stroke-width="10" stroke-opacity=".12"/>
+    <path d="M292 78H310M290 94H310M290 110H310M293 126H310" stroke="#fff" stroke-width="1" stroke-opacity=".8"/>
+    <path d="M313 72V130" stroke="#9fb3ae" stroke-width="2" stroke-opacity=".5"/>
+  </g>
+  </g>
 </svg>

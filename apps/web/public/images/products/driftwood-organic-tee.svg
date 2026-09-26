@@ -1,14 +1,55 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Organic Cotton Tee illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Organic Cotton Tee">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#be185d"/>
-      <stop offset="1" stop-color="#be185d" stop-opacity=".72"/>
+    <radialGradient id="driftwood-organic-tee-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF4F8"/>
+      <stop offset="1" stop-color="#F6DCE7"/>
+    </radialGradient>
+    <filter id="driftwood-organic-tee-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <filter id="driftwood-organic-tee-soft" filterUnits="userSpaceOnUse" x="0" y="0" width="640" height="640">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+    <linearGradient id="driftwood-organic-tee-torso" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#555a64"/>
+      <stop offset=".5" stop-color="#363941"/>
+      <stop offset="1" stop-color="#1f2127"/>
     </linearGradient>
+    <linearGradient id="driftwood-organic-tee-sleeve-l" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5a5f69"/>
+      <stop offset="1" stop-color="#34373f"/>
+    </linearGradient>
+    <linearGradient id="driftwood-organic-tee-sleeve-r" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a3d45"/>
+      <stop offset="1" stop-color="#1c1e23"/>
+    </linearGradient>
+    <clipPath id="driftwood-organic-tee-clip">
+      <path d="M236 140L280 128C292 154 348 154 360 128L404 140L414 206L420 470C360 476 280 476 220 470L226 206Z"/>
+    </clipPath>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M262 200l-52 30 22 44 30-14v110h116V260l30 14 22-44-52-30c-8 20-28 32-58 32s-50-12-58-32z" fill="#fff"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Organic Cotton Tee</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Driftwood Apparel</text>
+  <rect width="640" height="640" fill="url(#driftwood-organic-tee-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="320" cy="480" rx="170" ry="18" fill="#1e1b4b" fill-opacity=".16" filter="url(#driftwood-organic-tee-shadow)"/>
+  <path d="M238 140L150 176C136 182 130 196 134 210L160 276C164 286 174 290 184 285L230 262L228 206Z" fill="url(#driftwood-organic-tee-sleeve-l)"/>
+  <path d="M402 140L490 176C504 182 510 196 506 210L480 276C476 286 466 290 456 285L410 262L412 206Z" fill="url(#driftwood-organic-tee-sleeve-r)"/>
+  <path d="M146 204L172 270M494 204L468 270" stroke="#8a8f99" stroke-width="1.4" stroke-dasharray="4 3" stroke-opacity=".55" fill="none"/>
+  <path d="M170 196C186 190 202 188 220 196" stroke="#fff" stroke-width="6" stroke-opacity=".12" stroke-linecap="round" fill="none" filter="url(#driftwood-organic-tee-soft)"/>
+  <path d="M236 140L280 128C292 154 348 154 360 128L404 140L414 206L420 470C360 476 280 476 220 470L226 206Z" fill="url(#driftwood-organic-tee-torso)"/>
+  <g clip-path="url(#driftwood-organic-tee-clip)">
+    <path d="M262 180C256 260 254 360 258 450" stroke="#fff" stroke-width="40" stroke-opacity=".06" stroke-linecap="round" fill="none" filter="url(#driftwood-organic-tee-soft)"/>
+    <path d="M284 226C310 256 326 306 326 366" stroke="#fff" stroke-width="14" stroke-opacity=".09" stroke-linecap="round" fill="none" filter="url(#driftwood-organic-tee-soft)"/>
+    <path d="M300 236C326 266 342 316 342 376" stroke="#0e0f12" stroke-width="12" stroke-opacity=".35" stroke-linecap="round" fill="none" filter="url(#driftwood-organic-tee-soft)"/>
+    <path d="M232 380C280 396 330 410 400 416" stroke="#fff" stroke-width="12" stroke-opacity=".08" stroke-linecap="round" fill="none" filter="url(#driftwood-organic-tee-soft)"/>
+    <path d="M236 396C284 412 334 426 404 432" stroke="#0e0f12" stroke-width="10" stroke-opacity=".3" stroke-linecap="round" fill="none" filter="url(#driftwood-organic-tee-soft)"/>
+    <path d="M380 180C392 230 398 280 396 330" stroke="#0e0f12" stroke-width="16" stroke-opacity=".16" stroke-linecap="round" fill="none" filter="url(#driftwood-organic-tee-soft)"/>
+  </g>
+  <path d="M238 144C232 166 229 186 228 206M402 144C408 166 411 186 412 206" stroke="#16181c" stroke-width="1.6" stroke-opacity=".6" fill="none"/>
+  <path d="M240 146C235 166 232 186 231 206" stroke="#7d828c" stroke-width="1" stroke-opacity=".5" fill="none"/>
+  <path d="M222 458C280 464 360 464 418 458" stroke="#8a8f99" stroke-width="1.4" stroke-dasharray="4 3" stroke-opacity=".55" fill="none"/>
+  <path d="M276 130C290 168 350 168 364 130C350 124 290 124 276 130Z" fill="#40434b"/>
+  <path d="M289 133C300 155 340 155 351 133C340 129 300 129 289 133Z" fill="#17191d"/>
+  <rect x="311" y="134" width="18" height="9" rx="2.5" fill="#8b9099"/>
+  <path d="M282 134C295 162 345 162 358 134" stroke="#8a8f99" stroke-width="1.2" stroke-dasharray="3 2.5" stroke-opacity=".6" fill="none"/>
+  <path d="M278 131C291 166 349 166 362 131" stroke="#fff" stroke-width="1.2" stroke-opacity=".25" fill="none"/>
+  <path d="M282 132L240 142" stroke="#fff" stroke-width="1.5" stroke-opacity=".2" fill="none"/>
 </svg>

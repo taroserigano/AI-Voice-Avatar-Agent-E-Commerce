@@ -43,6 +43,15 @@ MUTABLE_TABLES = (
     "orders",
     "sessions",
     "outbox_events",
+    "product_reviews",
+    "customer_events",
+    "support_cases",
+    "refund_attempts",
+    "return_items",
+    "return_requests",
+    "shipment_events",
+    "shipments",
+    "payment_attempts",
 )
 PASSWORDS = {u.email: u.password for u in DEV_USERS}
 

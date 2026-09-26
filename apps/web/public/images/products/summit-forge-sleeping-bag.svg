@@ -1,14 +1,40 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Ember 30°F Sleeping Bag illustration">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#15803d"/>
-      <stop offset="1" stop-color="#15803d" stop-opacity=".72"/>
-    </linearGradient>
-  </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M320 180l110 170H210z" fill="#fff"/><path d="M320 260l40 90h-80z" fill-opacity=".25" fill="#000"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Ember 30°F Sleeping Bag</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Summit Forge</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Ember 30°F Sleeping Bag">
+<defs>
+<radialGradient id="summit-forge-sleeping-bag-bg" gradientUnits="userSpaceOnUse" cx="320" cy="240" r="520"><stop offset="0" stop-color="#F0FAF4"/><stop offset="1" stop-color="#D6EEDF"/></radialGradient>
+<filter id="summit-forge-sleeping-bag-shadow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+<linearGradient id="summit-forge-sleeping-bag-top" gradientUnits="userSpaceOnUse" x1="260" y1="290" x2="330" y2="400"><stop offset="0" stop-color="#F58A5A"/><stop offset="0.5" stop-color="#E2552F"/><stop offset="1" stop-color="#C8401F"/></linearGradient>
+<linearGradient id="summit-forge-sleeping-bag-side" gradientUnits="userSpaceOnUse" x1="0" y1="390" x2="0" y2="420"><stop offset="0" stop-color="#A8321A"/><stop offset="1" stop-color="#7A2112"/></linearGradient>
+<linearGradient id="summit-forge-sleeping-bag-roll" gradientUnits="userSpaceOnUse" x1="125" y1="290" x2="280" y2="326"><stop offset="0" stop-color="#F47E4C"/><stop offset="0.45" stop-color="#DC4B28"/><stop offset="1" stop-color="#9C2E17"/></linearGradient>
+<radialGradient id="summit-forge-sleeping-bag-face" gradientUnits="userSpaceOnUse" cx="176" cy="330" r="90"><stop offset="0" stop-color="#F0764A"/><stop offset="0.7" stop-color="#D8482A"/><stop offset="1" stop-color="#B2361C"/></radialGradient>
+<clipPath id="summit-forge-sleeping-bag-rollclip"><path d="M118.1 330.4L142.1 232.4A74 74 0 0 1 285.9 267.6L261.9 365.6Z"/><circle cx="214" cy="250" r="74"/></clipPath>
+<radialGradient id="summit-forge-sleeping-bag-hood" gradientUnits="userSpaceOnUse" cx="498" cy="344" r="40"><stop offset="0" stop-color="#1E2126"/><stop offset="1" stop-color="#4A4F58"/></radialGradient>
+</defs>
+<rect width="640" height="640" fill="url(#summit-forge-sleeping-bag-bg)"/>
+<circle cx="330" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+<ellipse cx="335" cy="422" rx="215" ry="18" fill="#1e1b4b" fill-opacity=".16" filter="url(#summit-forge-sleeping-bag-shadow)"/>
+<path d="M200 394L480 390C530 388 560 370 560 340L560 362C560 395 530 414 482 416L200 420Z" fill="url(#summit-forge-sleeping-bag-side)"/>
+<path d="M200 394L480 390C530 388 560 370 560 340C560 305 530 290 500 290L224 296Z" fill="url(#summit-forge-sleeping-bag-top)"/>
+<path d="M284 297Q268 344 262 392L262 417M326 297Q310 344 304 392L304 417M368 297Q352 344 346 392L346 417M410 297Q394 344 388 392L388 417M452 297Q436 344 430 392L430 417" fill="none" stroke="#8E2814" stroke-opacity=".45" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M258 300L476 296" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="5" stroke-linecap="round"/>
+<ellipse cx="506" cy="336" rx="42" ry="33" fill="#C23F1F" transform="rotate(-8 506 336)"/>
+<ellipse cx="505" cy="338" rx="33" ry="25" fill="url(#summit-forge-sleeping-bag-hood)" transform="rotate(-8 505 338)"/>
+<path d="M472 332C476 312 500 302 526 306" fill="none" stroke="#F79A6C" stroke-opacity=".6" stroke-width="3" stroke-linecap="round"/>
+<path d="M466 386L270 390" fill="none" stroke="#5A1A0E" stroke-width="2" stroke-dasharray="2 2.5"/>
+<rect x="286" y="385" width="18" height="9" rx="3" fill="#2F3338"/>
+<circle cx="540" cy="371" r="5" fill="#2F3338"/><path d="M536 366l-8 -10" stroke="#2F3338" stroke-width="2"/>
+<path d="M118.1 330.4L142.1 232.4A74 74 0 0 1 285.9 267.6L261.9 365.6Z" fill="url(#summit-forge-sleeping-bag-roll)"/>
+<circle cx="214" cy="250" r="74" fill="url(#summit-forge-sleeping-bag-roll)"/>
+<g clip-path="url(#summit-forge-sleeping-bag-rollclip)">
+<circle cx="198.4" cy="313.7" r="76" fill="none" stroke="#2E3136" stroke-width="11"/>
+<circle cx="209.2" cy="269.6" r="76" fill="none" stroke="#2E3136" stroke-width="11"/>
+<circle cx="198.4" cy="313.7" r="79" fill="none" stroke="#6A707A" stroke-width="2" stroke-opacity=".7"/>
+<circle cx="209.2" cy="269.6" r="79" fill="none" stroke="#6A707A" stroke-width="2" stroke-opacity=".7"/>
+<rect x="190" y="182" width="22" height="16" rx="3" fill="#15171A" transform="rotate(8 201 190)"/>
+<rect x="200" y="227" width="22" height="16" rx="3" fill="#15171A" transform="rotate(8 211 235)"/>
+</g>
+<path d="M150 214C170 190 204 180 236 184" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="5" stroke-linecap="round"/>
+<circle cx="190" cy="348" r="74" fill="url(#summit-forge-sleeping-bag-face)"/>
+<path d="M190 276A72 72 0 0 1 190 420A66 66 0 0 1 190 288A60 60 0 0 1 190 408A54 54 0 0 1 190 300A48 48 0 0 1 190 396A42 42 0 0 1 190 312A36 36 0 0 1 190 384A30 30 0 0 1 190 324A24 24 0 0 1 190 372A18 18 0 0 1 190 336A12 12 0 0 1 190 360" fill="none" stroke="#3A3D44" stroke-width="4.5" stroke-linecap="round"/>
+<path d="M190 276A72 72 0 0 1 190 420A66 66 0 0 1 190 288A60 60 0 0 1 190 408A54 54 0 0 1 190 300A48 48 0 0 1 190 396A42 42 0 0 1 190 312A36 36 0 0 1 190 384A30 30 0 0 1 190 324A24 24 0 0 1 190 372A18 18 0 0 1 190 336A12 12 0 0 1 190 360" fill="none" stroke="#F58C5E" stroke-width="1.2" stroke-opacity=".5" transform="translate(-2 -2)"/>
+<path d="M132 318A60 60 0 0 1 170 280" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="4" stroke-linecap="round"/>
 </svg>

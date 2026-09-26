@@ -1,14 +1,70 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Beam Portable Bluetooth Speaker illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Beam Portable Bluetooth Speaker">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2563eb"/>
-      <stop offset="1" stop-color="#2563eb" stop-opacity=".72"/>
+    <radialGradient id="lumen-beam-bluetooth-speaker-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F1F3FF"/>
+      <stop offset="1" stop-color="#DCE1FB"/>
+    </radialGradient>
+    <filter id="lumen-beam-bluetooth-speaker-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="lumen-beam-bluetooth-speaker-body" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2a93b2"/>
+      <stop offset=".22" stop-color="#3fb0cc"/>
+      <stop offset=".55" stop-color="#1d7f9e"/>
+      <stop offset="1" stop-color="#0b4c63"/>
     </linearGradient>
+    <linearGradient id="lumen-beam-bluetooth-speaker-rubber" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1c6f88"/>
+      <stop offset=".25" stop-color="#2585a1"/>
+      <stop offset=".6" stop-color="#11546b"/>
+      <stop offset="1" stop-color="#083a4b"/>
+    </linearGradient>
+    <linearGradient id="lumen-beam-bluetooth-speaker-top" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4fc0da"/>
+      <stop offset="1" stop-color="#1f7f9c"/>
+    </linearGradient>
+    <linearGradient id="lumen-beam-bluetooth-speaker-sheen" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".32"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="lumen-beam-bluetooth-speaker-mesh" width="7" height="7" patternUnits="userSpaceOnUse">
+      <circle cx="3.5" cy="3.5" r="1.4" fill="#04303d" fill-opacity=".3"/>
+    </pattern>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M250 270a70 70 0 0 1 140 0" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round"/><rect x="228" y="262" width="36" height="64" rx="14" fill="#fff"/><rect x="376" y="262" width="36" height="64" rx="14" fill="#fff"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Beam Portable Bluetooth</tspan><tspan x="320" dy="40">Speaker</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Lumen Labs</text>
+  <rect width="640" height="640" fill="url(#lumen-beam-bluetooth-speaker-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="320" cy="492" rx="130" ry="20" fill="#1e1b4b" opacity=".16" filter="url(#lumen-beam-bluetooth-speaker-blur)"/>
+
+  <!-- wrist lanyard -->
+  <path d="M226 176C190 178 176 214 186 246C192 266 210 266 214 248C218 232 216 206 226 190" fill="none" stroke="#0d4254" stroke-width="7" stroke-linecap="round"/>
+  <path d="M224 178C194 181 182 212 190 242" fill="none" stroke="#5fc7df" stroke-opacity=".45" stroke-width="1.5" stroke-linecap="round"/>
+  <rect x="180" y="238" width="16" height="22" rx="6" transform="rotate(-12 188 249)" fill="#1d7f9e"/>
+  <rect x="183" y="241" width="5" height="16" rx="2.5" transform="rotate(-12 188 249)" fill="#fff" fill-opacity=".3"/>
+  <!-- fabric body -->
+  <path d="M210 160L210 462A110 32 0 0 0 430 462L430 160Z" fill="url(#lumen-beam-bluetooth-speaker-body)"/>
+  <path d="M210 160L210 462A110 32 0 0 0 430 462L430 160Z" fill="url(#lumen-beam-bluetooth-speaker-mesh)"/>
+  <rect x="236" y="184" width="30" height="250" fill="url(#lumen-beam-bluetooth-speaker-sheen)"/>
+  <rect x="298" y="398" width="44" height="10" rx="5" fill="#0b4c63" fill-opacity=".75"/>
+  <rect x="300" y="399" width="40" height="3" rx="1.5" fill="#fff" fill-opacity=".25"/>
+
+  <!-- bottom rubber cap -->
+  <path d="M210 434A110 32 0 0 0 430 434L430 462A110 32 0 0 1 210 462Z" fill="url(#lumen-beam-bluetooth-speaker-rubber)"/>
+  <path d="M214 438A108 30 0 0 0 426 438" fill="none" stroke="#6fd0e6" stroke-opacity=".35" stroke-width="2"/>
+
+  <!-- top rubber cap -->
+  <path d="M210 150L210 178A110 32 0 0 0 430 178L430 150Z" fill="url(#lumen-beam-bluetooth-speaker-rubber)"/>
+  <path d="M212 180A108 30 0 0 0 428 180" fill="none" stroke="#04303d" stroke-opacity=".3" stroke-width="2"/>
+  <ellipse cx="320" cy="150" rx="110" ry="32" fill="url(#lumen-beam-bluetooth-speaker-top)"/>
+  <path d="M226 142C244 126 280 118 320 118" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="320" cy="152" rx="80" ry="20" fill="#11546b" fill-opacity=".55"/>
+  <!-- buttons -->
+  <ellipse cx="276" cy="152" rx="15" ry="8" fill="#2a95b3"/>
+  <path d="M270 152H282" stroke="#d7f3fa" stroke-width="2.5" stroke-linecap="round"/>
+  <ellipse cx="320" cy="150" rx="17" ry="9" fill="#2a95b3"/>
+  <path d="M315 147A6 4 0 1 0 325 147" fill="none" stroke="#d7f3fa" stroke-width="2" stroke-linecap="round"/>
+  <path d="M320 144V149" stroke="#d7f3fa" stroke-width="2" stroke-linecap="round"/>
+  <ellipse cx="364" cy="152" rx="15" ry="8" fill="#2a95b3"/>
+  <path d="M358 152H370M364 148.5V155.5" stroke="#d7f3fa" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="320" cy="168" r="2.5" fill="#e0fbff"/>
 </svg>

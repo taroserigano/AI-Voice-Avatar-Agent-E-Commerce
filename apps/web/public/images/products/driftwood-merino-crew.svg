@@ -1,14 +1,76 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Merino Wool Crew Sweater illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Merino Wool Crew Sweater">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#be185d"/>
-      <stop offset="1" stop-color="#be185d" stop-opacity=".72"/>
+    <radialGradient id="driftwood-merino-crew-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF4F8"/>
+      <stop offset="1" stop-color="#F6DCE7"/>
+    </radialGradient>
+    <filter id="driftwood-merino-crew-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <filter id="driftwood-merino-crew-soft" filterUnits="userSpaceOnUse" x="0" y="0" width="640" height="640">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+    <linearGradient id="driftwood-merino-crew-torso" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d3d5da"/>
+      <stop offset=".5" stop-color="#b0b3ba"/>
+      <stop offset="1" stop-color="#8d9199"/>
     </linearGradient>
+    <linearGradient id="driftwood-merino-crew-sleeve-l" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d0d2d7"/>
+      <stop offset="1" stop-color="#a3a7ae"/>
+    </linearGradient>
+    <linearGradient id="driftwood-merino-crew-sleeve-r" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#abaeb5"/>
+      <stop offset="1" stop-color="#7f838b"/>
+    </linearGradient>
+    <linearGradient id="driftwood-merino-crew-band" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b9bcc2"/>
+      <stop offset="1" stop-color="#8a8e96"/>
+    </linearGradient>
+    <pattern id="driftwood-merino-crew-knit" width="8" height="9" patternUnits="userSpaceOnUse">
+      <path d="M1 2L4 6.5L7 2" stroke="#5f636b" stroke-width="1" stroke-opacity=".16" fill="none"/>
+      <circle cx="2" cy="8" r=".8" fill="#fff" fill-opacity=".35"/>
+      <circle cx="6" cy="5" r=".7" fill="#4b4f57" fill-opacity=".2"/>
+    </pattern>
+    <pattern id="driftwood-merino-crew-rib" width="6" height="6" patternUnits="userSpaceOnUse">
+      <rect width="3" height="6" fill="#4b4f57" fill-opacity=".18"/>
+      <rect x="3" width="1" height="6" fill="#fff" fill-opacity=".25"/>
+    </pattern>
+    <pattern id="driftwood-merino-crew-rib-l" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(14)">
+      <rect width="3" height="6" fill="#4b4f57" fill-opacity=".18"/>
+      <rect x="3" width="1" height="6" fill="#fff" fill-opacity=".25"/>
+    </pattern>
+    <pattern id="driftwood-merino-crew-rib-r" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-14)">
+      <rect width="3" height="6" fill="#4b4f57" fill-opacity=".18"/>
+      <rect x="3" width="1" height="6" fill="#fff" fill-opacity=".25"/>
+    </pattern>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M262 200l-52 30 22 44 30-14v110h116V260l30 14 22-44-52-30c-8 20-28 32-58 32s-50-12-58-32z" fill="#fff"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Merino Wool Crew Sweater</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Driftwood Apparel</text>
+  <rect width="640" height="640" fill="url(#driftwood-merino-crew-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="320" cy="512" rx="180" ry="18" fill="#1e1b4b" fill-opacity=".16" filter="url(#driftwood-merino-crew-shadow)"/>
+  <path d="M230 150C200 156 180 170 172 194L120 398L168 412L214 250Z" fill="url(#driftwood-merino-crew-sleeve-l)"/>
+  <path d="M230 150C200 156 180 170 172 194L120 398L168 412L214 250Z" fill="url(#driftwood-merino-crew-knit)"/>
+  <path d="M410 150C440 156 460 170 468 194L520 398L472 412L426 250Z" fill="url(#driftwood-merino-crew-sleeve-r)"/>
+  <path d="M410 150C440 156 460 170 468 194L520 398L472 412L426 250Z" fill="url(#driftwood-merino-crew-knit)"/>
+  <path d="M120 398L168 412L160 446L112 432Z" fill="url(#driftwood-merino-crew-band)"/>
+  <path d="M120 398L168 412L160 446L112 432Z" fill="url(#driftwood-merino-crew-rib-l)"/>
+  <path d="M520 398L472 412L480 446L528 432Z" fill="#878b93"/>
+  <path d="M520 398L472 412L480 446L528 432Z" fill="url(#driftwood-merino-crew-rib-r)"/>
+  <path d="M120 398L168 412M520 398L472 412" stroke="#6f737b" stroke-width="1.5" stroke-opacity=".6"/>
+  <path d="M182 210C168 270 150 330 134 390" stroke="#fff" stroke-width="10" stroke-opacity=".2" stroke-linecap="round" fill="none" filter="url(#driftwood-merino-crew-soft)"/>
+  <path d="M230 150L278 138C290 164 350 164 362 138L410 150L428 196L432 466L208 466L212 196Z" fill="url(#driftwood-merino-crew-torso)"/>
+  <path d="M230 150L278 138C290 164 350 164 362 138L410 150L428 196L432 466L208 466L212 196Z" fill="url(#driftwood-merino-crew-knit)"/>
+  <path d="M232 152C222 184 214 216 213 250M408 152C418 184 426 216 427 250" stroke="#6f737b" stroke-width="1.6" stroke-opacity=".55" fill="none"/>
+  <path d="M234 156C225 186 218 216 217 248" stroke="#fff" stroke-width="1.2" stroke-opacity=".4" fill="none"/>
+  <path d="M250 190C246 270 244 360 244 450" stroke="#fff" stroke-width="16" stroke-opacity=".18" stroke-linecap="round" fill="none" filter="url(#driftwood-merino-crew-soft)"/>
+  <path d="M300 250C330 280 356 330 360 400M380 220C392 250 400 290 402 330" stroke="#6f737b" stroke-width="8" stroke-opacity=".16" stroke-linecap="round" fill="none" filter="url(#driftwood-merino-crew-soft)"/>
+  <path d="M208 462L432 462L430 506L210 506Z" fill="url(#driftwood-merino-crew-band)"/>
+  <path d="M208 462L432 462L430 506L210 506Z" fill="url(#driftwood-merino-crew-rib)"/>
+  <path d="M208 462L432 462" stroke="#6f737b" stroke-width="1.5" stroke-opacity=".6"/>
+  <path d="M270 140C284 182 356 182 370 140C356 132 284 132 270 140Z" fill="url(#driftwood-merino-crew-band)"/>
+  <path d="M270 140C284 182 356 182 370 140C356 132 284 132 270 140Z" fill="url(#driftwood-merino-crew-rib)"/>
+  <path d="M287 143C298 166 342 166 353 143C340 139 300 139 287 143Z" fill="#6c7078"/>
+  <path d="M292 146C302 160 338 160 348 146C338 150 302 150 292 146Z" fill="#595d65"/>
+  <rect x="312" y="146" width="16" height="7" rx="2" fill="#dcdde1"/>
+  <path d="M276 142C290 176 350 176 364 142" stroke="#fff" stroke-width="1.5" stroke-opacity=".4" fill="none"/>
 </svg>

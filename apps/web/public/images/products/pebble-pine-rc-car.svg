@@ -1,14 +1,101 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="All-Terrain Remote Control Car illustration">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="All-Terrain Remote Control Car">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#7c3aed"/>
-      <stop offset="1" stop-color="#7c3aed" stop-opacity=".72"/>
+    <radialGradient id="pebble-pine-rc-car-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F7F4FF"/>
+      <stop offset="1" stop-color="#E4DDFB"/>
+    </radialGradient>
+    <filter id="pebble-pine-rc-car-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="pebble-pine-rc-car-body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff7a55"/>
+      <stop offset=".4" stop-color="#f2452a"/>
+      <stop offset="1" stop-color="#b3240f"/>
     </linearGradient>
+    <linearGradient id="pebble-pine-rc-car-glass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4a64a8"/>
+      <stop offset=".6" stop-color="#1c2b5e"/>
+      <stop offset="1" stop-color="#0e1636"/>
+    </linearGradient>
+    <radialGradient id="pebble-pine-rc-car-tire" cx=".35" cy=".3" r=".8">
+      <stop offset="0" stop-color="#4a4c55"/>
+      <stop offset=".6" stop-color="#2a2b31"/>
+      <stop offset="1" stop-color="#151619"/>
+    </radialGradient>
+    <radialGradient id="pebble-pine-rc-car-rim" cx=".35" cy=".3" r=".8">
+      <stop offset="0" stop-color="#fff0a3"/>
+      <stop offset=".55" stop-color="#ffcf2e"/>
+      <stop offset="1" stop-color="#d99a06"/>
+    </radialGradient>
+    <linearGradient id="pebble-pine-rc-car-chassis" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3b3d45"/>
+      <stop offset="1" stop-color="#1a1b20"/>
+    </linearGradient>
+    <g id="pebble-pine-rc-car-wheel">
+      <ellipse cx="0" cy="0" rx="62" ry="72" fill="#1c1d22"/>
+      <ellipse cx="0" cy="0" rx="61" ry="71" fill="none" stroke="#1c1d22" stroke-width="12" stroke-dasharray="10 8"/>
+      <ellipse cx="10" cy="-2" rx="54" ry="66" fill="url(#pebble-pine-rc-car-tire)"/>
+      <ellipse cx="10" cy="-2" rx="45" ry="56" fill="none" stroke="#111215" stroke-opacity=".4" stroke-width="2"/>
+      <ellipse cx="12" cy="-2" rx="30" ry="37" fill="url(#pebble-pine-rc-car-rim)"/>
+      <g stroke="#c98d07" stroke-width="5" stroke-linecap="round">
+        <path d="M12 -2L12 -30M12 -2L36 -12M12 -2L27 26M12 -2L-3 26M12 -2L-12 -12"/>
+      </g>
+      <ellipse cx="12" cy="-2" rx="10" ry="12" fill="#e7e9ef"/>
+      <ellipse cx="10" cy="-5" rx="4" ry="5" fill="#fff"/>
+      <path d="M-40 -36C-30 -58 -10 -68 8 -68" fill="none" stroke="#fff" stroke-opacity=".2" stroke-width="4" stroke-linecap="round"/>
+    </g>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <rect x="240" y="210" width="70" height="70" rx="10" fill="#fff"/><rect x="330" y="210" width="70" height="70" rx="10" fill="#fff" fill-opacity=".8"/><rect x="285" y="290" width="70" height="70" rx="10" fill="#fff" fill-opacity=".9"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">All-Terrain Remote</tspan><tspan x="320" dy="40">Control Car</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Pebble &amp; Pine</text>
+  <rect width="640" height="640" fill="url(#pebble-pine-rc-car-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="322" cy="498" rx="190" ry="20" fill="#1e1b4b" opacity=".16" filter="url(#pebble-pine-rc-car-blur)"/>
+
+  <g transform="translate(-14 0)">
+    <!-- far wheels -->
+    <g transform="translate(482 392) scale(.82)" opacity=".92">
+      <ellipse cx="0" cy="0" rx="62" ry="72" fill="#141518"/>
+      <ellipse cx="0" cy="0" rx="61" ry="71" fill="none" stroke="#141518" stroke-width="12" stroke-dasharray="10 8"/>
+    </g>
+    <g transform="translate(284 394) scale(.84)">
+      <ellipse cx="0" cy="0" rx="62" ry="72" fill="#141518"/>
+      <ellipse cx="0" cy="0" rx="61" ry="71" fill="none" stroke="#141518" stroke-width="12" stroke-dasharray="10 8"/>
+    </g>
+
+    <!-- chassis and springs -->
+    <rect x="176" y="360" width="320" height="34" rx="14" fill="url(#pebble-pine-rc-car-chassis)"/>
+    <path d="M250 356L262 364L246 370L262 376L246 382L258 390M404 356L416 364L400 370L416 376L400 382L412 390" fill="none" stroke="#ffd23f" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+
+    <!-- antenna -->
+    <path d="M446 262C452 220 462 184 474 150" fill="none" stroke="#2a2b31" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="474" cy="148" r="6" fill="#f2452a"/>
+    <circle cx="472" cy="146" r="2" fill="#fff" fill-opacity=".7"/>
+
+    <!-- rear wing -->
+    <path d="M470 290L476 250M500 290L506 248" stroke="#2a2b31" stroke-width="6" stroke-linecap="round"/>
+    <path d="M448 246L526 236C532 236 534 244 528 246L452 258C444 258 442 248 448 246Z" fill="#ffd23f"/>
+    <path d="M452 248L522 239" stroke="#fff" stroke-opacity=".6" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- body shell -->
+    <path d="M156 372C150 346 168 326 200 322L268 314C288 282 318 262 360 260L430 262C462 264 486 286 494 318L500 352C502 368 492 378 476 378L176 382C164 382 158 378 156 372Z" fill="url(#pebble-pine-rc-car-body)"/>
+    <path d="M172 330C190 322 230 318 268 314" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="3" stroke-linecap="round"/>
+    <path d="M296 276C314 266 334 262 360 262L426 264" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/>
+    <!-- windows -->
+    <path d="M288 306C300 286 322 274 350 274L398 274L394 306Z" fill="url(#pebble-pine-rc-car-glass)"/>
+    <path d="M406 274L436 276C454 280 466 292 470 306L402 306Z" fill="url(#pebble-pine-rc-car-glass)"/>
+    <path d="M318 302L340 276H352L330 302Z" fill="#fff" fill-opacity=".35"/>
+    <path d="M420 302L432 278H438L426 302Z" fill="#fff" fill-opacity=".25"/>
+    <!-- stripe and decal -->
+    <path d="M166 348C240 340 400 334 496 334" fill="none" stroke="#ffd23f" stroke-width="9" stroke-linecap="round"/>
+    <path d="M166 348C240 340 400 334 496 334" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="2" transform="translate(0 -2)"/>
+    <circle cx="344" cy="330" r="17" fill="#fff"/>
+    <path d="M344 318L347.5 326.3L356.4 326.9L349.6 332.6L351.8 341.3L344 336.6L336.2 341.3L338.4 332.6L331.6 326.9L340.5 326.3Z" fill="#2f6fe0"/>
+    <!-- front bumper and lights -->
+    <rect x="138" y="352" width="44" height="30" rx="12" fill="#2a2b31"/>
+    <rect x="142" y="355" width="30" height="5" rx="2.5" fill="#fff" fill-opacity=".2"/>
+    <ellipse cx="170" cy="334" rx="9" ry="7" fill="#fff6c9"/>
+    <ellipse cx="168" cy="332" rx="3.5" ry="2.8" fill="#fff"/>
+
+    <!-- near wheels -->
+    <use xlink:href="#pebble-pine-rc-car-wheel" href="#pebble-pine-rc-car-wheel" transform="translate(440 424) scale(.95)"/>
+    <use xlink:href="#pebble-pine-rc-car-wheel" href="#pebble-pine-rc-car-wheel" transform="translate(214 424)"/>
+  </g>
 </svg>

@@ -1,14 +1,73 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Ridge Waterproof Trail Running Shoes illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Ridge Waterproof Trail Running Shoes">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#be185d"/>
-      <stop offset="1" stop-color="#be185d" stop-opacity=".72"/>
+    <radialGradient id="stridewell-trail-runner-gtx-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF4F8"/>
+      <stop offset="1" stop-color="#F6DCE7"/>
+    </radialGradient>
+    <filter id="stridewell-trail-runner-gtx-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="stridewell-trail-runner-gtx-upper" x1="0" y1="0" x2=".4" y2="1">
+      <stop offset="0" stop-color="#9ba6b5"/>
+      <stop offset=".45" stop-color="#66727f"/>
+      <stop offset="1" stop-color="#3f4853"/>
     </linearGradient>
+    <linearGradient id="stridewell-trail-runner-gtx-guard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4b5460"/>
+      <stop offset="1" stop-color="#2a3038"/>
+    </linearGradient>
+    <linearGradient id="stridewell-trail-runner-gtx-ridge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b3bcc8"/>
+      <stop offset="1" stop-color="#7c8795"/>
+    </linearGradient>
+    <linearGradient id="stridewell-trail-runner-gtx-mid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".55" stop-color="#e6e9ed"/>
+      <stop offset="1" stop-color="#b9c0c9"/>
+    </linearGradient>
+    <linearGradient id="stridewell-trail-runner-gtx-accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff8f5e"/>
+      <stop offset="1" stop-color="#e5442a"/>
+    </linearGradient>
+    <pattern id="stridewell-trail-runner-gtx-mesh" width="7" height="7" patternUnits="userSpaceOnUse">
+      <circle cx="3.5" cy="3.5" r="1.2" fill="#1f252d" fill-opacity=".2"/>
+    </pattern>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M262 200l-52 30 22 44 30-14v110h116V260l30 14 22-44-52-30c-8 20-28 32-58 32s-50-12-58-32z" fill="#fff"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Ridge Waterproof Trail</tspan><tspan x="320" dy="40">Running Shoes</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Stridewell</text>
+  <rect width="640" height="640" fill="url(#stridewell-trail-runner-gtx-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="330" cy="420" rx="200" ry="18" fill="#1e1b4b" fill-opacity=".16" filter="url(#stridewell-trail-runner-gtx-shadow)"/>
+  <g transform="translate(-4 -18)">
+    <path d="M122 350C112 306 118 262 140 234C146 226 154 222 162 222C188 222 212 238 236 248C254 254 272 252 286 240L302 214C310 202 330 202 336 216C368 254 426 290 486 312C524 324 548 336 550 356L122 356Z" fill="url(#stridewell-trail-runner-gtx-upper)"/>
+    <path d="M122 350C112 306 118 262 140 234C146 226 154 222 162 222C188 222 212 238 236 248C254 254 272 252 286 240L302 214C310 202 330 202 336 216C368 254 426 290 486 312C524 324 548 336 550 356L122 356Z" fill="url(#stridewell-trail-runner-gtx-mesh)"/>
+    <path d="M162 224C188 224 212 240 236 250C254 256 272 254 286 242C276 262 248 268 224 262C198 254 176 240 160 232Z" fill="#242930"/>
+    <path d="M300 218C308 202 330 200 338 216C328 222 314 224 300 218Z" fill="#4d5764"/>
+    <path d="M312 208C313 190 328 188 331 206" fill="none" stroke="url(#stridewell-trail-runner-gtx-accent)" stroke-width="5.5" stroke-linecap="round"/>
+    <path d="M298 228C334 252 400 292 474 314L466 330C396 310 330 272 290 246Z" fill="#48515d"/>
+    <path d="M196 356L246 300L276 324L328 262L384 328L414 304L458 356Z" fill="url(#stridewell-trail-runner-gtx-ridge)"/>
+    <path d="M196 356L246 300L276 324L328 262L384 328L414 304L458 356" fill="none" stroke="#ff7445" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M250 306L270 322M332 270L378 326" stroke="#fff" stroke-width="2" stroke-opacity=".35" fill="none"/>
+    <path d="M126 356C150 338 200 336 260 344C340 352 420 350 486 338C520 334 544 340 550 356Z" fill="url(#stridewell-trail-runner-gtx-guard)"/>
+    <path d="M472 316C520 326 548 338 550 356L476 352C466 340 466 328 472 316Z" fill="#343b45"/>
+    <path d="M482 324C510 330 530 338 538 348" stroke="#fff" stroke-width="4" stroke-opacity=".35" stroke-linecap="round" fill="none"/>
+    <path d="M122 352C112 306 118 262 140 234C152 250 160 272 162 298C164 324 172 342 184 354Z" fill="url(#stridewell-trail-runner-gtx-accent)"/>
+    <path d="M132 250C124 280 124 316 132 344" stroke="#fff" stroke-width="4" stroke-opacity=".45" stroke-linecap="round" fill="none"/>
+    <path d="M148 232C140 208 160 198 170 222" fill="none" stroke="#e5442a" stroke-width="6" stroke-linecap="round"/>
+    <path d="M168 228C192 228 214 242 236 252" stroke="#cdd5df" stroke-width="3" stroke-opacity=".6" stroke-linecap="round" fill="none"/>
+    <path d="M342 226C374 258 428 288 474 304" stroke="#fff" stroke-width="3" stroke-opacity=".28" stroke-linecap="round" fill="none"/>
+    <g stroke-linecap="round">
+      <path d="M338 232L325 250M366 251L353 269M394 269L381 287M422 285L410 303M450 298L440 314" stroke="#1d2228" stroke-width="10" stroke-opacity=".35"/>
+      <path d="M337 228L324 246M365 247L352 265M393 265L380 283M421 281L409 299M449 294L439 310" stroke="url(#stridewell-trail-runner-gtx-accent)" stroke-width="7"/>
+    </g>
+    <g fill="#1f242a">
+      <circle cx="323" cy="249" r="3.2"/><circle cx="351" cy="268" r="3.2"/><circle cx="379" cy="286" r="3.2"/><circle cx="408" cy="302" r="3.2"/><circle cx="438" cy="313" r="3.2"/>
+    </g>
+    <path d="M116 344C112 364 116 392 128 404C150 412 200 414 260 414L430 414C480 414 520 404 548 378C556 370 556 358 550 352C470 360 300 358 116 344Z" fill="url(#stridewell-trail-runner-gtx-mid)"/>
+    <path d="M124 350C300 364 470 366 546 358" stroke="#fff" stroke-width="3" fill="none"/>
+    <path d="M140 386C220 392 330 394 420 392C470 390 510 380 536 366" stroke="#9aa2ad" stroke-width="2" stroke-opacity=".6" fill="none"/>
+    <path d="M142 396C166 380 204 376 236 384" stroke="#ff7445" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M128 404C150 412 200 414 260 414L430 414C480 414 520 404 548 378L556 386C530 416 486 430 436 430L180 430C150 430 132 422 124 410Z" fill="#2b3139"/>
+    <path d="M160 429h24l-5 12h-14zM198 429h24l-5 12h-14zM236 429h24l-5 12h-14zM274 429h24l-5 12h-14zM312 429h24l-5 12h-14zM350 429h24l-5 12h-14zM388 429h24l-5 12h-14zM426 428h22l-5 12h-13z" fill="#20252c"/>
+    <path d="M468 424l20 -6l-4 13l-13 2zM504 410l18 -9l-1 13l-12 5zM534 390l14 -10l2 13l-10 7zM128 416l-4 13l12 2l6 -9z" fill="#20252c"/>
+    <path d="M132 408C160 416 210 417 260 417L430 417C476 417 514 408 542 386" stroke="#5f6773" stroke-width="1.5" fill="none"/>
+  </g>
 </svg>

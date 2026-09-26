@@ -1,14 +1,63 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Chunky Knit Throw Blanket illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Chunky Knit Throw Blanket">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#b45309"/>
-      <stop offset="1" stop-color="#b45309" stop-opacity=".72"/>
+    <radialGradient id="harbor-home-throw-blanket-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF8EF"/>
+      <stop offset="1" stop-color="#F6E6CF"/>
+    </radialGradient>
+    <filter id="harbor-home-throw-blanket-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <pattern id="harbor-home-throw-blanket-knit" width="30" height="26" patternUnits="userSpaceOnUse">
+      <rect width="30" height="26" fill="#c2b194"/>
+      <ellipse cx="9.5" cy="13" rx="5.6" ry="12.6" transform="rotate(-30 9.5 13)" fill="#f0e7d5"/>
+      <ellipse cx="20.5" cy="13" rx="5.6" ry="12.6" transform="rotate(30 20.5 13)" fill="#e6dbc5"/>
+      <ellipse cx="7.6" cy="9.4" rx="1.8" ry="5.4" transform="rotate(-30 7.6 9.4)" fill="#fff" fill-opacity=".65"/>
+      <ellipse cx="18.8" cy="9.6" rx="1.6" ry="5" transform="rotate(30 18.8 9.6)" fill="#fff" fill-opacity=".35"/>
+    </pattern>
+    <pattern id="harbor-home-throw-blanket-knit-top" width="30" height="17" patternUnits="userSpaceOnUse">
+      <rect width="30" height="17" fill="#cbbc9f"/>
+      <ellipse cx="9.5" cy="8.5" rx="5.4" ry="8.4" transform="rotate(-34 9.5 8.5)" fill="#f4ecdd"/>
+      <ellipse cx="20.5" cy="8.5" rx="5.4" ry="8.4" transform="rotate(34 20.5 8.5)" fill="#ece2cf"/>
+    </pattern>
+    <linearGradient id="harbor-home-throw-blanket-shade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".28"/>
+      <stop offset=".4" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#5c4527" stop-opacity=".34"/>
     </linearGradient>
+    <linearGradient id="harbor-home-throw-blanket-side" x1="120" y1="0" x2="520" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".16"/>
+      <stop offset=".4" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#5c4527" stop-opacity=".24"/>
+    </linearGradient>
+    <linearGradient id="harbor-home-throw-blanket-topshade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5c4527" stop-opacity=".12"/>
+      <stop offset="1" stop-color="#fff" stop-opacity=".25"/>
+    </linearGradient>
+    <path id="harbor-home-throw-blanket-l1" d="M168 414h304q40 0 40 38t-40 38H168q-40 0-40-38t40-38z"/>
+    <path id="harbor-home-throw-blanket-l2" d="M178 338h284q40 0 40 38t-40 38H178q-40 0-40-38t40-38z"/>
+    <path id="harbor-home-throw-blanket-l3" d="M172 262h296q40 0 40 38t-40 38H172q-40 0-40-38t40-38z"/>
+    <path id="harbor-home-throw-blanket-topface" d="M172 272h296q28 0 16-16l-30-50q-8-10-24-10H210q-16 0-24 10l-30 50q-12 16 16 16z"/>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M250 230h140v70a50 50 0 0 1-50 50h-40a50 50 0 0 1-50-50z" fill="#fff"/><path d="M390 250h22a22 22 0 0 1 0 44h-22" fill="none" stroke="#fff" stroke-width="14"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Chunky Knit Throw</tspan><tspan x="320" dy="40">Blanket</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Harbor Home</text>
+  <rect width="640" height="640" fill="url(#harbor-home-throw-blanket-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="320" cy="478" rx="190" ry="20" fill="#1e1b4b" fill-opacity=".16" filter="url(#harbor-home-throw-blanket-shadow)"/>
+  <g transform="translate(0 -20)">
+    <use href="#harbor-home-throw-blanket-l1" fill="url(#harbor-home-throw-blanket-knit)"/>
+    <use href="#harbor-home-throw-blanket-l1" fill="url(#harbor-home-throw-blanket-shade)"/>
+    <use href="#harbor-home-throw-blanket-l1" fill="url(#harbor-home-throw-blanket-side)"/>
+    <path d="M148 416h344" stroke="#5c4527" stroke-opacity=".2" stroke-width="10" stroke-linecap="round"/>
+    <use href="#harbor-home-throw-blanket-l2" fill="url(#harbor-home-throw-blanket-knit)"/>
+    <use href="#harbor-home-throw-blanket-l2" fill="url(#harbor-home-throw-blanket-shade)"/>
+    <use href="#harbor-home-throw-blanket-l2" fill="url(#harbor-home-throw-blanket-side)"/>
+    <!-- woven tag -->
+    <rect x="486" y="360" width="16" height="30" rx="3" fill="#b99c73"/>
+    <rect x="488" y="364" width="12" height="22" rx="2" fill="none" stroke="#e8d8bd" stroke-opacity=".7" stroke-width="1" stroke-dasharray="2 2"/>
+    <path d="M150 340h340" stroke="#5c4527" stroke-opacity=".2" stroke-width="10" stroke-linecap="round"/>
+    <use href="#harbor-home-throw-blanket-topface" fill="url(#harbor-home-throw-blanket-knit-top)"/>
+    <use href="#harbor-home-throw-blanket-topface" fill="url(#harbor-home-throw-blanket-topshade)"/>
+    <use href="#harbor-home-throw-blanket-l3" fill="url(#harbor-home-throw-blanket-knit)"/>
+    <use href="#harbor-home-throw-blanket-l3" fill="url(#harbor-home-throw-blanket-shade)"/>
+    <use href="#harbor-home-throw-blanket-l3" fill="url(#harbor-home-throw-blanket-side)"/>
+    <path d="M176 266q140-10 290 0" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="4" stroke-linecap="round"/>
+  </g>
 </svg>

@@ -1,6 +1,24 @@
 import type { Metadata, Viewport } from "next";
+import { Bricolage_Grotesque, Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+
+// Self-hosted at build time by next/font (browsers never request Google).
+// Inter = UI and body text; Bricolage Grotesque = display headings. Wired to
+// --font-sans / --font-display in globals.css.
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+  axes: ["opsz"],
+});
+
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-bricolage",
+  axes: ["opsz"],
+});
 
 export const metadata: Metadata = {
   title: { default: "Larkspur", template: "%s · Larkspur" },
@@ -9,15 +27,15 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#6740de" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-surface font-sans antialiased">
+    <html lang="en" className={`${inter.variable} ${bricolage.variable}`}>
+      <body className="min-h-screen bg-canvas font-sans text-ink antialiased">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:font-semibold focus:shadow"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-raised focus:px-5 focus:py-3 focus:font-semibold focus:text-brand-700 focus:shadow-lg"
         >
           Skip to main content
         </a>

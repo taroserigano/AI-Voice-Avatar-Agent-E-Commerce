@@ -39,6 +39,10 @@ class ProductSummary(ApiModel):
     currency: str
     in_stock: bool
     variant_count: int
+    rating_average: float | None = Field(
+        description="Mean review rating to one decimal; null with no reviews"
+    )
+    rating_count: int
 
 
 class ProductDetail(ProductSummary):
@@ -77,6 +81,7 @@ class SortOrder(StrEnum):
     PRICE_ASC = "price_asc"
     PRICE_DESC = "price_desc"
     NEWEST = "newest"
+    TOP_RATED = "top_rated"
 
 
 class ProductPage(ApiModel):

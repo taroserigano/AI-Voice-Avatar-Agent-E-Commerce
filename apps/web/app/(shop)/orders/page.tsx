@@ -1,7 +1,9 @@
+import { ArrowRightIcon, ClockIcon, PackageIcon, ReturnIcon, TruckIcon } from "@/components/icons";
+import { OrderCard } from "@/components/orders/order-card";
 import { ButtonLink } from "@/components/ui/button";
 import { WebVitalsReporter } from "@/components/web-vitals";
 import { serverApi, unwrap } from "@/lib/api-server";
-import { formatMoney } from "@/lib/format";
+import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Orders" };
@@ -9,30 +11,64 @@ export const metadata: Metadata = { title: "Orders" };
 export default async function OrdersPage() {
   const api = await serverApi();
   const orders = await unwrap(await api.GET("/v1/orders"));
+  const open = orders.filter((o) => o.status === "paid" || o.status === "fulfilling").length;
+
   return (
-    <div>
+    <div className="pb-8 sm:pt-2">
       <WebVitalsReporter route="orders" />
-      <h1 className="text-2xl font-bold">Orders &amp; returns</h1>
+      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+        <div>
+          <h1 className="font-display text-3xl font-semibold text-ink sm:text-4xl">Orders &amp; returns</h1>
+          <p className="mt-2 text-muted">
+            {orders.length === 0
+              ? "Track deliveries and start returns from here."
+              : `${orders.length} ${orders.length === 1 ? "order" : "orders"}, newest first${
+                  open > 0 ? ` · ${open} on the way` : ""
+                }.`}
+          </p>
+        </div>
+        {orders.length > 0 ? (
+          <Link
+            href="/activity"
+            className="group -mr-2 inline-flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold text-brand-700 transition-colors hover:text-brand-900"
+          >
+            <ClockIcon className="size-4" />
+            Your activity
+            <ArrowRightIcon className="size-4 transition-transform duration-200 ease-snappy group-hover:translate-x-0.5" />
+          </Link>
+        ) : null}
+      </div>
+
       {orders.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-stone-300 bg-white p-10 text-center">
-          <p className="text-lg font-semibold">No orders yet.</p>
-          <p className="mt-1 text-muted">When you buy something, it shows up here.</p>
-          <ButtonLink href="/" variant="secondary" className="mt-4">
+        <div className="mt-8 flex flex-col items-center rounded-3xl bg-mesh-light px-6 py-16 text-center sm:py-20">
+          <span className="grid size-16 place-items-center rounded-2xl bg-raised text-brand-600 shadow-md">
+            <PackageIcon className="size-8" />
+          </span>
+          <p className="mt-6 font-display text-2xl font-semibold text-ink sm:text-3xl">No orders yet.</p>
+          <p className="mt-2 max-w-sm text-muted">When you buy something, it shows up here.</p>
+          <ButtonLink href="/" size="lg" className="mt-7">
             Start shopping
+            <ArrowRightIcon className="size-4.5" />
           </ButtonLink>
+          <ul className="mt-10 grid gap-3 text-left text-sm text-muted sm:grid-cols-2 sm:gap-6">
+            <li className="flex items-center gap-3">
+              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-raised text-brand-600 shadow-xs">
+                <TruckIcon className="size-4.5" />
+              </span>
+              Follow each order from paid to delivered
+            </li>
+            <li className="flex items-center gap-3">
+              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-raised text-brand-600 shadow-xs">
+                <ReturnIcon className="size-4.5" />
+              </span>
+              Start a return within 30 days of delivery
+            </li>
+          </ul>
         </div>
       ) : (
-        <ul className="mt-4 divide-y divide-line rounded-2xl border border-line bg-white">
-          {orders.map((o) => (
-            <li key={o.id} className="flex flex-wrap justify-between gap-2 p-4">
-              <div>
-                <p className="font-semibold">Order placed {new Date(o.placed_at).toLocaleDateString("en-US")}</p>
-                <p className="text-sm text-muted">
-                  {o.item_count} {o.item_count === 1 ? "item" : "items"} · {o.status}
-                </p>
-              </div>
-              <p className="font-semibold">{formatMoney(o.total_minor, o.currency)}</p>
-            </li>
+        <ul aria-label="Your orders" className="mt-6 space-y-4 sm:mt-8">
+          {orders.map((o, i) => (
+            <OrderCard key={o.id} order={o} index={i} />
           ))}
         </ul>
       )}

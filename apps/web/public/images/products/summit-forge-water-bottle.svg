@@ -1,14 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Insulated Water Bottle, 32 oz illustration">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#15803d"/>
-      <stop offset="1" stop-color="#15803d" stop-opacity=".72"/>
-    </linearGradient>
-  </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M320 180l110 170H210z" fill="#fff"/><path d="M320 260l40 90h-80z" fill-opacity=".25" fill="#000"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Insulated Water Bottle,</tspan><tspan x="320" dy="40">32 oz</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Summit Forge</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Insulated Water Bottle, 32 oz">
+<defs>
+<radialGradient id="summit-forge-water-bottle-bg" gradientUnits="userSpaceOnUse" cx="320" cy="240" r="520"><stop offset="0" stop-color="#F0FAF4"/><stop offset="1" stop-color="#D6EEDF"/></radialGradient>
+<filter id="summit-forge-water-bottle-shadow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+<linearGradient id="summit-forge-water-bottle-body" gradientUnits="userSpaceOnUse" x1="245" y1="0" x2="395" y2="0"><stop offset="0" stop-color="#BFDDEE"/><stop offset="0.16" stop-color="#DCEFF9"/><stop offset="0.42" stop-color="#A9D2E9"/><stop offset="0.8" stop-color="#7DB1D2"/><stop offset="1" stop-color="#6495B8"/></linearGradient>
+<linearGradient id="summit-forge-water-bottle-steel" gradientUnits="userSpaceOnUse" x1="272" y1="0" x2="368" y2="0"><stop offset="0" stop-color="#8E98A3"/><stop offset="0.25" stop-color="#F1F4F7"/><stop offset="0.5" stop-color="#B8C0C8"/><stop offset="0.8" stop-color="#7C8590"/><stop offset="1" stop-color="#A9B1BA"/></linearGradient>
+<linearGradient id="summit-forge-water-bottle-cap" gradientUnits="userSpaceOnUse" x1="272" y1="0" x2="368" y2="0"><stop offset="0" stop-color="#4E545C"/><stop offset="0.25" stop-color="#6E757D"/><stop offset="0.6" stop-color="#34383E"/><stop offset="1" stop-color="#24272B"/></linearGradient>
+<linearGradient id="summit-forge-water-bottle-loop" gradientUnits="userSpaceOnUse" x1="288" y1="90" x2="352" y2="140"><stop offset="0" stop-color="#F4F6F8"/><stop offset="0.5" stop-color="#AEB6BF"/><stop offset="1" stop-color="#6F7882"/></linearGradient>
+</defs>
+<rect width="640" height="640" fill="url(#summit-forge-water-bottle-bg)"/>
+<circle cx="320" cy="310" r="210" fill="#fff" fill-opacity=".45"/>
+<ellipse cx="320" cy="530" rx="70" ry="16" fill="#1e1b4b" fill-opacity=".16" filter="url(#summit-forge-water-bottle-shadow)"/>
+<path d="M282 204C282 232 246 240 246 272V508Q246 526 264 526H376Q394 526 394 508V272C394 240 358 232 358 204Z" fill="url(#summit-forge-water-bottle-body)"/>
+<path d="M248 504Q320 522 392 504" fill="none" stroke="#4E7FA3" stroke-opacity=".3" stroke-width="2"/>
+<path d="M258 270C262 248 280 236 286 216" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="5" stroke-linecap="round"/>
+<rect x="266" y="262" width="13" height="236" rx="6.5" fill="#fff" fill-opacity=".38"/>
+<rect x="380" y="276" width="5" height="220" rx="2.5" fill="#fff" fill-opacity=".14"/>
+<path d="M309 356L320 340L331 356Z" fill="#fff" fill-opacity=".7"/>
+<path d="M315 356L322 346L329 356" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1.5"/>
+<rect x="280" y="180" width="80" height="26" rx="3" fill="url(#summit-forge-water-bottle-steel)"/>
+<path d="M280 199Q320 208 360 199" fill="none" stroke="#6F7882" stroke-opacity=".6" stroke-width="1.5"/>
+<path d="M272 140H368V178Q368 186 360 186H280Q272 186 272 178Z" fill="url(#summit-forge-water-bottle-cap)"/>
+<path d="M282 146V180M289.6 146V180M297.2 146V180M304.8 146V180M312.4 146V180M320 146V180M327.6 146V180M335.2 146V180M342.8 146V180M350.4 146V180M358 146V180" stroke="#1A1C1F" stroke-opacity=".35" stroke-width="1.5"/>
+<ellipse cx="320" cy="140" rx="48" ry="9" fill="#5E656D"/>
+<ellipse cx="320" cy="139" rx="40" ry="6" fill="#474C53"/>
+<path d="M288 138C288 82 352 82 352 138" fill="none" stroke="url(#summit-forge-water-bottle-loop)" stroke-width="11" stroke-linecap="round"/>
+<path d="M293 124C295 98 312 90 330 92" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="3" stroke-linecap="round"/>
+<circle cx="288" cy="140" r="7" fill="#9AA3AD"/><circle cx="352" cy="140" r="7" fill="#7C8590"/>
+<circle cx="286" cy="138" r="2.5" fill="#fff" fill-opacity=".7"/>
 </svg>

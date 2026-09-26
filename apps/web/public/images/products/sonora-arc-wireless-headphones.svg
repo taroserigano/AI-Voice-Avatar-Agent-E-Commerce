@@ -1,14 +1,86 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Arc Wireless Over-Ear Headphones illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Arc Wireless Over-Ear Headphones">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2563eb"/>
-      <stop offset="1" stop-color="#2563eb" stop-opacity=".72"/>
+    <radialGradient id="sonora-arc-wireless-headphones-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F1F3FF"/>
+      <stop offset="1" stop-color="#DCE1FB"/>
+    </radialGradient>
+    <filter id="sonora-arc-wireless-headphones-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="sonora-arc-wireless-headphones-band" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#47558a"/>
+      <stop offset=".45" stop-color="#1f2848"/>
+      <stop offset="1" stop-color="#0b0f20"/>
+    </linearGradient>
+    <linearGradient id="sonora-arc-wireless-headphones-cushion" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2f3650"/>
+      <stop offset=".5" stop-color="#1a1f31"/>
+      <stop offset="1" stop-color="#0d1020"/>
+    </linearGradient>
+    <linearGradient id="sonora-arc-wireless-headphones-shellL" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4a5b90"/>
+      <stop offset=".45" stop-color="#20294b"/>
+      <stop offset="1" stop-color="#0a0e1d"/>
+    </linearGradient>
+    <linearGradient id="sonora-arc-wireless-headphones-shellR" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#34426f"/>
+      <stop offset=".5" stop-color="#171e3a"/>
+      <stop offset="1" stop-color="#070a16"/>
+    </linearGradient>
+    <linearGradient id="sonora-arc-wireless-headphones-pad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a4057"/>
+      <stop offset=".5" stop-color="#1c2030"/>
+      <stop offset="1" stop-color="#0c0e18"/>
+    </linearGradient>
+    <radialGradient id="sonora-arc-wireless-headphones-plate" cx=".35" cy=".3" r=".85">
+      <stop offset="0" stop-color="#3b4979"/>
+      <stop offset=".6" stop-color="#1a2140"/>
+      <stop offset="1" stop-color="#10152b"/>
+    </radialGradient>
+    <linearGradient id="sonora-arc-wireless-headphones-steel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f5f7fc"/>
+      <stop offset=".45" stop-color="#b6bdcd"/>
+      <stop offset="1" stop-color="#6a7387"/>
     </linearGradient>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M250 270a70 70 0 0 1 140 0" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round"/><rect x="228" y="262" width="36" height="64" rx="14" fill="#fff"/><rect x="376" y="262" width="36" height="64" rx="14" fill="#fff"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Arc Wireless Over-Ear</tspan><tspan x="320" dy="40">Headphones</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Sonora Audio</text>
+  <rect width="640" height="640" fill="url(#sonora-arc-wireless-headphones-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="320" cy="498" rx="178" ry="18" fill="#1e1b4b" opacity=".16" filter="url(#sonora-arc-wireless-headphones-blur)"/>
+
+  <!-- headband cushion -->
+  <path d="M204 274C208 180 258 120 320 120C382 120 432 180 436 274L422 274C418 196 374 144 320 144C266 144 222 196 218 274Z" fill="url(#sonora-arc-wireless-headphones-cushion)"/>
+  <!-- headband -->
+  <path d="M170 296C170 148 238 90 320 90C402 90 470 148 470 296L440 296C440 170 390 122 320 122C250 122 200 170 200 296Z" fill="url(#sonora-arc-wireless-headphones-band)"/>
+  <path d="M182 250C188 164 244 102 320 100" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="4" stroke-linecap="round"/>
+  <path d="M210 262C216 190 260 136 320 134" fill="none" stroke="#5d6aa0" stroke-opacity=".5" stroke-width="1.5" stroke-dasharray="4 5"/>
+
+  <!-- sliders and yokes -->
+  <rect x="177" y="280" width="18" height="44" rx="5" fill="url(#sonora-arc-wireless-headphones-steel)"/>
+  <rect x="445" y="280" width="18" height="44" rx="5" fill="url(#sonora-arc-wireless-headphones-steel)"/>
+  <rect x="165" y="300" width="42" height="18" rx="9" fill="#2a3355"/>
+  <rect x="433" y="300" width="42" height="18" rx="9" fill="#1a2140"/>
+
+  <!-- left cup -->
+  <ellipse cx="214" cy="400" rx="50" ry="88" fill="url(#sonora-arc-wireless-headphones-pad)"/>
+  <path d="M232 322C252 344 262 372 262 400" fill="none" stroke="#fff" stroke-opacity=".18" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="186" cy="400" rx="60" ry="92" fill="url(#sonora-arc-wireless-headphones-shellL)"/>
+  <ellipse cx="182" cy="398" rx="42" ry="70" fill="url(#sonora-arc-wireless-headphones-plate)"/>
+  <ellipse cx="182" cy="398" rx="42" ry="70" fill="none" stroke="#5a6ba3" stroke-opacity=".35" stroke-width="1.5"/>
+  <path d="M136 360C142 334 160 314 184 310" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="4" stroke-linecap="round"/>
+  <path d="M150 372C154 356 164 344 176 340" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="182" cy="398" r="9" fill="none" stroke="#9aa8d8" stroke-opacity=".55" stroke-width="2"/>
+  <circle cx="182" cy="398" r="3" fill="#9aa8d8" fill-opacity=".55"/>
+  <circle cx="160" cy="474" r="7" fill="#7de3ff" fill-opacity=".25"/>
+  <circle cx="160" cy="474" r="3" fill="#aef0ff"/>
+  <rect x="196" y="480" width="22" height="6" rx="3" fill="#39456f"/>
+
+  <!-- right cup -->
+  <ellipse cx="426" cy="400" rx="50" ry="88" fill="url(#sonora-arc-wireless-headphones-pad)"/>
+  <path d="M396 330C384 350 378 374 378 400" fill="none" stroke="#fff" stroke-opacity=".15" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="454" cy="400" rx="60" ry="92" fill="url(#sonora-arc-wireless-headphones-shellR)"/>
+  <ellipse cx="458" cy="398" rx="42" ry="70" fill="url(#sonora-arc-wireless-headphones-plate)" opacity=".85"/>
+  <ellipse cx="458" cy="398" rx="42" ry="70" fill="none" stroke="#4b5a8f" stroke-opacity=".3" stroke-width="1.5"/>
+  <path d="M418 344C426 326 440 314 456 310" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="458" cy="398" r="9" fill="none" stroke="#8494c8" stroke-opacity=".45" stroke-width="2"/>
+  <circle cx="458" cy="398" r="3" fill="#8494c8" fill-opacity=".45"/>
 </svg>

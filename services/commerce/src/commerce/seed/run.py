@@ -25,6 +25,9 @@ from commerce.config import get_settings
 from commerce.db import get_sessionmaker
 from commerce.outbox.service import PRODUCT_UPSERTED, emit
 from commerce.seed.data import CATEGORIES, DEV_USERS, PRODUCTS
+from commerce.seed.history import seed_order_history, seed_policy_versions
+from commerce.seed.return_history import seed_return_history
+from commerce.seed.reviews import seed_sample_reviews
 
 log = logging.getLogger(__name__)
 
@@ -123,10 +126,18 @@ def main() -> None:
     settings = get_settings()
     with get_sessionmaker()() as db:
         result = seed_catalog(db)
+        seed_policy_versions(db)
         if settings.is_dev:
             result["dev_users_created"] = seed_dev_users(db)
+            result["sample_reviews_created"] = seed_sample_reviews(db)
+            # After any order seed: payments, tracking, activity, and support around the orders.
+            for key, value in seed_order_history(db).items():
+                result[f"history_{key}"] = value
+            result["history_returns"] = seed_return_history(db)
         else:
-            log.info("APP_ENV=%s: skipping development accounts", settings.app_env)
+            log.info(
+                "APP_ENV=%s: skipping development accounts and sample reviews", settings.app_env
+            )
         db.commit()
     for key, value in result.items():
         print(f"{key}: {value}")

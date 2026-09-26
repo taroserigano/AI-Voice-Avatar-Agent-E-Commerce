@@ -1,14 +1,94 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Studio Wired Headphones illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Studio Wired Headphones">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2563eb"/>
-      <stop offset="1" stop-color="#2563eb" stop-opacity=".72"/>
+    <radialGradient id="sonora-studio-wired-headphones-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F1F3FF"/>
+      <stop offset="1" stop-color="#DCE1FB"/>
+    </radialGradient>
+    <filter id="sonora-studio-wired-headphones-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="sonora-studio-wired-headphones-band" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#55585f"/>
+      <stop offset=".45" stop-color="#26282d"/>
+      <stop offset="1" stop-color="#0f1013"/>
+    </linearGradient>
+    <linearGradient id="sonora-studio-wired-headphones-pad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4a4c53"/>
+      <stop offset=".5" stop-color="#25272c"/>
+      <stop offset="1" stop-color="#121316"/>
+    </linearGradient>
+    <linearGradient id="sonora-studio-wired-headphones-shellL" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5a5d65"/>
+      <stop offset=".45" stop-color="#2a2c31"/>
+      <stop offset="1" stop-color="#0e0f12"/>
+    </linearGradient>
+    <linearGradient id="sonora-studio-wired-headphones-shellR" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#44474e"/>
+      <stop offset=".5" stop-color="#1f2125"/>
+      <stop offset="1" stop-color="#09090b"/>
+    </linearGradient>
+    <radialGradient id="sonora-studio-wired-headphones-cap" cx=".35" cy=".3" r=".8">
+      <stop offset="0" stop-color="#f4f6fa"/>
+      <stop offset=".55" stop-color="#b7bcc7"/>
+      <stop offset="1" stop-color="#7c8290"/>
+    </radialGradient>
+    <linearGradient id="sonora-studio-wired-headphones-steel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f5f7fb"/>
+      <stop offset=".45" stop-color="#b3b9c6"/>
+      <stop offset="1" stop-color="#6b7282"/>
+    </linearGradient>
+    <linearGradient id="sonora-studio-wired-headphones-gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbe7a6"/>
+      <stop offset=".5" stop-color="#d9ab45"/>
+      <stop offset="1" stop-color="#9c7420"/>
     </linearGradient>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M250 270a70 70 0 0 1 140 0" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round"/><rect x="228" y="262" width="36" height="64" rx="14" fill="#fff"/><rect x="376" y="262" width="36" height="64" rx="14" fill="#fff"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Studio Wired Headphones</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Sonora Audio</text>
+  <rect width="640" height="640" fill="url(#sonora-studio-wired-headphones-bg)"/>
+  <circle cx="320" cy="296" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="320" cy="494" rx="180" ry="18" fill="#1e1b4b" opacity=".16" filter="url(#sonora-studio-wired-headphones-blur)"/>
+
+  <!-- headband -->
+  <path d="M218 250C222 170 264 128 320 128C376 128 418 170 422 250L408 250C404 182 370 146 320 146C270 146 236 182 232 250Z" fill="#1a1b1f"/>
+  <path d="M190 262C190 142 250 92 320 92C390 92 450 142 450 262L422 262C422 164 376 120 320 120C264 120 218 164 218 262Z" fill="url(#sonora-studio-wired-headphones-band)"/>
+  <path d="M200 226C208 150 256 102 320 100" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="4" stroke-linecap="round"/>
+  <path d="M232 200C244 150 278 124 320 122" fill="none" stroke="#777b85" stroke-opacity=".5" stroke-width="1.5" stroke-dasharray="4 5"/>
+
+  <!-- sliders -->
+  <rect x="196" y="244" width="16" height="50" rx="4" fill="url(#sonora-studio-wired-headphones-steel)"/>
+  <rect x="428" y="244" width="16" height="50" rx="4" fill="url(#sonora-studio-wired-headphones-steel)"/>
+  <path d="M199 258H209M199 266H209M199 274H209M431 258H441M431 266H441M431 274H441" stroke="#6b7282" stroke-width="1.5"/>
+
+  <!-- left cup -->
+  <ellipse cx="222" cy="350" rx="50" ry="70" fill="url(#sonora-studio-wired-headphones-pad)"/>
+  <path d="M238 290C258 308 270 330 270 352" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="198" cy="350" rx="58" ry="72" fill="url(#sonora-studio-wired-headphones-shellL)"/>
+  <ellipse cx="194" cy="348" rx="36" ry="46" fill="url(#sonora-studio-wired-headphones-cap)"/>
+  <ellipse cx="194" cy="348" rx="26" ry="34" fill="none" stroke="#8c919d" stroke-opacity=".6" stroke-width="1.5"/>
+  <circle cx="194" cy="348" r="5" fill="#6b7180"/>
+  <path d="M150 318C158 298 174 284 196 280" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M172 330C176 320 184 312 194 310" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="3" stroke-linecap="round"/>
+  <!-- left fork -->
+  <path d="M140 352C140 312 166 290 204 290C224 290 240 296 250 306" fill="none" stroke="url(#sonora-studio-wired-headphones-steel)" stroke-width="8" stroke-linecap="round"/>
+  <rect x="192" y="282" width="24" height="16" rx="6" fill="#2d2f35"/>
+
+  <!-- right cup -->
+  <ellipse cx="418" cy="350" rx="50" ry="70" fill="url(#sonora-studio-wired-headphones-pad)"/>
+  <ellipse cx="442" cy="350" rx="58" ry="72" fill="url(#sonora-studio-wired-headphones-shellR)"/>
+  <ellipse cx="446" cy="348" rx="36" ry="46" fill="url(#sonora-studio-wired-headphones-cap)" opacity=".85"/>
+  <ellipse cx="446" cy="348" rx="26" ry="34" fill="none" stroke="#7c8290" stroke-opacity=".6" stroke-width="1.5"/>
+  <circle cx="446" cy="348" r="5" fill="#5f6573"/>
+  <path d="M424 322C428 312 436 306 446 304" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="3" stroke-linecap="round"/>
+  <path d="M500 352C500 312 474 290 436 290C416 290 400 296 390 306" fill="none" stroke="url(#sonora-studio-wired-headphones-steel)" stroke-width="8" stroke-linecap="round"/>
+  <rect x="424" y="282" width="24" height="16" rx="6" fill="#222428"/>
+
+  <!-- coiled cable -->
+  <rect x="184" y="414" width="16" height="16" rx="5" fill="#2a2c31"/>
+  <path d="M192.0 424.0L187.3 421.6L185.0 418.9L185.9 417.1L189.3 417.5L193.7 420.1L197.3 424.3L198.5 429.1L196.6 433.0L192.1 435.2L186.4 435.1L181.4 433.3L178.8 430.7L179.4 428.7L182.8 428.3L187.6 429.8L191.9 433.1L194.0 437.3L193.0 441.3L189.1 444.0L183.5 445.0L178.3 444.2L175.1 442.2L175.2 440.1L178.3 438.6L183.2 438.7L188.2 440.5L191.3 443.8L191.4 447.7L188.4 451.3L183.4 453.8L178.1 454.5L174.5 453.6L173.8 451.5L176.2 449.1L180.8 447.5L186.0 447.4L190.0 449.3L191.4 452.9L189.8 457.3L186.0 461.3L181.4 463.9L177.7 464.4L176.2 462.7L177.6 459.6L181.4 456.4L186.3 454.5L190.8 454.9L193.4 457.8L193.5 462.6L191.4 467.8L187.9 471.8L184.6 473.4L182.8 472.2L183.2 468.8L186.0 464.7L190.3 461.4L194.9 460.6L198.5 462.7L200.1 467.4L199.5 473.0L197.3 477.8L194.6 480.2L192.7 479.5L192.5 476.1L194.5 471.4L198.3 467.3L202.9 465.6L207.0 467.1L209.7 471.4L210.4 477.1L209.2 482.3L207.1 485.1L205.3 484.7L204.8 481.4L206.3 476.4L209.7 471.9L214.3 469.5L218.9 470.4L222.4 474.4L224.0 480.0L223.7 485.3L222.2 488.4L220.5 488.3L219.9 485.0L221.1 479.9L224.3 475.0L228.9 472.2L233.9 472.7L238.0 476.3L240.4 481.8L240.8 487.1L239.8 490.3L238.4 490.3L237.7 487.0L238.8 481.9L241.9 476.7L246.6 473.6L251.8 473.7L256.5 477.0L259.5 482.3L260.6 487.6L260.0 490.9L258.8 491.0L258.3 487.7L259.3 482.5L262.4 477.1L267.1 473.8L272.7 473.6L277.8 476.6L281.4 481.7L283.0 487.0L282.9 490.3L282.0 490.3L281.5 487.1L282.6 481.8L285.7 476.3L290.6 472.7L296.4 472.2L301.9 475.0L306.0 480.0Q326 484 360 482" fill="none" stroke="#1b1c20" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M192.0 424.0L187.3 421.6L185.0 418.9L185.9 417.1L189.3 417.5L193.7 420.1L197.3 424.3L198.5 429.1L196.6 433.0L192.1 435.2L186.4 435.1L181.4 433.3L178.8 430.7L179.4 428.7L182.8 428.3L187.6 429.8L191.9 433.1L194.0 437.3L193.0 441.3L189.1 444.0L183.5 445.0L178.3 444.2L175.1 442.2L175.2 440.1L178.3 438.6L183.2 438.7L188.2 440.5L191.3 443.8L191.4 447.7L188.4 451.3L183.4 453.8L178.1 454.5L174.5 453.6L173.8 451.5L176.2 449.1L180.8 447.5L186.0 447.4L190.0 449.3L191.4 452.9L189.8 457.3L186.0 461.3L181.4 463.9L177.7 464.4L176.2 462.7L177.6 459.6L181.4 456.4L186.3 454.5L190.8 454.9L193.4 457.8L193.5 462.6L191.4 467.8L187.9 471.8L184.6 473.4L182.8 472.2L183.2 468.8L186.0 464.7L190.3 461.4L194.9 460.6L198.5 462.7L200.1 467.4L199.5 473.0L197.3 477.8L194.6 480.2L192.7 479.5L192.5 476.1L194.5 471.4L198.3 467.3L202.9 465.6L207.0 467.1L209.7 471.4L210.4 477.1L209.2 482.3L207.1 485.1L205.3 484.7L204.8 481.4L206.3 476.4L209.7 471.9L214.3 469.5L218.9 470.4L222.4 474.4L224.0 480.0L223.7 485.3L222.2 488.4L220.5 488.3L219.9 485.0L221.1 479.9L224.3 475.0L228.9 472.2L233.9 472.7L238.0 476.3L240.4 481.8L240.8 487.1L239.8 490.3L238.4 490.3L237.7 487.0L238.8 481.9L241.9 476.7L246.6 473.6L251.8 473.7L256.5 477.0L259.5 482.3L260.6 487.6L260.0 490.9L258.8 491.0L258.3 487.7L259.3 482.5L262.4 477.1L267.1 473.8L272.7 473.6L277.8 476.6L281.4 481.7L283.0 487.0L282.9 490.3L282.0 490.3L281.5 487.1L282.6 481.8L285.7 476.3L290.6 472.7L296.4 472.2L301.9 475.0L306.0 480.0Q326 484 360 482" fill="none" stroke="#8b909b" stroke-opacity=".5" stroke-width="1.2" stroke-linejoin="round" transform="translate(-.8 -1)"/>
+  <!-- 3.5 mm plug -->
+  <rect x="356" y="474" width="46" height="16" rx="6" fill="#26282d"/>
+  <rect x="360" y="476" width="38" height="4" rx="2" fill="#fff" fill-opacity=".2"/>
+  <rect x="400" y="476" width="8" height="12" rx="2" fill="url(#sonora-studio-wired-headphones-steel)"/>
+  <path d="M408 478H432C436 478 438 480 438 482C438 484 436 486 432 486H408Z" fill="url(#sonora-studio-wired-headphones-gold)"/>
+  <path d="M418 478V486M426 478V486" stroke="#1b1c20" stroke-width="1.5"/>
 </svg>

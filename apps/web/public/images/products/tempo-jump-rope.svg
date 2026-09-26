@@ -1,14 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Speed Jump Rope illustration">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#c2410c"/>
-      <stop offset="1" stop-color="#c2410c" stop-opacity=".72"/>
-    </linearGradient>
-  </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <circle cx="320" cy="270" r="80" fill="none" stroke="#fff" stroke-width="16"/><path d="M240 270h160M320 190c-40 50-40 110 0 160M320 190c40 50 40 110 0 160" stroke="#fff" stroke-width="10" fill="none"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Speed Jump Rope</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Tempo Athletics</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Speed Jump Rope">
+<defs>
+<radialGradient id="tempo-jump-rope-bg" gradientUnits="userSpaceOnUse" cx="320" cy="240" r="520"><stop offset="0" stop-color="#FFF6EF"/><stop offset="1" stop-color="#F8DFCB"/></radialGradient>
+<filter id="tempo-jump-rope-shadow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+<linearGradient id="tempo-jump-rope-h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6CD1CE"/><stop offset="0.4" stop-color="#1FA3A2"/><stop offset="1" stop-color="#0B676B"/></linearGradient>
+<linearGradient id="tempo-jump-rope-cap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="0.35" stop-color="#C3C9D0"/><stop offset="0.7" stop-color="#737B84"/><stop offset="1" stop-color="#B5BCC4"/></linearGradient>
+<filter id="tempo-jump-rope-soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3"/></filter>
+</defs>
+<rect width="640" height="640" fill="url(#tempo-jump-rope-bg)"/>
+<circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+<ellipse cx="320" cy="466" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".16" filter="url(#tempo-jump-rope-shadow)"/>
+<path d="M168.2 362.5C127 334 110 250 150 205C190 160 330 130 420 160C480 180 545 240 505 290C478 324 405 320 398 285C391 250 440 238 462 262C484 286 513 334 471.8 362.5" fill="none" stroke="#1e1b4b" stroke-opacity=".14" stroke-width="6" filter="url(#tempo-jump-rope-soft)" transform="translate(3 8)"/>
+<path d="M168.2 362.5C127 334 110 250 150 205C190 160 330 130 420 160C480 180 545 240 505 290C478 324 405 320 398 285C391 250 440 238 462 262C484 286 513 334 471.8 362.5" fill="none" stroke="#2B2F36" stroke-width="5" stroke-linecap="round"/>
+<path d="M168.2 362.5C127 334 110 250 150 205C190 160 330 130 420 160C480 180 545 240 505 290C478 324 405 320 398 285C391 250 440 238 462 262C484 286 513 334 471.8 362.5" fill="none" stroke="#A3ACB6" stroke-opacity=".8" stroke-width="1.2" transform="translate(-.8 -1.2)"/>
+<ellipse cx="300" cy="460" rx="70" ry="8" fill="#1e1b4b" fill-opacity=".1" filter="url(#tempo-jump-rope-soft)"/>
+<g transform="translate(296 452) rotate(215)">
+<path d="M0 -13L128 -10V10L0 13Q-9 13 -9 0Q-9 -13 0 -13Z" fill="url(#tempo-jump-rope-h)"/>
+<path d="M14 -13V13M20 -12.8V12.8M26 -12.6V12.6" stroke="#0A4E52" stroke-opacity=".35" stroke-width="1.5"/>
+<path d="M2 -8L122 -6" stroke="#fff" stroke-opacity=".45" stroke-width="3" stroke-linecap="round"/>
+<path d="M126 -10H144Q150 -10 150 -4V4Q150 10 144 10H126Z" fill="url(#tempo-jump-rope-cap)"/>
+<rect x="148" y="-4.5" width="9" height="9" rx="2" fill="url(#tempo-jump-rope-cap)"/>
+<ellipse cx="-9" cy="0" rx="3" ry="9" fill="#0B5A5E"/>
+</g>
+<g transform="translate(344 452) rotate(-35)">
+<path d="M0 -13L128 -10V10L0 13Q-9 13 -9 0Q-9 -13 0 -13Z" fill="url(#tempo-jump-rope-h)"/>
+<path d="M14 -13V13M20 -12.8V12.8M26 -12.6V12.6" stroke="#0A4E52" stroke-opacity=".35" stroke-width="1.5"/>
+<path d="M2 -8L122 -6" stroke="#fff" stroke-opacity=".45" stroke-width="3" stroke-linecap="round"/>
+<path d="M126 -10H144Q150 -10 150 -4V4Q150 10 144 10H126Z" fill="url(#tempo-jump-rope-cap)"/>
+<rect x="148" y="-4.5" width="9" height="9" rx="2" fill="url(#tempo-jump-rope-cap)"/>
+<ellipse cx="-9" cy="0" rx="3" ry="9" fill="#0B5A5E"/>
+</g>
 </svg>

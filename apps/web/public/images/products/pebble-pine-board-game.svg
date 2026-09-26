@@ -1,14 +1,137 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Lighthouse Keepers Strategy Board Game illustration">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Lighthouse Keepers Strategy Board Game">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#7c3aed"/>
-      <stop offset="1" stop-color="#7c3aed" stop-opacity=".72"/>
+    <radialGradient id="pebble-pine-board-game-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F7F4FF"/>
+      <stop offset="1" stop-color="#E4DDFB"/>
+    </radialGradient>
+    <filter id="pebble-pine-board-game-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="pebble-pine-board-game-sea" x1="96" y1="342" x2="544" y2="494" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5cc3d2"/>
+      <stop offset=".6" stop-color="#2f9bb2"/>
+      <stop offset="1" stop-color="#1f7c96"/>
     </linearGradient>
+    <linearGradient id="pebble-pine-board-game-sky" x1="0" y1="158" x2="0" y2="340" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#151f57"/>
+      <stop offset=".6" stop-color="#2f4596"/>
+      <stop offset="1" stop-color="#6c6fc0"/>
+    </linearGradient>
+    <linearGradient id="pebble-pine-board-game-beam" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff4c4" stop-opacity="0"/>
+      <stop offset="1" stop-color="#fff4c4" stop-opacity=".5"/>
+    </linearGradient>
+    <linearGradient id="pebble-pine-board-game-beamR" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff4c4" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#fff4c4" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="pebble-pine-board-game-gloss" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".14"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="pebble-pine-board-game-board">
+      <path d="M96 418L320 342L544 418L320 494Z"/>
+    </clipPath>
+    <clipPath id="pebble-pine-board-game-art">
+      <rect x="218" y="158" width="184" height="222" rx="3"/>
+    </clipPath>
+    <path id="pebble-pine-board-game-meeple" d="M0 -24C6 -24 9 -20 9 -15C9 -12 8 -10 6 -8L18 -4C22 -3 22 4 18 5L10 6L16 22C17 25 15 26 12 26L4 26L0 16L-4 26L-12 26C-15 26 -17 25 -16 22L-10 6L-18 5C-22 4 -22 -3 -18 -4L-6 -8C-8 -10 -9 -12 -9 -15C-9 -20 -6 -24 0 -24Z"/>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <rect x="240" y="210" width="70" height="70" rx="10" fill="#fff"/><rect x="330" y="210" width="70" height="70" rx="10" fill="#fff" fill-opacity=".8"/><rect x="285" y="290" width="70" height="70" rx="10" fill="#fff" fill-opacity=".9"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Lighthouse Keepers</tspan><tspan x="320" dy="40">Strategy Board Game</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Pebble &amp; Pine</text>
+  <rect width="640" height="640" fill="url(#pebble-pine-board-game-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="320" cy="486" rx="200" ry="22" fill="#1e1b4b" opacity=".16" filter="url(#pebble-pine-board-game-blur)"/>
+
+  <!-- board -->
+  <path d="M96 418L320 494L320 503L96 427Z" fill="#e9dcc0"/>
+  <path d="M320 494L544 418L544 427L320 503Z" fill="#c9b894"/>
+  <path d="M96 418L320 342L544 418L320 494Z" fill="url(#pebble-pine-board-game-sea)"/>
+  <g clip-path="url(#pebble-pine-board-game-board)">
+    <path d="M150 400C200 390 230 404 280 396M360 370C400 364 430 376 470 370M380 470C420 462 450 470 490 460" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="2" stroke-linecap="round"/>
+    <ellipse cx="170" cy="420" rx="54" ry="20" fill="#f3d9a4"/>
+    <ellipse cx="166" cy="417" rx="38" ry="13" fill="#7cc38a"/>
+    <ellipse cx="480" cy="414" rx="38" ry="14" fill="#f3d9a4"/>
+    <ellipse cx="478" cy="412" rx="24" ry="8" fill="#7cc38a"/>
+    <path d="M150 432C200 452 250 468 320 472C390 474 440 452 500 424" fill="none" stroke="#fff4dc" stroke-opacity=".6" stroke-width="2" stroke-dasharray="3 5"/>
+    <g>
+      <ellipse cx="156" cy="434" rx="10" ry="5.5" fill="#fff4dc"/>
+      <ellipse cx="186" cy="446" rx="10" ry="5.5" fill="#f4c95d"/>
+      <ellipse cx="218" cy="456" rx="10" ry="5.5" fill="#fff4dc"/>
+      <ellipse cx="250" cy="464" rx="10" ry="5.5" fill="#e76f51"/>
+      <ellipse cx="284" cy="470" rx="10" ry="5.5" fill="#fff4dc"/>
+      <ellipse cx="320" cy="472" rx="10" ry="5.5" fill="#f4c95d"/>
+      <ellipse cx="356" cy="470" rx="10" ry="5.5" fill="#fff4dc"/>
+      <ellipse cx="392" cy="462" rx="10" ry="5.5" fill="#e76f51"/>
+      <ellipse cx="426" cy="450" rx="10" ry="5.5" fill="#fff4dc"/>
+      <ellipse cx="458" cy="438" rx="10" ry="5.5" fill="#f4c95d"/>
+      <ellipse cx="490" cy="426" rx="10" ry="5.5" fill="#fff4dc"/>
+    </g>
+  </g>
+  <path d="M112 418L320 348L528 418L320 488Z" fill="none" stroke="#fff4dc" stroke-opacity=".55" stroke-width="2"/>
+  <path d="M96 418L320 342" stroke="#fff" stroke-opacity=".4" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- game box standing on the board -->
+  <ellipse cx="316" cy="392" rx="120" ry="10" fill="#1e1b4b" opacity=".2" filter="url(#pebble-pine-board-game-blur)"/>
+  <path d="M206 146L414 146L452 124L244 124Z" fill="#3d4f9e"/>
+  <path d="M414 146L452 124L452 370L414 392Z" fill="#18214f"/>
+  <path d="M424 176L442 166L442 240L424 250Z" fill="#e8c170" fill-opacity=".8"/>
+  <rect x="206" y="146" width="208" height="246" fill="#1f2a60"/>
+  <path d="M206 146H414" stroke="#fff" stroke-opacity=".4" stroke-width="2"/>
+  <g clip-path="url(#pebble-pine-board-game-art)">
+    <rect x="218" y="158" width="184" height="222" fill="url(#pebble-pine-board-game-sky)"/>
+    <circle cx="238" cy="178" r="1.5" fill="#fff"/><circle cx="268" cy="196" r="1" fill="#fff"/><circle cx="372" cy="174" r="1.5" fill="#fff"/><circle cx="386" cy="206" r="1" fill="#fff"/><circle cx="352" cy="190" r="1" fill="#fff"/><circle cx="250" cy="220" r="1" fill="#fff"/>
+    <circle cx="370" cy="190" r="12" fill="#fdf1c7"/>
+    <circle cx="375" cy="186" r="11" fill="#2a3d8c"/>
+    <path d="M298 226L218 196L218 250Z" fill="url(#pebble-pine-board-game-beam)"/>
+    <path d="M322 226L402 204L402 256Z" fill="url(#pebble-pine-board-game-beamR)"/>
+    <!-- lighthouse -->
+    <path d="M262 336C272 318 292 312 310 314C330 310 352 318 362 336Z" fill="#141a45"/>
+    <path d="M296 318L302 240H318L324 318Z" fill="#f7f3ff"/>
+    <path d="M297.6 298L299.1 280H320.9L322.4 298Z" fill="#e0525f"/>
+    <path d="M300.4 264L301.2 252H318.8L319.6 264Z" fill="#e0525f"/>
+    <rect x="296" y="236" width="28" height="5" rx="2" fill="#141a45"/>
+    <rect x="302" y="220" width="16" height="16" rx="2" fill="#ffe29a"/>
+    <circle cx="310" cy="228" r="18" fill="#fff3c4" fill-opacity=".3"/>
+    <path d="M298 220L310 208L322 220Z" fill="#e0525f"/>
+    <!-- sea -->
+    <rect x="218" y="332" width="184" height="48" fill="#1a2466"/>
+    <path d="M218 344Q230 338 242 344T266 344T290 344T314 344T338 344T362 344T386 344T410 344M218 360Q230 354 242 360T266 360T290 360T314 360T338 360T362 360T386 360T410 360" fill="none" stroke="#9fb4ff" stroke-opacity=".55" stroke-width="2"/>
+    <path d="M300 340H320M304 350H316" stroke="#ffe29a" stroke-opacity=".7" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <rect x="222" y="162" width="176" height="214" rx="2" fill="none" stroke="#e8c170" stroke-width="2"/>
+  <path d="M250 146L206 392H220L266 146Z" fill="url(#pebble-pine-board-game-gloss)"/>
+
+  <!-- meeples -->
+  <g transform="translate(226 432) scale(1.05)">
+    <use xlink:href="#pebble-pine-board-game-meeple" href="#pebble-pine-board-game-meeple" transform="translate(4 -2)" fill="#a8342a"/>
+    <use xlink:href="#pebble-pine-board-game-meeple" href="#pebble-pine-board-game-meeple" fill="#e25646"/>
+    <path d="M-5 -20C-3 -22 1 -22 3 -21M-16 0C-14 -3 -10 -4 -7 -5" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(300 452) scale(1.05)">
+    <use xlink:href="#pebble-pine-board-game-meeple" href="#pebble-pine-board-game-meeple" transform="translate(4 -2)" fill="#c38c16"/>
+    <use xlink:href="#pebble-pine-board-game-meeple" href="#pebble-pine-board-game-meeple" fill="#f6c343"/>
+    <path d="M-5 -20C-3 -22 1 -22 3 -21M-16 0C-14 -3 -10 -4 -7 -5" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(370 442) scale(1.05)">
+    <use xlink:href="#pebble-pine-board-game-meeple" href="#pebble-pine-board-game-meeple" transform="translate(4 -2)" fill="#2f59a8"/>
+    <use xlink:href="#pebble-pine-board-game-meeple" href="#pebble-pine-board-game-meeple" fill="#4c7fe0"/>
+    <path d="M-5 -20C-3 -22 1 -22 3 -21M-16 0C-14 -3 -10 -4 -7 -5" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- dice -->
+  <g stroke-linejoin="round" stroke-width="3">
+    <path d="M474 403.7L493.1 414L474 424.3L454.9 414Z" fill="#ffffff" stroke="#ffffff"/>
+    <path d="M454.9 414L474 424.3L474 446.3L454.9 436Z" fill="#e6e7f0" stroke="#e6e7f0"/>
+    <path d="M474 424.3L493.1 414L493.1 436L474 446.3Z" fill="#c4c7d6" stroke="#c4c7d6"/>
+    <path d="M430 419.8L452.6 432L430 444.2L407.4 432Z" fill="#ffffff" stroke="#ffffff"/>
+    <path d="M407.4 432L430 444.2L430 470.2L407.4 458Z" fill="#e6e7f0" stroke="#e6e7f0"/>
+    <path d="M430 444.2L452.6 432L452.6 458L430 470.2Z" fill="#c4c7d6" stroke="#c4c7d6"/>
+  </g>
+  <g fill="#2a2d45">
+    <ellipse cx="474" cy="408.6" rx="2.6" ry="1.6"/><ellipse cx="474" cy="414" rx="2.6" ry="1.6"/><ellipse cx="474" cy="419.4" rx="2.6" ry="1.6"/>
+    <ellipse cx="464.5" cy="430.2" rx="2.1" ry="2.6"/><ellipse cx="483.5" cy="430.2" rx="2.1" ry="2.6"/>
+    <ellipse cx="430" cy="432" rx="3" ry="1.8"/><ellipse cx="441" cy="432" rx="3" ry="1.8"/><ellipse cx="419" cy="432" rx="3" ry="1.8"/><ellipse cx="430" cy="426" rx="3" ry="1.8"/><ellipse cx="430" cy="438" rx="3" ry="1.8"/>
+    <ellipse cx="413.7" cy="442.7" rx="2.3" ry="2.9"/><ellipse cx="423.7" cy="459.5" rx="2.3" ry="2.9"/>
+    <ellipse cx="441.3" cy="451.1" rx="2.5" ry="3.1"/>
+  </g>
 </svg>

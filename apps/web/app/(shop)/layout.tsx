@@ -1,7 +1,8 @@
 import { SessionGuard } from "@/components/session-guard";
+import { Footer } from "@/components/shop/footer";
 import { Header } from "@/components/shop/header";
+import { containerClasses } from "@/components/ui/container";
 import { getMe, isDevelopment, serverApi, unwrap } from "@/lib/api-server";
-import Link from "next/link";
 
 export default async function ShopLayout({ children }: { children: React.ReactNode }) {
   // getMe() redirects to sign-in if the session is missing, expired, or revoked.
@@ -16,29 +17,23 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
     <div className="flex min-h-screen flex-col">
       <SessionGuard />
       {isDevelopment() ? (
-        <p className="bg-amber-100 px-4 py-1.5 text-center text-sm text-amber-950">
-          <strong>Sandbox store:</strong> development sign-in, test data, and Stripe test-mode payments.
-          Nothing ships and no real money moves.
+        <p
+          role="region"
+          aria-label="Sandbox notice"
+          className="bg-neutral-900 px-4 py-2 text-center text-xs leading-relaxed text-neutral-300 focus-inverse"
+        >
+          <strong className="mr-2 inline-flex -translate-y-px items-center rounded-full bg-accent-400 px-2 py-px text-[0.6875rem] font-semibold uppercase tracking-eyebrow text-ink">
+            Sandbox store
+          </strong>
+          Development sign-in, test data, and Stripe test-mode payments.{" "}
+          <span className="text-white">Nothing ships and no real money moves.</span>
         </p>
       ) : null}
       <Header user={user} categories={categories} cart={cart} />
-      <main id="main" className="mx-auto w-full max-w-7xl flex-1 px-4 py-6">
+      <main id="main" className={containerClasses("default", "flex-1 pb-8 pt-6 sm:pt-10")}>
         {children}
       </main>
-      <footer className="border-t border-line bg-white">
-        <div className="mx-auto flex max-w-7xl flex-wrap gap-x-6 gap-y-2 px-4 py-6 text-sm text-muted">
-          <span>© Larkspur (demo store)</span>
-          <Link className="underline underline-offset-2 hover:text-ink" href="/privacy">
-            Privacy
-          </Link>
-          <Link className="underline underline-offset-2 hover:text-ink" href="/terms">
-            Terms
-          </Link>
-          <Link className="underline underline-offset-2 hover:text-ink" href="/accessibility">
-            Accessibility
-          </Link>
-        </div>
-      </footer>
+      <Footer categories={categories} />
     </div>
   );
 }

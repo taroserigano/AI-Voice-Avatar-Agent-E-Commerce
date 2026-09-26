@@ -1,8 +1,10 @@
+import { SearchIcon, ArrowRightIcon } from "@/components/icons";
 import { Logo } from "@/components/logo";
+import { containerClasses } from "@/components/ui/container";
 import type { CartOut, CategoryOut, UserOut } from "@ai-commerce/contracts";
-import Link from "next/link";
+import { AccountMenu } from "./account-menu";
 import { CartLink } from "./cart-link";
-import { SignOutButton } from "./sign-out-button";
+import { DepartmentNav } from "./department-nav";
 
 export function Header({
   user,
@@ -16,58 +18,51 @@ export function Header({
   query?: string;
 }) {
   return (
-    <header className="bg-brand-700 text-white">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3">
-        <Logo inverted />
-        <form action="/search" method="get" role="search" className="order-last flex w-full flex-1 md:order-none md:w-auto">
+    // Sticky (with a frosted backdrop) from tablet up; on phones it scrolls away to save height.
+    <header className="relative z-40 border-b border-line/80 bg-raised/85 backdrop-blur-xl backdrop-saturate-150 md:sticky md:top-0">
+      <div
+        className={containerClasses(
+          "default",
+          "flex flex-wrap items-center gap-x-2 gap-y-3 py-3 md:h-18 md:flex-nowrap md:gap-x-6 md:py-0 lg:gap-x-10",
+        )}
+      >
+        <Logo className="-ml-1 shrink-0 px-1" />
+        <form
+          action="/search"
+          method="get"
+          role="search"
+          className="order-last w-full md:order-0 md:mx-auto md:max-w-2xl md:flex-1"
+        >
           <label htmlFor="site-search" className="sr-only">
             Search products
           </label>
-          <input
-            id="site-search"
-            name="q"
-            type="search"
-            defaultValue={query}
-            placeholder="Search everything at Larkspur"
-            className="min-h-11 w-full rounded-l-full border-0 bg-white px-5 text-ink placeholder:text-stone-500"
-          />
-          <button
-            type="submit"
-            className="min-h-11 rounded-r-full bg-accent-400 px-5 font-semibold text-ink hover:bg-amber-300"
-          >
-            Search
-          </button>
+          <div className="group/search relative">
+            <SearchIcon className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted transition-colors group-focus-within/search:text-brand-600" />
+            <input
+              id="site-search"
+              name="q"
+              type="search"
+              defaultValue={query}
+              placeholder="Search everything at Larkspur"
+              autoComplete="off"
+              enterKeyHint="search"
+              className="h-12 w-full rounded-full border border-line bg-sunken/70 pl-11 pr-14 text-base text-ink shadow-2xs inset-shadow-well transition-[background-color,border-color,box-shadow] duration-200 ease-snappy placeholder:text-muted hover:border-line-strong hover:bg-sunken focus-visible:border-brand-600 focus-visible:bg-raised focus-visible:outline-2 focus-visible:outline-transparent focus-visible:ring-4 focus-visible:ring-brand-500/20 sm:pr-28 [&::-webkit-search-cancel-button]:hidden"
+            />
+            <button
+              type="submit"
+              className="absolute right-1.5 top-1/2 inline-flex h-9 min-w-9 -translate-y-1/2 items-center justify-center gap-1.5 rounded-full bg-brand-600 px-2.5 text-sm font-semibold text-white shadow-glow inset-shadow-highlight transition-[background-color,box-shadow] duration-200 ease-snappy before:absolute before:-inset-1 before:content-[''] hover:bg-brand-700 hover:shadow-glow-lg sm:px-4"
+            >
+              <span className="max-sm:sr-only">Search</span>
+              <ArrowRightIcon className="size-4 sm:hidden" />
+            </button>
+          </div>
         </form>
-        <nav aria-label="Account" className="ml-auto flex items-center gap-1">
-          <details className="relative">
-            <summary className="flex min-h-11 cursor-pointer list-none items-center rounded-full px-3 font-semibold hover:bg-brand-900">
-              <span className="sr-only">Account menu for </span>
-              Hi, {user.display_name.split(" ")[0]}
-            </summary>
-            <div className="absolute right-0 z-20 mt-2 w-48 rounded-xl border border-line bg-white p-2 text-ink shadow-lg">
-              <Link href="/orders" className="block rounded-lg px-3 py-2 hover:bg-stone-100">
-                Orders &amp; returns
-              </Link>
-              <SignOutButton className="block w-full rounded-lg px-3 py-2 text-left hover:bg-stone-100" />
-            </div>
-          </details>
+        <nav aria-label="Account" className="ml-auto flex shrink-0 items-center gap-0.5 md:ml-0 md:gap-1">
+          <AccountMenu displayName={user.display_name} email={user.email} />
           <CartLink initialCart={cart} />
         </nav>
       </div>
-      <nav aria-label="Departments" className="bg-brand-800">
-        <ul className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 py-1 text-sm">
-          {categories.map((c) => (
-            <li key={c.slug}>
-              <Link
-                href={`/c/${c.slug}`}
-                className="inline-flex min-h-10 items-center whitespace-nowrap rounded-full px-3 hover:bg-brand-900"
-              >
-                {c.name}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      <DepartmentNav categories={categories.map((c) => ({ slug: c.slug, name: c.name }))} />
     </header>
   );
 }

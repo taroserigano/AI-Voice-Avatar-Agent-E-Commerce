@@ -1,14 +1,79 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Packable Rain Shell Jacket illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Packable Rain Shell Jacket">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#be185d"/>
-      <stop offset="1" stop-color="#be185d" stop-opacity=".72"/>
+    <radialGradient id="driftwood-rain-shell-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF4F8"/>
+      <stop offset="1" stop-color="#F6DCE7"/>
+    </radialGradient>
+    <filter id="driftwood-rain-shell-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="driftwood-rain-shell-torso" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#95a262"/>
+      <stop offset=".5" stop-color="#6f7d3d"/>
+      <stop offset="1" stop-color="#4f5a2a"/>
     </linearGradient>
+    <linearGradient id="driftwood-rain-shell-sleeve-l" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9aa767"/>
+      <stop offset="1" stop-color="#65733a"/>
+    </linearGradient>
+    <linearGradient id="driftwood-rain-shell-sleeve-r" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6f7d3d"/>
+      <stop offset="1" stop-color="#454f24"/>
+    </linearGradient>
+    <linearGradient id="driftwood-rain-shell-hood" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8e9b59"/>
+      <stop offset="1" stop-color="#56622d"/>
+    </linearGradient>
+    <radialGradient id="driftwood-rain-shell-lining" cx=".5" cy=".75" r=".7">
+      <stop offset="0" stop-color="#454e29"/>
+      <stop offset="1" stop-color="#262c15"/>
+    </radialGradient>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M262 200l-52 30 22 44 30-14v110h116V260l30 14 22-44-52-30c-8 20-28 32-58 32s-50-12-58-32z" fill="#fff"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Packable Rain Shell</tspan><tspan x="320" dy="40">Jacket</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Driftwood Apparel</text>
+  <rect width="640" height="640" fill="url(#driftwood-rain-shell-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="320" cy="526" rx="170" ry="18" fill="#1e1b4b" fill-opacity=".16" filter="url(#driftwood-rain-shell-shadow)"/>
+  <path d="M244 204C236 134 270 88 320 86C370 88 404 134 396 204Z" fill="url(#driftwood-rain-shell-hood)"/>
+  <path d="M276 102C292 92 306 90 320 90" stroke="#fff" stroke-width="5" stroke-opacity=".3" stroke-linecap="round" fill="none"/>
+  <path d="M234 190C204 194 180 208 170 234L128 438L186 450L222 290Z" fill="url(#driftwood-rain-shell-sleeve-l)"/>
+  <path d="M406 190C436 194 460 208 470 234L512 438L454 450L418 290Z" fill="url(#driftwood-rain-shell-sleeve-r)"/>
+  <path d="M128 438L186 450L182 470L124 458Z" fill="#4a5427"/>
+  <path d="M512 438L454 450L458 470L516 458Z" fill="#3a431e"/>
+  <path d="M136 446l-2 12M146 448l-2 12M156 450l-2 12M166 452l-2 12M176 454l-2 12M504 446l2 12M494 448l2 12M484 450l2 12M474 452l2 12M464 454l2 12" stroke="#2c3316" stroke-width="1.5" stroke-opacity=".6"/>
+  <path d="M180 240C170 300 158 360 146 420" stroke="#fff" stroke-width="7" stroke-opacity=".22" stroke-linecap="round" fill="none"/>
+  <path d="M160 340C170 336 184 338 196 346M152 376C164 372 176 374 186 380" stroke="#4d5828" stroke-width="3" stroke-opacity=".5" stroke-linecap="round" fill="none"/>
+  <path d="M480 340C470 336 456 338 444 346M488 376C476 372 464 374 454 380" stroke="#303817" stroke-width="3" stroke-opacity=".5" stroke-linecap="round" fill="none"/>
+  <path d="M232 190L408 190L420 250L424 510C380 518 260 518 216 510L220 250Z" fill="url(#driftwood-rain-shell-torso)"/>
+  <path d="M270 204C250 230 232 262 222 292M370 204C390 230 408 262 418 292" stroke="#46501f" stroke-width="2" stroke-opacity=".7" fill="none"/>
+  <path d="M272 210C252 236 236 266 227 294M368 210C388 236 404 266 413 294" stroke="#b3bf82" stroke-width="1.2" stroke-opacity=".45" fill="none"/>
+  <path d="M244 230C240 300 238 380 238 480" stroke="#fff" stroke-width="10" stroke-opacity=".14" stroke-linecap="round" fill="none"/>
+  <path d="M268 206C262 156 286 118 320 116C354 118 378 156 372 206C352 214 288 214 268 206Z" fill="url(#driftwood-rain-shell-lining)"/>
+  <path d="M268 206C262 156 286 118 320 116C354 118 378 156 372 206" stroke="#a3b06d" stroke-width="5" stroke-opacity=".75" fill="none" stroke-linecap="round"/>
+  <path d="M272 196C268 158 288 126 316 122" stroke="#fff" stroke-width="2" stroke-opacity=".35" fill="none" stroke-linecap="round"/>
+  <path d="M320 212L332 212L332 514L320 516Z" fill="#3f4820" fill-opacity=".45"/>
+  <path d="M320 212V514" stroke="#2e3418" stroke-width="5"/>
+  <path d="M320 212V514" stroke="#5c6636" stroke-width="3" stroke-dasharray="1.5 2"/>
+  <rect x="313" y="220" width="14" height="30" rx="5" fill="#2b3019"/>
+  <rect x="315.5" y="238" width="9" height="6" rx="2" fill="#6b7646"/>
+  <path d="M316 224v10" stroke="#fff" stroke-width="2" stroke-opacity=".4" stroke-linecap="round"/>
+  <path d="M362 258L392 300" stroke="#2e3418" stroke-width="4" stroke-linecap="round"/>
+  <path d="M358 262L388 304" stroke="#a3b06d" stroke-width="1.2" stroke-opacity=".5"/>
+  <rect x="386" y="296" width="7" height="16" rx="3" fill="#2b3019" transform="rotate(-35 389 304)"/>
+  <path d="M252 372L262 444M388 372L378 444" stroke="#353d1b" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M248 372L258 444M384 372L374 444" stroke="#a3b06d" stroke-width="1" stroke-opacity=".45"/>
+  <path d="M220 498C260 504 380 504 422 498" stroke="#3a4220" stroke-width="1.5" stroke-dasharray="4 3" stroke-opacity=".8" fill="none"/>
+  <g stroke="#d8dcc7" stroke-width="3.5" stroke-linecap="round" fill="none">
+    <path d="M294 210C292 228 294 246 290 262"/>
+    <path d="M346 210C348 228 346 246 350 262"/>
+  </g>
+  <g fill="#2b3019">
+    <rect x="283" y="244" width="13" height="16" rx="5"/>
+    <rect x="344" y="244" width="13" height="16" rx="5"/>
+    <rect x="226" y="488" width="9" height="13" rx="4"/>
+    <rect x="405" y="488" width="9" height="13" rx="4"/>
+  </g>
+  <g fill="#fff" fill-opacity=".35">
+    <rect x="285" y="246" width="3" height="10" rx="1.5"/>
+    <rect x="346" y="246" width="3" height="10" rx="1.5"/>
+  </g>
+  <path d="M280 330C300 340 312 360 314 390M350 420C366 436 380 450 404 456" stroke="#4d5828" stroke-width="3" stroke-opacity=".35" stroke-linecap="round" fill="none"/>
 </svg>

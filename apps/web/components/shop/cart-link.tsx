@@ -1,30 +1,37 @@
 "use client";
 
+import { BagIcon } from "@/components/icons";
 import { useCart } from "@/lib/cart-query";
 import type { CartOut } from "@ai-commerce/contracts";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function CartLink({ initialCart }: { initialCart: CartOut }) {
   const { data } = useCart(initialCart);
+  const pathname = usePathname();
   const count = data?.item_count ?? 0;
+  const shown = count > 99 ? "99+" : String(count);
   return (
     <Link
       href="/cart"
-      className="relative inline-flex min-h-11 items-center gap-2 rounded-full px-3 font-semibold text-white hover:bg-brand-900"
+      aria-current={pathname === "/cart" ? "page" : undefined}
+      className="group/cart relative inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full px-2.5 text-sm font-semibold text-ink transition-colors duration-150 hover:bg-sunken aria-[current=page]:bg-brand-50 aria-[current=page]:text-brand-800 sm:px-3.5"
     >
-      <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.2" strokeLinecap="round" strokeLinejoin="round" />
-        <circle cx="10" cy="20" r="1.5" />
-        <circle cx="17" cy="20" r="1.5" />
-      </svg>
-      <span>Cart</span>
-      <span
-        className="min-w-6 rounded-full bg-accent-400 px-1.5 text-center text-sm font-bold text-ink"
-        aria-live="polite"
-      >
-        <span className="sr-only">, </span>
-        {count}
-        <span className="sr-only"> {count === 1 ? "item" : "items"}</span>
+      <span className="relative">
+        <BagIcon className="size-6 transition-transform duration-300 ease-spring group-hover/cart:-rotate-6 motion-reduce:group-hover/cart:rotate-0" />
+        {count > 0 ? (
+          <span
+            key={count}
+            aria-hidden="true"
+            className="absolute -right-2 -top-1.5 grid h-5 min-w-5 animate-pop place-items-center rounded-full bg-brand-600 px-1.5 text-[0.6875rem] font-semibold tabular-nums leading-none text-white shadow-sm ring-2 ring-raised"
+          >
+            {shown}
+          </span>
+        ) : null}
+      </span>
+      <span className="max-sm:sr-only">Cart</span>
+      <span className="sr-only" aria-live="polite">
+        , {count} {count === 1 ? "item" : "items"}
       </span>
     </Link>
   );

@@ -1,14 +1,73 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Commuter Laptop Backpack illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Commuter Laptop Backpack">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#475569"/>
-      <stop offset="1" stop-color="#475569" stop-opacity=".72"/>
+    <radialGradient id="quillmark-laptop-backpack-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F4F6F9"/>
+      <stop offset="1" stop-color="#DEE4EC"/>
+    </radialGradient>
+    <filter id="quillmark-laptop-backpack-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="quillmark-laptop-backpack-front" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5d626b"/>
+      <stop offset=".45" stop-color="#40444c"/>
+      <stop offset="1" stop-color="#2b2e34"/>
+    </linearGradient>
+    <linearGradient id="quillmark-laptop-backpack-side" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2c2f35"/>
+      <stop offset="1" stop-color="#1c1e22"/>
+    </linearGradient>
+    <linearGradient id="quillmark-laptop-backpack-pocket" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#50555e"/>
+      <stop offset="1" stop-color="#2f3238"/>
+    </linearGradient>
+    <linearGradient id="quillmark-laptop-backpack-strap" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3a3e45"/>
+      <stop offset="1" stop-color="#1e2024"/>
     </linearGradient>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <rect x="250" y="200" width="140" height="170" rx="10" fill="#fff"/><path d="M275 240h90M275 270h90M275 300h60" stroke="#94a3b8" stroke-width="10" stroke-linecap="round"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Commuter Laptop Backpack</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Quillmark</text>
+  <rect width="640" height="640" fill="url(#quillmark-laptop-backpack-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="322" cy="496" rx="150" ry="18" fill="#1e1b4b" fill-opacity=".16" filter="url(#quillmark-laptop-backpack-shadow)"/>
+  <g transform="translate(-26 0)">
+    <!-- top handle -->
+    <path d="M266 152c0-44 60-44 60 0" fill="none" stroke="#2c2f35" stroke-width="12" stroke-linecap="round"/>
+    <path d="M272 140c4-26 44-26 48 0" fill="none" stroke="#fff" stroke-opacity=".15" stroke-width="2"/>
+    <!-- shoulder strap -->
+    <path d="M444 196c56 30 70 120 56 210-4 30-14 54-26 66l-12-8c12-40 22-120 6-196z" fill="url(#quillmark-laptop-backpack-strap)"/>
+    <path d="M458 210c40 34 48 110 38 184" fill="none" stroke="#6b7079" stroke-opacity=".5" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <rect x="462" y="440" width="22" height="14" rx="3" transform="rotate(20 473 447)" fill="#15171a"/>
+    <!-- side gusset -->
+    <path d="M388 166q34-22 54 2 22 26 24 62l10 244q-24 18-62 12L402 222q-2-34-14-56z" fill="url(#quillmark-laptop-backpack-side)"/>
+    <path d="M406 386q34-10 64-12l4 100q-24 18-60 12z" fill="#26292e"/>
+    <path d="M406 386q34-10 64-12" fill="none" stroke="#50555e" stroke-width="4"/>
+    <g stroke="#50555e" stroke-opacity=".5" stroke-width="1.2">
+      <path d="M408 404l64-6M409 422l64-6M410 440l65-6M411 458l65-6"/>
+    </g>
+    <!-- front panel -->
+    <path d="M196 486 186 222q0-72 108-76 104 4 108 76l12 264q-108 14-218 0z" fill="url(#quillmark-laptop-backpack-front)"/>
+    <path d="M200 230q4-64 92-72" fill="none" stroke="#fff" stroke-opacity=".14" stroke-width="10" stroke-linecap="round"/>
+    <!-- main zipper -->
+    <path d="M191 350 190 224q2-64 104-68 100 4 104 68l5 126" fill="none" stroke="#1f2227" stroke-width="7" stroke-linecap="round"/>
+    <path d="M191 350 190 224q2-64 104-68 100 4 104 68l5 126" fill="none" stroke="#7a808a" stroke-width="2.5" stroke-dasharray="2 3"/>
+    <path d="M196 486 186 222q0-72 108-76 104 4 108 76l12 264" fill="none" stroke="#6b7079" stroke-opacity=".35" stroke-width="1.2" stroke-dasharray="4 4"/>
+    <!-- zipper pulls -->
+    <g fill="#1a1c20">
+      <rect x="360" y="170" width="12" height="16" rx="3" transform="rotate(35 366 178)"/>
+      <rect x="376" y="178" width="12" height="16" rx="3" transform="rotate(45 382 186)"/>
+    </g>
+    <path d="M362 184q-6 16 4 26M378 194q-2 16 10 22" fill="none" stroke="#9aa0a9" stroke-width="3" stroke-linecap="round"/>
+    <!-- logo patch -->
+    <rect x="276" y="236" width="40" height="22" rx="6" fill="#2d3036"/>
+    <rect x="279" y="239" width="34" height="16" rx="4" fill="none" stroke="#7a808a" stroke-opacity=".5" stroke-width="1" stroke-dasharray="2 2"/>
+    <circle cx="296" cy="247" r="3.5" fill="#9aa0a9"/>
+    <!-- front pocket -->
+    <path d="M212 350q94-14 190 0l8 122q-106 14-212 0z" fill="url(#quillmark-laptop-backpack-pocket)"/>
+    <path d="M218 364q88-12 178 0" fill="none" stroke="#1f2227" stroke-width="6" stroke-linecap="round"/>
+    <path d="M218 364q88-12 178 0" fill="none" stroke="#7a808a" stroke-width="2.2" stroke-dasharray="2 3"/>
+    <path d="M214 358l-6 106q100 12 200 0l-6-106" fill="none" stroke="#6b7079" stroke-opacity=".4" stroke-width="1.2" stroke-dasharray="4 4"/>
+    <path d="M218 356q88-12 176 0" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="2"/>
+    <rect x="352" y="358" width="11" height="16" rx="3" fill="#1a1c20"/>
+    <path d="M357 372q-2 14 4 20" fill="none" stroke="#9aa0a9" stroke-width="3" stroke-linecap="round"/>
+    <path d="M220 470q90 10 186 0" fill="none" stroke="#000" stroke-opacity=".2" stroke-width="4"/>
+  </g>
 </svg>

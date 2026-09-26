@@ -1,14 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Trailbeam Rechargeable Headlamp illustration">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#15803d"/>
-      <stop offset="1" stop-color="#15803d" stop-opacity=".72"/>
-    </linearGradient>
-  </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M320 180l110 170H210z" fill="#fff"/><path d="M320 260l40 90h-80z" fill-opacity=".25" fill="#000"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Trailbeam Rechargeable</tspan><tspan x="320" dy="40">Headlamp</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Summit Forge</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Trailbeam Rechargeable Headlamp">
+<defs>
+<radialGradient id="summit-forge-headlamp-bg" gradientUnits="userSpaceOnUse" cx="320" cy="240" r="520"><stop offset="0" stop-color="#F0FAF4"/><stop offset="1" stop-color="#D6EEDF"/></radialGradient>
+<filter id="summit-forge-headlamp-shadow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+<linearGradient id="summit-forge-headlamp-back" gradientUnits="userSpaceOnUse" x1="0" y1="180" x2="0" y2="215"><stop offset="0" stop-color="#1D2025"/><stop offset="1" stop-color="#3A3F47"/></linearGradient>
+<linearGradient id="summit-forge-headlamp-band" gradientUnits="userSpaceOnUse" x1="0" y1="350" x2="0" y2="400"><stop offset="0" stop-color="#565C66"/><stop offset="0.5" stop-color="#383D45"/><stop offset="1" stop-color="#24272C"/></linearGradient>
+<linearGradient id="summit-forge-headlamp-house" gradientUnits="userSpaceOnUse" x1="250" y1="318" x2="392" y2="428"><stop offset="0" stop-color="#4A5059"/><stop offset="0.5" stop-color="#2C3036"/><stop offset="1" stop-color="#1A1C20"/></linearGradient>
+<linearGradient id="summit-forge-headlamp-cap" gradientUnits="userSpaceOnUse" x1="0" y1="316" x2="0" y2="352"><stop offset="0" stop-color="#FFA24D"/><stop offset="1" stop-color="#E4671A"/></linearGradient>
+<linearGradient id="summit-forge-headlamp-bezel" gradientUnits="userSpaceOnUse" x1="270" y1="342" x2="330" y2="410"><stop offset="0" stop-color="#F2F4F6"/><stop offset="0.5" stop-color="#A9B0B8"/><stop offset="1" stop-color="#6E767F"/></linearGradient>
+<radialGradient id="summit-forge-headlamp-lens" gradientUnits="userSpaceOnUse" cx="294" cy="368" r="30"><stop offset="0" stop-color="#FFFFFF"/><stop offset="0.35" stop-color="#FFF8DA"/><stop offset="0.8" stop-color="#E7E2C8"/><stop offset="1" stop-color="#B9B6A6"/></radialGradient>
+<radialGradient id="summit-forge-headlamp-glow" gradientUnits="userSpaceOnUse" cx="300" cy="376" r="120"><stop offset="0" stop-color="#FFFBE6" stop-opacity="0.85"/><stop offset="0.3" stop-color="#FFF6C8" stop-opacity="0.4"/><stop offset="1" stop-color="#FFF6C8" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="640" height="640" fill="url(#summit-forge-headlamp-bg)"/>
+<circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+<ellipse cx="320" cy="430" rx="190" ry="18" fill="#1e1b4b" fill-opacity=".16" filter="url(#summit-forge-headlamp-shadow)"/>
+<path d="M120 270A200 90 0 0 1 520 270L520 305A200 90 0 0 0 120 305Z" fill="url(#summit-forge-headlamp-back)"/>
+<path d="M150 214A200 90 0 0 1 490 214" fill="none" stroke="#FF8A2A" stroke-width="2.5" stroke-opacity=".75" transform="translate(0 4)"/>
+<rect x="150" y="214" width="30" height="36" rx="6" fill="#15171A" transform="rotate(-30 165 232)"/>
+<rect x="156" y="222" width="18" height="6" rx="2" fill="#5B616B" transform="rotate(-30 165 232)"/>
+<path d="M120 270A200 90 0 0 0 520 270L520 305A200 90 0 0 1 120 305Z" fill="url(#summit-forge-headlamp-band)"/>
+<path d="M122 288A200 90 0 0 0 518 288" fill="none" stroke="#FF8A2A" stroke-width="3" stroke-opacity=".9"/>
+<path d="M140 322A200 90 0 0 0 250 355" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="3" stroke-linecap="round"/>
+<rect x="248" y="318" width="144" height="110" rx="30" fill="url(#summit-forge-headlamp-house)"/>
+<path d="M248 352V348Q248 318 278 318H362Q392 318 392 348V352Z" fill="url(#summit-forge-headlamp-cap)"/>
+<rect x="302" y="309" width="36" height="12" rx="6" fill="#C9540F"/>
+<path d="M262 330Q268 324 280 324H330" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/>
+<circle cx="300" cy="378" r="36" fill="url(#summit-forge-headlamp-bezel)"/>
+<circle cx="300" cy="378" r="28" fill="url(#summit-forge-headlamp-lens)"/>
+<g stroke="#C9C3A6" stroke-opacity=".6" stroke-width="1"><path d="M300 352v12M300 392v12M274 378h12M314 378h12M282 360l8 8M318 360l-8 8M282 396l8-8M318 396l-8-8"/></g>
+<circle cx="300" cy="378" r="7" fill="#fff"/>
+<circle cx="362" cy="366" r="9" fill="#5B1010"/><circle cx="362" cy="366" r="5" fill="#E03A3A"/>
+<circle cx="360" cy="364" r="2" fill="#fff" fill-opacity=".8"/>
+<rect x="352" y="392" width="20" height="8" rx="4" fill="#4A5059"/>
+<path d="M272 418Q320 428 368 418" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2"/>
+<circle cx="300" cy="378" r="120" fill="url(#summit-forge-headlamp-glow)"/>
 </svg>

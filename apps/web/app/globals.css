@@ -1,37 +1,397 @@
 @import "tailwindcss";
 
-/* Larkspur: an original brand. Colors meet WCAG 2.2 AA contrast on their backgrounds. */
-@theme {
-  --color-brand-50: #eef0ff;
-  --color-brand-100: #e0e3ff;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
-  --color-brand-800: #3730a3;
-  --color-brand-900: #2e2a7a;
-  --color-accent-400: #fbbf24;
-  --color-ink: #1c1917;
-  --color-muted: #57534e;
-  --color-line: #e7e5e4;
-  --color-surface: #fafaf9;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
-    sans-serif;
+/*
+ * Larkspur design tokens.
+ *
+ * Direction: "twilight larkspur" — deep violet-tinted ink, a luminous blue-violet brand
+ * (the flower), and one warm marigold accent. Soft layered depth, crisp display type.
+ *
+ * Rules:
+ * - Every text/background pair documented in docs/design/DESIGN.md was checked numerically
+ *   against WCAG 2.2 AA (4.5:1 text, 3:1 large text and UI parts). Stay on the documented pairs.
+ * - Components use semantic tokens (ink, muted, canvas, raised, line, focus…) first and raw
+ *   scale steps second. Never hard-code hex in components.
+ * - Semantic tokens reference scale steps with var(), so a future dark theme only needs to
+ *   redefine the semantic layer under a selector. There is intentionally no dark theme yet.
+ *
+ * `static` keeps every token emitted as a CSS variable even if no utility uses it yet, so
+ * inline styles and arbitrary values like `bg-(--color-brand-600)` always resolve.
+ */
+@theme static {
+  /* ---------- Brand: larkspur blue-violet (OKLCH hue ≈ 287) ---------- */
+  --color-brand-50: #f5f5ff;
+  --color-brand-100: #eaeaff;
+  --color-brand-200: #d7d5ff;
+  --color-brand-300: #bcb7ff;
+  --color-brand-400: #9c91f9;
+  --color-brand-500: #7d64ef;
+  --color-brand-600: #6740de; /* primary action; white text 6.24:1 */
+  --color-brand-700: #5530be; /* hover / brand text; 8.23:1 on white */
+  --color-brand-800: #432995;
+  --color-brand-900: #2f2068;
+  --color-brand-950: #1b123e; /* inverse surfaces (hero, footer) */
+
+  /* ---------- Accent: warm marigold (use sparingly: badges, highlights, stars) ---------- */
+  --color-accent-50: #fff8ea;
+  --color-accent-100: #ffefcf;
+  --color-accent-200: #ffdea1;
+  --color-accent-300: #ffc867;
+  --color-accent-400: #ffb439; /* surface only, with ink text (9.92:1) */
+  --color-accent-500: #f09d00;
+  --color-accent-600: #cb7f00; /* star fill; 3.19:1 on white (graphic) */
+  --color-accent-700: #975d00; /* accent text on white 5.41:1 */
+  --color-accent-800: #744700;
+  --color-accent-900: #563500;
+
+  /* ---------- Neutral: cool, faintly violet-tinted greys (overrides Tailwind `neutral`) ---------- */
+  --color-neutral-50: #f9f9fb;
+  --color-neutral-100: #f2f3f6;
+  --color-neutral-200: #e5e6ec;
+  --color-neutral-300: #d3d3db;
+  --color-neutral-400: #92939e; /* 3.05:1 on white: control borders only, never text */
+  --color-neutral-500: #6e6f7b; /* smallest-allowed text grey: 4.97 white / 4.73 canvas */
+  --color-neutral-600: #595a66;
+  --color-neutral-700: #40414e;
+  --color-neutral-800: #292a36;
+  --color-neutral-900: #181823;
+  --color-neutral-950: #0d0d16;
+
+  /* ---------- Semantic status colors (50 bg · 200 border · 600 icon · 700/800 text) ---------- */
+  --color-success-50: #ecfcf0;
+  --color-success-100: #d4f7de;
+  --color-success-200: #abedc1;
+  --color-success-500: #29ac68;
+  --color-success-600: #008b4e;
+  --color-success-700: #006e3b;
+  --color-success-800: #03532d;
+  --color-success-900: #083a20;
+
+  --color-warning-50: #fff6e8;
+  --color-warning-100: #ffe9c7;
+  --color-warning-200: #ffcf8f;
+  --color-warning-500: #f29520;
+  --color-warning-600: #c97500;
+  --color-warning-700: #995600;
+  --color-warning-800: #744200;
+  --color-warning-900: #563000;
+
+  --color-danger-50: #fff3f2;
+  --color-danger-100: #ffe3df;
+  --color-danger-200: #ffc6c0;
+  --color-danger-500: #e94646;
+  --color-danger-600: #ce2930;
+  --color-danger-700: #b01e25;
+  --color-danger-800: #8a161b;
+  --color-danger-900: #691214;
+
+  --color-info-50: #f0f8ff;
+  --color-info-100: #ddf0ff;
+  --color-info-200: #bae0ff;
+  --color-info-500: #168dd9;
+  --color-info-600: #0074bf;
+  --color-info-700: #005f9e;
+  --color-info-800: #004879;
+  --color-info-900: #013658;
+
+  /* ---------- Semantic layer (what components should reach for) ---------- */
+  --color-ink: var(--color-neutral-900); /* primary text */
+  --color-ink-soft: var(--color-neutral-700); /* body copy in long-form, secondary headings */
+  --color-muted: var(--color-neutral-600); /* secondary text, captions */
+  --color-subtle: var(--color-neutral-500); /* placeholders, meta; min allowed grey for text */
+  --color-line: var(--color-neutral-200); /* hairline dividers, card borders (decorative) */
+  --color-line-strong: var(--color-neutral-300); /* hover borders, table heads */
+  --color-control: var(--color-neutral-400); /* input/checkbox borders (3:1) */
+  --color-canvas: var(--color-neutral-50); /* page background */
+  --color-surface: var(--color-neutral-50); /* legacy alias of canvas */
+  --color-raised: #ffffff; /* cards, popovers, inputs */
+  --color-sunken: var(--color-neutral-100); /* wells, image mats, table stripes */
+  --color-overlay: rgb(13 13 22 / 0.5); /* modal / drawer scrim */
+  --color-inverse: var(--color-brand-950); /* dark brand surfaces */
+  --color-focus: var(--color-brand-600); /* focus ring; `focus-inverse` swaps it on dark */
+  --color-star: var(--color-accent-600);
+  --color-star-empty: var(--color-neutral-300);
+
+  /* ---------- Radius ---------- */
+  --radius-xs: 0.25rem; /* 4px  tags inside dense UI */
+  --radius-sm: 0.375rem; /* 6px  small chips, kbd */
+  --radius-md: 0.5rem; /* 8px  inputs in dense tables */
+  --radius-lg: 0.75rem; /* 12px inputs, menus items, notices */
+  --radius-xl: 1rem; /* 16px image mats, popovers */
+  --radius-2xl: 1.25rem; /* 20px cards */
+  --radius-3xl: 1.75rem; /* 28px feature panels, hero */
+  --radius-4xl: 2.25rem; /* 36px large marketing panels */
+
+  /* ---------- Elevation: layered, ink-tinted, soft ---------- */
+  --shadow-2xs: 0 1px 0 rgb(22 18 50 / 0.04);
+  --shadow-xs: 0 1px 2px rgb(22 18 50 / 0.06);
+  --shadow-sm: 0 1px 2px rgb(22 18 50 / 0.05), 0 2px 6px -1px rgb(22 18 50 / 0.07);
+  --shadow-md: 0 1px 2px rgb(22 18 50 / 0.04), 0 4px 12px -2px rgb(22 18 50 / 0.08),
+    0 10px 24px -8px rgb(22 18 50 / 0.1);
+  --shadow-lg: 0 2px 4px rgb(22 18 50 / 0.04), 0 10px 24px -6px rgb(22 18 50 / 0.1),
+    0 24px 48px -16px rgb(22 18 50 / 0.16);
+  --shadow-xl: 0 4px 8px rgb(22 18 50 / 0.05), 0 18px 40px -10px rgb(22 18 50 / 0.16),
+    0 40px 80px -24px rgb(22 18 50 / 0.24);
+  --shadow-2xl: 0 50px 100px -30px rgb(22 18 50 / 0.35);
+  /* Colored glow for the primary CTA only. */
+  --shadow-glow: 0 1px 2px rgb(67 41 149 / 0.25), 0 6px 18px -6px rgb(103 64 222 / 0.55);
+  --shadow-glow-lg: 0 2px 4px rgb(67 41 149 / 0.25), 0 14px 32px -10px rgb(103 64 222 / 0.6);
+  /* Composable inner shadows (`inset-shadow-*`): top highlight on filled buttons, inset on inputs. */
+  --inset-shadow-highlight: inset 0 1px 0 rgb(255 255 255 / 0.18);
+  --inset-shadow-well: inset 0 1px 2px rgb(22 18 50 / 0.06);
+
+  /* ---------- Type scale (size / line-height / tracking) ---------- */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-xs--letter-spacing: 0.01em;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  --text-xl--letter-spacing: -0.01em;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-2xl--letter-spacing: -0.015em;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-3xl--letter-spacing: -0.02em;
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: 2.625rem;
+  --text-4xl--letter-spacing: -0.025em;
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1.08;
+  --text-5xl--letter-spacing: -0.03em;
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 1.02;
+  --text-6xl--letter-spacing: -0.035em;
+  /* Fluid hero headline: 40px on phones → 72px on wide screens. */
+  --text-display: clamp(2.5rem, 1.55rem + 3.8vw, 4.5rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.04em;
+
+  --tracking-eyebrow: 0.14em;
+
+  /* ---------- Motion ---------- */
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1); /* default for UI: fast out, gentle settle */
+  --ease-snappy: cubic-bezier(0.2, 0, 0, 1); /* hover/press feedback */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* tiny overshoot: badges, toasts */
+
+  --animate-fade-in: fade-in 260ms var(--ease-smooth) both;
+  --animate-fade-up: fade-up 520ms var(--ease-smooth) both;
+  --animate-scale-in: scale-in 220ms var(--ease-smooth) both;
+  --animate-slide-down: slide-down 200ms var(--ease-smooth) both;
+  --animate-pop: pop 360ms var(--ease-spring);
+  --animate-shimmer: shimmer 1.6s linear infinite;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes slide-down {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes pop {
+    0% {
+      transform: scale(1);
+    }
+    40% {
+      transform: scale(1.22);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes shimmer {
+    from {
+      background-position: 150% 0;
+    }
+    to {
+      background-position: -50% 0;
+    }
+  }
 }
 
-html {
-  color: var(--color-ink);
-  background: var(--color-surface);
+/* Fonts come from next/font in app/layout.tsx (CSS variables on <html>). `inline` makes the
+   utilities use the resolved stacks directly. */
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-inter), ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", sans-serif;
 }
 
-/* Visible keyboard focus everywhere (WCAG 2.4.7 / 2.4.11). */
-:focus-visible {
-  outline: 3px solid var(--color-brand-600);
-  outline-offset: 2px;
-  border-radius: 4px;
+/* Durations are plain variables (Tailwind has no duration namespace): use as
+   `duration-(--duration-base)` or just `duration-200`. */
+:root {
+  --duration-instant: 100ms;
+  --duration-fast: 150ms;
+  --duration-base: 220ms;
+  --duration-slow: 360ms;
+  --duration-slower: 560ms;
 }
 
+@layer base {
+  html {
+    color: var(--color-ink);
+    background: var(--color-canvas);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-optical-sizing: auto;
+    /* Inter: open digits, disambiguated l/I; harmless for other faces. */
+    font-feature-settings: "cv05", "cv08", "cv11";
+    scrollbar-color: var(--color-neutral-300) transparent;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  ::selection {
+    background: var(--color-brand-200);
+    color: var(--color-brand-950);
+  }
+
+  /* Headings default to the display face; zero specificity, so `font-sans` still wins. */
+  :where(h1, h2, h3) {
+    font-family: var(--font-display);
+    font-feature-settings: normal;
+  }
+  :where(h1, h2, h3, h4, h5, h6) {
+    text-wrap: balance;
+  }
+  :where(p, li, dd, figcaption, blockquote) {
+    text-wrap: pretty;
+  }
+
+  /* Tailwind v4 preflight gives buttons the default cursor; restore the pointer for clarity. */
+  :where(button:not(:disabled), [role="button"]:not([aria-disabled="true"]), summary, label[for], select) {
+    cursor: pointer;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Visible keyboard focus everywhere (WCAG 2.4.7 / 2.4.11 / 2.4.13). Outlines follow radius. */
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  /* Text inputs show focus with their own ring (see inputClasses), keep a fallback outline off. */
+  :where(input:not([type="checkbox"], [type="radio"], [type="range"]), textarea, select):focus-visible {
+    outline-offset: 0;
+  }
+
+  :where(code, kbd, samp, pre) {
+    font-feature-settings: normal;
+  }
+}
+
+/* ---------- Utilities ---------- */
+
+/* Use on any dark surface (bg-inverse, bg-brand-800+, bg-neutral-900+) so focus rings stay visible. */
+@utility focus-inverse {
+  --color-focus: #ffffff;
+}
+
+/* Chevron for native <select>s (see components/ui/field.tsx). A named utility because an
+   arbitrary bg-[url(...)] class with an inline SVG isn't picked up by class detection. */
+@utility select-chevron {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23595a66' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9.5 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.875rem center;
+  background-size: 1rem;
+}
+
+/* Hide scrollbars on horizontal rails (content must stay reachable by keyboard/swipe). */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Stagger entrance animations: `animate-fade-up animation-delay-80`. */
+@utility animation-delay-* {
+  animation-delay: calc(--value(integer) * 1ms);
+}
+
+/* Shimmer fill for skeletons (pair with `animate-shimmer`). */
+@utility bg-shimmer {
+  background-color: var(--color-neutral-100);
+  background-image: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgb(255 255 255 / 0.75) 50%,
+    transparent 80%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+}
+
+/* Signature backgrounds. Dark: deep larkspur night with violet + marigold glows (white text
+   on the darkest stop is 17:1; keep text on the left/center where the base shows). */
+@utility bg-mesh-dark {
+  background-color: var(--color-brand-950);
+  background-image:
+    radial-gradient(60% 80% at 100% 0%, rgb(125 100 239 / 0.55) 0%, transparent 60%),
+    radial-gradient(50% 60% at 85% 100%, rgb(255 180 57 / 0.22) 0%, transparent 60%),
+    radial-gradient(70% 90% at 0% 100%, rgb(67 41 149 / 0.7) 0%, transparent 65%);
+}
+/* Light: barely-there lavender/cream wash for soft hero and empty-state panels. */
+@utility bg-mesh-light {
+  background-color: var(--color-brand-50);
+  background-image:
+    radial-gradient(60% 80% at 100% 0%, rgb(215 213 255 / 0.9) 0%, transparent 60%),
+    radial-gradient(50% 70% at 0% 100%, rgb(255 239 207 / 0.9) 0%, transparent 60%);
+}
+
+/* Respect reduced motion: kill animation/transition time, no smooth scroll, no shimmer sweep. */
 @media (prefers-reduced-motion: reduce) {
-  * {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

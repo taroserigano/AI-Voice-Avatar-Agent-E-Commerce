@@ -1,14 +1,82 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Clearview 1080p Webcam illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Clearview 1080p Webcam">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2563eb"/>
-      <stop offset="1" stop-color="#2563eb" stop-opacity=".72"/>
+    <radialGradient id="lumen-hd-webcam-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F1F3FF"/>
+      <stop offset="1" stop-color="#DCE1FB"/>
+    </radialGradient>
+    <filter id="lumen-hd-webcam-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="lumen-hd-webcam-body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a4e58"/>
+      <stop offset=".35" stop-color="#2a2d34"/>
+      <stop offset="1" stop-color="#101216"/>
+    </linearGradient>
+    <linearGradient id="lumen-hd-webcam-bodyH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity=".08"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".25"/>
+    </linearGradient>
+    <linearGradient id="lumen-hd-webcam-ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f3f5fa"/>
+      <stop offset=".5" stop-color="#9aa1b1"/>
+      <stop offset="1" stop-color="#5b6272"/>
+    </linearGradient>
+    <radialGradient id="lumen-hd-webcam-glass" cx=".4" cy=".35" r=".75">
+      <stop offset="0" stop-color="#3a4aa8"/>
+      <stop offset=".5" stop-color="#16205a"/>
+      <stop offset="1" stop-color="#05071a"/>
+    </radialGradient>
+    <radialGradient id="lumen-hd-webcam-iris" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#02030a"/>
+      <stop offset=".7" stop-color="#0c1130"/>
+      <stop offset="1" stop-color="#2a3b8f"/>
+    </radialGradient>
+    <linearGradient id="lumen-hd-webcam-clip" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3e424c"/>
+      <stop offset=".5" stop-color="#262930"/>
+      <stop offset="1" stop-color="#15171b"/>
     </linearGradient>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M250 270a70 70 0 0 1 140 0" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round"/><rect x="228" y="262" width="36" height="64" rx="14" fill="#fff"/><rect x="376" y="262" width="36" height="64" rx="14" fill="#fff"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Clearview 1080p Webcam</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Lumen Labs</text>
+  <rect width="640" height="640" fill="url(#lumen-hd-webcam-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="336" cy="474" rx="110" ry="16" fill="#1e1b4b" opacity=".16" filter="url(#lumen-hd-webcam-blur)"/>
+
+  <!-- monitor clip: back leg, front plate -->
+  <path d="M328 292L354 292L428 446C431 452 427 457 420 457L404 457Z" fill="#15171b"/>
+  <rect x="398" y="450" width="30" height="9" rx="4.5" fill="#3a3d45"/>
+  <path d="M290 292L350 292L364 458C364 466 358 470 350 470L290 470C282 470 276 466 276 458Z" fill="url(#lumen-hd-webcam-clip)"/>
+  <path d="M292 300L284 456" stroke="#fff" stroke-opacity=".18" stroke-width="3" stroke-linecap="round"/>
+  <rect x="278" y="460" width="84" height="12" rx="6" fill="#4a4e57"/>
+  <rect x="284" y="282" width="72" height="22" rx="11" fill="#1d1f24"/>
+  <rect x="290" y="286" width="60" height="4" rx="2" fill="#fff" fill-opacity=".15"/>
+
+  <!-- camera body -->
+  <rect x="130" y="176" width="380" height="116" rx="58" fill="url(#lumen-hd-webcam-body)"/>
+  <rect x="130" y="176" width="380" height="116" rx="58" fill="url(#lumen-hd-webcam-bodyH)"/>
+  <path d="M172 184H468" stroke="#fff" stroke-opacity=".3" stroke-width="3" stroke-linecap="round"/>
+  <path d="M150 206C142 218 138 230 140 244" fill="none" stroke="#fff" stroke-opacity=".2" stroke-width="3" stroke-linecap="round"/>
+  <rect x="146" y="206" width="348" height="56" rx="28" fill="#0c0d11" fill-opacity=".55"/>
+
+  <!-- lens -->
+  <circle cx="320" cy="234" r="50" fill="#07080b"/>
+  <circle cx="320" cy="234" r="44" fill="none" stroke="url(#lumen-hd-webcam-ring)" stroke-width="4"/>
+  <circle cx="320" cy="234" r="36" fill="url(#lumen-hd-webcam-glass)"/>
+  <circle cx="320" cy="234" r="20" fill="url(#lumen-hd-webcam-iris)"/>
+  <circle cx="320" cy="234" r="8" fill="#010207"/>
+  <path d="M296 220C302 208 314 202 326 202" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="310" cy="224" r="4" fill="#fff" fill-opacity=".85"/>
+  <circle cx="336" cy="250" r="6" fill="#a78bfa" fill-opacity=".35"/>
+  <circle cx="340" cy="222" r="2.5" fill="#67e8f9" fill-opacity=".6"/>
+
+  <!-- activity light and mics -->
+  <circle cx="386" cy="234" r="7" fill="#86efac" fill-opacity=".25"/>
+  <circle cx="386" cy="234" r="3" fill="#bbf7d0"/>
+  <g fill="#55596a">
+    <circle cx="178" cy="228" r="2"/><circle cx="186" cy="228" r="2"/><circle cx="194" cy="228" r="2"/>
+    <circle cx="178" cy="238" r="2"/><circle cx="186" cy="238" r="2"/><circle cx="194" cy="238" r="2"/>
+    <circle cx="446" cy="228" r="2"/><circle cx="454" cy="228" r="2"/><circle cx="462" cy="228" r="2"/>
+    <circle cx="446" cy="238" r="2"/><circle cx="454" cy="238" r="2"/><circle cx="462" cy="238" r="2"/>
+  </g>
+  <circle cx="254" cy="234" r="5" fill="none" stroke="#6b7082" stroke-width="1.5"/>
 </svg>

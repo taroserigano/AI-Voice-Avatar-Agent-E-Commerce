@@ -1,14 +1,73 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Daily Face Moisturizer SPF 30 illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Daily Face Moisturizer SPF 30">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0f766e"/>
-      <stop offset="1" stop-color="#0f766e" stop-opacity=".72"/>
+    <radialGradient id="verdant-botanicals-face-moisturizer-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#EFFBF8"/>
+      <stop offset="1" stop-color="#D3EFE8"/>
+    </radialGradient>
+    <filter id="verdant-botanicals-face-moisturizer-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="verdant-botanicals-face-moisturizer-glass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f4fbf9"/>
+      <stop offset=".25" stop-color="#ffffff"/>
+      <stop offset=".6" stop-color="#e2f0ec"/>
+      <stop offset="1" stop-color="#aecdc4"/>
+    </linearGradient>
+    <linearGradient id="verdant-botanicals-face-moisturizer-base" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#bcdad2" stop-opacity="0"/>
+      <stop offset="1" stop-color="#8fbcb0" stop-opacity=".7"/>
+    </linearGradient>
+    <linearGradient id="verdant-botanicals-face-moisturizer-lid" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b3d4c6"/>
+      <stop offset=".3" stop-color="#9cc5b5"/>
+      <stop offset="1" stop-color="#5f8e7d"/>
+    </linearGradient>
+    <linearGradient id="verdant-botanicals-face-moisturizer-lidtop" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d3e9e0"/>
+      <stop offset="1" stop-color="#94bcac"/>
+    </linearGradient>
+    <linearGradient id="verdant-botanicals-face-moisturizer-leaf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9fd0ab"/>
+      <stop offset="1" stop-color="#4a8660"/>
+    </linearGradient>
+    <linearGradient id="verdant-botanicals-face-moisturizer-label" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e9eee8"/>
     </linearGradient>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <rect x="290" y="210" width="60" height="30" rx="6" fill="#fff"/><rect x="270" y="240" width="100" height="120" rx="22" fill="#fff"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Daily Face Moisturizer</tspan><tspan x="320" dy="40">SPF 30</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Verdant Botanicals</text>
+  <rect width="640" height="640" fill="url(#verdant-botanicals-face-moisturizer-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="290" cy="482" rx="165" ry="20" fill="#1e1b4b" fill-opacity=".16" filter="url(#verdant-botanicals-face-moisturizer-shadow)"/>
+  <g transform="translate(-40 -12)">
+    <path d="M462 452C494 380 500 280 548 166" stroke="#5b8a64" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <g fill="url(#verdant-botanicals-face-moisturizer-leaf)">
+      <ellipse cx="506" cy="392" rx="24" ry="13" transform="rotate(-30 506 392)"/>
+      <ellipse cx="470" cy="352" rx="22" ry="12" transform="rotate(-150 470 352)"/>
+      <ellipse cx="518" cy="306" rx="23" ry="12.5" transform="rotate(-35 518 306)"/>
+      <ellipse cx="484" cy="264" rx="21" ry="11" transform="rotate(-140 484 264)"/>
+      <ellipse cx="540" cy="228" rx="20" ry="11" transform="rotate(-40 540 228)"/>
+      <ellipse cx="514" cy="190" rx="18" ry="10" transform="rotate(-130 514 190)"/>
+      <ellipse cx="552" cy="160" rx="15" ry="8.5" transform="rotate(-65 552 160)"/>
+    </g>
+    <path d="M488 400L526 382M488 358L452 346M500 312L538 298M498 270L468 258M522 234L558 220M530 194L498 186" stroke="#3f7552" stroke-width="1.5" stroke-opacity=".6" stroke-linecap="round"/>
+    <path d="M182 280L182 446C182 470 244 484 320 484C396 484 458 470 458 446L458 280Z" fill="url(#verdant-botanicals-face-moisturizer-glass)"/>
+    <path d="M182 430C182 454 244 468 320 468C396 468 458 454 458 430L458 446C458 470 396 484 320 484C244 484 182 470 182 446Z" fill="url(#verdant-botanicals-face-moisturizer-base)"/>
+    <path d="M190 312C190 326 250 336 320 336C390 336 450 326 450 312L450 420C450 436 390 446 320 446C250 446 190 436 190 420Z" fill="#fff" fill-opacity=".35"/>
+    <rect x="238" y="334" width="164" height="92" rx="14" fill="url(#verdant-botanicals-face-moisturizer-label)"/>
+    <path d="M320 358C300 366 298 388 316 400C334 388 336 366 320 358Z" fill="#7fb592"/>
+    <path d="M318 368V400" stroke="#4f8a62" stroke-width="1.5"/>
+    <path d="M318 400C308 396 300 390 296 382C306 382 314 388 318 400Z" fill="#a9d3b4"/>
+    <circle cx="376" cy="352" r="5.5" fill="#f2b84b"/>
+    <path d="M376 340v-4M376 364v4M364 352h-4M388 352h4M367.5 343.5l-3-3M384.5 343.5l3-3M367.5 360.5l-3 3M384.5 360.5l3 3" stroke="#f2b84b" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="262" y="410" width="116" height="3" rx="1.5" fill="#9cc5b5"/>
+    <path d="M204 298C202 350 202 400 206 450" stroke="#fff" stroke-width="12" stroke-opacity=".75" stroke-linecap="round" fill="none"/>
+    <path d="M224 300C222 340 222 380 224 420" stroke="#fff" stroke-width="3" stroke-opacity=".6" stroke-linecap="round" fill="none"/>
+    <path d="M438 300C440 350 440 400 436 446" stroke="#7fa99c" stroke-width="6" stroke-opacity=".35" stroke-linecap="round" fill="none"/>
+    <path d="M172 196L172 262C172 284 238 296 320 296C402 296 468 284 468 262L468 196Z" fill="url(#verdant-botanicals-face-moisturizer-lid)"/>
+    <path d="M196 210V276M214 214V282M232 216V286M250 218V289M268 220V291M286 221V293M304 222V294M322 222V294M340 222V294M358 221V293M376 220V291M394 218V289M412 216V286M430 214V282M448 210V276" stroke="#4f7d6c" stroke-width="2" stroke-opacity=".22"/>
+    <path d="M172 262C172 284 238 296 320 296C402 296 468 284 468 262" stroke="#4f7d6c" stroke-width="2" stroke-opacity=".4" fill="none"/>
+    <ellipse cx="320" cy="196" rx="148" ry="28" fill="url(#verdant-botanicals-face-moisturizer-lidtop)"/>
+    <path d="M196 188C230 174 290 170 330 170" stroke="#fff" stroke-width="5" stroke-opacity=".6" stroke-linecap="round" fill="none"/>
+    <path d="M190 214C190 240 192 258 196 272" stroke="#fff" stroke-width="8" stroke-opacity=".45" stroke-linecap="round" fill="none"/>
+  </g>
 </svg>

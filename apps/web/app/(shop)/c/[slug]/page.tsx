@@ -2,7 +2,15 @@ import { Listing, type ListingParams } from "@/components/shop/listing";
 import { WebVitalsReporter } from "@/components/web-vitals";
 import { serverApi, unwrap } from "@/lib/api-server";
 import { toProductQuery } from "@/lib/listing-query";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const api = await serverApi();
+  const categories = await unwrap(await api.GET("/v1/categories"));
+  return { title: categories.find((c) => c.slug === slug)?.name ?? "Department" };
+}
 
 export default async function CategoryPage({
   params,
@@ -23,7 +31,14 @@ export default async function CategoryPage({
   return (
     <>
       <WebVitalsReporter route="category" />
-      <Listing page={page} params={query} basePath={`/c/${slug}`} heading={category.name} showCategoryFacet={false} />
+      <Listing
+        page={page}
+        params={query}
+        basePath={`/c/${slug}`}
+        heading={category.name}
+        showCategoryFacet={false}
+        category={{ slug: category.slug, name: category.name }}
+      />
     </>
   );
 }

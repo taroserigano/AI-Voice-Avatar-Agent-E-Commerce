@@ -1,8 +1,8 @@
 import type { ListingParams } from "@/components/shop/listing";
 import { asList, dollarsToMinor } from "@/components/shop/listing";
+import type { SortOrder } from "@ai-commerce/contracts";
 
-type SortOrder = "relevance" | "price_asc" | "price_desc" | "newest";
-const SORTS: SortOrder[] = ["relevance", "price_asc", "price_desc", "newest"];
+const SORTS: SortOrder[] = ["relevance", "price_asc", "price_desc", "newest", "top_rated"];
 
 /** Turn page search params into the typed API query. Invalid values are dropped. */
 export function toProductQuery(params: ListingParams, fixedCategory?: string) {

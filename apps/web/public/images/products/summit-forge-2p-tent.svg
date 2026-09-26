@@ -1,14 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Basecamp 2-Person Backpacking Tent illustration">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#15803d"/>
-      <stop offset="1" stop-color="#15803d" stop-opacity=".72"/>
-    </linearGradient>
-  </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M320 180l110 170H210z" fill="#fff"/><path d="M320 260l40 90h-80z" fill-opacity=".25" fill="#000"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Basecamp 2-Person</tspan><tspan x="320" dy="40">Backpacking Tent</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Summit Forge</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Basecamp 2-Person Backpacking Tent">
+<defs>
+<radialGradient id="summit-forge-2p-tent-bg" gradientUnits="userSpaceOnUse" cx="320" cy="240" r="520"><stop offset="0" stop-color="#F0FAF4"/><stop offset="1" stop-color="#D6EEDF"/></radialGradient>
+<filter id="summit-forge-2p-tent-shadow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+<linearGradient id="summit-forge-2p-tent-front" gradientUnits="userSpaceOnUse" x1="150" y1="190" x2="350" y2="480"><stop offset="0" stop-color="#FACD78"/><stop offset="0.55" stop-color="#EEA946"/><stop offset="1" stop-color="#DB8E2C"/></linearGradient>
+<linearGradient id="summit-forge-2p-tent-side" gradientUnits="userSpaceOnUse" x1="330" y1="170" x2="540" y2="470"><stop offset="0" stop-color="#DC9431"/><stop offset="1" stop-color="#A6611A"/></linearGradient>
+<linearGradient id="summit-forge-2p-tent-door" gradientUnits="userSpaceOnUse" x1="0" y1="282" x2="0" y2="490"><stop offset="0" stop-color="#23170E"/><stop offset="1" stop-color="#4A3524"/></linearGradient>
+<linearGradient id="summit-forge-2p-tent-floor" gradientUnits="userSpaceOnUse" x1="0" y1="430" x2="0" y2="490"><stop offset="0" stop-color="#5F646B"/><stop offset="1" stop-color="#8A9098"/></linearGradient>
+<linearGradient id="summit-forge-2p-tent-shade" gradientUnits="userSpaceOnUse" x1="0" y1="380" x2="0" y2="492"><stop offset="0" stop-color="#7A4410" stop-opacity="0"/><stop offset="1" stop-color="#7A4410" stop-opacity="0.35"/></linearGradient>
+</defs>
+<rect width="640" height="640" fill="url(#summit-forge-2p-tent-bg)"/>
+<circle cx="326" cy="318" r="210" fill="#fff" fill-opacity=".45"/>
+<ellipse cx="330" cy="480" rx="225" ry="20" fill="#1e1b4b" fill-opacity=".16" filter="url(#summit-forge-2p-tent-shadow)"/>
+<g transform="translate(0 -18)">
+<path d="M118 470C150 330 228 196 318 160C337 250 350 370 352 492Q236 488 118 470Z" fill="url(#summit-forge-2p-tent-front)"/>
+<path d="M318 160C420 178 502 296 532 452Q446 480 352 492C350 370 337 250 318 160Z" fill="url(#summit-forge-2p-tent-side)"/>
+<path d="M118 470C150 330 228 196 318 160C337 250 350 370 352 492Q236 488 118 470Z" fill="url(#summit-forge-2p-tent-shade)"/>
+<path d="M318 160C404 226 440 340 448 478" fill="none" stroke="#8C5213" stroke-opacity=".35" stroke-width="2.5"/>
+<path d="M318 160C262 214 212 318 196 474" fill="none" stroke="#B87420" stroke-opacity=".3" stroke-width="2"/>
+<path d="M318 160C337 250 350 370 352 492" fill="none" stroke="#9E5E16" stroke-opacity=".45" stroke-width="2.5"/>
+<path d="M364 200Q400 204 426 232L414 250Q390 226 356 220Z" fill="#9C5A15"/>
+<path d="M356 220Q390 226 414 250L412 256Q386 234 356 228Z" fill="#6E3D0C" fill-opacity=".6"/>
+<path d="M168 474C182 390 236 300 312 282C330 340 338 420 340 490Q250 486 168 474Z" fill="url(#summit-forge-2p-tent-door)"/>
+<path d="M186 474Q262 482 338 488L332 440Q264 434 212 428Z" fill="url(#summit-forge-2p-tent-floor)"/>
+<path d="M214 428Q264 434 332 440" fill="none" stroke="#2A2D31" stroke-opacity=".5" stroke-width="2"/>
+<path d="M232 410C246 360 280 318 318 306" fill="none" stroke="#C9CCC4" stroke-opacity=".18" stroke-width="30" stroke-linecap="round"/>
+<path d="M170 468C184 392 236 306 302 286" fill="none" stroke="#C57F22" stroke-width="18" stroke-linecap="round"/>
+<path d="M166 460C180 388 230 306 298 283" fill="none" stroke="#F6C46C" stroke-width="5" stroke-linecap="round" stroke-opacity=".8"/>
+<path d="M188 392l-14 -8M232 322l-10 -12" stroke="#5A3408" stroke-width="3" stroke-linecap="round"/>
+<path d="M312 282C330 340 338 420 340 490" fill="none" stroke="#7A450C" stroke-width="2.5" stroke-dasharray="3 3"/>
+<path d="M118 470Q236 488 352 492Q446 480 532 452" fill="none" stroke="#4A4F55" stroke-width="9" stroke-linecap="round"/>
+<path d="M142 420C172 320 238 212 310 176" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="6" stroke-linecap="round"/>
+<path d="M340 176C410 200 470 280 500 380" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="5" stroke-linecap="round"/>
+<ellipse cx="318" cy="162" rx="14" ry="7" fill="#5A3408"/>
+<g stroke="#6B5A45" stroke-width="1.6" stroke-opacity=".85" fill="none">
+<path d="M204 280L84 452"/><path d="M462 262L594 456"/><path d="M506 356L604 470"/>
+</g>
+<g stroke="#8B95A0" stroke-width="3.5" stroke-linecap="round">
+<path d="M84 452l-6 12"/><path d="M594 456l6 12"/><path d="M604 470l6 11"/>
+</g>
+<g fill="#5A3408"><circle cx="204" cy="280" r="4"/><circle cx="462" cy="262" r="4"/><circle cx="506" cy="356" r="4"/></g>
+</g>
 </svg>

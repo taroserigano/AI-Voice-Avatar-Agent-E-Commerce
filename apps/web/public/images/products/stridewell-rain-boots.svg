@@ -1,14 +1,62 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Puddle Waterproof Rain Boots illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Puddle Waterproof Rain Boots">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#be185d"/>
-      <stop offset="1" stop-color="#be185d" stop-opacity=".72"/>
+    <radialGradient id="stridewell-rain-boots-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF4F8"/>
+      <stop offset="1" stop-color="#F6DCE7"/>
+    </radialGradient>
+    <filter id="stridewell-rain-boots-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="stridewell-rain-boots-body" x1="0" y1="0" x2="1" y2=".25">
+      <stop offset="0" stop-color="#4f73b3"/>
+      <stop offset=".3" stop-color="#27488a"/>
+      <stop offset=".75" stop-color="#1a3368"/>
+      <stop offset="1" stop-color="#101f42"/>
     </linearGradient>
+    <linearGradient id="stridewell-rain-boots-sole" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b3347"/>
+      <stop offset="1" stop-color="#11151f"/>
+    </linearGradient>
+    <linearGradient id="stridewell-rain-boots-rim" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5a7fc0"/>
+      <stop offset=".5" stop-color="#2d4f92"/>
+      <stop offset="1" stop-color="#172d5c"/>
+    </linearGradient>
+    <radialGradient id="stridewell-rain-boots-toe" cx="420" cy="470" r="80" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0a1430" stop-opacity="0"/>
+      <stop offset="1" stop-color="#0a1430" stop-opacity=".35"/>
+    </radialGradient>
+    <path id="stridewell-rain-boots-boot" d="M194 150L328 150C330 250 320 330 324 368C332 394 362 404 402 414C442 424 464 440 464 470L464 486C464 494 458 498 450 498L212 498C202 498 196 492 196 484L196 440C196 402 206 382 204 340C202 280 196 210 194 150Z"/>
+    <clipPath id="stridewell-rain-boots-clip">
+      <use href="#stridewell-rain-boots-boot"/>
+    </clipPath>
+    <g id="stridewell-rain-boots-art">
+      <path d="M206 154C206 116 240 116 240 154" fill="none" stroke="#1d3a74" stroke-width="10" stroke-linecap="round"/>
+      <path d="M208 150C209 124 237 124 238 150" fill="none" stroke="#6d8fcc" stroke-width="3" stroke-linecap="round" stroke-opacity=".7"/>
+      <use href="#stridewell-rain-boots-boot" fill="url(#stridewell-rain-boots-body)"/>
+      <g clip-path="url(#stridewell-rain-boots-clip)">
+        <rect x="180" y="150" width="160" height="20" fill="url(#stridewell-rain-boots-rim)"/>
+        <rect x="180" y="168" width="160" height="3" fill="#0d1a3a" fill-opacity=".35"/>
+        <path d="M320 380C360 404 420 410 470 440L470 500L300 500Z" fill="url(#stridewell-rain-boots-toe)"/>
+        <rect x="180" y="470" width="300" height="32" fill="url(#stridewell-rain-boots-sole)"/>
+        <rect x="180" y="470" width="300" height="2.5" fill="#5b6a8c" fill-opacity=".6"/>
+        <path d="M200 461H462" stroke="#7d9bd6" stroke-width="2" stroke-opacity=".45"/>
+        <path d="M214 498v-9h16v9M250 498v-9h16v9M286 498v-9h16v9M322 498v-9h16v9M358 498v-9h16v9M394 498v-9h16v9M430 498v-9h16v9" fill="#070a12" fill-opacity=".55"/>
+        <path d="M300 150C302 250 296 330 300 372" stroke="#0a1636" stroke-width="22" stroke-opacity=".22" fill="none"/>
+      </g>
+      <ellipse cx="261" cy="151" rx="66" ry="8" fill="#0b1532"/>
+      <path d="M196 151C220 145 302 145 326 151" stroke="#8fb0e8" stroke-width="2.5" stroke-opacity=".6" fill="none"/>
+      <path d="M216 182C213 260 214 340 219 424" stroke="#fff" stroke-width="11" stroke-opacity=".42" stroke-linecap="round" fill="none"/>
+      <path d="M236 186C234 250 234 320 237 380" stroke="#fff" stroke-width="4" stroke-opacity=".22" stroke-linecap="round" fill="none"/>
+      <path d="M346 408C386 418 426 426 448 446" stroke="#fff" stroke-width="7" stroke-opacity=".45" stroke-linecap="round" fill="none"/>
+      <path d="M316 190C318 250 314 320 316 360" stroke="#9db8ec" stroke-width="3" stroke-opacity=".35" stroke-linecap="round" fill="none"/>
+    </g>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M262 200l-52 30 22 44 30-14v110h116V260l30 14 22-44-52-30c-8 20-28 32-58 32s-50-12-58-32z" fill="#fff"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Puddle Waterproof Rain</tspan><tspan x="320" dy="40">Boots</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Stridewell</text>
+  <rect width="640" height="640" fill="url(#stridewell-rain-boots-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="300" cy="470" rx="150" ry="16" fill="#1e1b4b" fill-opacity=".16" filter="url(#stridewell-rain-boots-shadow)"/>
+  <use href="#stridewell-rain-boots-art" transform="translate(-66 -34)"/>
+  <use href="#stridewell-rain-boots-boot" transform="translate(-66 -34)" fill="#0a1430" fill-opacity=".3"/>
+  <ellipse cx="398" cy="506" rx="130" ry="10" fill="#1e1b4b" fill-opacity=".14" filter="url(#stridewell-rain-boots-shadow)"/>
+  <use href="#stridewell-rain-boots-art" transform="translate(46 8)"/>
 </svg>

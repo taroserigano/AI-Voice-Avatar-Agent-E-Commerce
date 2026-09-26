@@ -1,14 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Kink-Free Garden Hose, 50 ft illustration">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#15803d"/>
-      <stop offset="1" stop-color="#15803d" stop-opacity=".72"/>
-    </linearGradient>
-  </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M320 180l110 170H210z" fill="#fff"/><path d="M320 260l40 90h-80z" fill-opacity=".25" fill="#000"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Kink-Free Garden Hose,</tspan><tspan x="320" dy="40">50 ft</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Verdant Grounds</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Kink-Free Garden Hose, 50 ft">
+<defs>
+<radialGradient id="verdant-garden-hose-bg" gradientUnits="userSpaceOnUse" cx="320" cy="240" r="520"><stop offset="0" stop-color="#F0FAF4"/><stop offset="1" stop-color="#D6EEDF"/></radialGradient>
+<filter id="verdant-garden-hose-shadow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+<linearGradient id="verdant-garden-hose-brass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FBE39A"/><stop offset="0.35" stop-color="#E2B447"/><stop offset="0.7" stop-color="#A7771F"/><stop offset="1" stop-color="#D9AA45"/></linearGradient>
+<linearGradient id="verdant-garden-hose-barrel" gradientUnits="userSpaceOnUse" x1="0" y1="388" x2="0" y2="420"><stop offset="0" stop-color="#E4E8EC"/><stop offset="0.4" stop-color="#A9B1BA"/><stop offset="1" stop-color="#5F6771"/></linearGradient>
+<linearGradient id="verdant-garden-hose-grip" gradientUnits="userSpaceOnUse" x1="470" y1="0" x2="530" y2="0"><stop offset="0" stop-color="#3A3F46"/><stop offset="1" stop-color="#16181B"/></linearGradient>
+<linearGradient id="verdant-garden-hose-dial" gradientUnits="userSpaceOnUse" x1="0" y1="384" x2="0" y2="426"><stop offset="0" stop-color="#FFB05C"/><stop offset="1" stop-color="#D9670F"/></linearGradient>
+</defs>
+<rect width="640" height="640" fill="url(#verdant-garden-hose-bg)"/>
+<circle cx="320" cy="318" r="210" fill="#fff" fill-opacity=".45"/>
+<ellipse cx="300" cy="386" rx="165" ry="20" fill="#1e1b4b" fill-opacity=".16" filter="url(#verdant-garden-hose-shadow)"/>
+<ellipse cx="440" cy="476" rx="85" ry="12" fill="#1e1b4b" fill-opacity=".16" filter="url(#verdant-garden-hose-shadow)"/>
+<g fill="none"><ellipse cx="300" cy="307" rx="150" ry="62" stroke="#17532D" stroke-width="26"/><ellipse cx="300" cy="303" rx="150" ry="62" stroke="#2F8C51" stroke-width="14"/><ellipse cx="298" cy="299" rx="148" ry="61" stroke="#A6E3B8" stroke-opacity=".5" stroke-width="3.5"/><ellipse cx="300" cy="294" rx="150" ry="62" stroke="#17532D" stroke-width="26"/><ellipse cx="300" cy="290" rx="150" ry="62" stroke="#2F8C51" stroke-width="14"/><ellipse cx="298" cy="286" rx="148" ry="61" stroke="#A6E3B8" stroke-opacity=".5" stroke-width="3.5"/><ellipse cx="300" cy="281" rx="150" ry="62" stroke="#17532D" stroke-width="26"/><ellipse cx="300" cy="277" rx="150" ry="62" stroke="#2F8C51" stroke-width="14"/><ellipse cx="298" cy="273" rx="148" ry="61" stroke="#A6E3B8" stroke-opacity=".5" stroke-width="3.5"/><ellipse cx="300" cy="268" rx="150" ry="62" stroke="#17532D" stroke-width="26"/><ellipse cx="300" cy="264" rx="150" ry="62" stroke="#2F8C51" stroke-width="14"/><ellipse cx="298" cy="260" rx="148" ry="61" stroke="#A6E3B8" stroke-opacity=".5" stroke-width="3.5"/><ellipse cx="300" cy="255" rx="150" ry="62" stroke="#17532D" stroke-width="26"/><ellipse cx="300" cy="251" rx="150" ry="62" stroke="#2F8C51" stroke-width="14"/><ellipse cx="298" cy="247" rx="148" ry="61" stroke="#A6E3B8" stroke-opacity=".5" stroke-width="3.5"/></g>
+<path d="M430 352C462 386 482 428 500 460" fill="none" stroke="#17532D" stroke-width="26" stroke-linecap="round"/><path d="M430 352C462 386 482 428 500 460" fill="none" stroke="#2F8C51" stroke-width="14" stroke-linecap="round" transform="translate(-1 -4)"/><path d="M430 352C462 386 482 428 500 460" fill="none" stroke="#A6E3B8" stroke-opacity=".5" stroke-width="3.5" stroke-linecap="round" transform="translate(-2 -8)"/>
+<path d="M196 292C212 280 232 272 250 268" fill="none" stroke="#17532D" stroke-width="26" stroke-linecap="round"/><path d="M196 292C212 280 232 272 250 268" fill="none" stroke="#2F8C51" stroke-width="14" stroke-linecap="round" transform="translate(-1 -4)"/><path d="M196 292C212 280 232 272 250 268" fill="none" stroke="#A6E3B8" stroke-opacity=".5" stroke-width="3.5" stroke-linecap="round" transform="translate(-2 -8)"/>
+<g transform="translate(250 268) rotate(-12)">
+<rect x="-2" y="-15" width="22" height="30" rx="3" fill="url(#verdant-garden-hose-brass)"/>
+<rect x="20" y="-10" width="20" height="20" rx="2" fill="url(#verdant-garden-hose-brass)"/>
+<path d="M24 -10v20M28 -10v20M32 -10v20M36 -10v20" stroke="#7E5A14" stroke-opacity=".6" stroke-width="1.2"/>
+<path d="M5 -15v30M12 -15v30" stroke="#7E5A14" stroke-opacity=".4" stroke-width="1"/>
+</g>
+<g transform="translate(503 466) rotate(62)">
+<rect x="-6" y="-16" width="26" height="32" rx="3" fill="url(#verdant-garden-hose-brass)"/>
+<path d="M2 -16v32M10 -16v32" stroke="#7E5A14" stroke-opacity=".45" stroke-width="1.2"/>
+</g>
+<path d="M468 414L494 414L518 458Q520 468 510 470L494 472Q486 472 484 464Z" fill="url(#verdant-garden-hose-grip)"/>
+<path d="M494 420L512 454" stroke="#fff" stroke-opacity=".15" stroke-width="3" stroke-linecap="round"/>
+<path d="M444 420C438 440 444 458 462 470L470 464C458 452 454 438 458 420Z" fill="#F08A24"/>
+<path d="M446 424C442 440 446 452 456 462" fill="none" stroke="#FFD2A0" stroke-opacity=".7" stroke-width="2" stroke-linecap="round"/>
+<rect x="362" y="388" width="140" height="32" rx="14" fill="url(#verdant-garden-hose-barrel)"/>
+<path d="M376 395H488" stroke="#fff" stroke-opacity=".7" stroke-width="3" stroke-linecap="round"/>
+<rect x="344" y="384" width="26" height="42" rx="6" fill="url(#verdant-garden-hose-dial)"/>
+<path d="M350 384v42M356 384v42M362 384v42" stroke="#A84C08" stroke-opacity=".45" stroke-width="1.5"/>
+<ellipse cx="344" cy="405" rx="7" ry="20" fill="#7C848D"/>
+<ellipse cx="343" cy="405" rx="4" ry="13" fill="#4A5059"/>
 </svg>

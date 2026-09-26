@@ -1,14 +1,82 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Washed Linen Sheet Set illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Washed Linen Sheet Set">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#b45309"/>
-      <stop offset="1" stop-color="#b45309" stop-opacity=".72"/>
+    <radialGradient id="harbor-home-linen-sheets-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF8EF"/>
+      <stop offset="1" stop-color="#F6E6CF"/>
+    </radialGradient>
+    <filter id="harbor-home-linen-sheets-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="harbor-home-linen-sheets-front" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#efe4cf"/>
+      <stop offset=".2" stop-color="#e2d2b6"/>
+      <stop offset=".7" stop-color="#d4c09f"/>
+      <stop offset="1" stop-color="#bba381"/>
     </linearGradient>
+    <linearGradient id="harbor-home-linen-sheets-top" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e6d8be"/>
+      <stop offset="1" stop-color="#f3e9d7"/>
+    </linearGradient>
+    <linearGradient id="harbor-home-linen-sheets-side" x1="110" y1="0" x2="530" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".2"/>
+      <stop offset=".3" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".82" stop-color="#6b5436" stop-opacity="0"/>
+      <stop offset="1" stop-color="#6b5436" stop-opacity=".22"/>
+    </linearGradient>
+    <linearGradient id="harbor-home-linen-sheets-tie" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#faf5ec"/>
+      <stop offset=".6" stop-color="#ede3d1"/>
+      <stop offset="1" stop-color="#d6c7ad"/>
+    </linearGradient>
+    <path id="harbor-home-linen-sheets-l1" d="M132 432h376q14 0 16 30-2 30-16 30H132q-14 0-16-30 2-30 16-30z"/>
+    <path id="harbor-home-linen-sheets-l2" d="M140 374h362q14 0 16 30-2 30-16 30H140q-14 0-16-30 2-30 16-30z"/>
+    <path id="harbor-home-linen-sheets-l3" d="M128 316h384q14 0 16 30-2 30-16 30H128q-14 0-16-30 2-30 16-30z"/>
+    <path id="harbor-home-linen-sheets-l4" d="M146 258h348q14 0 16 30-2 30-16 30H146q-14 0-16-30 2-30 16-30z"/>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M250 230h140v70a50 50 0 0 1-50 50h-40a50 50 0 0 1-50-50z" fill="#fff"/><path d="M390 250h22a22 22 0 0 1 0 44h-22" fill="none" stroke="#fff" stroke-width="14"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Washed Linen Sheet Set</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Harbor Home</text>
+  <rect width="640" height="640" fill="url(#harbor-home-linen-sheets-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="320" cy="472" rx="190" ry="20" fill="#1e1b4b" fill-opacity=".16" filter="url(#harbor-home-linen-sheets-shadow)"/>
+  <g transform="translate(0 -28)">
+    <!-- layer 1 -->
+    <use href="#harbor-home-linen-sheets-l1" fill="url(#harbor-home-linen-sheets-front)"/>
+    <use href="#harbor-home-linen-sheets-l1" fill="url(#harbor-home-linen-sheets-side)"/>
+    <path d="M140 438h360" stroke="#fff" stroke-opacity=".55" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M170 462q40 8 80 0M372 476q50 6 100-4M480 446q14 12 30 12" fill="none" stroke="#9c8260" stroke-opacity=".32" stroke-width="2" stroke-linecap="round"/>
+    <!-- layer 2 (flat sheet with hem) -->
+    <path d="M128 434h384" stroke="#6b5436" stroke-opacity=".2" stroke-width="6" stroke-linecap="round"/>
+    <use href="#harbor-home-linen-sheets-l2" fill="url(#harbor-home-linen-sheets-front)"/>
+    <use href="#harbor-home-linen-sheets-l2" fill="url(#harbor-home-linen-sheets-side)"/>
+    <path d="M148 380h346" stroke="#fff" stroke-opacity=".55" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M126 412h390" stroke="#a88e6a" stroke-opacity=".45" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <path d="M200 398q40 8 70-2M400 422q40 6 80-4" fill="none" stroke="#9c8260" stroke-opacity=".3" stroke-width="2" stroke-linecap="round"/>
+    <!-- layer 3 -->
+    <path d="M122 376h392" stroke="#6b5436" stroke-opacity=".2" stroke-width="6" stroke-linecap="round"/>
+    <use href="#harbor-home-linen-sheets-l3" fill="url(#harbor-home-linen-sheets-front)"/>
+    <use href="#harbor-home-linen-sheets-l3" fill="url(#harbor-home-linen-sheets-side)"/>
+    <path d="M136 322h368" stroke="#fff" stroke-opacity=".55" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M150 344q30 10 64 4M420 360q40 8 80-2M330 352q20 6 40 2" fill="none" stroke="#9c8260" stroke-opacity=".3" stroke-width="2" stroke-linecap="round"/>
+    <!-- top face -->
+    <path d="M146 264h348q12 0 7-12l-22-50q-4-8-16-8H177q-12 0-16 8l-22 50q-5 12 7 12z" fill="url(#harbor-home-linen-sheets-top)"/>
+    <path d="M160 248h320" stroke="#a88e6a" stroke-opacity=".4" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <path d="M190 214q60 8 110 2M350 222q60-4 110 8M210 234q30 4 60-2" fill="none" stroke="#b49a76" stroke-opacity=".28" stroke-width="2" stroke-linecap="round"/>
+    <!-- layer 4 (pillowcases) -->
+    <path d="M140 318h360" stroke="#6b5436" stroke-opacity=".2" stroke-width="6" stroke-linecap="round"/>
+    <use href="#harbor-home-linen-sheets-l4" fill="url(#harbor-home-linen-sheets-front)"/>
+    <use href="#harbor-home-linen-sheets-l4" fill="url(#harbor-home-linen-sheets-side)"/>
+    <path d="M154 264h332" stroke="#fff" stroke-opacity=".6" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M170 290q30 10 60 4M410 300q40 8 70-2" fill="none" stroke="#9c8260" stroke-opacity=".3" stroke-width="2" stroke-linecap="round"/>
+    <!-- fabric tie -->
+    <path d="M354 194h30l6 70h-32z" fill="url(#harbor-home-linen-sheets-tie)"/>
+    <path d="M358 258h32v234h-32z" fill="url(#harbor-home-linen-sheets-tie)"/>
+    <path d="M358 318h32M358 376h32M358 434h32" stroke="#8a7050" stroke-opacity=".28" stroke-width="3"/>
+    <path d="M361 262v228M387 262v228" stroke="#b8a584" stroke-opacity=".6" stroke-width="1.2" stroke-dasharray="4 4"/>
+    <!-- bow -->
+    <path d="M370 284c-26 30-12 60 2 54l6-50z" fill="#e6d9c3"/>
+    <path d="M378 284c26 30 14 62-2 56l-6-52z" fill="#dccdb3"/>
+    <path d="M372 280c-40-30-68-10-56 10 10 16 36 10 56-6z" fill="#f6efe3"/>
+    <path d="M376 280c40-30 68-10 56 10-10 16-36 10-56-6z" fill="#ebdfcb"/>
+    <path d="M326 284q14-12 40-2M422 284q-14-12-40-2" fill="none" stroke="#b8a584" stroke-opacity=".7" stroke-width="1.5" stroke-linecap="round"/>
+    <rect x="362" y="272" width="24" height="22" rx="8" fill="#f8f2e8"/>
+    <path d="M366 276q8-3 16 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  </g>
 </svg>

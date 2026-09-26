@@ -1,14 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Folding Camp Chair illustration">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#15803d"/>
-      <stop offset="1" stop-color="#15803d" stop-opacity=".72"/>
-    </linearGradient>
-  </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M320 180l110 170H210z" fill="#fff"/><path d="M320 260l40 90h-80z" fill-opacity=".25" fill="#000"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Folding Camp Chair</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Summit Forge</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Folding Camp Chair">
+<defs>
+<radialGradient id="summit-forge-camp-chair-bg" gradientUnits="userSpaceOnUse" cx="320" cy="240" r="520"><stop offset="0" stop-color="#F0FAF4"/><stop offset="1" stop-color="#D6EEDF"/></radialGradient>
+<filter id="summit-forge-camp-chair-shadow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+<linearGradient id="summit-forge-camp-chair-back" gradientUnits="userSpaceOnUse" x1="0" y1="125" x2="0" y2="318"><stop offset="0" stop-color="#50739B"/><stop offset="0.6" stop-color="#34557D"/><stop offset="1" stop-color="#253F5E"/></linearGradient>
+<linearGradient id="summit-forge-camp-chair-seat" gradientUnits="userSpaceOnUse" x1="200" y1="300" x2="420" y2="370"><stop offset="0" stop-color="#5D82AB"/><stop offset="0.6" stop-color="#3B5E87"/><stop offset="1" stop-color="#2A4668"/></linearGradient>
+<linearGradient id="summit-forge-camp-chair-sleeve" gradientUnits="userSpaceOnUse" x1="0" y1="120" x2="0" y2="166"><stop offset="0" stop-color="#2A4566"/><stop offset="1" stop-color="#1B2F48"/></linearGradient>
+<linearGradient id="summit-forge-camp-chair-cup" gradientUnits="userSpaceOnUse" x1="408" y1="0" x2="452" y2="0"><stop offset="0" stop-color="#3C4148"/><stop offset="1" stop-color="#15171A"/></linearGradient>
+<pattern id="summit-forge-camp-chair-mesh" patternUnits="userSpaceOnUse" width="6" height="6"><path d="M0 0L6 6M6 0L0 6" stroke="#6B737D" stroke-opacity=".6" stroke-width=".8"/></pattern>
+</defs>
+<rect width="640" height="640" fill="url(#summit-forge-camp-chair-bg)"/>
+<circle cx="330" cy="310" r="210" fill="#fff" fill-opacity=".45"/>
+<ellipse cx="332" cy="496" rx="170" ry="20" fill="#1e1b4b" fill-opacity=".16" filter="url(#summit-forge-camp-chair-shadow)"/>
+<path d="M265 435L240 122" fill="none" stroke="#24282D" stroke-width="9" stroke-linecap="round"/><path d="M265 435L240 122" fill="none" stroke="#8A939D" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round" transform="translate(-2 -1)"/><path d="M485 455L478 137" fill="none" stroke="#24282D" stroke-width="9" stroke-linecap="round"/><path d="M485 455L478 137" fill="none" stroke="#8A939D" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round" transform="translate(-2 -1)"/>
+<path d="M241 132Q360 120 479 146L481 318Q368 312 254 300Z" fill="url(#summit-forge-camp-chair-back)"/>
+<path d="M260 180Q360 170 462 192M262 240Q362 234 466 252" fill="none" stroke="#1B2F48" stroke-opacity=".35" stroke-width="2" stroke-dasharray="4 3"/>
+<path d="M241 132Q360 120 479 146L480 168Q360 144 242 154Z" fill="url(#summit-forge-camp-chair-sleeve)"/>
+<path d="M244 158Q360 148 478 172" fill="none" stroke="#8FB0D6" stroke-opacity=".5" stroke-width="1.5" stroke-dasharray="4 3"/>
+<path d="M248 136Q330 126 400 132" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="3" stroke-linecap="round"/>
+<ellipse cx="240" cy="124" rx="6" ry="4" fill="#15171A"/><ellipse cx="478" cy="138" rx="6" ry="4" fill="#15171A"/>
+<path d="M265 435L185 335" fill="none" stroke="#24282D" stroke-width="7" stroke-linecap="round"/><path d="M265 435L185 335" fill="none" stroke="#8A939D" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round" transform="translate(-2 -1)"/><path d="M175 485L254 300" fill="none" stroke="#24282D" stroke-width="7" stroke-linecap="round"/><path d="M175 485L254 300" fill="none" stroke="#8A939D" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round" transform="translate(-2 -1)"/>
+<path d="M400 510L481 318" fill="none" stroke="#24282D" stroke-width="7" stroke-linecap="round"/><path d="M400 510L481 318" fill="none" stroke="#8A939D" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round" transform="translate(-2 -1)"/><path d="M485 455L395 360" fill="none" stroke="#24282D" stroke-width="7" stroke-linecap="round"/><path d="M485 455L395 360" fill="none" stroke="#8A939D" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round" transform="translate(-2 -1)"/>
+<path d="M185 335Q290 374 395 360L481 318Q370 318 254 300Z" fill="url(#summit-forge-camp-chair-seat)"/>
+<path d="M200 334Q290 362 386 352" fill="none" stroke="#8FB0D6" stroke-opacity=".45" stroke-width="1.5" stroke-dasharray="4 3"/>
+<path d="M185 335Q290 374 395 360" fill="none" stroke="#1B2F48" stroke-width="6" stroke-linecap="round"/>
+<path d="M254 300Q370 318 481 318" fill="none" stroke="#1B2F48" stroke-opacity=".45" stroke-width="3"/>
+<path d="M175 485L395 360" fill="none" stroke="#24282D" stroke-width="7" stroke-linecap="round"/><path d="M175 485L395 360" fill="none" stroke="#8A939D" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round" transform="translate(-2 -1)"/><path d="M400 510L185 335" fill="none" stroke="#24282D" stroke-width="7" stroke-linecap="round"/><path d="M400 510L185 335" fill="none" stroke="#8A939D" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round" transform="translate(-2 -1)"/>
+<path d="M175 485L182 272" fill="none" stroke="#24282D" stroke-width="9" stroke-linecap="round"/><path d="M175 485L182 272" fill="none" stroke="#8A939D" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round" transform="translate(-2 -1)"/><path d="M400 510L398 296" fill="none" stroke="#24282D" stroke-width="9" stroke-linecap="round"/><path d="M400 510L398 296" fill="none" stroke="#8A939D" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round" transform="translate(-2 -1)"/>
+<path d="M182 272L249 240" fill="none" stroke="#1B2F48" stroke-width="15" stroke-linecap="round"/>
+<path d="M181 267L247 236" fill="none" stroke="#4E729B" stroke-width="4" stroke-linecap="round"/>
+<path d="M398 296L480 258" fill="none" stroke="#1B2F48" stroke-width="15" stroke-linecap="round"/>
+<path d="M397 291L478 254" fill="none" stroke="#4E729B" stroke-width="4" stroke-linecap="round"/>
+<g fill="#15171A"><ellipse cx="175" cy="487" rx="8" ry="4"/><ellipse cx="400" cy="512" rx="8" ry="4"/><ellipse cx="485" cy="457" rx="8" ry="4"/><ellipse cx="265" cy="437" rx="7" ry="3.5"/></g>
+<path d="M410 300L452 300L448 342Q430 350 414 342Z" fill="url(#summit-forge-camp-chair-cup)"/>
+<path d="M410 300L452 300L448 342Q430 350 414 342Z" fill="url(#summit-forge-camp-chair-mesh)"/>
+<ellipse cx="431" cy="300" rx="21" ry="7" fill="#101215"/>
+<ellipse cx="431" cy="300" rx="21" ry="7" fill="none" stroke="#1B2F48" stroke-width="5"/>
+<path d="M412 298Q420 294 432 293" fill="none" stroke="#8FB0D6" stroke-opacity=".6" stroke-width="1.5"/>
 </svg>

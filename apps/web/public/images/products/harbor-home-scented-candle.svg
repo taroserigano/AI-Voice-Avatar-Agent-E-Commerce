@@ -1,14 +1,77 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Cedar &amp; Sea Salt Soy Candle illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Cedar &amp; Sea Salt Soy Candle">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#b45309"/>
-      <stop offset="1" stop-color="#b45309" stop-opacity=".72"/>
+    <radialGradient id="harbor-home-scented-candle-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF8EF"/>
+      <stop offset="1" stop-color="#F6E6CF"/>
+    </radialGradient>
+    <filter id="harbor-home-scented-candle-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="harbor-home-scented-candle-glass" x1="200" y1="0" x2="380" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d98a3d"/>
+      <stop offset=".18" stop-color="#e9a45a"/>
+      <stop offset=".55" stop-color="#b8672a"/>
+      <stop offset=".85" stop-color="#8a4518"/>
+      <stop offset="1" stop-color="#a0561f"/>
+    </linearGradient>
+    <linearGradient id="harbor-home-scented-candle-wood" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d9a877"/>
+      <stop offset=".5" stop-color="#c08a55"/>
+      <stop offset="1" stop-color="#94643a"/>
+    </linearGradient>
+    <linearGradient id="harbor-home-scented-candle-woodtop" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ecc497"/>
+      <stop offset="1" stop-color="#c99461"/>
+    </linearGradient>
+    <radialGradient id="harbor-home-scented-candle-glow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ffd98a" stop-opacity=".9"/>
+      <stop offset=".45" stop-color="#ffcf73" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#ffcf73" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="harbor-home-scented-candle-flame" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffb13b"/>
+      <stop offset=".55" stop-color="#ffd568"/>
+      <stop offset="1" stop-color="#fff4d0"/>
     </linearGradient>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M250 230h140v70a50 50 0 0 1-50 50h-40a50 50 0 0 1-50-50z" fill="#fff"/><path d="M390 250h22a22 22 0 0 1 0 44h-22" fill="none" stroke="#fff" stroke-width="14"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Cedar &amp; Sea Salt Soy</tspan><tspan x="320" dy="40">Candle</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Harbor Home</text>
+  <rect width="640" height="640" fill="url(#harbor-home-scented-candle-bg)"/>
+  <circle cx="320" cy="310" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="330" cy="492" rx="180" ry="18" fill="#1e1b4b" fill-opacity=".16" filter="url(#harbor-home-scented-candle-shadow)"/>
+  <g transform="translate(-24 0)">
+    <circle cx="290" cy="214" r="78" fill="url(#harbor-home-scented-candle-glow)"/>
+    <!-- jar -->
+    <path d="M200 230a90 16 0 0 1 180 0v222q-1 20-20 22a90 14 0 0 1-140 0q-19-2-20-22z" fill="url(#harbor-home-scented-candle-glass)"/>
+    <ellipse cx="290" cy="230" rx="86" ry="14" fill="#7a3c14" fill-opacity=".55"/>
+    <ellipse cx="290" cy="266" rx="84" ry="14" fill="#fbe7c6" fill-opacity=".55"/>
+    <ellipse cx="290" cy="266" rx="30" ry="5" fill="#fff4dc" fill-opacity=".5"/>
+    <path d="M204 266a86 14 0 0 0 172 0v10a86 14 0 0 1-172 0z" fill="#f5cf97" fill-opacity=".3"/>
+    <path d="M200 230a90 16 0 0 0 180 0" fill="none" stroke="#f6c68a" stroke-width="3"/>
+    <path d="M200 230a90 16 0 0 1 180 0" fill="none" stroke="#f9d6a6" stroke-opacity=".6" stroke-width="2"/>
+    <path d="M204 452q2 16 20 18a90 14 0 0 0 132 0q18-2 20-18" fill="none" stroke="#6e3510" stroke-opacity=".35" stroke-width="8"/>
+    <!-- label -->
+    <rect x="232" y="318" width="116" height="100" rx="10" fill="#f5ecdc"/>
+    <rect x="232" y="318" width="116" height="100" rx="10" fill="none" stroke="#d7c4a4" stroke-width="1.5"/>
+    <circle cx="290" cy="354" r="13" fill="none" stroke="#6d8f8a" stroke-width="2.5"/>
+    <path d="M280 356q5-6 10 0t10 0" fill="none" stroke="#6d8f8a" stroke-width="2.5" stroke-linecap="round"/>
+    <rect x="256" y="384" width="68" height="6" rx="3" fill="#b99f7a" fill-opacity=".55"/>
+    <rect x="268" y="398" width="44" height="5" rx="2.5" fill="#b99f7a" fill-opacity=".35"/>
+    <!-- glass highlights -->
+    <path d="M214 246v206" stroke="#fff" stroke-opacity=".45" stroke-width="7" stroke-linecap="round"/>
+    <path d="M230 250v60M230 428v30" stroke="#fff" stroke-opacity=".25" stroke-width="3" stroke-linecap="round"/>
+    <path d="M368 250v200" stroke="#fff" stroke-opacity=".12" stroke-width="3" stroke-linecap="round"/>
+    <!-- wick + flame -->
+    <path d="M290 264q1-8-1-14" stroke="#3a2a1e" stroke-width="3" stroke-linecap="round"/>
+    <path d="M290 192c10 18 16 34 10 48-4 8-16 8-20 0-6-14 0-30 10-48z" fill="url(#harbor-home-scented-candle-flame)"/>
+    <ellipse cx="290" cy="236" rx="4.5" ry="8" fill="#9fc7ff" fill-opacity=".7"/>
+    <!-- wooden lid -->
+    <path d="M350 468v14a72 17 0 0 0 144 0v-14z" fill="url(#harbor-home-scented-candle-wood)"/>
+    <path d="M354 484a68 15 0 0 0 136 0v6a68 15 0 0 1-136 0z" fill="#d8d2c7"/>
+    <ellipse cx="422" cy="468" rx="72" ry="17" fill="url(#harbor-home-scented-candle-woodtop)"/>
+    <g fill="none" stroke="#9a6a3c" stroke-opacity=".3" stroke-width="1.5">
+      <ellipse cx="428" cy="469" rx="52" ry="11"/>
+      <ellipse cx="432" cy="470" rx="30" ry="6"/>
+      <path d="M362 466q30-6 60-2M400 478q30 3 66-4"/>
+    </g>
+    <path d="M358 462a72 17 0 0 1 90-10" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
 </svg>

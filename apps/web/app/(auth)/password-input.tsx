@@ -1,5 +1,6 @@
 "use client";
 
+import { EyeIcon, EyeOffIcon, LockIcon } from "@/components/icons";
 import { inputClasses } from "@/components/ui/field";
 import { cn } from "@/lib/cn";
 import { useState } from "react";
@@ -25,7 +26,8 @@ export function PasswordInput({
 }) {
   const [visible, setVisible] = useState(false);
   return (
-    <div className="relative">
+    <div className="group/pw relative">
+      <LockIcon className="pointer-events-none absolute left-3.5 top-1/2 size-4.5 -translate-y-1/2 text-muted transition-colors group-focus-within/pw:text-brand-600" />
       <input
         id={id}
         name={name}
@@ -35,15 +37,16 @@ export function PasswordInput({
         minLength={minLength}
         aria-invalid={invalid ? true : undefined}
         aria-describedby={describedBy}
-        className={cn(inputClasses, "pr-20")}
+        className={cn(inputClasses, "pl-11 pr-24")}
       />
       <button
         type="button"
         onClick={() => setVisible((v) => !v)}
         aria-pressed={visible}
         aria-controls={id}
-        className="absolute inset-y-0 right-1 my-1 min-w-16 rounded-md px-2 text-sm font-semibold text-brand-700 hover:bg-brand-50"
+        className="absolute inset-y-0 right-1 my-auto inline-flex h-11 min-w-20 items-center justify-center gap-1.5 rounded-lg px-2.5 text-sm font-semibold text-brand-700 transition-colors hover:bg-brand-50 hover:text-brand-800"
       >
+        {visible ? <EyeOffIcon className="size-4" /> : <EyeIcon className="size-4" />}
         {visible ? "Hide" : "Show"}
         <span className="sr-only"> password</span>
       </button>

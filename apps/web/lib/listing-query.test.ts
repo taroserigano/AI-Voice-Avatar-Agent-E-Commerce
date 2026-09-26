@@ -21,6 +21,9 @@ describe("toProductQuery", () => {
     expect(q.page).toBe(1);
     expect(q.brand).toEqual(["A"]);
   });
+  it("passes through the top-rated sort", () => {
+    expect(toProductQuery({ sort: "top_rated" }).sort).toBe("top_rated");
+  });
   it("a fixed category wins over the query string", () => {
     expect(toProductQuery({ category: "toys" }, "electronics").category).toBe("electronics");
   });

@@ -3,9 +3,12 @@ from __future__ import annotations
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
+from commerce.activity.models import EventType
+from commerce.activity.service import record
+from commerce.auth.deps import CurrentUser
 from commerce.catalog.schemas import CategoryOut, ProductDetail, ProductPage, SortOrder
 from commerce.catalog.service import ProductFilters, get_product, list_categories, list_products
 from commerce.db import get_db
@@ -22,6 +25,8 @@ def categories(db: DbDep) -> list[CategoryOut]:
 @router.get("/products", response_model=ProductPage)
 def products(
     db: DbDep,
+    principal: CurrentUser,
+    background: BackgroundTasks,
     q: Annotated[str | None, Query(max_length=200, description="Free-text search")] = None,
     category: Annotated[str | None, Query(max_length=80)] = None,
     brand: Annotated[list[str] | None, Query(max_length=20)] = None,
@@ -39,7 +44,15 @@ def products(
         max_price_minor=max_price,
         in_stock=in_stock,
     )
-    return list_products(db, query=q, filters=filters, sort=sort, page=page, page_size=page_size)
+    result = list_products(db, query=q, filters=filters, sort=sort, page=page, page_size=page_size)
+    if q and q.strip() and page == 1:
+        background.add_task(
+            record,
+            principal.id,
+            EventType.SEARCHED,
+            data={"query": q.strip()[:200], "results": result.total},
+        )
+    return result
 
 
 @router.get(
@@ -47,8 +60,11 @@ def products(
     response_model=ProductDetail,
     responses={404: {"description": "No such product"}},
 )
-def product_detail(product_id: uuid.UUID, db: DbDep) -> ProductDetail:
+def product_detail(
+    product_id: uuid.UUID, db: DbDep, principal: CurrentUser, background: BackgroundTasks
+) -> ProductDetail:
     product = get_product(db, product_id)
     if product is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Product not found")
+    background.add_task(record, principal.id, EventType.VIEWED_PRODUCT, product_id=product.id)
     return product

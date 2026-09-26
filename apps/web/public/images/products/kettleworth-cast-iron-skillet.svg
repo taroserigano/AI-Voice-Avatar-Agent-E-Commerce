@@ -1,14 +1,81 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Pre-Seasoned Cast Iron Skillet, 12 in illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Pre-Seasoned Cast Iron Skillet, 12 in">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#b45309"/>
-      <stop offset="1" stop-color="#b45309" stop-opacity=".72"/>
+    <radialGradient id="kettleworth-cast-iron-skillet-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF8EF"/>
+      <stop offset="1" stop-color="#F6E6CF"/>
+    </radialGradient>
+    <filter id="kettleworth-cast-iron-skillet-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <filter id="kettleworth-cast-iron-skillet-grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".7" numOctaves="2" seed="7"/>
+      <feColorMatrix values="0 0 0 0 1  0 0 0 0 .88  0 0 0 0 .76  1.1 0 0 0 -.5"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <linearGradient id="kettleworth-cast-iron-skillet-side" x1="100" y1="0" x2="424" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4a433e"/>
+      <stop offset=".35" stop-color="#2f2b28"/>
+      <stop offset=".75" stop-color="#1e1c1a"/>
+      <stop offset="1" stop-color="#151413"/>
     </linearGradient>
+    <linearGradient id="kettleworth-cast-iron-skillet-rim" x1="100" y1="200" x2="424" y2="400" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5e554e"/>
+      <stop offset=".5" stop-color="#3b3632"/>
+      <stop offset="1" stop-color="#282523"/>
+    </linearGradient>
+    <linearGradient id="kettleworth-cast-iron-skillet-handle" x1="0" y1="228" x2="0" y2="334" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4f4842"/>
+      <stop offset=".5" stop-color="#36322e"/>
+      <stop offset="1" stop-color="#272422"/>
+    </linearGradient>
+    <linearGradient id="kettleworth-cast-iron-skillet-wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#443e39"/>
+      <stop offset=".45" stop-color="#2a2725"/>
+      <stop offset="1" stop-color="#1c1a19"/>
+    </linearGradient>
+    <radialGradient id="kettleworth-cast-iron-skillet-floor" cx=".36" cy=".3" r=".8">
+      <stop offset="0" stop-color="#4a413a"/>
+      <stop offset=".5" stop-color="#2e2a27"/>
+      <stop offset="1" stop-color="#211f1d"/>
+    </radialGradient>
+    <radialGradient id="kettleworth-cast-iron-skillet-sheen" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#8a6a50" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#8a6a50" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M250 230h140v70a50 50 0 0 1-50 50h-40a50 50 0 0 1-50-50z" fill="#fff"/><path d="M390 250h22a22 22 0 0 1 0 44h-22" fill="none" stroke="#fff" stroke-width="14"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Pre-Seasoned Cast Iron</tspan><tspan x="320" dy="40">Skillet, 12 in</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Kettleworth</text>
+  <rect width="640" height="640" fill="url(#kettleworth-cast-iron-skillet-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="264" cy="420" rx="165" ry="20" fill="#1e1b4b" fill-opacity=".16" filter="url(#kettleworth-cast-iron-skillet-shadow)"/>
+  <g transform="translate(320 300) scale(.88) translate(-334 -318)">
+    <!-- side wall -->
+    <path d="M100 300 108 342a154 96 0 0 0 308 0l8-42z" fill="url(#kettleworth-cast-iron-skillet-side)"/>
+    <path d="M128 372a154 96 0 0 0 140 66" fill="none" stroke="#a88a72" stroke-opacity=".14" stroke-width="4" stroke-linecap="round"/>
+    <!-- helper handle (loop) -->
+    <path d="M110 272 84 268q-28 0-30 16 0 16 28 22l30 6z" transform="translate(0 12)" fill="#171514"/>
+    <path fill-rule="evenodd" d="M110 272 84 268q-28 0-30 16 0 16 28 22l30 6zM82 280q-12 0-12 6t12 8l12 2q8 0 8-7t-8-8z" fill="url(#kettleworth-cast-iron-skillet-rim)"/>
+    <path d="M62 280q6-8 22-8" fill="none" stroke="#c9a88d" stroke-opacity=".35" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- long handle: one cast piece flaring into the rim -->
+    <path d="M408 272c34 4 66-2 152-26 30-8 50 6 46 24-3 14-14 18-30 22-76 22-118 40-162 56z" fill="#171514"/>
+    <path fill-rule="evenodd" d="M406 256c36 6 68 0 154-24 30-8 50 6 46 24-3 14-14 18-30 22-76 22-118 40-162 56zM582 244q-14 0-16 8t10 8q14 0 16-8t-10-8z" fill="url(#kettleworth-cast-iron-skillet-handle)"/>
+    <path d="M574 262q-4 4 4 4 12-1 14-10" fill="none" stroke="#0e0d0c" stroke-opacity=".6" stroke-width="2"/>
+    <path d="M430 296c40-8 80-22 120-34" fill="none" stroke="#171514" stroke-opacity=".7" stroke-width="7" stroke-linecap="round"/>
+    <path d="M432 300c40-8 80-22 120-34" fill="none" stroke="#a88a72" stroke-opacity=".15" stroke-width="2" stroke-linecap="round"/>
+    <path d="M414 258c36 4 70-4 146-26 24-6 40 2 42 14" fill="none" stroke="#e6c7ab" stroke-opacity=".32" stroke-width="3" stroke-linecap="round"/>
+    <!-- rim + pour spouts -->
+    <path d="M238 396q24 26 48 0z" fill="#2a2724"/>
+    <path d="M242 198q20-20 40 0z" fill="#4a433e"/>
+    <ellipse cx="262" cy="300" rx="162" ry="100" fill="url(#kettleworth-cast-iron-skillet-rim)"/>
+    <!-- interior -->
+    <ellipse cx="262" cy="302" rx="150" ry="91" fill="url(#kettleworth-cast-iron-skillet-wall)"/>
+    <ellipse cx="264" cy="318" rx="132" ry="76" fill="url(#kettleworth-cast-iron-skillet-floor)"/>
+    <ellipse cx="264" cy="318" rx="132" ry="76" fill="#000" filter="url(#kettleworth-cast-iron-skillet-grain)" opacity=".22"/>
+    <ellipse cx="220" cy="292" rx="80" ry="40" fill="url(#kettleworth-cast-iron-skillet-sheen)"/>
+    <ellipse cx="264" cy="318" rx="132" ry="76" fill="none" stroke="#141312" stroke-opacity=".5" stroke-width="3"/>
+    <!-- spout notches in the inner edge -->
+    <path d="M246 392q16 12 32 0" fill="none" stroke="#141312" stroke-opacity=".6" stroke-width="3" stroke-linecap="round"/>
+    <path d="M248 212q14-8 28 0" fill="none" stroke="#141312" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/>
+    <!-- rim highlights with warm sheen -->
+    <path d="M110 276a162 100 0 0 1 120-74" fill="none" stroke="#f2d6bd" stroke-opacity=".4" stroke-width="3" stroke-linecap="round"/>
+    <path d="M296 201a162 100 0 0 1 70 12" fill="none" stroke="#f2d6bd" stroke-opacity=".2" stroke-width="2" stroke-linecap="round"/>
+  </g>
 </svg>

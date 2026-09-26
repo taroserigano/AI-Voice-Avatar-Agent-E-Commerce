@@ -1,14 +1,59 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="8-inch Chef&#x27;s Knife illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="8-inch Chef's Knife">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#b45309"/>
-      <stop offset="1" stop-color="#b45309" stop-opacity=".72"/>
+    <radialGradient id="kettleworth-chef-knife-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF8EF"/>
+      <stop offset="1" stop-color="#F6E6CF"/>
+    </radialGradient>
+    <filter id="kettleworth-chef-knife-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="kettleworth-chef-knife-blade" x1="0" y1="262" x2="0" y2="340" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8f98a3"/>
+      <stop offset=".08" stop-color="#f3f5f8"/>
+      <stop offset=".45" stop-color="#d3d8de"/>
+      <stop offset=".7" stop-color="#b3bac3"/>
+      <stop offset="1" stop-color="#8a929c"/>
+    </linearGradient>
+    <linearGradient id="kettleworth-chef-knife-bevel" x1="0" y1="316" x2="0" y2="340" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9aa2ac"/>
+      <stop offset="1" stop-color="#e9edf1"/>
+    </linearGradient>
+    <linearGradient id="kettleworth-chef-knife-handle" x1="0" y1="274" x2="0" y2="326" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4a4549"/>
+      <stop offset=".3" stop-color="#2b272b"/>
+      <stop offset="1" stop-color="#141214"/>
+    </linearGradient>
+    <linearGradient id="kettleworth-chef-knife-steel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".5" stop-color="#c4cad2"/>
+      <stop offset="1" stop-color="#7d858f"/>
     </linearGradient>
   </defs>
-  <rect width="640" height="640" fill="url(#g)"/>
-  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
-  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
-  <path d="M250 230h140v70a50 50 0 0 1-50 50h-40a50 50 0 0 1-50-50z" fill="#fff"/><path d="M390 250h22a22 22 0 0 1 0 44h-22" fill="none" stroke="#fff" stroke-width="14"/>
-  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">8-inch Chef&#x27;s Knife</tspan></text>
-  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Kettleworth</text>
+  <rect width="640" height="640" fill="url(#kettleworth-chef-knife-bg)"/>
+  <circle cx="320" cy="300" r="210" fill="#fff" fill-opacity=".45"/>
+  <ellipse cx="320" cy="462" rx="175" ry="18" fill="#1e1b4b" fill-opacity=".16" filter="url(#kettleworth-chef-knife-shadow)"/>
+  <g transform="rotate(-30 320 300) translate(320 300) scale(1.1) translate(-326 -300)">
+    <!-- blade -->
+    <path d="M252 262 430 263q80 3 136 27-46 46-146 50H254z" fill="url(#kettleworth-chef-knife-blade)"/>
+    <path d="M254 318h164q80-2 138-24l10-4q-46 46-146 50H254z" fill="url(#kettleworth-chef-knife-bevel)" fill-opacity=".85"/>
+    <path d="M256 337h164q92-4 140-44" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+    <path d="M254 263 430 264q80 3 136 27" fill="none" stroke="#6f7782" stroke-width="2"/>
+    <path d="M264 270h170q50 2 90 12" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="3" stroke-linecap="round"/>
+    <g stroke="#fff" stroke-opacity=".28" stroke-width="1.5" stroke-linecap="round">
+      <path d="M280 286h150"/><path d="M300 296h170"/><path d="M272 306h120"/>
+    </g>
+    <path d="M254 318h164q80-2 138-24" fill="none" stroke="#8a929c" stroke-opacity=".45" stroke-width="1.5"/>
+    <!-- bolster -->
+    <path d="M234 258h20q6 0 6 6v74q0 6-6 6h-20z" fill="url(#kettleworth-chef-knife-steel)"/>
+    <path d="M238 262v76" stroke="#fff" stroke-opacity=".8" stroke-width="2" stroke-linecap="round"/>
+    <!-- handle -->
+    <g transform="translate(0 -9)">
+    <path d="M236 274H120q-32 2-34 26 2 24 34 26h116z" fill="url(#kettleworth-chef-knife-handle)"/>
+    <path d="M232 278H122q-24 2-30 16" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="3" stroke-linecap="round"/>
+    <path d="M236 300H96" stroke="#b9c0c8" stroke-opacity=".35" stroke-width="1.5"/>
+    <circle cx="130" cy="300" r="6.5" fill="url(#kettleworth-chef-knife-steel)"/>
+    <circle cx="170" cy="300" r="6.5" fill="url(#kettleworth-chef-knife-steel)"/>
+    <circle cx="210" cy="300" r="6.5" fill="url(#kettleworth-chef-knife-steel)"/>
+    </g>
+  </g>
 </svg>
