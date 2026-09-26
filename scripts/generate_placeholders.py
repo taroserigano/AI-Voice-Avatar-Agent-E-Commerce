@@ -84,6 +84,46 @@ def svg_for(title: str, brand: str, color: str, category: str) -> str:
 """
 
 
+def _mix(hex_color: str, weight: float) -> str:
+    """Blend a #rrggbb color toward white; weight 0 = the color, 1 = white."""
+    r, g, b = (int(hex_color[i : i + 2], 16) for i in (1, 3, 5))
+    r, g, b = (round(c + (255 - c) * weight) for c in (r, g, b))
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
+def svg_for_type(product_type: str, color: str, category: str) -> str:
+    """A shared image for every generated product of one type, in the storefront's
+    illustration style: a light, department-tinted studio sweep, the department glyph drawn
+    in the department color with a soft floor shadow, and a small label naming the type."""
+    uid = f"t-{product_type}"
+    light, mid = _mix(color, 0.95), _mix(color, 0.83)
+    glyph = GLYPHS.get(category, "").replace('"#fff"', f'"url(#{uid}-ink)"')
+    label = html.escape(type_label(product_type))
+    pill_w = min(520, 60 + 15 * len(label))
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="{label}">
+  <defs>
+    <radialGradient id="{uid}-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="{light}"/>
+      <stop offset="1" stop-color="{mid}"/>
+    </radialGradient>
+    <linearGradient id="{uid}-ink" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="{_mix(color, 0.12)}"/>
+      <stop offset="1" stop-color="{color}"/>
+    </linearGradient>
+    <filter id="{uid}-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+  </defs>
+  <rect width="640" height="640" fill="url(#{uid}-bg)"/>
+  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#{uid}-blur)"/>
+  <g transform="translate(320 290) scale(1.3) translate(-320 -275)">{glyph}</g>
+  <rect x="{320 - pill_w / 2:.0f}" y="500" width="{pill_w}" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
+  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">{label}</text>
+</svg>
+"""
+
+
 def type_label(product_type: str) -> str:
     return product_type.replace("-", " ").capitalize()
 
@@ -97,24 +137,24 @@ def _write(path: Path, svg: str, force: bool) -> bool:
 
 
 def main() -> None:
-    force = "--force" in sys.argv  # redraw placeholders that already exist
+    # Redraw the shared type images. Product images are never overwritten: most are hand-drawn.
+    force = "--force" in sys.argv
     OUT.mkdir(parents=True, exist_ok=True)
     TYPES.mkdir(parents=True, exist_ok=True)
     colors = {c.slug: c.color for c in CATEGORIES}
-    names = {c.slug: c.name for c in CATEGORIES}
     written = 0
     for p in PRODUCTS:
         if p.image_path is None:
             svg = svg_for(p.title, p.brand, colors[p.category], p.category)
-            written += _write(OUT / f"{p.slug}.svg", svg, force)
+            written += _write(OUT / f"{p.slug}.svg", svg, force=False)
     types: dict[str, str] = {}
     for p in PRODUCTS:
         if p.image_path and p.image_path.startswith("/images/types/"):
             types.setdefault(p.product_type, p.category)
     for product_type, category in sorted(types.items()):
-        svg = svg_for(type_label(product_type), names[category], colors[category], category)
+        svg = svg_for_type(product_type, colors[category], category)
         written += _write(TYPES / f"{product_type}.svg", svg, force)
-    print(f"wrote {written} missing placeholders under {IMAGES} (--force redraws existing ones)")
+    print(f"wrote {written} placeholders under {IMAGES} (--force redraws the type images)")
 
 
 if __name__ == "__main__":

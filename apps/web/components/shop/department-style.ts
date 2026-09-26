@@ -60,6 +60,18 @@ const tints = {
 } satisfies Record<string, DepartmentTint>;
 
 const bySlug: Record<string, keyof typeof tints> = {
+  "dairy-eggs": "info",
+  produce: "success",
+  "meat-seafood": "danger",
+  bakery: "accent",
+  frozen: "info",
+  pantry: "warning",
+  snacks: "accent",
+  beverages: "info",
+  household: "neutral",
+  "health-wellness": "success",
+  baby: "brand",
+  pet: "warning",
   electronics: "info",
   "home-kitchen": "accent",
   "clothing-shoes": "brand",

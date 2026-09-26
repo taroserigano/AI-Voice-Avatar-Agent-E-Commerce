@@ -401,7 +401,105 @@ export const BasketIcon = createIcon(
   </>,
 );
 
+/* Grocery and everyday departments */
+export const MilkIcon = createIcon(
+  "MilkIcon",
+  <>
+    <path d="M8.5 3.5h7v3l2 3.5v9.5a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1V10l2-3.5v-3Z" />
+    <path d="M6.5 10h11M9.5 14h5" />
+  </>,
+);
+export const AppleIcon = createIcon(
+  "AppleIcon",
+  <>
+    <path d="M12 7.5c-1.5-1-5.5-1.6-6.8 1.9-1.1 3 .6 7.6 2.6 9.6 1.3 1.3 2.6 1 4.2.3 1.6.7 2.9 1 4.2-.3 2-2 3.7-6.6 2.6-9.6C17.5 5.9 13.5 6.5 12 7.5Z" />
+    <path d="M12 7.5c0-2 .8-3.3 2.5-4" />
+  </>,
+);
+export const FishIcon = createIcon(
+  "FishIcon",
+  <>
+    <path d="M3.5 12c2.7-3.8 6.3-5.5 10-5 2.6.4 4.6 2.2 5.5 5-.9 2.8-2.9 4.6-5.5 5-3.7.5-7.3-1.2-10-5Z" />
+    <path d="M19 12l2-3v6l-2-3ZM8 11.5v1" />
+  </>,
+);
+export const BreadIcon = createIcon(
+  "BreadIcon",
+  <>
+    <path d="M5 11.5a3.5 3.5 0 0 1 1-6.5h12a3.5 3.5 0 0 1 1 6.5V19a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-7.5Z" />
+    <path d="M9.5 9.5l-1 3M13 9.5l-1 3M16.5 9.5l-1 3" />
+  </>,
+);
+export const SnowflakeIcon = createIcon(
+  "SnowflakeIcon",
+  <path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9.5 4.5 12 7l2.5-2.5M9.5 19.5 12 17l2.5 2.5" />,
+);
+export const JarIcon = createIcon(
+  "JarIcon",
+  <>
+    <path d="M8 3.5h8v3H8zM7 6.5h10l1 2.5v10a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V9l1-2.5Z" />
+    <path d="M9 12h6v4H9z" />
+  </>,
+);
+export const SnackIcon = createIcon(
+  "SnackIcon",
+  <>
+    <path d="M6.5 3.5h11l-1 3 1 3-1 3 1 3-1 3 1 2h-11l1-2-1-3 1-3-1-3 1-3-1-3Z" />
+    <path d="M10 10.5h4" />
+  </>,
+);
+export const BottleIcon = createIcon(
+  "BottleIcon",
+  <>
+    <path d="M10 3.5h4v3c2 1.2 3 2.8 3 5v8a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1v-8c0-2.2 1-3.8 3-5v-3Z" />
+    <path d="M7 13h10M7 17h10" />
+  </>,
+);
+export const SprayIcon = createIcon(
+  "SprayIcon",
+  <>
+    <path d="M9 8h5l1.5 3v8.5a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1V11L9 8Z" />
+    <path d="M10 8V5.5h5l2.5 1.5M18.5 4v.01M20 6.5v.01M18.5 9v.01" />
+  </>,
+);
+export const PillIcon = createIcon(
+  "PillIcon",
+  <>
+    <path d="M10.5 20.5a4.95 4.95 0 0 1-7-7l6-6a4.95 4.95 0 0 1 7 7l-6 6Z" />
+    <path d="m7.5 10.5 6 6" />
+  </>,
+);
+export const BabyBottleIcon = createIcon(
+  "BabyBottleIcon",
+  <>
+    <path d="M10.5 2.5h3l.5 3h-4l.5-3ZM9 5.5h6v2.5l1 2v9.5a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V10l1-2V5.5Z" />
+    <path d="M8 12.5h3M8 15.5h3" />
+  </>,
+);
+export const PawIcon = createIcon(
+  "PawIcon",
+  <>
+    <path d="M12 12.5c-2.8 0-5 2.6-5 4.8 0 1.6 1.2 2.2 2.5 2.2 1 0 1.6-.5 2.5-.5s1.5.5 2.5.5c1.3 0 2.5-.6 2.5-2.2 0-2.2-2.2-4.8-5-4.8Z" />
+    <circle cx="6" cy="10.5" r="1.6" />
+    <circle cx="18" cy="10.5" r="1.6" />
+    <circle cx="9.5" cy="6.5" r="1.6" />
+    <circle cx="14.5" cy="6.5" r="1.6" />
+  </>,
+);
+
 const departmentIcons: Record<string, Icon> = {
+  "dairy-eggs": MilkIcon,
+  produce: AppleIcon,
+  "meat-seafood": FishIcon,
+  bakery: BreadIcon,
+  frozen: SnowflakeIcon,
+  pantry: JarIcon,
+  snacks: SnackIcon,
+  beverages: BottleIcon,
+  household: SprayIcon,
+  "health-wellness": PillIcon,
+  baby: BabyBottleIcon,
+  pet: PawIcon,
   electronics: HeadphonesIcon,
   "home-kitchen": PotIcon,
   "clothing-shoes": ShirtIcon,
