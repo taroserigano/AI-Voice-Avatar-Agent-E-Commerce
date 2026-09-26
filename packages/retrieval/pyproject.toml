@@ -1,0 +1,27 @@
+[project]
+name = "ai-commerce-retrieval"
+version = "0.1.0"
+description = "Meaning-based retrieval: LlamaIndex ingestion into Qdrant, and hybrid search with OpenSearch"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic==2.13.5",
+    "pydantic-settings==2.15.0",
+    "qdrant-client==1.19.1",
+    "llama-index-core==0.14.25",
+    "llama-index-vector-stores-qdrant==0.10.3",
+    "llama-index-embeddings-openai==0.7.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ai_commerce_retrieval"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "integration: needs a running Qdrant (pnpm local:up, or QDRANT_URL)",
+    "openai: calls the real OpenAI embeddings API (costs money; opt in with RETRIEVAL_LIVE_EMBED=1)",
+]

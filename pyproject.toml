@@ -9,7 +9,7 @@ dependencies = []
 package = false
 
 [tool.uv.workspace]
-members = ["services/commerce", "packages/telemetry"]
+members = ["services/commerce", "packages/telemetry", "packages/retrieval"]
 
 [dependency-groups]
 dev = [
@@ -34,7 +34,7 @@ ignore = [
 "scripts/generate_placeholders.py" = ["E501"]  # inline SVG markup
 
 [tool.ruff.lint.isort]
-known-first-party = ["commerce", "ai_commerce_telemetry", "tests"]
+known-first-party = ["commerce", "ai_commerce_telemetry", "ai_commerce_retrieval", "tests"]
 
 [tool.mypy]
 python_version = "3.12"
