@@ -15,6 +15,7 @@
 | Build plan | ✅ Done: `docs/PLAN_ai-commerce-build.md` |
 | Step 0: project folder, docs unzipped, `CLAUDE.md`, `.gitignore`, `.gitattributes` | ✅ Done |
 | First Git commit, pushed to GitHub | ✅ Done: **public** repo `https://github.com/taroserigano777/ai-commerce`, branch `main` |
+| Private repo | ✅ 2026-09-26: **private** `https://github.com/taroserigano/ai-commerce` (git remote `private`), with `main`, `milestone-1-signin-shopping`, and `catalog-stores`. The public repo above (remote `origin`) is unchanged and still public. |
 | Step 1: fix the handoff docs | ✅ Done (2026-09-25, Windows laptop) |
 | Step 2: Milestone 1 (sign-in and shopping foundation) | ✅ Built and tested locally (2026-09-25). Pinecone semantic search is waiting on a free index slot; see Open items. |
 | Steps 3–8: build | ⬜ Not started |
