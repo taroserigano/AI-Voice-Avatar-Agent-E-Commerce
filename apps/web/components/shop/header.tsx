@@ -39,6 +39,9 @@ export function Header({
           </button>
         </form>
         <nav aria-label="Account" className="ml-auto flex items-center gap-1">
+          <Link href="/stores" className="flex min-h-11 items-center rounded-full px-3 font-semibold hover:bg-brand-900">
+            Stores
+          </Link>
           <details className="relative">
             <summary className="flex min-h-11 cursor-pointer list-none items-center rounded-full px-3 font-semibold hover:bg-brand-900">
               <span className="sr-only">Account menu for </span>

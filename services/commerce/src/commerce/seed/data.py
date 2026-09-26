@@ -6,7 +6,7 @@ Images are generated placeholders in ``apps/web/public/images/products/`` (see
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from typing import Any
 
 from commerce.catalog.models import PolicyClass
@@ -27,6 +27,27 @@ class VariantSeed:
     stock: int
     price_cents: int | None = None  # None: use the product's base price
     attributes: dict[str, Any] = field(default_factory=dict)
+    sku: str | None = None  # None: derived from the product slug with make_sku()
+
+
+@dataclass(frozen=True)
+class Nutrition:
+    """Per labeled serving, as on a US nutrition facts panel."""
+
+    serving_size: str
+    calories: int
+    total_fat_g: float
+    saturated_fat_g: float
+    sodium_mg: int
+    total_carbs_g: float
+    fiber_g: float
+    total_sugars_g: float
+    added_sugars_g: float
+    protein_g: float
+
+    @property
+    def net_carbs_g(self) -> float:
+        return max(0.0, self.total_carbs_g - self.fiber_g)
 
 
 @dataclass(frozen=True)
@@ -38,9 +59,39 @@ class ProductSeed:
     price_cents: int
     description: str
     variants: tuple[VariantSeed, ...]
+    product_type: str = "general"  # e.g. "milk", "greek-yogurt", "headphones"
+    tags: tuple[str, ...] = ()  # slugs from commerce.catalog.tags.TAGS
+    nutrition: Nutrition | None = None
+    ingredients: str | None = None
+    allergens: tuple[str, ...] = ()  # e.g. ("milk", "soy"), the major US food allergens
+    specs: dict[str, str] = field(default_factory=dict)  # e.g. {"Milkfat": "0%"}
+    image_path: str | None = None  # None: /images/products/<slug>.svg
+
+    def details(self) -> dict[str, Any]:
+        """The ``products.details`` JSON document."""
+        return {
+            "nutrition": asdict(self.nutrition) if self.nutrition else None,
+            "ingredients": self.ingredients,
+            "allergens": list(self.allergens),
+            "specs": dict(self.specs),
+        }
 
 
 CATEGORIES: tuple[CategorySeed, ...] = (
+    # Grocery. Fresh and frozen food isn't sent back (see the "perishable" policy class).
+    CategorySeed("dairy-eggs", "Dairy & Eggs", PolicyClass.PERISHABLE, "#0369a1"),
+    CategorySeed("produce", "Fresh Produce", PolicyClass.PERISHABLE, "#4d7c0f"),
+    CategorySeed("meat-seafood", "Meat & Seafood", PolicyClass.PERISHABLE, "#b91c1c"),
+    CategorySeed("bakery", "Bakery & Bread", PolicyClass.PERISHABLE, "#92400e"),
+    CategorySeed("frozen", "Frozen", PolicyClass.PERISHABLE, "#0e7490"),
+    CategorySeed("pantry", "Pantry", PolicyClass.STANDARD, "#a16207"),
+    CategorySeed("snacks", "Snacks", PolicyClass.STANDARD, "#c2410c"),
+    CategorySeed("beverages", "Beverages", PolicyClass.STANDARD, "#1d4ed8"),
+    CategorySeed("household", "Household Essentials", PolicyClass.STANDARD, "#0f766e"),
+    CategorySeed("health-wellness", "Health & Wellness", PolicyClass.STANDARD, "#15803d"),
+    CategorySeed("baby", "Baby", PolicyClass.STANDARD, "#db2777"),
+    CategorySeed("pet", "Pet Supplies", PolicyClass.STANDARD, "#7c2d12"),
+    # General merchandise
     CategorySeed("electronics", "Electronics", PolicyClass.INSPECTION, "#2563eb"),
     CategorySeed("home-kitchen", "Home & Kitchen", PolicyClass.STANDARD, "#b45309"),
     CategorySeed("clothing-shoes", "Clothing & Shoes", PolicyClass.STANDARD, "#be185d"),
@@ -76,7 +127,7 @@ def _sizes(sizes: tuple[str, ...], stock: int, color: str | None = None) -> tupl
     return tuple(out)
 
 
-PRODUCTS: tuple[ProductSeed, ...] = (
+_HANDWRITTEN: tuple[ProductSeed, ...] = (
     # --- Electronics (returns need inspection) ---
     ProductSeed(
         "sonora-arc-wireless-headphones",
@@ -598,6 +649,76 @@ PRODUCTS: tuple[ProductSeed, ...] = (
             VariantSeed("100", "$100", 999, price_cents=10000, attributes={"value": "$100"}),
         ),
     ),
+)
+
+
+# Product type and tags for the hand-written products above.
+_ENRICHMENT: dict[str, tuple[str, tuple[str, ...]]] = {
+    "sonora-arc-wireless-headphones": (
+        "headphones",
+        ("wireless", "bluetooth", "noise-cancelling", "rechargeable", "usb-c"),
+    ),
+    "sonora-pulse-wireless-earbuds": (
+        "earbuds",
+        ("wireless", "bluetooth", "water-resistant", "rechargeable"),
+    ),
+    "sonora-studio-wired-headphones": ("headphones", ()),
+    "lumen-beam-bluetooth-speaker": (
+        "bluetooth-speaker",
+        ("wireless", "bluetooth", "waterproof", "rechargeable"),
+    ),
+    "lumen-glow-smart-bulb-4pk": ("smart-bulb", ("smart-home", "energy-efficient", "wireless")),
+    "lumen-tablet-10": ("tablet", ("wireless", "rechargeable", "usb-c")),
+    "lumen-power-bank-20k": ("power-bank", ("rechargeable", "usb-c")),
+    "lumen-hd-webcam": ("webcam", ()),
+    "sonora-kids-headphones": ("headphones", ("kids",)),
+    "kettleworth-gooseneck-kettle": ("electric-kettle", ()),
+    "kettleworth-cast-iron-skillet": ("skillet", ()),
+    "kettleworth-chef-knife": ("kitchen-knife", ()),
+    "harbor-home-linen-sheets": ("sheet-set", ("machine-washable",)),
+    "harbor-home-throw-blanket": ("throw-blanket", ("machine-washable",)),
+    "harbor-home-glass-containers": ("food-storage", ("bpa-free", "dishwasher-safe")),
+    "kettleworth-french-press": ("coffee-maker", ("dishwasher-safe",)),
+    "harbor-home-scented-candle": ("candle", ()),
+    "kettleworth-mixing-bowls": ("mixing-bowls", ("dishwasher-safe",)),
+    "stridewell-rain-boots": ("boots", ("waterproof",)),
+    "stridewell-trail-runner-gtx": ("running-shoes", ("waterproof",)),
+    "stridewell-everyday-sneaker": ("sneakers", ()),
+    "driftwood-rain-shell": ("rain-jacket", ("waterproof",)),
+    "driftwood-merino-crew": ("sweater", ()),
+    "driftwood-organic-tee": ("t-shirt", ("organic", "machine-washable")),
+    "driftwood-wool-socks-3pk": ("socks", ("moisture-wicking",)),
+    "summit-forge-2p-tent": ("tent", ("waterproof",)),
+    "summit-forge-sleeping-bag": ("sleeping-bag", ()),
+    "summit-forge-headlamp": ("headlamp", ("rechargeable", "water-resistant", "usb-c")),
+    "summit-forge-water-bottle": ("water-bottle", ("bpa-free",)),
+    "verdant-raised-garden-bed": ("garden-bed", ()),
+    "verdant-garden-hose": ("garden-hose", ()),
+    "summit-forge-camp-chair": ("camp-chair", ()),
+    "tempo-yoga-mat": ("yoga-mat", ()),
+    "tempo-adjustable-dumbbells": ("dumbbells", ()),
+    "tempo-jump-rope": ("jump-rope", ()),
+    "tempo-resistance-bands": ("resistance-bands", ()),
+    "tempo-foam-roller": ("foam-roller", ()),
+    "pebble-pine-wooden-blocks": ("building-blocks", ("kids",)),
+    "pebble-pine-puzzle-1000": ("puzzle", ()),
+    "pebble-pine-board-game": ("board-game", ()),
+    "pebble-pine-plush-otter": ("plush-toy", ("kids",)),
+    "pebble-pine-rc-car": ("rc-car", ("rechargeable", "kids")),
+    "verdant-botanicals-face-moisturizer": ("face-moisturizer", ("cruelty-free",)),
+    "verdant-botanicals-shampoo-bar": ("shampoo", ("cruelty-free", "vegan", "sulfate-free")),
+    "verdant-botanicals-electric-toothbrush": ("electric-toothbrush", ("rechargeable",)),
+    "verdant-botanicals-hand-cream": ("hand-cream", ("cruelty-free",)),
+    "quillmark-dotted-notebook": ("notebook", ()),
+    "quillmark-gel-pens-12pk": ("pens", ()),
+    "quillmark-desk-lamp": ("desk-lamp", ("energy-efficient", "usb-c")),
+    "quillmark-laptop-backpack": ("backpack", ("water-resistant",)),
+    "larkspur-gift-card": ("gift-card", ()),
+}
+
+HANDWRITTEN_PRODUCTS: tuple[ProductSeed, ...] = tuple(
+    replace(p, product_type=_ENRICHMENT[p.slug][0], tags=_ENRICHMENT[p.slug][1])
+    for p in _HANDWRITTEN
 )
 
 

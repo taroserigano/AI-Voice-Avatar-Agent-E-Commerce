@@ -19,10 +19,22 @@ the assistant, and voice come next.
   to start if a route is missing the session check.
 - **Simple sign-in:** the API checks the email and password and sets a session cookie.
   Nothing else: no rate limiting, password reset, or external identity provider.
-- **Catalog:** 51 original products in 9 departments, with generated placeholder images.
-- **Hybrid search:** OpenSearch (keywords, typos, SKUs) plus Pinecone (meaning), merged
-  with reciprocal rank fusion. Price and stock always come from PostgreSQL. Filters,
-  facets, sorting, and pagination.
+- **Catalog:** about 2,000 original products in 21 departments, mostly grocery. Every
+  product has a type and diet/feature tags (organic, fat free, sugar free, lactose free,
+  vegan, wireless, ...); food has nutrition facts, ingredients, and allergens. It's generated
+  deterministically (`services/commerce/src/commerce/seed/gen/`), and a test checks every tag
+  against the facts, since the assistant will answer from this data.
+- **Hybrid search:** OpenSearch (keywords, typos, SKUs, synonyms such as "nonfat" = "skim")
+  plus Pinecone (meaning), merged with reciprocal rank fusion. Price and stock always come
+  from PostgreSQL. Filters for type, tags (required or excluded), brand, and price; facets,
+  sorting, and pagination.
+- **Store locator:** 10 demo stores around Dallas-Fort Worth on a Google map, with hours,
+  open-now status, and directions.
+- **Order history for the dev accounts:** 14 orders covering every return case (inspection,
+  perishables, partial returns with cent rounding, final sale, late, not delivered, ...),
+  reset to fresh dates on every `pnpm db:seed`.
+- **Assistant scripts:** scripted product Q&A and return conversations with known-right
+  answers in `evals/assistant/`, and the policy text they cite in `content/policies/`.
 - **Durable cart** per customer. Customers can't reach each other's carts or orders.
 - **Outbox publisher** that keeps OpenSearch and Pinecone in sync with PostgreSQL.
 - **OpenTelemetry everywhere:** one trace per page render, from Next.js through the API to
@@ -32,7 +44,8 @@ the assistant, and voice come next.
 
 ## Prerequisites
 
-- Docker Desktop with about 8 GB of RAM (OpenSearch needs about 2 GB)
+- Either an installed PostgreSQL 16 or newer (see [Without containers](#without-containers)),
+  or Docker Desktop / Podman with about 8 GB of RAM (OpenSearch needs about 2 GB)
 - Node.js 20.9 or newer, and pnpm 10
 - [uv](https://docs.astral.sh/uv/) (it installs Python 3.12 for you)
 - Optional: a Pinecone API key, for meaning-based search
@@ -41,7 +54,7 @@ the assistant, and voice come next.
 
 ```bash
 cp .env.example .env        # then edit: Pinecone key, SEARCH_ENV=dev-<yourname>
-pnpm infra:up               # PostgreSQL, Redis, OpenSearch, Temporal, OTel Collector, Grafana
+pnpm local:up               # PostgreSQL + OpenSearch on this machine (or: pnpm infra:up)
 pnpm bootstrap              # install deps, migrate, seed, build the search indexes
 pnpm dev                    # API :8000, outbox worker, web :3000
 ```
@@ -55,6 +68,50 @@ Open http://localhost:3000 and sign in with a development account:
 | `staff@example.com` | `staff-dev-password` | staff |
 
 These accounts exist only when `APP_ENV` is `dev`, `test`, or `ci`.
+
+### Without containers
+
+`pnpm local:up` runs just what the app needs, directly on your machine:
+
+- **PostgreSQL** from your own installation (`PG_BIN`, the newest
+  `C:\Program Files\PostgreSQL\<n>\bin`, or `pg_ctl` on your PATH). It uses a private data
+  folder with a `commerce` user and the `commerce` and `commerce_test` databases, so an
+  existing PostgreSQL service and its data are left alone. Port 5432 must be free.
+- **OpenSearch**, downloaded on first use (about 1 GB), localhost only.
+
+Both live in `%LOCALAPPDATA%\ai-commerce` (or `~/.local/share/ai-commerce`), outside the
+repo. `pnpm local:status` shows what's running; `pnpm local:down` stops both. Redis,
+Temporal, and the telemetry stack aren't needed to run the app yet; `pnpm dev` notices
+there's no OTel Collector and simply doesn't export telemetry.
+
+### Two checkouts at once (git worktrees)
+
+Give each checkout its own database, search indexes, and ports, so they never touch
+each other's data. In that checkout's `.env`:
+
+```bash
+COMMERCE_DATABASE_URL=postgresql+psycopg://commerce:commerce@localhost:5432/commerce_mybranch
+SEARCH_ENV=dev-mybranch
+```
+
+Create the database once (`CREATE DATABASE commerce_mybranch`), run `pnpm db:migrate`,
+`pnpm db:seed`, and `pnpm reindex`, then start it on other ports:
+`API_PORT=8200 WEB_PORT=3200 pnpm dev`. For its integration tests, set
+`COMMERCE_TEST_DATABASE_URL` to a separate test database.
+
+### Podman
+
+The `infra:*` scripts use whichever of Docker or Podman is running; set
+`CONTAINER_ENGINE=podman` (or `docker`) to choose. With Podman, create a **rootful** machine
+once, because OpenSearch asks for unlimited locked memory, which rootless containers can't
+grant:
+
+```bash
+podman machine init --cpus 4 --memory 8192 --rootful --now
+```
+
+`podman compose` runs the `docker-compose` or `podman-compose` program, so one of them must
+be installed.
 
 ### Pinecone
 
@@ -81,7 +138,8 @@ says so. After fixing the settings, run `pnpm reindex`.
 
 | Command | What it does |
 |---|---|
-| `pnpm infra:up` / `infra:down` / `infra:reset` | Start, stop, or wipe the local services |
+| `pnpm local:up` / `local:down` / `local:status` | Start, stop, or check PostgreSQL and OpenSearch without containers |
+| `pnpm infra:up` / `infra:down` / `infra:reset` | Start, stop, or wipe all local services in containers (Docker or Podman) |
 | `pnpm dev` | Run the API, outbox worker, and web app together |
 | `pnpm db:migrate` / `pnpm db:seed` | Apply migrations / seed catalog and dev accounts (safe to repeat) |
 | `pnpm reindex` | Rebuild OpenSearch and Pinecone from PostgreSQL |
@@ -93,8 +151,10 @@ says so. After fixing the settings, run `pnpm reindex`.
 
 `make <target>` wrappers exist for the same commands on macOS and Linux.
 
-Integration tests use a separate `commerce_test` database and Redis database 15, and
-migrate the test database themselves.
+The app reads its database from `COMMERCE_DATABASE_URL`, never `DATABASE_URL`, so a `.env`
+shared with another project can't point it at that project's database. Integration tests
+always use a separate `commerce_test` database (`COMMERCE_TEST_DATABASE_URL`) and migrate it
+themselves.
 
 ## Layout
 
@@ -116,7 +176,7 @@ docs/                  build plan and handoff docs
 
 | Integration | State |
 |---|---|
-| PostgreSQL, Redis, OpenSearch, OTel Collector, Grafana | Real (local Docker) |
+| PostgreSQL, Redis, OpenSearch, OTel Collector, Grafana | Real (local Docker or Podman) |
 | Pinecone | Real service; code and guards tested, but the semantic path hasn't run end to end yet because the account had no free index slot |
 | Sign-in | Email and password checked by the API (by design, no other layers) |
 | Stripe, Temporal workflows, LLM, voice | Not used yet (Milestones 2-4) |

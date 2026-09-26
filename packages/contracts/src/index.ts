@@ -18,6 +18,10 @@ export type UserOut = Schemas["UserOut"];
 export type SearchMeta = Schemas["SearchMeta"];
 export type OrderSummary = Schemas["OrderSummary"];
 export type OrderDetail = Schemas["OrderDetail"];
+export type TagOut = Schemas["TagOut"];
+export type Nutrition = Schemas["Nutrition"];
+export type StoreOut = Schemas["StoreOut"];
+export type DayHours = Schemas["DayHours"];
 
 export function createCommerceClient(options: ClientOptions) {
   return createClient<paths>(options);

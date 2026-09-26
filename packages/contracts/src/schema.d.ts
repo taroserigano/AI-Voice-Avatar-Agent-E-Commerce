@@ -225,6 +225,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/stores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Stores */
+        get: operations["list_stores_v1_stores_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -301,6 +318,21 @@ export interface components {
             /** Slug */
             slug: string;
         };
+        /** DayHours */
+        DayHours: {
+            /** Closes */
+            closes: string | null;
+            /**
+             * Day
+             * @description "mon" through "sun"
+             */
+            day: string;
+            /**
+             * Opens
+             * @description "07:00" local time; null when closed
+             */
+            opens: string | null;
+        };
         /** FacetValue */
         FacetValue: {
             /** Count */
@@ -316,6 +348,10 @@ export interface components {
             brands: components["schemas"]["FacetValue"][];
             /** Categories */
             categories: components["schemas"]["FacetValue"][];
+            /** Product Types */
+            product_types: components["schemas"]["FacetValue"][];
+            /** Tags */
+            tags: components["schemas"]["FacetValue"][];
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -331,6 +367,32 @@ export interface components {
         MessageOut: {
             /** Message */
             message: string;
+        };
+        /**
+         * Nutrition
+         * @description Per labeled serving, as on a US nutrition facts panel.
+         */
+        Nutrition: {
+            /** Added Sugars G */
+            added_sugars_g: number;
+            /** Calories */
+            calories: number;
+            /** Fiber G */
+            fiber_g: number;
+            /** Protein G */
+            protein_g: number;
+            /** Saturated Fat G */
+            saturated_fat_g: number;
+            /** Serving Size */
+            serving_size: string;
+            /** Sodium Mg */
+            sodium_mg: number;
+            /** Total Carbs G */
+            total_carbs_g: number;
+            /** Total Fat G */
+            total_fat_g: number;
+            /** Total Sugars G */
+            total_sugars_g: number;
         };
         /** OrderDetail */
         OrderDetail: {
@@ -425,9 +487,14 @@ export interface components {
          * @description How the sandbox return policy treats a category (see PRODUCT_REQUIREMENTS.md).
          * @enum {string}
          */
-        PolicyClass: "standard" | "inspection" | "final_sale";
+        PolicyClass: "standard" | "inspection" | "final_sale" | "perishable";
         /** ProductDetail */
         ProductDetail: {
+            /**
+             * Allergens
+             * @description Major food allergens, e.g. ["milk", "soy"]
+             */
+            allergens: string[];
             /**
              * As Of
              * Format: date-time
@@ -450,13 +517,31 @@ export interface components {
             image_path: string;
             /** In Stock */
             in_stock: boolean;
+            /** Ingredients */
+            ingredients: string | null;
+            /** @description Food only */
+            nutrition: components["schemas"]["Nutrition"] | null;
             /**
              * Price Minor
              * @description Lowest current variant price
              */
             price_minor: number;
+            /**
+             * Product Type
+             * @description What a shopper would call it, e.g. "milk"
+             */
+            product_type: string;
             /** Slug */
             slug: string;
+            /**
+             * Specs
+             * @description Key facts, e.g. {"Milkfat": "0%"}
+             */
+            specs: {
+                [key: string]: string;
+            };
+            /** Tags */
+            tags: components["schemas"]["TagOut"][];
             /** Title */
             title: string;
             /** Variant Count */
@@ -499,8 +584,15 @@ export interface components {
              * @description Lowest current variant price
              */
             price_minor: number;
+            /**
+             * Product Type
+             * @description What a shopper would call it, e.g. "milk"
+             */
+            product_type: string;
             /** Slug */
             slug: string;
+            /** Tags */
+            tags: components["schemas"]["TagOut"][];
             /** Title */
             title: string;
             /** Variant Count */
@@ -561,6 +653,54 @@ export interface components {
          * @enum {string}
          */
         SortOrder: "relevance" | "price_asc" | "price_desc" | "newest";
+        /** StoreOut */
+        StoreOut: {
+            /** Address Line1 */
+            address_line1: string;
+            /** City */
+            city: string;
+            /** Code */
+            code: string;
+            /** Hours */
+            hours: components["schemas"]["DayHours"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Latitude */
+            latitude: number;
+            /** Longitude */
+            longitude: number;
+            /** Name */
+            name: string;
+            /**
+             * Open Now
+             * @description Whether the store is open at the time of the request
+             */
+            open_now: boolean;
+            /** Phone */
+            phone: string;
+            /** Postal Code */
+            postal_code: string;
+            /** Services */
+            services: string[];
+            /** State */
+            state: string;
+            /** Timezone */
+            timezone: string;
+            today_hours: components["schemas"]["DayHours"];
+        };
+        /** TagOut */
+        TagOut: {
+            /** Label */
+            label: string;
+            /**
+             * Value
+             * @description Tag slug, usable in the tag / exclude_tag filters
+             */
+            value: string;
+        };
         /** UserOut */
         UserOut: {
             /** Display Name */
@@ -966,6 +1106,12 @@ export interface operations {
                 /** @description Minor units */
                 max_price?: number | null;
                 in_stock?: boolean;
+                /** @description Any of these types, e.g. "milk", "yogurt" */
+                product_type?: string[] | null;
+                /** @description Every one of these tags, e.g. "organic", "fat-free" */
+                tag?: string[] | null;
+                /** @description None of these tags, e.g. "whole-milk" */
+                exclude_tag?: string[] | null;
                 sort?: components["schemas"]["SortOrder"];
                 page?: number;
                 page_size?: number;
@@ -1030,6 +1176,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_stores_v1_stores_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoreOut"][];
                 };
             };
         };

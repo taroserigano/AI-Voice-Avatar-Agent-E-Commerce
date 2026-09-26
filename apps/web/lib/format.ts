@@ -9,3 +9,11 @@ export function formatMoney(amountMinor: number, currency = "USD"): string {
   }
   return fmt.format(amountMinor / 100);
 }
+
+/** Store hours: "07:00" -> "7 AM", "21:30" -> "9:30 PM", "00:00" -> "12 AM". */
+export function formatTime(hhmm: string): string {
+  const [h = 0, m = 0] = hhmm.split(":").map(Number);
+  const suffix = h >= 12 ? "PM" : "AM";
+  const hour = h % 12 === 0 ? 12 : h % 12;
+  return m ? `${hour}:${String(m).padStart(2, "0")} ${suffix}` : `${hour} ${suffix}`;
+}

@@ -12,11 +12,13 @@ from sqlalchemy import (
     DateTime,
     Enum,
     ForeignKey,
+    Index,
     Integer,
     String,
     Text,
     UniqueConstraint,
 )
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from commerce.db import Base, Timestamps, UUIDPk, utcnow
@@ -28,6 +30,9 @@ class PolicyClass(enum.StrEnum):
     STANDARD = "standard"
     INSPECTION = "inspection"  # e.g. Electronics: refund after warehouse inspection
     FINAL_SALE = "final_sale"  # e.g. Gift cards: not returnable
+    # Fresh and frozen food: not sent back; a damaged or spoiled item reported within
+    # 7 days of delivery is refunded without a return shipment.
+    PERISHABLE = "perishable"
 
 
 class Category(UUIDPk, Base):
@@ -46,6 +51,7 @@ class Category(UUIDPk, Base):
 
 class Product(UUIDPk, Timestamps, Base):
     __tablename__ = "products"
+    __table_args__ = (Index("ix_products_tags", "tags", postgresql_using="gin"),)
 
     slug: Mapped[str] = mapped_column(String(160), unique=True)
     title: Mapped[str] = mapped_column(String(200))
@@ -54,6 +60,13 @@ class Product(UUIDPk, Timestamps, Base):
     category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("categories.id"), index=True)
     image_path: Mapped[str] = mapped_column(String(300))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    # What a shopper would call it ("milk", "yogurt", "headphones"): groups products across
+    # brands for filters and for the assistant's structured search.
+    product_type: Mapped[str] = mapped_column(String(80), default="general", index=True)
+    # Controlled vocabulary in catalog/tags.py ("organic", "fat-free", "wireless", ...).
+    tags: Mapped[list[str]] = mapped_column(ARRAY(String(40)), default=list)
+    # Nutrition facts, ingredients, allergens, and specs (see catalog.schemas.ProductDetail).
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
 
     category: Mapped[Category] = relationship(back_populates="products")
     variants: Mapped[list[Variant]] = relationship(

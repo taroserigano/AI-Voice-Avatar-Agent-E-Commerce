@@ -21,6 +21,11 @@ describe("toProductQuery", () => {
     expect(q.page).toBe(1);
     expect(q.brand).toEqual(["A"]);
   });
+  it("keeps only well-formed tag and product type slugs", () => {
+    const q = toProductQuery({ tag: ["organic", "fat-free", "Bad Tag", "x;drop"], product_type: "milk" });
+    expect(q.tag).toEqual(["organic", "fat-free"]);
+    expect(q.product_type).toEqual(["milk"]);
+  });
   it("a fixed category wins over the query string", () => {
     expect(toProductQuery({ category: "toys" }, "electronics").category).toBe("electronics");
   });

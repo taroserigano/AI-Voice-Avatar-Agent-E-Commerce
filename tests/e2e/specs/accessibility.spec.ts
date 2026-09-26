@@ -44,6 +44,20 @@ test("home, search, product, and cart pages have no automatic WCAG 2.2 AA violat
   await expectNoViolations(page);
 });
 
+test("filtered listing, food product, and store locator pages have no automatic WCAG 2.2 AA violations", async ({ page }) => {
+  await signInFromScratch(page, ALICE);
+  await page.goto("/c/dairy-eggs?product_type=yogurt&tag=sugar-free");
+  await expectNoViolations(page);
+  await page.locator("ul[aria-label='Dairy & Eggs'] > li a").first().click();
+  await expect(page.getByRole("table", { name: /Nutrition Facts/ })).toBeVisible();
+  await expectNoViolations(page);
+  await page.goto("/stores");
+  await expect(page.getByRole("list", { name: "Store list" })).toBeVisible();
+  // The map itself is Google's embedded page; axe checks our page around it.
+  const results = await new AxeBuilder({ page }).withTags(WCAG).exclude("iframe").analyze();
+  expect(results.violations.map((v) => `${v.id} (${v.impact}): ${v.nodes.length} node(s)`)).toEqual([]);
+});
+
 test("the skip link moves focus to the main content", async ({ page }) => {
   await page.goto("/sign-in");
   await signIn(page, ALICE);

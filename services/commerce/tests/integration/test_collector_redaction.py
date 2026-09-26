@@ -2,12 +2,13 @@
 
 Runs the real collector image with infra/otel/collector.yaml plus a small override that
 writes to a file instead of Grafana, sends it a span and a log containing an email and a
-card-like number, and checks what the collector exports. Needs Docker.
+card-like number, and checks what the collector exports. Needs Docker or Podman.
 """
 
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import socket
 import subprocess
@@ -45,6 +46,19 @@ service:
 """
 
 
+def _container_engine() -> str | None:
+    """CONTAINER_ENGINE if set, else the first of Docker or Podman that is running."""
+    if chosen := os.environ.get("CONTAINER_ENGINE"):
+        return chosen
+    for engine in ("docker", "podman"):
+        if (
+            shutil.which(engine)
+            and subprocess.run([engine, "info"], capture_output=True).returncode == 0
+        ):
+            return engine
+    return None
+
+
 def _free_port() -> int:
     with socket.socket() as s:
         s.bind(("127.0.0.1", 0))
@@ -53,8 +67,9 @@ def _free_port() -> int:
 
 @pytest.fixture
 def collector(tmp_path: Path):  # type: ignore[no-untyped-def]
-    if shutil.which("docker") is None:
-        pytest.skip("docker is not available")
+    engine = _container_engine()
+    if engine is None:
+        pytest.skip("neither Docker nor Podman is running")
     (tmp_path / "override.yaml").write_text(OVERRIDE, encoding="utf-8")
     out = tmp_path / "out"
     out.mkdir()
@@ -62,7 +77,7 @@ def collector(tmp_path: Path):  # type: ignore[no-untyped-def]
     name = f"otel-redaction-test-{uuid.uuid4().hex[:8]}"
     subprocess.run(
         [
-            "docker", "run", "-d", "--rm", "--name", name,
+            engine, "run", "-d", "--rm", "--name", name,
             "-e", "OTEL_BASELINE_SAMPLING_PERCENT=100",
             "-p", f"{port}:4318",
             "-v", f"{REPO / 'infra' / 'otel' / 'collector.yaml'}:/etc/otelcol/config.yaml:ro",
@@ -85,7 +100,7 @@ def collector(tmp_path: Path):  # type: ignore[no-untyped-def]
                 time.sleep(0.5)
         yield base, out / "export.jsonl"
     finally:
-        subprocess.run(["docker", "rm", "-f", name], capture_output=True)
+        subprocess.run([engine, "rm", "-f", name], capture_output=True)
 
 
 def _attr(key: str, value: str) -> dict:  # type: ignore[type-arg]

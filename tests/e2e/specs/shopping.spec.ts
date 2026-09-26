@@ -13,7 +13,7 @@ test.describe("shopping journey", () => {
     await expect(page.getByRole("heading", { name: "Results for “wireless headphones”" })).toBeVisible();
 
     const results = page.getByRole("list", { name: /Results for/ });
-    await expect(results.getByRole("listitem").first()).toContainText("Arc Wireless Over-Ear Headphones");
+    await expect(results.locator(":scope > li").first()).toContainText(/Wireless.*Headphones/);
     await results.getByRole("link", { name: /Arc Wireless Over-Ear Headphones/ }).click();
 
     await expect(page.getByRole("heading", { level: 1, name: "Arc Wireless Over-Ear Headphones" })).toBeVisible();
@@ -57,13 +57,14 @@ test.describe("shopping journey", () => {
   });
 
   test("filters: department, in-stock only, and price", async ({ page }) => {
-    await page.goto("/c/home-kitchen");
+    await page.goto("/c/home-kitchen?product_type=mixing-bowls&product_type=candle");
     await expect(page.getByRole("heading", { name: "Home & Kitchen" })).toBeVisible();
-    await expect(page.getByText("Nesting Stainless Mixing Bowls, Set of 5")).toBeVisible();
+    await expect(page.getByText("Nesting Stainless Mixing Bowls, Set of 5")).toBeVisible(); // sold out
     await page.getByLabel("In stock only").check();
     await page.getByLabel("Maximum price in dollars").fill("30");
     await page.getByRole("button", { name: "Apply filters" }).click();
     await expect(page).toHaveURL(/in_stock=true/);
+    await expect(page).toHaveURL(/product_type=candle/); // the checked types are kept
     await expect(page.getByText("Nesting Stainless Mixing Bowls, Set of 5")).toHaveCount(0);
     await expect(page.getByText("Cedar & Sea Salt Soy Candle")).toBeVisible();
   });

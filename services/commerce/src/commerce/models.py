@@ -14,6 +14,7 @@ from commerce.catalog.models import (
 from commerce.db import Base
 from commerce.orders.models import Order, OrderLine, OrderStatus
 from commerce.outbox.models import OutboxEvent
+from commerce.stores.models import Store
 
 __all__ = [
     "AuthSession",
@@ -31,6 +32,7 @@ __all__ = [
     "Product",
     "Role",
     "StockLocation",
+    "Store",
     "User",
     "Variant",
 ]

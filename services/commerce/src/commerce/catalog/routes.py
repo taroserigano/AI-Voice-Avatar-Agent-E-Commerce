@@ -28,6 +28,18 @@ def products(
     min_price: Annotated[int | None, Query(ge=0, description="Minor units")] = None,
     max_price: Annotated[int | None, Query(ge=0, description="Minor units")] = None,
     in_stock: bool = False,
+    product_type: Annotated[
+        list[str] | None,
+        Query(max_length=10, description='Any of these types, e.g. "milk", "yogurt"'),
+    ] = None,
+    tag: Annotated[
+        list[str] | None,
+        Query(max_length=10, description='Every one of these tags, e.g. "organic", "fat-free"'),
+    ] = None,
+    exclude_tag: Annotated[
+        list[str] | None,
+        Query(max_length=10, description='None of these tags, e.g. "whole-milk"'),
+    ] = None,
     sort: SortOrder = SortOrder.RELEVANCE,
     page: Annotated[int, Query(ge=1, le=1000)] = 1,
     page_size: Annotated[int, Query(ge=1, le=60)] = 24,
@@ -38,6 +50,9 @@ def products(
         min_price_minor=min_price,
         max_price_minor=max_price,
         in_stock=in_stock,
+        product_types=tuple(product_type or ()),
+        tags=tuple(tag or ()),
+        exclude_tags=tuple(exclude_tag or ()),
     )
     return list_products(db, query=q, filters=filters, sort=sort, page=page, page_size=page_size)
 

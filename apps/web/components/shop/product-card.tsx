@@ -1,6 +1,20 @@
 import { formatMoney } from "@/lib/format";
-import type { ProductSummary } from "@ai-commerce/contracts";
+import type { ProductSummary, TagOut } from "@ai-commerce/contracts";
 import Link from "next/link";
+
+export function TagBadges({ tags, max, className = "" }: { tags: TagOut[]; max?: number; className?: string }) {
+  const shown = max === undefined ? tags : tags.slice(0, max);
+  if (shown.length === 0) return null;
+  return (
+    <ul aria-label="Features" className={`flex flex-wrap gap-1 ${className}`}>
+      {shown.map((t) => (
+        <li key={t.value} className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-900 ring-1 ring-emerald-200">
+          {t.label}
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export function ProductCard({ product, priority = false }: { product: ProductSummary; priority?: boolean }) {
   return (
@@ -21,6 +35,7 @@ export function ProductCard({ product, priority = false }: { product: ProductSum
         </p>
         <h3 className="mt-1 line-clamp-2 font-medium group-hover:underline">{product.title}</h3>
         <p className="mt-0.5 text-sm text-muted">{product.brand}</p>
+        <TagBadges tags={product.tags} max={3} className="mt-2" />
         <p className={`mt-auto pt-2 text-sm font-medium ${product.in_stock ? "text-emerald-800" : "text-red-800"}`}>
           {product.in_stock ? "In stock" : "Out of stock"}
         </p>

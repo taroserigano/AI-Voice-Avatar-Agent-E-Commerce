@@ -6,7 +6,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import AliasChoices, Field
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
@@ -21,7 +21,12 @@ class Settings(BaseSettings):
 
     app_env: Literal["dev", "test", "ci", "staging", "prod"] = "dev"
 
-    database_url: str = "postgresql+psycopg://commerce:commerce@localhost:5432/commerce"
+    # COMMERCE_DATABASE_URL, not DATABASE_URL: the repo-root .env may be shared with other
+    # projects, and this app must never migrate another project's database.
+    database_url: str = Field(
+        default="postgresql+psycopg://commerce:commerce@localhost:5432/commerce",
+        validation_alias="COMMERCE_DATABASE_URL",
+    )
     opensearch_url: str = "http://localhost:9200"
 
     # Pinecone is always the real service. With no key, meaning-based search is reported
@@ -52,6 +57,15 @@ class Settings(BaseSettings):
 
     otel_exporter_otlp_endpoint: str | None = None
     log_level: str = "INFO"
+
+    @field_validator("database_url")
+    @classmethod
+    def _use_psycopg_driver(cls, url: str) -> str:
+        # Hosted providers (Supabase, Neon) hand out postgres:// or postgresql:// URLs.
+        for prefix in ("postgres://", "postgresql://"):
+            if url.startswith(prefix):
+                return "postgresql+psycopg://" + url.removeprefix(prefix)
+        return url
 
     @property
     def products_index(self) -> str:

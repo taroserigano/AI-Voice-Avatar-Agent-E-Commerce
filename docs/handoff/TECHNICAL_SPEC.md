@@ -30,7 +30,7 @@ Shopping: browser → Next.js → commerce API → PostgreSQL. Product search re
 
 ## Suggested tables and invariants
 
-- `users`, `sessions`, `products`, `variants`, `categories`, `prices`, `stock_locations`, `inventory_balances`, `inventory_reservations`.
+- `users`, `sessions`, `products` (with `product_type`, controlled-vocabulary `tags`, and `details`: nutrition, ingredients, allergens, specs), `variants`, `categories`, `prices`, `stock_locations`, `inventory_balances`, `inventory_reservations`, `stores` (store locator only).
 - `carts`, `cart_items`, `checkout_attempts`, `orders`, `order_lines`, `payment_attempts`, `shipments`.
 - `return_quotes`, `return_requests`, `return_items`, `refund_attempts`, `support_cases`, `policy_versions`.
 - `conversations`, `messages`, `graph_checkpoints`, `tool_audit`, `outbox_events`, `provider_webhook_events`.
@@ -44,8 +44,9 @@ All routes require a verified identity except the auth routes, `/healthz`, and t
 | Method and path | Input | Output/behavior |
 |---|---|---|
 | `POST /v1/auth/sign-in` / `sign-up` / `sign-out` | credentials | Session cookie (HttpOnly, Secure, `SameSite=Lax`, fixed expiry); sign-out ends the server session |
-| `GET /v1/products` | query, filters, pagination (signed in) | Product summaries and facets; search-backed |
-| `GET /v1/products/{id}` | product ID (signed in) | Variants and descriptive details; fresh price/stock fields |
+| `GET /v1/products` | query; filters: category, brand, `product_type` (any of), `tag` (all of), `exclude_tag` (none of), price, in stock; pagination (signed in) | Product summaries (with type and tags) and facets (categories, brands, types, tags); search-backed |
+| `GET /v1/products/{id}` | product ID (signed in) | Variants, description, nutrition, ingredients, allergens, specs; fresh price/stock fields |
+| `GET /v1/stores` | signed in | Store locations with hours, services, and open-now status (America/Chicago) |
 | `GET /v1/cart` / `PUT /v1/cart/items` | variant, quantity | Durable cart; server-side current estimate |
 | `POST /v1/checkout/quote` | cart/version | Server totals and stock validation, "tax calculated at payment", quote expiry |
 | `POST /v1/checkout/start` | quote ID, idempotency key | Checkout attempt (Temporal workflow ID = attempt ID) and Stripe Checkout Session URL |

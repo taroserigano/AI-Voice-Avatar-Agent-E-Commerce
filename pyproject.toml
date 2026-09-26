@@ -30,7 +30,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = ["S105", "S106", "S311", "S603", "S607"]
-"**/seed/**" = ["S105", "S106"]
+"**/seed/**" = ["S105", "S106", "E501"]  # dev passwords; one-row-per-item data tables
 "scripts/generate_placeholders.py" = ["E501"]  # inline SVG markup
 
 [tool.ruff.lint.isort]

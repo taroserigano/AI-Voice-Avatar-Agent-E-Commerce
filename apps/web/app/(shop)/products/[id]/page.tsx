@@ -3,7 +3,9 @@ import { serverApi, unwrap } from "@/lib/api-server";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { TagBadges } from "@/components/shop/product-card";
 import { AddToCart } from "./add-to-cart";
+import { ProductFacts, ReturnPolicyNote } from "./product-facts";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -57,20 +59,16 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         <div>
           <p className="font-medium text-brand-700">{product.brand}</p>
           <h1 className="mt-1 text-3xl font-bold leading-tight">{product.title}</h1>
+          <TagBadges tags={product.tags} className="mt-3" />
           <AddToCart product={product} />
           <section aria-labelledby="about" className="mt-8 border-t border-line pt-6">
             <h2 id="about" className="text-lg font-semibold">
               About this item
             </h2>
             <p className="mt-2 leading-relaxed text-stone-700">{product.description}</p>
-            {product.category.policy_class === "final_sale" ? (
-              <p className="mt-3 text-sm font-medium text-red-800">Final sale: this item can&apos;t be returned.</p>
-            ) : product.category.policy_class === "inspection" ? (
-              <p className="mt-3 text-sm text-muted">Returnable within 30 days of delivery; refunded after inspection.</p>
-            ) : (
-              <p className="mt-3 text-sm text-muted">Returnable within 30 days of delivery.</p>
-            )}
+            <ReturnPolicyNote policyClass={product.category.policy_class} />
           </section>
+          <ProductFacts product={product} />
         </div>
       </div>
     </div>

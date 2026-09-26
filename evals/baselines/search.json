@@ -1,26 +1,31 @@
 {
-  "ran_at": "2026-09-25T22:32:58+00:00",
+  "ran_at": "2026-09-26T17:12:46+00:00",
   "split": "all",
-  "queries": 54,
+  "queries": 74,
   "backends_seen": {
-    "keyword=ok": 54,
-    "semantic=unavailable": 54
+    "keyword=ok": 74,
+    "semantic=disabled": 74
   },
   "overall": {
-    "ndcg@10": 0.9084,
-    "recall@10": 0.8843,
-    "mrr": 0.9259
+    "ndcg@10": 0.7811,
+    "recall@10": 0.8129,
+    "mrr": 0.7818
   },
   "by_type": {
+    "attribute": {
+      "ndcg@10": 0.9467,
+      "recall@10": 0.8244,
+      "mrr": 1.0
+    },
     "keyword": {
-      "ndcg@10": 0.9813,
-      "recall@10": 0.9828,
-      "mrr": 0.9828
+      "ndcg@10": 0.8421,
+      "recall@10": 0.9741,
+      "mrr": 0.7989
     },
     "semantic": {
-      "ndcg@10": 0.8074,
-      "recall@10": 0.75,
-      "mrr": 0.8409
+      "ndcg@10": 0.5483,
+      "recall@10": 0.5758,
+      "mrr": 0.5538
     },
     "sku": {
       "ndcg@10": 1.0,
@@ -28,21 +33,37 @@
       "mrr": 1.0
     },
     "typo": {
-      "ndcg@10": 0.9159,
+      "ndcg@10": 0.6923,
       "recall@10": 0.875,
-      "mrr": 1.0
+      "mrr": 0.75
     }
   },
   "worst": [
+    {
+      "id": "q30",
+      "type": "semantic",
+      "query": "light for camping at night",
+      "top": [
+        "brightside-light-mayonnaise",
+        "spokehaven-rechargeable-bike-light-set",
+        "ampwell-led-candelabra-light-bulbs-40w-equivalent",
+        "ampwell-led-a19-light-bulbs-60w-equivalent-soft-white",
+        "ampwell-led-a19-light-bulbs-60w-equivalent-daylight"
+      ],
+      "ndcg@10": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0
+    },
     {
       "id": "q32",
       "type": "semantic",
       "query": "grow vegetables at home",
       "top": [
-        "harbor-home-linen-sheets",
-        "harbor-home-throw-blanket",
-        "harbor-home-glass-containers",
-        "harbor-home-scented-candle"
+        "curio-labs-crystal-growing-science-kit",
+        "larkspur-kitchen-vegetable-broth",
+        "larkspur-kitchen-vegetable-oil",
+        "sonora-audio-room-wi-fi-and-bluetooth-home-speaker",
+        "larkspur-kitchen-frozen-mixed-vegetables"
       ],
       "ndcg@10": 0.0,
       "recall@10": 0.0,
@@ -53,10 +74,41 @@
       "type": "semantic",
       "query": "weights for home gym",
       "top": [
-        "harbor-home-linen-sheets",
-        "harbor-home-throw-blanket",
-        "harbor-home-glass-containers",
-        "harbor-home-scented-candle"
+        "tempo-athletics-rubber-hex-dumbbell-single",
+        "larkspur-home-quick-dry-cotton-bath-towel-set-6-piece",
+        "harbor-home-turkish-cotton-bath-towels-white",
+        "harbor-home-turkish-cotton-bath-towels-stone",
+        "harbor-home-turkish-cotton-bath-towels-navy"
+      ],
+      "ndcg@10": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "id": "q39",
+      "type": "semantic",
+      "query": "toy blocks for toddlers",
+      "top": [
+        "pressmark-pm-20xl-high-yield-black-and-tri-color-ink-combo-pack",
+        "rootwell-plant-foods-organic-extra-firm-tofu",
+        "larkspur-kitchen-chicken-flavor-ramen-noodle-soup",
+        "puddlejump-toddler-short-sleeve-tees-4-pack",
+        "wagworks-durable-rubber-chew-toy-for-dogs"
+      ],
+      "ndcg@10": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "id": "q44",
+      "type": "semantic",
+      "query": "sunscreen moisturizer",
+      "top": [
+        "larkspur-basics-moisturizing-shampoo-coconut",
+        "larkspur-basics-moisturizing-conditioner-coconut",
+        "solstice-beauty-moisturizing-satin-lipstick",
+        "larkspur-basics-sunscreen-spray-spf-30",
+        "snugglebee-daily-moisture-baby-lotion"
       ],
       "ndcg@10": 0.0,
       "recall@10": 0.0,
@@ -66,73 +118,46 @@
       "id": "q54",
       "type": "semantic",
       "query": "present for someone who loves the outdoors",
-      "top": [],
+      "top": [
+        "courtline-rubber-outdoor-basketball",
+        "courtline-indoor-outdoor-volleyball",
+        "freshfield-dryer-sheets-outdoor-fresh",
+        "brightgate-wireless-outdoor-security-camera-2k",
+        "courtline-official-size-7-indoor-outdoor-basketball"
+      ],
       "ndcg@10": 0.0,
       "recall@10": 0.0,
       "mrr": 0.0
     },
     {
-      "id": "q10",
-      "type": "keyword",
-      "query": "webcam for video calls",
-      "top": [
-        "lumen-tablet-10",
-        "lumen-hd-webcam"
-      ],
-      "ndcg@10": 0.6309297535714574,
-      "recall@10": 1.0,
-      "mrr": 0.5
-    },
-    {
-      "id": "q30",
+      "id": "q45",
       "type": "semantic",
-      "query": "light for camping at night",
+      "query": "plastic-free shampoo",
       "top": [
-        "pebble-pine-puzzle-1000",
-        "summit-forge-headlamp",
-        "tempo-resistance-bands",
-        "lumen-hd-webcam",
-        "summit-forge-camp-chair"
+        "larkspur-baby-tear-free-baby-shampoo",
+        "clearwell-skin-fragrance-free-gentle-shampoo",
+        "verdant-botanicals-curl-defining-sulfate-free-shampoo",
+        "verdant-botanicals-color-care-sulfate-free-shampoo",
+        "little-fern-tear-free-baby-wash-and-shampoo-fragrance-free"
       ],
-      "ndcg@10": 0.6309297535714574,
+      "ndcg@10": 0.2890648263178878,
       "recall@10": 1.0,
-      "mrr": 0.5
+      "mrr": 0.1
     },
     {
       "id": "q03",
       "type": "semantic",
       "query": "noise cancelling headphones for travel",
       "top": [
+        "crestone-audio-noise-cancelling-wireless-over-ear-headphones",
+        "sonora-audio-arc-lite-noise-cancelling-wireless-headphones",
+        "sonora-audio-arc-pro-noise-cancelling-wireless-over-ear-headphones",
         "sonora-arc-wireless-headphones",
-        "sonora-studio-wired-headphones",
-        "sonora-kids-headphones"
+        "crestone-audio-noise-cancelling-wireless-earbuds"
       ],
-      "ndcg@10": 0.8262346571285599,
+      "ndcg@10": 0.35583989829307827,
       "recall@10": 0.5,
-      "mrr": 1.0
-    },
-    {
-      "id": "q12",
-      "type": "semantic",
-      "query": "kettle for pour over coffee",
-      "top": [
-        "kettleworth-gooseneck-kettle",
-        "sonora-arc-wireless-headphones"
-      ],
-      "ndcg@10": 0.8262346571285599,
-      "recall@10": 0.5,
-      "mrr": 1.0
-    },
-    {
-      "id": "q18",
-      "type": "semantic",
-      "query": "something to keep coffee hot",
-      "top": [
-        "kettleworth-french-press"
-      ],
-      "ndcg@10": 0.8262346571285599,
-      "recall@10": 0.5,
-      "mrr": 1.0
+      "mrr": 0.25
     }
   ]
 }

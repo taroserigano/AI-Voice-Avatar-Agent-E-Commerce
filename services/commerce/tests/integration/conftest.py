@@ -29,8 +29,9 @@ from commerce.main import create_app
 from commerce.search.keyword import get_keyword_index
 from commerce.search.reindex import reindex
 from commerce.search.semantic import get_semantic_index
-from commerce.seed.data import DEV_USERS, PRODUCTS
-from commerce.seed.run import make_sku, seed_catalog, seed_dev_users
+from commerce.seed.catalog import PRODUCTS
+from commerce.seed.data import DEV_USERS
+from commerce.seed.run import make_sku, seed_catalog, seed_dev_users, seed_stores
 from commerce.telemetry import init_telemetry
 
 pytestmark = pytest.mark.integration
@@ -62,6 +63,7 @@ def _database(_telemetry: None) -> Iterator[None]:
         conn.execute(text("SELECT 1"))
     with get_sessionmaker()() as db:
         seed_catalog(db)
+        seed_stores(db)
         seed_dev_users(db)
         db.commit()
     _seed_password_hashes()
@@ -84,22 +86,39 @@ def _seed_password_hashes() -> dict[str, str]:
     return {email: hash_password(password) for email, password in PASSWORDS.items()}
 
 
+@functools.cache
+def _seed_values() -> dict[str, tuple[int, int]]:
+    """SKU -> (seed price, seed stock) for the whole catalog."""
+    return {
+        v.sku or make_sku(p.slug, v.code): (v.price_cents or p.price_cents, v.stock)
+        for p in PRODUCTS
+        for v in p.variants
+    }
+
+
 def _reset_catalog(db: Session) -> None:
-    """Put every price and stock level back to the seed values."""
-    for p in PRODUCTS:
-        for v in p.variants:
-            variant_id = db.scalar(
-                select(Variant.id).where(Variant.sku == make_sku(p.slug, v.code))
-            )
+    """Put every price and stock level back to the seed values.
+
+    One read of the whole catalog, then updates only for the few rows a test changed.
+    """
+    rows = db.execute(
+        select(Variant.id, Variant.sku, Price.amount_minor, InventoryBalance.on_hand,
+               InventoryBalance.reserved)
+        .join(Price, Price.variant_id == Variant.id)
+        .join(InventoryBalance, InventoryBalance.variant_id == Variant.id)
+    )  # fmt: skip
+    seed = _seed_values()
+    for variant_id, sku, price, on_hand, reserved in rows:
+        seed_price, seed_stock = seed.get(sku, (price, on_hand))
+        if price != seed_price:
             db.execute(
-                update(Price)
-                .where(Price.variant_id == variant_id)
-                .values(amount_minor=v.price_cents or p.price_cents)
+                update(Price).where(Price.variant_id == variant_id).values(amount_minor=seed_price)
             )
+        if (on_hand, reserved) != (seed_stock, 0):
             db.execute(
                 update(InventoryBalance)
                 .where(InventoryBalance.variant_id == variant_id)
-                .values(on_hand=v.stock, reserved=0)
+                .values(on_hand=seed_stock, reserved=0)
             )
 
 

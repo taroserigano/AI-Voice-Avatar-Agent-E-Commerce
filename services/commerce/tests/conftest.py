@@ -6,8 +6,11 @@ import os
 import uuid
 
 os.environ["APP_ENV"] = "test"
-os.environ.setdefault(
-    "DATABASE_URL", "postgresql+psycopg://commerce:commerce@localhost:5432/commerce_test"
+# Always the test database (integration tests truncate tables), never the dev database,
+# even when COMMERCE_DATABASE_URL points at a hosted one.
+os.environ["COMMERCE_DATABASE_URL"] = os.environ.get(
+    "COMMERCE_TEST_DATABASE_URL",
+    "postgresql+psycopg://commerce:commerce@localhost:5432/commerce_test",
 )
 os.environ.setdefault("OPENSEARCH_URL", "http://localhost:9200")
 # A throwaway suffix per run: its own OpenSearch index and (if configured) Pinecone namespace.

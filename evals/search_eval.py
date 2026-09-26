@@ -4,6 +4,9 @@ Run from the repo root with the stack up: ``pnpm eval:search``
   --record-baseline   save this run as evals/baselines/search.json
   --split dev|test|all  which queries to score (default all; tune only on dev)
 
+Queries have hand labels (``relevant``) or, for attribute queries such as "nonfat organic
+milk", a ``relevant_rule`` (product type + tags) that labels the catalog from its own data.
+
 Metrics per query (graded relevance: 2 = what the shopper wants, 1 = fair alternative):
   nDCG@10    ranking quality, rewarding the best items near the top
   Recall@10  share of relevant items that appear in the top 10
@@ -51,6 +54,27 @@ def score(ranked: list[str], relevant: dict[str, int]) -> dict[str, float]:
     return {"ndcg@10": ndcg, "recall@10": recall, "mrr": mrr}
 
 
+def graded_by_rule(rule: dict, facts: list[tuple[str, str, set[str]]]) -> dict[str, int]:  # type: ignore[type-arg]
+    """Labels computed from product data, for attribute queries over a large catalog.
+
+    Grade 2: the right type with every required tag and no excluded one. Grade 1: the right
+    type with some of the required tags (a fair alternative). Hand-labeling every organic
+    milk in a 2,000-product catalog would go stale; the rule can't.
+    """
+    types = set(rule.get("product_type", []))
+    required = set(rule.get("tags", []))
+    excluded = set(rule.get("exclude_tags", []))
+    grades: dict[str, int] = {}
+    for slug, ptype, tags in facts:
+        if types and ptype not in types:
+            continue
+        if required <= tags and not tags & excluded:
+            grades[slug] = 2
+        elif tags & required:
+            grades[slug] = 1
+    return grades
+
+
 def run(split: str) -> dict:  # type: ignore[type-arg]
     rows = [json.loads(line) for line in QUERIES.read_text(encoding="utf-8").splitlines() if line]
     if split != "all":
@@ -59,7 +83,17 @@ def run(split: str) -> dict:  # type: ignore[type-arg]
     legs: dict[str, int] = defaultdict(int)
     with get_sessionmaker()() as db:
         slug_by_id = {str(i): s for i, s in db.execute(select(Product.id, Product.slug))}
+        facts = [
+            (slug, ptype, set(tags or []))
+            for slug, ptype, tags in db.execute(
+                select(Product.slug, Product.product_type, Product.tags).where(
+                    Product.is_active.is_(True)
+                )
+            )
+        ]
         for row in rows:
+            if "relevant_rule" in row:
+                row["relevant"] = graded_by_rule(row["relevant_rule"], facts)
             page = list_products(
                 db,
                 query=row["query"],

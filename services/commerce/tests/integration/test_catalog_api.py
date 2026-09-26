@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from commerce.catalog.models import InventoryBalance, Price
 from commerce.search import keyword as keyword_module
+from commerce.seed.catalog import PRODUCTS
 
 from .conftest import variant_id_for
 
@@ -19,17 +20,18 @@ def _titles(page: dict) -> list[str]:  # type: ignore[type-arg]
 
 def test_wireless_headphones_query_finds_headphones_first(alice: TestClient) -> None:
     page = alice.get("/v1/products", params={"q": "wireless headphones"}).json()
-    assert _titles(page)[0] == "Arc Wireless Over-Ear Headphones"
-    assert "Pulse Wireless Earbuds" in _titles(page)
+    top = page["items"][:5]
+    assert all(i["product_type"] in {"headphones", "earbuds"} for i in top)
+    assert all("wireless" in {t["value"] for t in i["tags"]} for i in top)
+    assert "Arc Wireless Over-Ear Headphones" in _titles(page)[:5]
     assert page["search"]["keyword"] == "ok"
 
 
 def test_rain_shoes_query_finds_waterproof_footwear(alice: TestClient) -> None:
-    titles = _titles(alice.get("/v1/products", params={"q": "waterproof shoes for rain"}).json())
-    assert set(titles[:2]) == {
-        "Puddle Waterproof Rain Boots",
-        "Ridge Waterproof Trail Running Shoes",
-    }
+    page = alice.get("/v1/products", params={"q": "waterproof shoes for rain"}).json()
+    footwear = {"boots", "running-shoes", "sneakers", "sandals"}
+    assert all(i["product_type"] in footwear for i in page["items"][:5])
+    assert _titles(page)[0] == "Puddle Waterproof Rain Boots"
 
 
 def test_search_prices_come_from_postgres_not_the_index(alice: TestClient, db: Session) -> None:
@@ -69,10 +71,9 @@ def test_filters_and_facets(alice: TestClient) -> None:
 
 
 def test_in_stock_filter_hides_sold_out_products(alice: TestClient) -> None:
-    all_kitchen = _titles(alice.get("/v1/products", params={"category": "home-kitchen"}).json())
-    in_stock = _titles(
-        alice.get("/v1/products", params={"category": "home-kitchen", "in_stock": "true"}).json()
-    )
+    params = {"q": "mixing bowls", "category": "home-kitchen"}
+    all_kitchen = _titles(alice.get("/v1/products", params=params).json())
+    in_stock = _titles(alice.get("/v1/products", params={**params, "in_stock": "true"}).json())
     assert "Nesting Stainless Mixing Bowls, Set of 5" in all_kitchen
     assert "Nesting Stainless Mixing Bowls, Set of 5" not in in_stock
 
@@ -84,7 +85,7 @@ def test_sorting_and_pagination(alice: TestClient) -> None:
     ).json()
     prices = [i["price_minor"] for i in first["items"] + second["items"]]
     assert prices == sorted(prices)
-    assert first["total"] == 51
+    assert first["total"] == len(PRODUCTS)
     assert not set(_titles(first)) & set(_titles(second))
 
 
