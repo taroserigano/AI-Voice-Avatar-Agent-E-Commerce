@@ -21,7 +21,7 @@ from tests.fakes import FakeCatalog
 SECRET = "test-secret-0123456789-0123456789"
 ALICE = uuid.UUID("00000000-0000-0000-0000-00000000a11c")
 BOB = uuid.UUID("00000000-0000-0000-0000-000000000b0b")
-GOAL = PlannerRequest(goal="A week of nut-free dinners for 4 under $40")
+GOAL = PlannerRequest(goal="A week of nut-free dinners for 4 under $80")
 
 
 @pytest.fixture

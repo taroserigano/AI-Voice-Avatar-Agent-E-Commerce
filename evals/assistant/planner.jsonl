@@ -1,0 +1,12 @@
+{"id": "nut-free-week", "goal": "A week of nut-free dinners for 4 under $80", "banned": ["peanuts", "tree nuts"], "tags": [], "budget_minor": 8000, "min_lines": 4}
+{"id": "dairy-free-breakfast", "goal": "Dairy-free breakfasts for 2 for 5 days under $30", "banned": ["milk"], "tags": [], "budget_minor": 3000, "min_lines": 3}
+{"id": "gluten-free-dinners", "goal": "Gluten-free dinners for 3, 4 nights, under $60", "banned": ["wheat"], "tags": ["gluten-free"], "budget_minor": 6000, "min_lines": 3}
+{"id": "vegan-lunches", "goal": "vegan lunches for 5 days under $40", "banned": ["milk", "egg", "fish", "shellfish"], "tags": ["vegan"], "budget_minor": 4000, "min_lines": 2}
+{"id": "small-dinners", "goal": "3 dinners for 2 under $25", "banned": [], "tags": [], "budget_minor": 2500, "min_lines": 3}
+{"id": "kid-peanut-allergy", "goal": "My kids have a peanut allergy: lunches for 5 days, $35 max", "banned": ["peanuts"], "tags": [], "budget_minor": 3500, "min_lines": 2}
+{"id": "organic-breakfast", "goal": "organic breakfasts for a week under $70", "banned": [], "tags": ["organic"], "budget_minor": 7000, "min_lines": 2}
+{"id": "egg-free-breakfast", "goal": "Egg-free breakfasts for 4 under $40", "banned": ["egg"], "tags": [], "budget_minor": 4000, "min_lines": 3}
+{"id": "keto-dinners", "goal": "keto dinners for 2 for 4 nights under $50", "banned": [], "tags": ["keto"], "budget_minor": 5000, "min_lines": 1}
+{"id": "sesame-soy-free", "goal": "sesame-free and soy-free dinners for 4 under $60", "banned": ["sesame", "soy"], "tags": [], "budget_minor": 6000, "min_lines": 3}
+{"id": "kosher-dinners", "goal": "kosher dinners for 4 under $70", "banned": [], "tags": ["kosher"], "budget_minor": 7000, "min_lines": 1}
+{"id": "impossible-budget", "goal": "a week of dinners for 6 under $5", "banned": [], "tags": [], "budget_minor": 500, "min_lines": 0, "expect_basket": false}

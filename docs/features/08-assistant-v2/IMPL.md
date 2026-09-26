@@ -116,6 +116,13 @@ P4 shopping planner: `services/planner` (`ai_commerce_planner`), a new uv worksp
   - A2A: 401s, the same events as the in-process run, and cross-customer task isolation.
 - [x] Live run on `gpt-5.5` (`PLANNER_LIVE_MODEL=1`): it planned with todos and proposed a nut-free basket under $30 that code accepted, in 37 s.
 
+- [x] Planner eval (`pnpm eval:planner`, `evals/planner_eval.py`, 12 scenarios in `evals/assistant/planner.jsonl`).
+  - It runs on the **real 2,358-product seed catalog** held in memory.
+  - Hard gates (plain code): rules, budget, totals, tools, and honesty (no basket when the goal can't be met).
+  - Quality: coverage, compared with `evals/baselines/planner-scripted.json`.
+  - Scripted baseline: every hard gate passes; coverage is 92%, because it finds no kosher items for its dinner slots.
+  - `--provider openai` scores the real model.
+
 Next in P4 (needs catalog-stores merged)
 - [ ] Commerce: a `PLANNER_ROUTES` allowlist for `PLANNER_SERVICE_TOKEN` (catalog reads only), `POST /v1/cart/estimate`, and `POST /v1/cart/items:bulk` with an `Idempotency-Key` and expected prices (409 if stale)
 - [ ] Assistant: route `plan_shopping` to `PlannerPort`, re-emit the planner events as SSE v2, and rebuild the basket card from commerce data before it's sent
@@ -145,3 +152,6 @@ Next in P3
   `FilesystemMiddleware(tools=[...])`, which replaces the default by name.
 - A2A 1.0 in `a2a-sdk` 1.1.5: task ownership comes from `request.user.display_name`, which is
   set to the customer ID, so other customers' tasks are simply "not found".
+- The planner eval caught the scripted planner meeting "a week of dinners for 6 under $5" by
+  cutting quantities to $4.95. It now swaps pricier options for cheaper ones but never cuts
+  what the plan needs, and says how far over the cheapest full basket is.

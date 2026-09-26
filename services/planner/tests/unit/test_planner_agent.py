@@ -63,7 +63,7 @@ def settings(**kw: Any) -> PlannerSettings:
 
 def test_scripted_run_streams_a_plan_and_a_basket_that_obeys_every_rule() -> None:
     catalog = FakeCatalog()
-    goal = "A week of nut-free dinners for 4 under $40"
+    goal = "A week of nut-free dinners for 4 under $80"
 
     events = list(run_planner(PlannerRequest(goal=goal), catalog, settings()))
 
@@ -83,10 +83,24 @@ def test_scripted_run_streams_a_plan_and_a_basket_that_obeys_every_rule() -> Non
         assert not {"peanuts", "tree nuts"} & set(facts.allergens)
         assert line.unit_price_minor == facts.variants[0].price_minor
     assert basket.subtotal_minor == sum(ln.line_total_minor for ln in basket.lines)
-    assert basket.within_budget is True and basket.subtotal_minor <= 4000
+    assert basket.within_budget is True and basket.subtotal_minor <= 8000
 
     done = events[-1]
     assert isinstance(done, DoneEvent) and done.status == "completed" and done.simulated
+
+
+def test_a_budget_that_cant_feed_the_plan_gets_an_honest_no_not_a_tiny_basket() -> None:
+    events = list(
+        run_planner(
+            PlannerRequest(goal="a week of dinners for 6 under $5"), FakeCatalog(), settings()
+        )
+    )
+
+    assert not [e for e in events if isinstance(e, BasketEvent)]
+    text = next(e for e in events if type(e).__name__ == "TextEvent").text  # type: ignore[attr-defined]
+    assert "couldn't fit" in text and "over" in text
+    done = events[-1]
+    assert isinstance(done, DoneEvent) and done.status == "no_basket"
 
 
 class HostileModel(BaseChatModel):

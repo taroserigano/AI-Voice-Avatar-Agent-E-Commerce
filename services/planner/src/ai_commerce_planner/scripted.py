@@ -19,6 +19,8 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
 
+from ai_commerce_planner.basket import MAX_QUANTITY
+
 # What goes into a meal, as catalog product types, cheapest first within each slot.
 MEALS: dict[str, list[tuple[str, list[str]]]] = {
     "dinner": [
@@ -122,7 +124,16 @@ class ScriptedPlannerModel(BaseChatModel):
         if "propose_basket" not in called:
             lines = self._last_args(messages, "check_basket")["lines"]
             check = self._result_of(messages, results, "check_basket")
-            lines = self._fit_budget(lines, check)
+            lines, still_over = self._fit_budget(lines, check)
+            if still_over > 0 or not lines:
+                budget = (check.get("budget_cents") or 0) / 100
+                return AIMessage(
+                    content=f"I couldn't fit {days_of(goal)} {meal}s for {self.servings} people "
+                    f"into your ${budget:,.2f} budget. The cheapest basket I found that covers "
+                    f"them is about ${budget + still_over / 100:,.2f}, which is "
+                    f"${still_over / 100:,.2f} over. Raise the budget or plan fewer meals, and "
+                    "I'll build it."
+                )
             return self._calls(
                 "propose",
                 [
@@ -194,9 +205,22 @@ class ScriptedPlannerModel(BaseChatModel):
                 if tc["name"] != "search_products" or tc["id"] not in results:
                     continue
                 found = _tool_payload(results[tc["id"]]).get("results") or []
+                slot = next(
+                    (
+                        name
+                        for name, types in MEALS[meal]
+                        if types == tc["args"].get("product_types")
+                    ),
+                    None,
+                )
                 for item in sorted(found, key=lambda r: r["price_cents"])[:per_slot]:
                     lines.append(
-                        {"product_id": item["product_id"], "quantity": qty, "reason": f"{meal}s"}
+                        {
+                            "product_id": item["product_id"],
+                            "quantity": qty,
+                            "reason": f"{meal}s",
+                            "slot": slot,  # ignored by the tool schema; the script's own note
+                        }
                     )
         return lines
 
@@ -222,12 +246,17 @@ class ScriptedPlannerModel(BaseChatModel):
         return {}
 
     @staticmethod
-    def _fit_budget(lines: list[dict[str, Any]], check: dict[str, Any]) -> list[dict[str, Any]]:
-        """Lower quantities, then drop the priciest lines, until the checked subtotal fits.
+    def _fit_budget(
+        lines: list[dict[str, Any]], check: dict[str, Any]
+    ) -> tuple[list[dict[str, Any]], float]:
+        """Swap pricier alternates for the cheapest option in the same slot until the checked
+        subtotal fits. Quantities stay what the plan needs: cutting them would "fit" a week
+        of dinners for six into $5 with a basket that feeds nobody. Returns the lines and
+        how far over budget they still are (0 when they fit).
 
         Works from the check's own prices (catalog data). Lines the check left out are
         dropped here too."""
-        over = check.get("over_budget_by_cents") or 0
+        over = float(check.get("over_budget_by_cents") or 0)
         unit = {
             item["product_id"]: item["line_total_cents"] / max(item["qty"], 1)
             for item in check.get("items") or []
@@ -237,17 +266,23 @@ class ScriptedPlannerModel(BaseChatModel):
             for line in lines
             if line["product_id"] in unit
         ]
-        while over > 0:
-            biggest = max(
-                (p for p in priced if p["quantity"] > 1), key=lambda p: p["_unit"], default=None
+        if over > 0:
+            slots: dict[Any, list[dict[str, Any]]] = {}
+            for p in priced:
+                slots.setdefault(p.get("slot"), []).append(p)
+            swaps = [
+                (p, min(opts, key=lambda o: o["_unit"]))
+                for opts in slots.values()
+                for p in opts
+                if p is not min(opts, key=lambda o: o["_unit"])
+            ]
+            swaps.sort(
+                key=lambda pc: (pc[0]["_unit"] - pc[1]["_unit"]) * pc[0]["quantity"], reverse=True
             )
-            if biggest is not None:
-                biggest["quantity"] -= 1
-                over -= biggest["_unit"]
-                continue
-            if len(priced) <= 1:
-                break
-            drop = max(priced, key=lambda p: p["_unit"])
-            priced.remove(drop)
-            over -= drop["_unit"]
-        return [{k: v for k, v in p.items() if k != "_unit"} for p in priced]
+            for p, cheapest in swaps:
+                if over <= 0:
+                    break
+                over -= (p["_unit"] - cheapest["_unit"]) * p["quantity"]
+                cheapest["quantity"] = min(cheapest["quantity"] + p["quantity"], MAX_QUANTITY)
+                priced.remove(p)
+        return [{k: v for k, v in p.items() if k != "_unit"} for p in priced], max(over, 0.0)

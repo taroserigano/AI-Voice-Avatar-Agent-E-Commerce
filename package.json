@@ -31,6 +31,7 @@
     "test:stream": "uv run --directory packages/assistant-stream pytest -q",
     "dev:planner": "uv run --directory services/planner planner-a2a",
     "test:e2e": "pnpm --filter @ai-commerce/e2e test",
-    "eval:search": "uv run --directory services/commerce python ../../evals/search_eval.py"
+    "eval:search": "uv run --directory services/commerce python ../../evals/search_eval.py",
+    "eval:planner": "uv run --directory services/planner python ../../evals/planner_eval.py"
   }
 }

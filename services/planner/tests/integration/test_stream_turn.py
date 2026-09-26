@@ -23,7 +23,7 @@ pytestmark = pytest.mark.integration
 
 SECRET = "test-secret-0123456789-0123456789"
 ALICE = uuid.UUID("00000000-0000-0000-0000-00000000a11c")
-GOAL = PlannerRequest(goal="A week of nut-free dinners for 4 under $40")
+GOAL = PlannerRequest(goal="A week of nut-free dinners for 4 under $80")
 
 
 def settings() -> PlannerSettings:
@@ -62,14 +62,14 @@ def test_a_planner_turn_streams_plan_progress_and_a_checked_basket(
     assert "plan" in kinds and "tool.start" in kinds and "tool.end" in kinds
     plans = [e["data"] for e in events if e["event"] == "plan"]
     assert plans[0]["constraints"] == [
-        "Under $40.00",
+        "Under $80.00",
         "No peanuts or tree nuts (per label)",
         "4 people",
     ]
     assert all(t["status"] == "completed" for t in plans[-1]["todos"])
     (card,) = [e["data"]["card"] for e in events if e["event"] == "card"]
     assert card["kind"] == "basket" and card["simulated"] is True
-    assert card["within_budget"] is True and card["subtotal_minor"] <= 4000
+    assert card["within_budget"] is True and card["subtotal_minor"] <= 8000
     assert all(not {"peanuts", "tree nuts"} & set(line["allergens"]) for line in card["lines"])
     assert events[-1]["data"]["simulated"] is True and events[-1]["data"]["agent"] == "planner"
     assert [int(e["id"]) for e in events] == list(range(1, len(events) + 1))
