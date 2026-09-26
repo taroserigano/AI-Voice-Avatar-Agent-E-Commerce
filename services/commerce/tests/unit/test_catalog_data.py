@@ -18,6 +18,7 @@ from commerce.catalog.tags import TAGS
 from commerce.seed.catalog import GENERATED_PRODUCTS, PRODUCTS
 from commerce.seed.data import CATEGORIES, ProductSeed
 from commerce.seed.gen.common import ALLERGENS
+from commerce.seed.photos import PHOTOGRAPHED
 from commerce.seed.run import make_sku
 
 PUBLIC = Path(__file__).resolve().parents[4] / "apps" / "web" / "public"
@@ -129,6 +130,12 @@ def test_policy_cases_are_all_present() -> None:
         by_class[p.category] == PolicyClass.STANDARD and p.price_cents < 2500 for p in PRODUCTS
     )
     assert any(v.stock == 0 for p in PRODUCTS for v in p.variants)
+
+
+def test_every_photo_belongs_to_a_product() -> None:
+    # A renamed or removed slug would otherwise leave its photo orphaned and the product on its
+    # fallback illustration.
+    assert not PHOTOGRAPHED - {p.slug for p in PRODUCTS}
 
 
 def test_generated_products_use_type_images_and_explicit_skus() -> None:
