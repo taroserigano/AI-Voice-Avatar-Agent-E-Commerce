@@ -1,0 +1,40 @@
+[project]
+name = "ai-commerce-planner"
+version = "0.1.0"
+description = "Shopping planner: a deep agent for multi-step baskets (meal plans, budgets, allergens), in-process or over A2A"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic==2.13.5",
+    "pydantic-settings==2.15.0",
+    "httpx==0.28.1",
+    "langgraph==1.2.12",
+    "langchain-core==1.6.5",
+    "langchain==1.4.2",
+    "langchain-openai==1.6.6",
+    "deepagents==0.7.19",
+    "a2a-sdk[http-server]==1.1.5",
+    "fastapi==0.141.1",
+    "uvicorn==0.54.0",
+    "pyjwt==2.10.1",
+    "ai-commerce-stream",
+]
+
+[tool.uv.sources]
+ai-commerce-stream = { workspace = true }
+
+[project.scripts]
+planner-a2a = "ai_commerce_planner.a2a_server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ai_commerce_planner"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "integration: needs PostgreSQL (pnpm local:up)",
+    "openai: calls the real OpenAI API (costs money; opt in with PLANNER_LIVE_MODEL=1)",
+]
