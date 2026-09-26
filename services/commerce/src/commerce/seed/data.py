@@ -716,24 +716,8 @@ _ENRICHMENT: dict[str, tuple[str, tuple[str, ...]]] = {
     "serigan-mart-gift-card": ("gift-card", ()),
 }
 
-# Products with a studio-style packshot photo (apps/web/public/images/products-photo/, generated
-# with OpenAI gpt-image-2.5). Everything else uses its illustration in images/products/.
-_PHOTOGRAPHED = frozenset(
-    {
-        "verdant-botanicals-face-moisturizer",
-        "verdant-botanicals-shampoo-bar",
-        "verdant-botanicals-electric-toothbrush",
-        "verdant-botanicals-hand-cream",
-    }
-)
-
 HANDWRITTEN_PRODUCTS: tuple[ProductSeed, ...] = tuple(
-    replace(
-        p,
-        product_type=_ENRICHMENT[p.slug][0],
-        tags=_ENRICHMENT[p.slug][1],
-        image_path=f"/images/products-photo/{p.slug}.png" if p.slug in _PHOTOGRAPHED else None,
-    )
+    replace(p, product_type=_ENRICHMENT[p.slug][0], tags=_ENRICHMENT[p.slug][1])
     for p in _HANDWRITTEN
 )
 

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 from commerce.seed.data import HANDWRITTEN_PRODUCTS, ProductSeed
 from commerce.seed.gen import (
     baby,
@@ -25,6 +27,7 @@ from commerce.seed.gen import (
     sports,
     toys,
 )
+from commerce.seed.photos import PHOTOGRAPHED, photo_path
 
 _MODULES = (
     dairy, produce, meat, bakery, frozen, pantry, snacks, beverages, household, health, baby,
@@ -32,4 +35,7 @@ _MODULES = (
 )  # fmt: skip
 
 GENERATED_PRODUCTS: tuple[ProductSeed, ...] = tuple(p for m in _MODULES for p in m.products())
-PRODUCTS: tuple[ProductSeed, ...] = HANDWRITTEN_PRODUCTS + GENERATED_PRODUCTS
+PRODUCTS: tuple[ProductSeed, ...] = tuple(
+    replace(p, image_path=photo_path(p.slug)) if p.slug in PHOTOGRAPHED else p
+    for p in HANDWRITTEN_PRODUCTS + GENERATED_PRODUCTS
+)
