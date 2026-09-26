@@ -22,11 +22,13 @@
     "dev:web": "pnpm --filter @ai-commerce/web dev",
     "contracts": "uv run --directory services/commerce commerce-openapi && pnpm --filter @ai-commerce/contracts generate",
     "lint": "uv run ruff check . && uv run ruff format --check . && pnpm --filter @ai-commerce/web lint",
-    "typecheck": "uv run mypy services/commerce/src packages/telemetry/src packages/retrieval/src && pnpm -r typecheck",
-    "test": "pnpm test:unit && pnpm test:integration && pnpm test:retrieval && pnpm --filter @ai-commerce/web test",
+    "typecheck": "uv run mypy services/commerce/src packages/telemetry/src packages/retrieval/src services/planner/src && pnpm -r typecheck",
+    "test": "pnpm test:unit && pnpm test:integration && pnpm test:retrieval && pnpm test:planner && pnpm --filter @ai-commerce/web test",
     "test:unit": "uv run --directory services/commerce pytest tests/unit -q",
     "test:integration": "uv run --directory services/commerce pytest tests/integration -q",
     "test:retrieval": "uv run --directory packages/retrieval pytest -q",
+    "test:planner": "uv run --directory services/planner pytest -q",
+    "dev:planner": "uv run --directory services/planner planner-a2a",
     "test:e2e": "pnpm --filter @ai-commerce/e2e test",
     "eval:search": "uv run --directory services/commerce python ../../evals/search_eval.py"
   }

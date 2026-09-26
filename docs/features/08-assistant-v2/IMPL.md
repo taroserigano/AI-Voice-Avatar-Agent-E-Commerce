@@ -1,6 +1,7 @@
 # 8. Assistant v2 — implementation
 
-Status: **P3 retrieval package done** (2026-09-26). P0 waits for the catalog-stores commit.
+Status: **P3 retrieval package and P4 planner service done** (2026-09-26). P0-P2 and the
+commerce side of P3/P4 wait for the catalog-stores commit.
 
 ## Tasks
 
@@ -47,6 +48,51 @@ P3 retrieval: `packages/retrieval` (`ai_commerce_retrieval`), a new uv workspace
   - Reopening a collection adds indexes that were declared later.
   - Tests cover both behaviors.
 
+P4 shopping planner: `services/planner` (`ai_commerce_planner`), a new uv workspace member
+- [x] `constraints.py`: code parses budget, allergens, required tags and servings from the goal.
+  - The rules are bound into the tools, so the model can tighten them but never loosen them.
+  - "Peanut allergy" rules out peanuts only; "nut-free" rules out peanuts and tree nuts.
+- [x] `catalog.py`: `CatalogPort`, plus `CommerceCatalog`, which reads `/v1/products` and `/v1/products/{id}` using the planner's own identity (service token + `X-On-Behalf-Of`).
+- [x] `basket.py`: `check_basket` re-reads every line from the catalog.
+  - Lines are dropped, with a reason, for a banned allergen, missing label data, a missing required tag, out of stock, or too little stock.
+  - Totals come only from catalog prices, and the budget is checked on the subtotal.
+  - The $5.99 / free-from-$35 shipping figure is only an estimate.
+- [x] `tools.py`: `search_products`, `check_basket` and `propose_basket`.
+  - Search results are pre-filtered by the shopper's rules.
+  - Every result is wrapped in `<untrusted_data>`.
+  - There's no cart, order, return, payment or handoff tool, and no identity argument.
+- [x] `agent.py`: `create_deep_agent` with:
+  - `TodoListMiddleware`, plus model and tool call limits (12 and 40)
+  - `StateBackend` scratch files
+  - a read-only `general-purpose` helper that replaces the default one
+  - `PlannerState.basket`
+- [x] `scripted.py`: a labeled `ScriptedPlannerModel` that drives the same graph without a key (plan, search, check, trim to budget, propose)
+- [x] `runner.py` / `events.py`: graph stream → `plan`, `tool.start`, `tool.end`, `basket`, `text` and `done` events, with a 90 s budget, `stop` for cancel, and helper steps kept internal
+- [x] `delegation.py`: gateway delegation JWTs (HS256)
+  - Claims: aud `shopping-planner`, iss `assistant-gateway`, a scope, and a `jti` that works only once.
+  - Lifetime is at most 5 minutes.
+  - The token rides in the HTTP header only.
+- [x] `a2a_server.py`: an A2A 1.0 server built on `a2a-sdk` 1.1.5 (JSON-RPC, streaming, no push)
+  - Every route except `/healthz` needs a delegation token, including the Agent Card.
+  - Tasks are owned by the customer, so another customer gets `TaskNotFoundError`.
+  - It binds to localhost (`pnpm dev:planner`, :8302).
+- [x] `port.py`: `PlannerPort` with `InProcessPlanner` and `A2APlanner`.
+  - `A2APlanner` signs a fresh token on each HTTP request and streams through a queue for the assistant's worker thread.
+  - Both adapters yield the same events.
+- [x] Tests: 30, plus 1 opt-in live test.
+  - Parsing, the basket rules, and the tool surface (no `execute`, no forbidden tools, no identity arguments).
+  - A scripted end-to-end run whose basket obeys every rule.
+  - A **hostile-model test**: the model proposes an injected peanut product and an item that doesn't exist, and code drops both.
+  - Untrusted wrapping, and delegation (9 kinds of bad token, plus replay).
+  - A2A: 401s, the same events as the in-process run, and cross-customer task isolation.
+- [x] Live run on `gpt-5.5` (`PLANNER_LIVE_MODEL=1`): it planned with todos and proposed a nut-free basket under $30 that code accepted, in 37 s.
+
+Next in P4 (needs catalog-stores merged)
+- [ ] Commerce: a `PLANNER_ROUTES` allowlist for `PLANNER_SERVICE_TOKEN` (catalog reads only), `POST /v1/cart/estimate`, and `POST /v1/cart/items:bulk` with an `Idempotency-Key` and expected prices (409 if stale)
+- [ ] Assistant: route `plan_shopping` to `PlannerPort`, re-emit the planner events as SSE v2, and rebuild the basket card from commerce data before it's sent
+- [ ] A2A task store in PostgreSQL (`DatabaseTaskStore`) once async PostgreSQL works on Windows' event loop; `InMemoryTaskStore` for now, since tasks are short and the assistant stores the events
+- [ ] Web: `PlanCard`, `BasketCard`, `AllergenLine`, workspace mode
+
 Next in P3
 - [ ] Commerce product search: replace `commerce/search/semantic.py` (Pinecone) with `ai_commerce_retrieval`, reuse `fusion.py`, update `test_no_other_vector_store_in_app_code`, and have `pnpm reindex` sync Qdrant
 - [ ] Policy search: once catalog-stores lands, move `commerce/policies/search.py` to records with `cite`, `version`, `effective_from` and `status`
@@ -65,3 +111,8 @@ Next in P3
 - The old 91-character key (now `QDRANT` in the main .env) gets 403 on the cluster. `QDRANT_API_KEY` works.
 - The worktree has its own gitignored `.env`, with the two keys copied from the main
   checkout, `SEARCH_ENV=assistant-v2`, and the :8300-range ports. It points at Qdrant Cloud, while tests default to the local Qdrant.
+- deepagents 0.7.19 registers `execute` even with `StateBackend`, and only hides it from the
+  model at runtime. The tool-surface test caught it, so the planner now passes its own
+  `FilesystemMiddleware(tools=[...])`, which replaces the default by name.
+- A2A 1.0 in `a2a-sdk` 1.1.5: task ownership comes from `request.user.display_name`, which is
+  set to the customer ID, so other customers' tasks are simply "not found".
