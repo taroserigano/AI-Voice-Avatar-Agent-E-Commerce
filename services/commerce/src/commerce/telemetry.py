@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
-from opentelemetry.instrumentation.redis import RedisInstrumentor
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 from opentelemetry.instrumentation.urllib3 import URLLib3Instrumentor
 from opentelemetry.sdk.trace import SpanProcessor
@@ -30,7 +29,6 @@ def init_telemetry(
     )
     SQLAlchemyInstrumentor().instrument(engine=get_engine())
     HTTPXClientInstrumentor().instrument()
-    RedisInstrumentor().instrument()
     # opensearch-py and parts of the Pinecone client go through urllib3.
     URLLib3Instrumentor().instrument()
     return _handles

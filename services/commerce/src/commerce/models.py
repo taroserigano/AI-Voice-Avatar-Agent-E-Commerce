@@ -1,6 +1,6 @@
 """Import every model so SQLAlchemy metadata (and Alembic autogenerate) sees all tables."""
 
-from commerce.auth.models import AuthSession, PasswordResetToken, Role, User
+from commerce.auth.models import AuthSession, Role, User
 from commerce.cart.models import Cart, CartItem
 from commerce.catalog.models import (
     Category,
@@ -26,7 +26,6 @@ __all__ = [
     "OrderLine",
     "OrderStatus",
     "OutboxEvent",
-    "PasswordResetToken",
     "PolicyClass",
     "Price",
     "Product",

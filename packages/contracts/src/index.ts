@@ -15,7 +15,6 @@ export type CategoryOut = Schemas["CategoryOut"];
 export type CartOut = Schemas["CartOut"];
 export type CartLineOut = Schemas["CartLineOut"];
 export type UserOut = Schemas["UserOut"];
-export type AuthConfigOut = Schemas["AuthConfigOut"];
 export type SearchMeta = Schemas["SearchMeta"];
 export type OrderSummary = Schemas["OrderSummary"];
 export type OrderDetail = Schemas["OrderDetail"];

@@ -1,7 +1,7 @@
 [project]
 name = "commerce"
 version = "0.1.0"
-description = "Commerce API: auth, catalog, cart, orders, search, outbox"
+description = "Commerce API: sign-in, catalog, cart, orders, search, outbox"
 requires-python = ">=3.12"
 dependencies = [
     "ai-commerce-telemetry",
@@ -17,13 +17,10 @@ dependencies = [
     "argon2-cffi==25.1.0",
     "opensearch-py==3.2.0",
     "pinecone==10.0.0",
-    "redis==8.1.0",
     "httpx==0.28.1",
-    "pyjwt[crypto]==2.15.0",
     "opentelemetry-instrumentation-fastapi==0.66b0",
     "opentelemetry-instrumentation-sqlalchemy==0.66b0",
     "opentelemetry-instrumentation-httpx==0.66b0",
-    "opentelemetry-instrumentation-redis==0.66b0",
     "opentelemetry-instrumentation-urllib3==0.66b0",
 ]
 

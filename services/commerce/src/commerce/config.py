@@ -22,7 +22,6 @@ class Settings(BaseSettings):
     app_env: Literal["dev", "test", "ci", "staging", "prod"] = "dev"
 
     database_url: str = "postgresql+psycopg://commerce:commerce@localhost:5432/commerce"
-    redis_url: str = "redis://localhost:6379/0"
     opensearch_url: str = "http://localhost:9200"
 
     # Pinecone is always the real service. With no key, meaning-based search is reported
@@ -45,21 +44,11 @@ class Settings(BaseSettings):
     semantic_timeout_ms: int = 250
     keyword_top_k: int = 100
 
-    auth_provider: Literal["dev", "oidc"] = "dev"
+    # Keys the one-way customer hash put on telemetry (never the raw customer ID).
     session_secret: str = Field(default="dev-only-session-secret-change-me", min_length=16)
     session_ttl_hours: int = 12
     cookie_secure: bool = False
     session_cookie_name: str = "ac_session"
-    web_origin: str = "http://localhost:3000"
-
-    signin_max_failures_per_account: int = 5
-    signin_max_attempts_per_ip: int = 30
-    signin_window_seconds: int = 900
-
-    oidc_issuer: str | None = None
-    oidc_client_id: str | None = None
-    oidc_client_secret: str | None = None
-    oidc_redirect_uri: str | None = None
 
     otel_exporter_otlp_endpoint: str | None = None
     log_level: str = "INFO"

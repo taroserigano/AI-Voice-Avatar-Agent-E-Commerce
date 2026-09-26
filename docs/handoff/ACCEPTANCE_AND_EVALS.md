@@ -41,7 +41,7 @@ Every customer action becomes one **trace**: a timeline of every service call it
 | Group | Metrics |
 |---|---|
 | Shopping | Search speed (p50/p95), zero-result searches, add-to-cart rate, index lag |
-| Sign-in | Successes, failures, rate-limit hits (never passwords or raw emails) |
+| Sign-in | Successes and failures (never passwords or raw emails) |
 | Money | Checkouts started, paid, failed, and expired; webhook delay; checkouts stuck in reconciliation; refunds by state; duplicate requests blocked; ownership denials |
 | AI | Tokens and cost per conversation, tool calls per turn, tool errors, handoff rate, answers with no citation, cap hits |
 | Voice | Time per stage (speech-to-text, first LLM token, first audio), end-of-speech to first audio, interruption stop time, session minutes, false-confirmation blocks |

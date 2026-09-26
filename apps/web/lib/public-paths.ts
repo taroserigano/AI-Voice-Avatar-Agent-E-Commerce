@@ -5,8 +5,6 @@
 export const PUBLIC_PAGES = [
   "/sign-in",
   "/sign-up",
-  "/forgot-password",
-  "/reset-password",
   "/privacy",
   "/terms",
   "/accessibility",

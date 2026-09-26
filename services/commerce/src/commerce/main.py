@@ -27,14 +27,9 @@ from commerce.orders.routes import router as orders_router
 PUBLIC_ROUTES: frozenset[tuple[str, str]] = frozenset(
     {
         ("GET", "/healthz"),
-        ("GET", "/v1/auth/config"),
         ("POST", "/v1/auth/sign-in"),
         ("POST", "/v1/auth/sign-up"),
         ("POST", "/v1/auth/sign-out"),
-        ("POST", "/v1/auth/forgot-password"),
-        ("POST", "/v1/auth/reset-password"),
-        ("GET", "/v1/auth/oidc/start"),
-        ("GET", "/v1/auth/oidc/callback"),
     }
 )
 

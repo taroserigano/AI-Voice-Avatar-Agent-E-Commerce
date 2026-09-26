@@ -1,35 +1,6 @@
 {
   "components": {
     "schemas": {
-      "AuthConfigOut": {
-        "properties": {
-          "development_sign_in": {
-            "description": "True when the development sign-in adapter is active; the UI must say so.",
-            "title": "Development Sign In",
-            "type": "boolean"
-          },
-          "min_password_length": {
-            "default": 8,
-            "title": "Min Password Length",
-            "type": "integer"
-          },
-          "provider": {
-            "enum": [
-              "dev",
-              "oidc"
-            ],
-            "title": "Provider",
-            "type": "string"
-          }
-        },
-        "required": [
-          "provider",
-          "development_sign_in",
-          "min_password_length"
-        ],
-        "title": "AuthConfigOut",
-        "type": "object"
-      },
       "CartLineOut": {
         "properties": {
           "available": {
@@ -225,20 +196,6 @@
           "brands"
         ],
         "title": "Facets",
-        "type": "object"
-      },
-      "ForgotPasswordRequest": {
-        "properties": {
-          "email": {
-            "format": "email",
-            "title": "Email",
-            "type": "string"
-          }
-        },
-        "required": [
-          "email"
-        ],
-        "title": "ForgotPasswordRequest",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -665,28 +622,6 @@
         "title": "ProductSummary",
         "type": "object"
       },
-      "ResetPasswordRequest": {
-        "properties": {
-          "password": {
-            "maxLength": 256,
-            "minLength": 8,
-            "title": "Password",
-            "type": "string"
-          },
-          "token": {
-            "maxLength": 200,
-            "minLength": 10,
-            "title": "Token",
-            "type": "string"
-          }
-        },
-        "required": [
-          "token",
-          "password"
-        ],
-        "title": "ResetPasswordRequest",
-        "type": "object"
-      },
       "Role": {
         "enum": [
           "customer",
@@ -959,68 +894,6 @@
         ]
       }
     },
-    "/v1/auth/config": {
-      "get": {
-        "operationId": "auth_config_v1_auth_config_get",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthConfigOut"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Auth Config",
-        "tags": [
-          "auth"
-        ]
-      }
-    },
-    "/v1/auth/forgot-password": {
-      "post": {
-        "operationId": "forgot_password_v1_auth_forgot_password_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ForgotPasswordRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "202": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageOut"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Forgot Password",
-        "tags": [
-          "auth"
-        ]
-      }
-    },
     "/v1/auth/me": {
       "get": {
         "operationId": "me_v1_auth_me_get",
@@ -1037,50 +910,6 @@
           }
         },
         "summary": "Me",
-        "tags": [
-          "auth"
-        ]
-      }
-    },
-    "/v1/auth/reset-password": {
-      "post": {
-        "operationId": "reset_password_v1_auth_reset_password_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ResetPasswordRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204": {
-            "description": "Successful Response"
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageOut"
-                }
-              }
-            },
-            "description": "Bad Request"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Reset Password",
         "tags": [
           "auth"
         ]
@@ -1129,16 +958,6 @@
               }
             },
             "description": "Validation Error"
-          },
-          "429": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageOut"
-                }
-              }
-            },
-            "description": "Too Many Requests"
           }
         },
         "summary": "Sign In",

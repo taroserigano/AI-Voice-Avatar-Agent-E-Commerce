@@ -28,7 +28,7 @@ jobs:
       - run: uv run --directory services/commerce pytest tests/unit -q
 
   integration:
-    name: Integration tests (PostgreSQL, Redis, OpenSearch, OTel Collector)
+    name: Integration tests (PostgreSQL, OpenSearch, OTel Collector)
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -41,10 +41,6 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U commerce -d commerce_test"
           --health-interval 3s --health-timeout 3s --health-retries 20
-      redis:
-        image: redis:8.6-alpine
-        ports: ["6379:6379"]
-        options: --health-cmd "redis-cli ping" --health-interval 3s --health-retries 20
       opensearch:
         image: opensearchproject/opensearch:3.8.0
         env:

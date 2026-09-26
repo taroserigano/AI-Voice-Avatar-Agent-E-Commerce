@@ -63,6 +63,7 @@ ai-commerce/
 | 10 | Guests | **No guest access at all**: no guest browsing, cart, or checkout. |
 | 11 | Temporal | **Used in Milestone 2** for the checkout workflow, and in Milestone 3 for returns. |
 | 12 | AWS | **Taro's personal AWS account only, never RealPage's.** Use a CLI profile named `personal`, and pin Terraform with `allowed_account_ids`. |
+| 13 | Sign-in mechanism | **Extremely simple: check the email and password only, no additional layer.** No rate limiting, CAPTCHA, password reset, or Cognito/OIDC. The session cookie and the sign-in wall stay. Decided 2026-09-25. |
 
 **Defaults Taro accepted** (from the plan): Stripe Checkout Sessions with cards only; refunds go only to the original card; WCAG 2.2 AA; Jev as an optional flagged experiment; the sandbox return policy in Step 1.
 
@@ -133,7 +134,7 @@ Built natively on Windows (Git Bash/PowerShell, Docker Desktop), not inside WSL;
 | Tracing start | Traces start at the Next.js server render, not the browser | The plan keeps browser tracing minimal; real-browser LCP/INP are sent as metrics instead. |
 | Brand | "Larkspur": original name, logo, and placeholder art | README forbids copying another retailer. |
 
-Known gaps to pick up later: sign-in rate limiting trusts `X-Forwarded-For` (fine behind the ALB; tighten in Step 7); the Cognito OIDC adapter and password-reset email are unverified or missing; the search baseline was recorded keyword-only and should be re-recorded once Pinecone is connected.
+Known gaps to pick up later: the search baseline was recorded keyword-only and should be re-recorded once Pinecone is connected.
 
 ---
 

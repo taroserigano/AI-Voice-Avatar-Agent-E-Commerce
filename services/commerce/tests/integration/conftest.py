@@ -1,4 +1,4 @@
-"""Integration fixtures: real PostgreSQL (commerce_test), Redis (db 15), and OpenSearch.
+"""Integration fixtures: real PostgreSQL (commerce_test) and OpenSearch.
 
 Start them with ``pnpm infra:up``. Pinecone is used only if PINECONE_API_KEY is set, in a
 throwaway ``products-test-<id>`` namespace that is deleted afterwards.
@@ -11,7 +11,6 @@ from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
-import redis
 from alembic import command as alembic_command
 from alembic.config import Config as AlembicConfig
 from fastapi.testclient import TestClient
@@ -43,7 +42,6 @@ MUTABLE_TABLES = (
     "order_lines",
     "orders",
     "sessions",
-    "password_reset_tokens",
     "outbox_events",
 )
 PASSWORDS = {u.email: u.password for u in DEV_USERS}
@@ -113,12 +111,11 @@ def _clean_state() -> Iterator[None]:
         db.execute(
             text("DELETE FROM users WHERE NOT (email = ANY(:emails))"), {"emails": seed_emails}
         )
-        # Undo password changes (e.g. the reset test) without re-hashing every time.
+        # Undo any password changes without re-hashing on every test.
         for email, password_hash in _seed_password_hashes().items():
             db.execute(update(User).where(User.email == email).values(password_hash=password_hash))
         _reset_catalog(db)
         db.commit()
-    redis.Redis.from_url(get_settings().redis_url).flushdb()
     SPANS.clear()
     yield
 

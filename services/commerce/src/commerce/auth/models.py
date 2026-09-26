@@ -26,9 +26,7 @@ class User(UUIDPk, Timestamps, Base):
         Enum(Role, name="user_role", values_callable=lambda e: [m.value for m in e]),
         default=Role.CUSTOMER,
     )
-    # Null for accounts that only sign in through OIDC.
-    password_hash: Mapped[str | None] = mapped_column(String(255))
-    oidc_subject: Mapped[str | None] = mapped_column(String(255), unique=True)
+    password_hash: Mapped[str] = mapped_column(String(255))
 
     sessions: Mapped[list[AuthSession]] = relationship(back_populates="user")
 
@@ -47,15 +45,3 @@ class AuthSession(UUIDPk, Base):
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     user: Mapped[User] = relationship(back_populates="sessions")
-
-
-class PasswordResetToken(UUIDPk, Base):
-    __tablename__ = "password_reset_tokens"
-
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), index=True
-    )
-    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

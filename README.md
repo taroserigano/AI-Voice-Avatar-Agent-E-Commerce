@@ -13,12 +13,12 @@ the assistant, and voice come next.
 
 ## What works now
 
-- **Sign-in wall.** Every page except sign-in, create account, forgot/reset password,
-  privacy, terms, and accessibility sends a signed-out visitor to `/sign-in?returnTo=…` and
+- **Sign-in wall.** Every page except sign-in, create account, privacy, terms, and
+  accessibility sends a signed-out visitor to `/sign-in?returnTo=…` and
   returns them afterward. Every private API also answers 401 on its own, and the API refuses
   to start if a route is missing the session check.
-- **Development sign-in** with seeded accounts. The production path is an OIDC (Amazon
-  Cognito) adapter, written but not yet run against a live user pool.
+- **Simple sign-in:** the API checks the email and password and sets a session cookie.
+  Nothing else: no rate limiting, password reset, or external identity provider.
 - **Catalog:** 51 original products in 9 departments, with generated placeholder images.
 - **Hybrid search:** OpenSearch (keywords, typos, SKUs) plus Pinecone (meaning), merged
   with reciprocal rank fusion. Price and stock always come from PostgreSQL. Filters,
@@ -118,6 +118,5 @@ docs/                  build plan and handoff docs
 |---|---|
 | PostgreSQL, Redis, OpenSearch, OTel Collector, Grafana | Real (local Docker) |
 | Pinecone | Real service; code and guards tested, but the semantic path hasn't run end to end yet because the account had no free index slot |
-| Sign-in | Development adapter. The Cognito OIDC adapter is written but unverified |
-| Password-reset email | None yet: in development the reset link goes to the API log |
+| Sign-in | Email and password checked by the API (by design, no other layers) |
 | Stripe, Temporal workflows, LLM, voice | Not used yet (Milestones 2-4) |

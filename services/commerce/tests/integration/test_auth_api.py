@@ -34,23 +34,6 @@ def test_wrong_password_and_unknown_account_get_the_same_answer(client: TestClie
     assert wrong.json() == unknown.json() == {"detail": "Wrong email or password."}
 
 
-def test_repeated_failures_are_rate_limited_even_with_the_right_password(
-    client: TestClient,
-) -> None:
-    for _ in range(5):
-        client.post("/v1/auth/sign-in", json={"email": "bob@example.com", "password": "nope"})
-    resp = client.post(
-        "/v1/auth/sign-in", json={"email": "bob@example.com", "password": "bob-dev-password"}
-    )
-    assert resp.status_code == 429
-    assert "retry-after" in resp.headers
-    # Other accounts are unaffected.
-    ok = client.post(
-        "/v1/auth/sign-in", json={"email": "alice@example.com", "password": "alice-dev-password"}
-    )
-    assert ok.status_code == 200
-
-
 def test_sign_out_ends_the_session_on_the_server(alice: TestClient) -> None:
     token = alice.cookies.get("ac_session")
     assert alice.post("/v1/auth/sign-out").status_code == 204
@@ -99,35 +82,3 @@ def test_sign_up_rejects_short_passwords(client: TestClient) -> None:
         json={"email": "s@example.com", "password": "short", "display_name": "S"},
     )
     assert resp.status_code == 422
-
-
-def test_password_reset_flow_is_single_use_and_ends_old_sessions(
-    alice: TestClient, client: TestClient, caplog: pytest.LogCaptureFixture
-) -> None:
-    import logging
-
-    caplog.set_level(logging.INFO)
-    same = client.post("/v1/auth/forgot-password", json={"email": "nobody@example.com"})
-    resp = client.post("/v1/auth/forgot-password", json={"email": "alice@example.com"})
-    assert resp.status_code == same.status_code == 202
-    assert resp.json() == same.json()
-
-    record = next(r for r in caplog.records if "password reset link" in r.getMessage())
-    token = record.fields["reset_url"].split("token=")[1]  # type: ignore[attr-defined]
-
-    done = client.post("/v1/auth/reset-password", json={"token": token, "password": "brand-new-pw"})
-    assert done.status_code == 204
-    again = client.post(
-        "/v1/auth/reset-password", json={"token": token, "password": "other-pw-123"}
-    )
-    assert again.status_code == 400
-
-    assert alice.get("/v1/cart").status_code == 401  # old session ended
-    signed = client.post(
-        "/v1/auth/sign-in", json={"email": "alice@example.com", "password": "brand-new-pw"}
-    )
-    assert signed.status_code == 200
-
-
-def test_auth_config_labels_development_sign_in(client: TestClient) -> None:
-    assert client.get("/v1/auth/config").json()["development_sign_in"] is True

@@ -8,7 +8,7 @@ Build an original US retail storefront with catalog, search, cart, checkout, acc
 
 There is no guest access. Every visitor must sign in (or create an account) before browsing, searching, using a cart, reading help, or using the assistant. There is no guest cart, no cart merge on sign-in, and no guest order lookup.
 
-The only public pages are: sign-in, create account, forgot password, privacy, terms, and the accessibility statement.
+The only public pages are: sign-in, create account, privacy, terms, and the accessibility statement.
 
 - Customer: own cart, checkout, order history/status, return quote and confirmation, support chat/voice.
 - Staff: review exceptional returns and support cases; inspect audit trail under a separate role.
@@ -20,7 +20,7 @@ Enforce ownership and role checks on the server for every sensitive endpoint. A 
 
 ### Sign-in
 
-The sign-in screen is the first thing a visitor sees. After sign-in, the visitor returns to the page they asked for; the return path must be on our own site. The form works with password managers and allows pasting (WCAG 2.2 3.3.8), and shows the same "wrong email or password" message whether or not the account exists. Sign-in attempts are rate-limited.
+The sign-in screen is the first thing a visitor sees. After sign-in, the visitor returns to the page they asked for; the return path must be on our own site. The form works with password managers and allows pasting (WCAG 2.2 3.3.8), and shows the same "wrong email or password" message whether or not the account exists. Sign-in is deliberately simple: the server checks the email and password, then sets a session cookie. There is no rate limiting, CAPTCHA, password reset, or external identity provider.
 
 ### Shopping
 
@@ -53,7 +53,7 @@ Public policy questions use approved versioned content and show citations. Curre
 
 ## Pages
 
-Sign-in, create account, forgot password, privacy, terms, accessibility statement (all public); and, behind sign-in: home/category, search results, product detail, cart, checkout/status, account orders, order detail/returns, support panel, basic staff support queue, and accessible error/empty/loading states. The support panel stays usable on mobile. Show a clear indication when sandbox payments, development sign-in, or simulated shipping is in use.
+Sign-in, create account, privacy, terms, accessibility statement (all public); and, behind sign-in: home/category, search results, product detail, cart, checkout/status, account orders, order detail/returns, support panel, basic staff support queue, and accessible error/empty/loading states. The support panel stays usable on mobile. Show a clear indication when sandbox payments, development sign-in, or simulated shipping is in use.
 
 ## Accessibility
 

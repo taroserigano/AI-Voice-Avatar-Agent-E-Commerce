@@ -6,7 +6,6 @@ import { defineConfig, devices } from "@playwright/test";
  */
 export default defineConfig({
   testDir: "./specs",
-  globalSetup: "./global-setup.ts",
   fullyParallel: false, // the specs share the seeded accounts' carts
   workers: 1,
   retries: process.env.CI ? 1 : 0,

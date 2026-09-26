@@ -3,7 +3,7 @@
  * services/commerce/src/commerce/auth/returnto.py; both are tested with the same cases.
  */
 export const DEFAULT_RETURN_TO = "/";
-const AUTH_PAGES = ["/sign-in", "/sign-up", "/forgot-password", "/reset-password"];
+const AUTH_PAGES = ["/sign-in", "/sign-up"];
 
 export function safeReturnTo(value: string | null | undefined): string {
   if (!value || value.length > 2048) return DEFAULT_RETURN_TO;

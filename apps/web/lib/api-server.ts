@@ -54,8 +54,7 @@ export const getMe = cache(async () => {
   return unwrap(await api.GET("/v1/auth/me"));
 });
 
-export const getAuthConfig = cache(async () => {
-  const api = await serverApi();
-  const { data } = await api.GET("/v1/auth/config");
-  return data ?? { provider: "dev" as const, development_sign_in: true, min_password_length: 8 };
-});
+/** Development environments show the seeded test accounts and a sandbox banner. */
+export function isDevelopment(): boolean {
+  return (process.env.APP_ENV ?? "dev") !== "prod";
+}

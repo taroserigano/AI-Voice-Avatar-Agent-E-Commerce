@@ -8,7 +8,7 @@ _meter = metrics.get_meter("commerce")
 
 signin_attempts = _meter.create_counter(
     "commerce.signin.attempts",
-    description="Sign-in attempts by outcome (success, failure, rate_limited)",
+    description="Sign-in attempts by outcome (success, failure)",
 )
 search_requests = _meter.create_counter(
     "commerce.search.requests",

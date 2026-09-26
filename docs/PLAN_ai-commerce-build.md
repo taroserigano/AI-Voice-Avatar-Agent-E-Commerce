@@ -26,7 +26,7 @@ These override the handoff docs where they differ.
 | treg | **Dropped.** Its data is other retailers' listings, which the README forbids. |
 | Monitoring | **OpenTelemetry (OTel) everywhere**: traces, metrics, and logs from the browser to Stripe, built from Milestone 1. See "Evaluation and monitoring system" below. |
 | Evals | **A strong, layered eval system**, including **Ragas** for policy-answer quality. It runs on every pull request, nightly, and on live pilot traffic. |
-| Sign-in | **Sign-in comes first.** Every visitor lands on the sign-in screen and must sign in (or create an account) before using any part of the site: browsing, search, cart, help, or the assistant. The sign-in screen is the first thing built. |
+| Sign-in | **Sign-in comes first.** Every visitor lands on the sign-in screen and must sign in (or create an account) before using any part of the site: browsing, search, cart, help, or the assistant. The sign-in screen is the first thing built. **Sign-in itself stays extremely simple** (decided 2026-09-25): only the email and password are checked; no rate limiting, CAPTCHA, password reset, or Cognito/OIDC. |
 | Guest checkout | **None.** There is no guest access at all, so there is also no guest cart and no cart merge on sign-in. |
 | AWS account | **Taro's personal AWS account only, never a RealPage account.** Use a named AWS CLI profile (for example `personal`). Terraform locks itself to that account ID with `allowed_account_ids`, so it refuses to run against any other account. Local development needs no AWS at all. |
 | Temporal in Milestone 2 | **Used**, as the handoff says. A Temporal checkout workflow handles the wait for payment, reservation expiry, and reconciliation. |
@@ -197,7 +197,7 @@ Make these edits in `docs/handoff/`:
 | `TECHNICAL_SPEC.md` — states | Split checkout-attempt states from order states. The order row is created only after a verified `checkout.session.completed` (or the async-success event). Add Stripe's refund states `REQUIRES_ACTION` and `CANCELED`. A `SUCCEEDED` refund can later fail, so keep listening for `refund.updated` and `refund.failed`. |
 | `TECHNICAL_SPEC.md` — retries | Before **every** refund retry, check Stripe first. Stripe forgets idempotency keys after 24 hours. |
 | `TECHNICAL_SPEC.md` — local ops | Outbox publisher: a polling worker using `SELECT … FOR UPDATE SKIP LOCKED`. It feeds OpenSearch and Pinecone locally. EventBridge and SQS are used in the cloud only. |
-| `PRODUCT_REQUIREMENTS.md` | Add the sandbox return policy table (below). **Remove the Guest role**: the whole site needs sign-in, with no guest cart, cart merge, or guest order check. Only these pages are public: sign-in, create account, forgot password, privacy, terms, and the accessibility statement. Remove store credit. Target WCAG 2.2 AA. |
+| `PRODUCT_REQUIREMENTS.md` | Add the sandbox return policy table (below). **Remove the Guest role**: the whole site needs sign-in, with no guest cart, cart merge, or guest order check. Only these pages are public: sign-in, create account, privacy, terms, and the accessibility statement. Remove store credit. Target WCAG 2.2 AA. |
 | `TECHNICAL_SPEC.md` — API | `GET /v1/products` and `GET /v1/products/{id}` now need sign-in, like every other route. The only routes without sign-in are the auth routes, `/healthz`, and the Stripe webhook (which checks its signature instead). |
 | `IMPLEMENTATION_PLAN.md` | Milestone 1 starts with the **sign-in screen and sign-in wall**. Milestone 2 **uses Temporal** for the checkout workflow. Milestone 1's exit check adds "CI runs lint, type checks, and tests". Admin catalog editing moves to Milestone 5 (a basic form). |
 | `ACCEPTANCE_AND_EVALS.md` | Copy in the "Evaluation and monitoring system" section from this plan: the 7 eval layers and their gates, Ragas, the dataset files, the alerts, and the money audit trail. Accent and noise cases need recorded audio in `evals/audio/`. Add per-user caps on voice minutes, sessions, and LLM tokens. |
@@ -228,16 +228,15 @@ Make these edits in `docs/handoff/`:
 1. Create the monorepo: `apps/web`, `services/commerce`, `services/assistant`, `services/voice`, `workers/workflows`, `packages/contracts`, `infra`, `tests`. Pin all versions in lockfiles.
 2. Set up Docker Compose with PostgreSQL, Redis, OpenSearch, and the Temporal dev server. Pinecone is the real cloud service.
 3. **Build the sign-in screen first:**
-   - Pages: sign-in, create account, forgot password, and sign-out.
-   - **Local:** a development sign-in adapter with seeded accounts: two customers (`alice`, `bob`) and one staff user. The screen shows a clear "Development sign-in" label.
-   - **Cloud:** the same screen hands off to Amazon Cognito through the production OIDC interface (OIDC is the standard sign-in protocol).
+   - Pages: sign-in, create account, and sign-out.
+   - **Simple by decision (2026-09-25):** the server checks only the email and password (stored as a hash), then sets a session cookie. No rate limiting, CAPTCHA, password reset, or external identity provider (no Cognito/OIDC), locally or in the cloud.
+   - Seeded accounts: two customers (`alice`, `bob`) and one staff user. In development the screen lists them under a "Development sign-in" label.
    - Sessions use a secure, HttpOnly, `SameSite=Lax` cookie with a set expiry. Sign-out ends the session on the server too.
-   - The sign-in form works with password managers and allows pasting, as WCAG 2.2 "Accessible Authentication" (3.3.8) requires. It has clear error messages, and the same "wrong email or password" message whether or not the account exists.
-   - Basic rate limit on sign-in attempts from day one.
+   - The form works with password managers and allows pasting (WCAG 2.2 3.3.8), and shows the same "wrong email or password" message whether or not the account exists.
 4. **Build the sign-in wall:**
    - Next.js `proxy.ts` sends any signed-out visitor to `/sign-in?returnTo=<page>`. After sign-in, it returns them to that page.
    - `returnTo` must be a path on our own site, so it can't be used to send people to another site.
-   - The public allowlist is: sign-in, create account, forgot password, privacy, terms, the accessibility statement, static files, `/healthz`, and the Stripe webhook.
+   - The public allowlist is: sign-in, create account, privacy, terms, the accessibility statement, static files, `/healthz`, and the Stripe webhook.
    - **The redirect is only for convenience.** Every FastAPI route still checks the session itself and returns 401 when signed out. Never rely on `proxy.ts` alone for security.
 5. Build the FastAPI catalog, cart, and orders modules. Add Alembic migrations. Seed about 50 original products. Images are generated placeholders stored in the repo; never link to images on other websites.
 6. Build the outbox polling worker. It indexes products into OpenSearch (keywords) and Pinecone (namespace `products-<env>`).
@@ -252,7 +251,7 @@ Make these edits in `docs/handoff/`:
     - Add the shared span labels and JSON logs with trace IDs.
     - Set up personal-data removal in the collector.
     - Build the "Shopping" dashboard, plus the index-lag and search-speed metrics.
-    - Add sign-in metrics: successes, failures, and rate-limit hits. Never record passwords or raw emails.
+    - Add sign-in metrics: successes and failures. Never record passwords or raw emails.
 13. **Search evals v1:** write `evals/search_queries.jsonl` (about 50 queries to start) and a script that scores product search quality.
 
 **Exit criteria:**
@@ -440,7 +439,7 @@ One return shows as one trace across the API, the Temporal workflow, and Stripe,
 1. **Security:**
    - CSRF protection on Route Handlers; the webhook route is exempt.
    - A per-request CSP nonce.
-   - Rate limits and CAPTCHA on sign-in, checkout, and `/v1/voice/token`.
+   - Rate limits on checkout and `/v1/voice/token` (sign-in stays simple: no rate limit or CAPTCHA, by decision).
    - Secret scanning in CI.
 2. **Privacy:**
    - Hide personal data in logs and LangSmith traces.
@@ -502,8 +501,8 @@ One return shows as one trace across the API, the Temporal workflow, and Stripe,
 | `services/voice/` | New | LiveKit worker, Flux, Cartesia, voice-confirmation state |
 | `workers/workflows/` | New | Temporal checkout workflow, reconciliation schedule, return workflow, and refund activity |
 | `apps/web/proxy.ts` | New | Sign-in wall: sends signed-out visitors to `/sign-in?returnTo=…`, and allows only the public pages |
-| `apps/web/app/(auth)/` | New | Sign-in, create account, forgot password, and sign-out pages |
-| `services/commerce/auth/` | New | Development sign-in adapter, Cognito OIDC adapter, session checks on every route |
+| `apps/web/app/(auth)/` | New | Sign-in, create account, and sign-out pages |
+| `services/commerce/auth/` | New | Email and password sign-in, server-side sessions, session checks on every route |
 | `workers/outbox/` | New | Polling publisher that feeds OpenSearch and Pinecone |
 | `packages/contracts/` | New | Generated TypeScript client and shared schemas |
 | `evals/` | New | Scenarios, `policy_qa.jsonl`, `search_queries.jsonl`, audio, red-team set, code graders, Ragas runner, audio replay runner |

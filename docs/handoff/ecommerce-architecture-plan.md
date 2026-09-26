@@ -38,7 +38,7 @@ Use three separately scaled application areas from the beginning: commerce API, 
 | Durable business workflows | Temporal Cloud + Python workers | Checkout coordination, return labels, warehouse wait states, refund retries |
 | Events | Transactional outbox + EventBridge + SQS | Publish committed changes, feed search, notifications, integrations |
 | Payments | Stripe hosted payment components + server-side integration | Tokenized payment collection, authorization/capture, refunds |
-| Identity | Amazon Cognito using standard OIDC login | Customer identity; enforce resource ownership in backend code |
+| Identity | Email and password sign-in in the commerce API (kept deliberately simple) | Customer identity; enforce resource ownership in backend code |
 | Files | S3 + CloudFront | Product media and private, expiring return-label downloads |
 | Runtime | ECS Fargate + Application Load Balancer | Run frontend, API, workflow and voice workers independently |
 | Telemetry | OpenTelemetry + CloudWatch; LangSmith for AI traces/evals | Trace browser/API/tool/payment operations and AI behavior |

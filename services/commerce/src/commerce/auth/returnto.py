@@ -8,7 +8,7 @@ from __future__ import annotations
 from urllib.parse import urlsplit
 
 DEFAULT_RETURN_TO = "/"
-_AUTH_PAGES = ("/sign-in", "/sign-up", "/forgot-password", "/reset-password")
+_AUTH_PAGES = ("/sign-in", "/sign-up")
 
 
 def safe_return_to(value: str | None) -> str:

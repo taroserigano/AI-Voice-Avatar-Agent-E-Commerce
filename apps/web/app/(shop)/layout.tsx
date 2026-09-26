@@ -1,22 +1,21 @@
 import { SessionGuard } from "@/components/session-guard";
 import { Header } from "@/components/shop/header";
-import { getAuthConfig, getMe, serverApi, unwrap } from "@/lib/api-server";
+import { getMe, isDevelopment, serverApi, unwrap } from "@/lib/api-server";
 import Link from "next/link";
 
 export default async function ShopLayout({ children }: { children: React.ReactNode }) {
   // getMe() redirects to sign-in if the session is missing, expired, or revoked.
   const user = await getMe();
   const api = await serverApi();
-  const [categories, cart, config] = await Promise.all([
+  const [categories, cart] = await Promise.all([
     api.GET("/v1/categories").then(unwrap),
     api.GET("/v1/cart").then(unwrap),
-    getAuthConfig(),
   ]);
 
   return (
     <div className="flex min-h-screen flex-col">
       <SessionGuard />
-      {config.development_sign_in ? (
+      {isDevelopment() ? (
         <p className="bg-amber-100 px-4 py-1.5 text-center text-sm text-amber-950">
           <strong>Sandbox store:</strong> development sign-in, test data, and Stripe test-mode payments.
           Nothing ships and no real money moves.

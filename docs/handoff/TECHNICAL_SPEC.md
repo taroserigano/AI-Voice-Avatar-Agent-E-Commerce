@@ -14,7 +14,7 @@
 | Business process | Temporal Python workers | Checkout/return wait states, label and refund retries |
 | Payment | Stripe test mode during development; Stripe Checkout Sessions with `automatic_tax` (Stripe Tax) | Checkout session, tax, and provider refund |
 | Events | PostgreSQL transactional outbox; a polling publisher locally, EventBridge/SQS in AWS | Search projection and notifications |
-| Identity | Cognito/OIDC in cloud; development identity adapter locally | Authenticated subject and server-side roles |
+| Identity | Email and password checked by the commerce API, in every environment; no external identity provider, rate limiting, or password reset | Authenticated subject and server-side roles |
 | Runtime | Docker Compose locally; AWS ECS Fargate + ALB, S3/CloudFront, RDS/Aurora for cloud | Independent web/API/voice/worker scaling |
 | Telemetry | OpenTelemetry in every service; one OTel Collector that removes personal data and keeps all money and error traces; Grafana (`grafana/otel-lgtm`) locally; CloudWatch/X-Ray via ADOT in the cloud; LangSmith for AI traces | Request, workflow, and assistant diagnostics |
 

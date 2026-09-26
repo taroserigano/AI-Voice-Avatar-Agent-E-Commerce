@@ -1,9 +1,8 @@
 import { Logo } from "@/components/logo";
-import { getAuthConfig } from "@/lib/api-server";
+import { isDevelopment } from "@/lib/api-server";
 import Link from "next/link";
 
-export default async function AuthLayout({ children }: { children: React.ReactNode }) {
-  const config = await getAuthConfig();
+export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
       <aside className="bg-brand-800 px-6 py-8 text-white lg:flex lg:w-[44%] lg:flex-col lg:justify-between lg:px-12 lg:py-12">
@@ -24,7 +23,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
 
       <main id="main" className="flex flex-1 flex-col items-center justify-center px-4 py-10">
         <div className="w-full max-w-md">
-          {config.development_sign_in ? (
+          {isDevelopment() ? (
             <div
               className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950"
               role="note"

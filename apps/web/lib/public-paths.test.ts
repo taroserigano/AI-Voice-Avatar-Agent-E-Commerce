@@ -5,8 +5,6 @@ describe("isPublicPath", () => {
   it.each([
     "/sign-in",
     "/sign-up",
-    "/forgot-password",
-    "/reset-password",
     "/privacy",
     "/terms",
     "/accessibility",

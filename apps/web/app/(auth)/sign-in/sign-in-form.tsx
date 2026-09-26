@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, buttonClasses } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
 import { browserApi, errorMessage } from "@/lib/api-browser";
@@ -9,36 +9,11 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { PasswordInput } from "../password-input";
 
-export function SignInForm({
-  returnTo,
-  provider,
-  initialError,
-  passwordWasReset,
-}: {
-  returnTo: string;
-  provider: "dev" | "oidc";
-  initialError?: string;
-  passwordWasReset?: boolean;
-}) {
-  const [error, setError] = useState(initialError);
+export function SignInForm({ returnTo }: { returnTo: string }) {
+  const [error, setError] = useState<string>();
   const [pending, setPending] = useState(false);
   const errorRef = useRef<HTMLDivElement>(null);
   const withReturn = returnTo === "/" ? "" : `?returnTo=${encodeURIComponent(returnTo)}`;
-
-  if (provider === "oidc") {
-    return (
-      <div>
-        <h1 className="text-2xl font-bold">Sign in</h1>
-        {error ? <Notice tone="error" className="mt-4">{error}</Notice> : null}
-        <a
-          className={buttonClasses("primary", "lg", "mt-6 w-full")}
-          href={`/api/v1/auth/oidc/start${withReturn}`}
-        >
-          Continue to sign in
-        </a>
-      </div>
-    );
-  }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -67,11 +42,6 @@ export function SignInForm({
       <h1 className="text-2xl font-bold">Sign in</h1>
       <p className="mt-1 text-muted">Welcome back. Sign in to shop, track orders, and get help.</p>
 
-      {passwordWasReset ? (
-        <Notice tone="success" className="mt-4">
-          Your password was changed. Sign in with the new one.
-        </Notice>
-      ) : null}
       <div ref={errorRef} tabIndex={-1} className="outline-none">
         {error ? <Notice tone="error" className="mt-4">{error}</Notice> : null}
       </div>
@@ -91,14 +61,6 @@ export function SignInForm({
         <Field id="password" label="Password">
           <PasswordInput id="password" name="password" autoComplete="current-password" invalid={!!error} />
         </Field>
-        <div className="flex justify-end">
-          <Link
-            href="/forgot-password"
-            className="text-sm font-medium text-brand-700 underline underline-offset-2 hover:text-brand-900"
-          >
-            Forgot password?
-          </Link>
-        </div>
         <Button type="submit" size="lg" className="w-full" disabled={pending} aria-disabled={pending}>
           {pending ? "Signing in…" : "Sign in"}
         </Button>

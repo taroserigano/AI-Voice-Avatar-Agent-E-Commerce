@@ -31,7 +31,6 @@ def test_email_never_reaches_exported_spans_or_logs(client: TestClient, alice: T
             "/v1/auth/sign-up",
             json={"email": FAKE_EMAIL, "password": "long-enough-pw", "display_name": FAKE_EMAIL},
         )
-        client.post("/v1/auth/forgot-password", json={"email": FAKE_EMAIL})
         alice.get("/v1/products", params={"q": FAKE_EMAIL})
         alice.get(f"/v1/products?q={FAKE_EMAIL.replace('@', '%40')}")
     finally:
