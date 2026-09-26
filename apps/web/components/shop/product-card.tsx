@@ -3,8 +3,23 @@ import { Badge } from "@/components/ui/badge";
 import { RatingBadge } from "@/components/ui/stars";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/format";
-import type { ProductSummary } from "@ai-commerce/contracts";
+import type { ProductSummary, TagOut } from "@ai-commerce/contracts";
 import Link from "next/link";
+
+/** Feature tags such as "Organic" or "Gluten-free", as small success-toned chips. */
+export function TagBadges({ tags, max, className }: { tags: TagOut[]; max?: number; className?: string }) {
+  const shown = max === undefined ? tags : tags.slice(0, max);
+  if (shown.length === 0) return null;
+  return (
+    <ul aria-label="Features" className={cn("flex flex-wrap gap-1", className)}>
+      {shown.map((t) => (
+        <li key={t.value}>
+          <Badge tone="success">{t.label}</Badge>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 /** A shopper favourite: a high average from more than a couple of reviews. */
 function isTopRated(p: ProductSummary) {
@@ -85,6 +100,7 @@ export function ProductCard({
               count={product.rating_count}
               className="order-3 mt-1.5"
             />
+            <TagBadges tags={product.tags} max={2} className="order-3 mt-2" />
             <div className="order-4 mt-auto flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5 pt-3">
               <p className="whitespace-nowrap tabular-nums text-ink">
                 {multiVariant ? <span className="mr-1 text-xs font-medium text-muted">From</span> : null}

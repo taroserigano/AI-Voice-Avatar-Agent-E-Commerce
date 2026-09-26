@@ -15,6 +15,10 @@ def _doc(i: int) -> ProductSearchDoc:
         description="desc",
         skus=[f"SKU-{i}"],
         variant_text="Black",
+        product_type="headphones",
+        tags=["wireless"],
+        tag_text="Wireless",
+        specs_text="Battery: 40 hours.",
     )
 
 
@@ -37,6 +41,9 @@ def test_upsert_embeds_descriptive_text_and_never_price_or_stock() -> None:
     record = standin.upsert_calls[0][1][0]
     assert record["_id"] == "p1"
     assert "Product 1" in record["chunk_text"] and "Electronics" in record["chunk_text"]
+    # Type, tags, and specs are embedded too, so "wireless headphones" matches on meaning.
+    assert "Type: headphones" in record["chunk_text"] and "Wireless" in record["chunk_text"]
+    assert "Battery: 40 hours." in record["chunk_text"]
     # Price and stock live only in PostgreSQL.
     assert not {k for k in record if "price" in k or "stock" in k or "available" in k}
 

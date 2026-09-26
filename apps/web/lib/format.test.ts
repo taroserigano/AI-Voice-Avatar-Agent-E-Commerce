@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { formatMoney } from "./format";
+import { formatMoney, formatTime } from "./format";
+
+describe("formatTime", () => {
+  it("shows store hours the way people say them", () => {
+    expect(formatTime("07:00")).toBe("7 AM");
+    expect(formatTime("12:00")).toBe("12 PM");
+    expect(formatTime("21:30")).toBe("9:30 PM");
+    expect(formatTime("00:00")).toBe("12 AM");
+  });
+});
 
 describe("formatMoney", () => {
   it("formats minor units as dollars", () => {

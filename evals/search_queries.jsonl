@@ -52,3 +52,23 @@
 {"id": "q52", "query": "dumbels", "type": "typo", "relevant": {"tempo-adjustable-dumbbells": 2}, "split": "test"}
 {"id": "q53", "query": "SON-ARC-WIR-HEA-MID", "type": "sku", "relevant": {"sonora-arc-wireless-headphones": 2}, "split": "dev"}
 {"id": "q54", "query": "present for someone who loves the outdoors", "type": "semantic", "relevant": {"summit-forge-headlamp": 1, "summit-forge-water-bottle": 1, "summit-forge-2p-tent": 1, "summit-forge-sleeping-bag": 1, "driftwood-wool-socks-3pk": 1, "larkspur-gift-card": 1}, "split": "dev"}
+{"id": "a01", "query": "nonfat organic milk", "type": "attribute", "relevant_rule": {"product_type": ["milk"], "tags": ["organic", "fat-free"]}, "split": "dev"}
+{"id": "a02", "query": "sugar free yogurt", "type": "attribute", "relevant_rule": {"product_type": ["yogurt"], "tags": ["sugar-free"]}, "split": "dev"}
+{"id": "a03", "query": "lactose free milk", "type": "attribute", "relevant_rule": {"product_type": ["milk"], "tags": ["lactose-free"]}, "split": "dev"}
+{"id": "a04", "query": "skim milk", "type": "attribute", "relevant_rule": {"product_type": ["milk"], "tags": ["fat-free"]}, "split": "test"}
+{"id": "a05", "query": "organic whole milk", "type": "attribute", "relevant_rule": {"product_type": ["milk"], "tags": ["organic", "whole-milk"]}, "split": "dev"}
+{"id": "a06", "query": "unsweetened almond milk", "type": "attribute", "relevant_rule": {"product_type": ["plant-milk"], "tags": ["unsweetened"]}, "split": "dev"}
+{"id": "a07", "query": "grass fed butter", "type": "attribute", "relevant_rule": {"product_type": ["butter"], "tags": ["grass-fed"]}, "split": "test"}
+{"id": "a08", "query": "pasture raised eggs", "type": "attribute", "relevant_rule": {"product_type": ["eggs"], "tags": ["pasture-raised"]}, "split": "dev"}
+{"id": "a09", "query": "dairy free cheese", "type": "attribute", "relevant_rule": {"product_type": ["cheese"], "tags": ["dairy-free"]}, "split": "dev"}
+{"id": "a10", "query": "zero sugar greek yogurt", "type": "attribute", "relevant_rule": {"product_type": ["yogurt"], "tags": ["sugar-free"]}, "split": "test"}
+{"id": "a11", "query": "low sodium black beans", "type": "attribute", "relevant_rule": {"product_type": ["canned-beans"], "tags": ["low-sodium"]}, "split": "dev"}
+{"id": "a12", "query": "gluten free bread", "type": "attribute", "relevant_rule": {"product_type": ["bread"], "tags": ["gluten-free"]}, "split": "dev"}
+{"id": "a13", "query": "organic decaf coffee", "type": "attribute", "relevant_rule": {"product_type": ["coffee"], "tags": ["organic", "decaf"]}, "split": "test"}
+{"id": "a14", "query": "zero sugar soda", "type": "attribute", "relevant_rule": {"product_type": ["soda"], "tags": ["sugar-free"]}, "split": "dev"}
+{"id": "a15", "query": "grain free dog food", "type": "attribute", "relevant_rule": {"product_type": ["dog-food"], "tags": ["grain-free"]}, "split": "dev"}
+{"id": "a16", "query": "fragrance free laundry detergent", "type": "attribute", "relevant_rule": {"product_type": ["laundry-detergent"], "tags": ["fragrance-free"]}, "split": "test"}
+{"id": "a17", "query": "sulfate free shampoo", "type": "attribute", "relevant_rule": {"product_type": ["shampoo"], "tags": ["sulfate-free"]}, "split": "dev"}
+{"id": "a18", "query": "wild caught salmon", "type": "attribute", "relevant_rule": {"product_type": ["salmon"], "tags": ["wild-caught"]}, "split": "dev"}
+{"id": "a19", "query": "caffeine free herbal tea", "type": "attribute", "relevant_rule": {"product_type": ["tea"], "tags": ["caffeine-free"]}, "split": "dev"}
+{"id": "a20", "query": "organic apples", "type": "attribute", "relevant_rule": {"product_type": ["apples"], "tags": ["organic"]}, "split": "test"}

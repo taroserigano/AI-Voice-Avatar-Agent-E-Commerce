@@ -1,18 +1,24 @@
-"""Generate original SVG placeholder images for every seeded product.
+"""Generate original SVG placeholder images for the seed catalog.
 
 Run: uv run python scripts/generate_placeholders.py
-Writes apps/web/public/images/products/<slug>.svg. Nothing is downloaded from anywhere.
+Writes apps/web/public/images/products/<slug>.svg for the hand-written products and
+apps/web/public/images/types/<product-type>.svg, shared by every generated product of that
+type. Nothing is downloaded from anywhere.
 """
 
 from __future__ import annotations
 
 import html
+import sys
 import textwrap
 from pathlib import Path
 
-from commerce.seed.data import CATEGORIES, PRODUCTS
+from commerce.seed.catalog import PRODUCTS
+from commerce.seed.data import CATEGORIES
 
-OUT = Path(__file__).resolve().parents[1] / "apps" / "web" / "public" / "images" / "products"
+IMAGES = Path(__file__).resolve().parents[1] / "apps" / "web" / "public" / "images"
+OUT = IMAGES / "products"
+TYPES = IMAGES / "types"
 
 # A simple glyph per department, drawn with basic shapes (white, centered at 320,250).
 GLYPHS = {
@@ -31,6 +37,26 @@ GLYPHS = {
     '<path d="M275 240h90M275 270h90M275 300h60" stroke="#94a3b8" stroke-width="10" stroke-linecap="round"/>',
     "gift-cards": '<rect x="220" y="215" width="200" height="130" rx="16" fill="#fff"/>'
     '<path d="M320 215v130M220 270h200" stroke="#fbbf24" stroke-width="14"/>',
+    "dairy-eggs": '<path d="M270 230l20-40h60l20 40v140H270z" fill="#fff"/><path d="M290 190h60v-20h-60z" fill="#fff" fill-opacity=".8"/>'
+    '<rect x="290" y="270" width="60" height="50" rx="8" fill="#0369a1" fill-opacity=".35"/>',
+    "produce": '<circle cx="300" cy="285" r="62" fill="#fff"/><circle cx="345" cy="285" r="62" fill="#fff" fill-opacity=".85"/>'
+    '<path d="M322 222c0-24 12-40 34-46" stroke="#fff" stroke-width="10" fill="none" stroke-linecap="round"/>',
+    "meat-seafood": '<path d="M220 270c40-60 140-60 180 0-40 60-140 60-180 0z" fill="#fff"/><path d="M400 270l40-40v80z" fill="#fff"/>'
+    '<circle cx="262" cy="262" r="8" fill="#b91c1c"/>',
+    "bakery": '<path d="M230 300c0-60 40-90 90-90s90 30 90 90v40H230z" fill="#fff"/>'
+    '<path d="M280 250l-12 40M320 240v48M360 250l12 40" stroke="#92400e" stroke-width="8" stroke-linecap="round" stroke-opacity=".5"/>',
+    "frozen": '<path d="M320 180v180M242 225l156 90M242 315l156-90" stroke="#fff" stroke-width="16" stroke-linecap="round"/>'
+    '<circle cx="320" cy="270" r="20" fill="#fff"/>',
+    "pantry": '<rect x="260" y="200" width="120" height="30" rx="8" fill="#fff" fill-opacity=".85"/><rect x="250" y="230" width="140" height="140" rx="20" fill="#fff"/>'
+    '<rect x="275" y="275" width="90" height="50" rx="6" fill="#a16207" fill-opacity=".35"/>',
+    "snacks": '<path d="M250 200h140l-12 30 12 30-12 30 12 30-12 30 12 30H250l12-30-12-30 12-30-12-30 12-30z" fill="#fff"/>',
+    "beverages": '<path d="M300 180h40v40c30 20 40 40 40 70v80H260v-80c0-30 10-50 40-70z" fill="#fff"/>'
+    '<rect x="260" y="290" width="120" height="40" fill="#1d4ed8" fill-opacity=".35"/>',
+    "household": '<path d="M290 230h60l20 30v110H270V260z" fill="#fff"/><path d="M300 230v-30h50l30 16-30 14" fill="#fff" fill-opacity=".85"/>',
+    "health-wellness": '<rect x="230" y="235" width="180" height="70" rx="35" fill="#fff"/><path d="M320 235v70" stroke="#15803d" stroke-width="10" stroke-opacity=".5"/>',
+    "baby": '<path d="M300 210h40v30c20 10 30 25 30 45v85h-100v-85c0-20 10-35 30-45z" fill="#fff"/><rect x="305" y="180" width="30" height="30" rx="12" fill="#fff" fill-opacity=".85"/>',
+    "pet": '<ellipse cx="320" cy="310" rx="60" ry="48" fill="#fff"/><circle cx="260" cy="245" r="22" fill="#fff"/><circle cx="300" cy="215" r="22" fill="#fff"/>'
+    '<circle cx="340" cy="215" r="22" fill="#fff"/><circle cx="380" cy="245" r="22" fill="#fff"/>',
 }
 
 
@@ -58,16 +84,37 @@ def svg_for(title: str, brand: str, color: str, category: str) -> str:
 """
 
 
+def type_label(product_type: str) -> str:
+    return product_type.replace("-", " ").capitalize()
+
+
+def _write(path: Path, svg: str, force: bool) -> bool:
+    """Only fill gaps unless forced: existing images may be hand-drawn or real photos."""
+    if path.exists() and not force:
+        return False
+    path.write_text(svg, encoding="utf-8", newline="\n")
+    return True
+
+
 def main() -> None:
+    force = "--force" in sys.argv  # redraw placeholders that already exist
     OUT.mkdir(parents=True, exist_ok=True)
+    TYPES.mkdir(parents=True, exist_ok=True)
     colors = {c.slug: c.color for c in CATEGORIES}
+    names = {c.slug: c.name for c in CATEGORIES}
+    written = 0
     for p in PRODUCTS:
-        (OUT / f"{p.slug}.svg").write_text(
-            svg_for(p.title, p.brand, colors[p.category], p.category),
-            encoding="utf-8",
-            newline="\n",
-        )
-    print(f"wrote {len(PRODUCTS)} placeholders to {OUT}")
+        if p.image_path is None:
+            svg = svg_for(p.title, p.brand, colors[p.category], p.category)
+            written += _write(OUT / f"{p.slug}.svg", svg, force)
+    types: dict[str, str] = {}
+    for p in PRODUCTS:
+        if p.image_path and p.image_path.startswith("/images/types/"):
+            types.setdefault(p.product_type, p.category)
+    for product_type, category in sorted(types.items()):
+        svg = svg_for(type_label(product_type), names[category], colors[category], category)
+        written += _write(TYPES / f"{product_type}.svg", svg, force)
+    print(f"wrote {written} missing placeholders under {IMAGES} (--force redraws existing ones)")
 
 
 if __name__ == "__main__":

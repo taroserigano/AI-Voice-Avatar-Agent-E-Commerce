@@ -1,0 +1,13 @@
+{
+  "name": "@ai-commerce/render3d",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Procedural 3D product renders (three.js in headless Chromium). See README.md.",
+  "type": "module",
+  "scripts": {
+    "render": "node render.mjs"
+  },
+  "dependencies": {
+    "three": "0.186.1"
+  }
+}

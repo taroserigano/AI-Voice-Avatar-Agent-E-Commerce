@@ -27,13 +27,16 @@ from commerce.catalog.schemas import (
     Facets,
     FacetValue,
     LegStatus,
+    Nutrition,
     ProductDetail,
     ProductPage,
     ProductSummary,
     SearchMeta,
     SortOrder,
+    TagOut,
     VariantOut,
 )
+from commerce.catalog.tags import tag_label
 from commerce.config import get_settings
 from commerce.db import utcnow
 from commerce.metrics import (
@@ -51,6 +54,7 @@ from commerce.search.semantic import get_semantic_index
 log = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
 _pool = ThreadPoolExecutor(max_workers=8, thread_name_prefix="search-leg")
+FACET_LIMIT = 40  # most common product types / tags shown as filters
 
 
 @dataclass(frozen=True)
@@ -60,6 +64,9 @@ class ProductFilters:
     min_price_minor: int | None = None
     max_price_minor: int | None = None
     in_stock: bool = False
+    product_types: tuple[str, ...] = ()  # any of these
+    tags: tuple[str, ...] = ()  # all of these
+    exclude_tags: tuple[str, ...] = ()  # none of these
 
 
 def _stats_subquery() -> Subquery:
@@ -89,11 +96,18 @@ def _apply_filters[T: tuple[Any, ...]](
     *,
     skip_category: bool = False,
     skip_brand: bool = False,
+    skip_type: bool = False,
 ) -> Select[T]:
     if f.category and not skip_category:
         stmt = stmt.where(Category.slug == f.category)
     if f.brands and not skip_brand:
         stmt = stmt.where(Product.brand.in_(f.brands))
+    if f.product_types and not skip_type:
+        stmt = stmt.where(Product.product_type.in_(f.product_types))
+    if f.tags:
+        stmt = stmt.where(Product.tags.contains(list(f.tags)))  # GIN-indexed @>
+    if f.exclude_tags:
+        stmt = stmt.where(~Product.tags.overlap(list(f.exclude_tags)))
     if f.min_price_minor is not None:
         stmt = stmt.where(stats.c.min_price >= f.min_price_minor)
     if f.max_price_minor is not None:
@@ -126,6 +140,10 @@ def _base(stats: Subquery, ratings: Subquery, candidate_ids: list[uuid.UUID] | N
 
 def _category_out(c: Category) -> CategoryOut:
     return CategoryOut(slug=c.slug, name=c.name, policy_class=c.policy_class)
+
+
+def _tags_out(tags: list[str] | None) -> list[TagOut]:
+    return [TagOut(value=t, label=tag_label(t)) for t in tags or []]
 
 
 def _timed_leg(name: str, fn: Callable[[], list[str]]) -> tuple[list[str] | None, float]:
@@ -295,6 +313,8 @@ def list_products(
             title=p.title,
             brand=p.brand,
             category=_category_out(c),
+            product_type=p.product_type,
+            tags=_tags_out(p.tags),
             image_path=p.image_path,
             price_minor=int(min_price),
             currency=DEFAULT_CURRENCY,
@@ -352,12 +372,46 @@ def _facets(
         f,
         skip_brand=True,
     )
+    type_stmt = _apply_filters(
+        select(Product.product_type, func.count(Product.id))
+        .select_from(Product)
+        .join(Category, Category.id == Product.category_id)
+        .join(stats, stats.c.product_id == Product.id)
+        .where(Product.is_active.is_(True))
+        .group_by(Product.product_type)
+        .order_by(func.count(Product.id).desc(), Product.product_type)
+        .limit(FACET_LIMIT),
+        stats,
+        f,
+        skip_type=True,
+    )
+    # Tags narrow (every chosen tag must match), so they're counted with all filters applied.
+    tag = func.unnest(Product.tags).label("tag")
+    tag_stmt = _apply_filters(
+        select(tag, func.count())
+        .select_from(Product)
+        .join(Category, Category.id == Product.category_id)
+        .join(stats, stats.c.product_id == Product.id)
+        .where(Product.is_active.is_(True))
+        .group_by(tag)
+        .order_by(func.count().desc(), tag)
+        .limit(FACET_LIMIT),
+        stats,
+        f,
+    )
     if candidate_ids is not None:
         cat_stmt = cat_stmt.where(Product.id.in_(candidate_ids))
         brand_stmt = brand_stmt.where(Product.id.in_(candidate_ids))
+        type_stmt = type_stmt.where(Product.id.in_(candidate_ids))
+        tag_stmt = tag_stmt.where(Product.id.in_(candidate_ids))
     return Facets(
         categories=[FacetValue(value=s, label=n, count=c) for s, n, c in db.execute(cat_stmt)],
         brands=[FacetValue(value=b, label=b, count=c) for b, c in db.execute(brand_stmt)],
+        product_types=[
+            FacetValue(value=t, label=t.replace("-", " ").capitalize(), count=c)
+            for t, c in db.execute(type_stmt)
+        ],
+        tags=[FacetValue(value=t, label=tag_label(t), count=c) for t, c in db.execute(tag_stmt)],
     )
 
 
@@ -398,12 +452,15 @@ def get_product(db: Session, product_id: uuid.UUID) -> ProductDetail | None:
             ratings.c.product_id == product.id
         )
     ).first()
+    details = product.details or {}
     return ProductDetail(
         id=product.id,
         slug=product.slug,
         title=product.title,
         brand=product.brand,
         category=_category_out(product.category),
+        product_type=product.product_type,
+        tags=_tags_out(product.tags),
         image_path=product.image_path,
         price_minor=min(v.price_minor for v in variants),
         currency=DEFAULT_CURRENCY,
@@ -412,6 +469,10 @@ def get_product(db: Session, product_id: uuid.UUID) -> ProductDetail | None:
         rating_average=round_average(rating.rating_avg) if rating else None,
         rating_count=int(rating.rating_count) if rating else 0,
         description=product.description,
+        nutrition=Nutrition(**details["nutrition"]) if details.get("nutrition") else None,
+        ingredients=details.get("ingredients"),
+        allergens=list(details.get("allergens") or []),
+        specs=dict(details.get("specs") or {}),
         variants=variants,
         as_of=utcnow(),
     )

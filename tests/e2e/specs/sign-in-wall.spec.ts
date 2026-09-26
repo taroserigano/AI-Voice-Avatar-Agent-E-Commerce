@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { ALICE, API_URL, signIn, signInFromScratch } from "./helpers";
+import { ALICE, API_URL, WEB_URL, signIn, signInFromScratch } from "./helpers";
 
 test.describe("sign-in wall", () => {
   for (const path of ["/", "/cart", "/search?q=headphones", "/c/electronics", "/orders"]) {
@@ -32,9 +32,9 @@ test.describe("sign-in wall", () => {
   test("a returnTo pointing to another site is ignored", async ({ page }) => {
     await page.goto("/sign-in?returnTo=https%3A%2F%2Fevil.example%2Fphish");
     await signIn(page, ALICE);
-    await expect(page).toHaveURL("http://localhost:3000/");
+    await expect(page).toHaveURL(`${WEB_URL}/`);
     await page.goto("/sign-in?returnTo=%2F%2Fevil.example");
-    await expect(page).toHaveURL(/localhost:3000/);
+    await expect(page).toHaveURL(new RegExp(`^${WEB_URL}/`));
   });
 
   test("wrong password shows one generic message", async ({ page }) => {
@@ -52,7 +52,7 @@ test.describe("sign-in wall", () => {
     const anon = await playwright.request.newContext();
     for (const path of ["/v1/cart", "/v1/products", "/v1/orders", "/v1/categories", "/v1/auth/me"]) {
       expect((await anon.get(`${API_URL}${path}`)).status(), path).toBe(401);
-      expect((await anon.get(`http://localhost:3000/api${path}`)).status(), `/api${path}`).toBe(401);
+      expect((await anon.get(`${WEB_URL}/api${path}`)).status(), `/api${path}`).toBe(401);
     }
     await anon.dispose();
   });

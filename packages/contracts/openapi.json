@@ -235,6 +235,45 @@
         "title": "CategoryOut",
         "type": "object"
       },
+      "DayHours": {
+        "properties": {
+          "closes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closes"
+          },
+          "day": {
+            "description": "\"mon\" through \"sun\"",
+            "title": "Day",
+            "type": "string"
+          },
+          "opens": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "\"07:00\" local time; null when closed",
+            "title": "Opens"
+          }
+        },
+        "required": [
+          "day",
+          "opens",
+          "closes"
+        ],
+        "title": "DayHours",
+        "type": "object"
+      },
       "EventType": {
         "enum": [
           "signed_in",
@@ -289,11 +328,27 @@
             },
             "title": "Categories",
             "type": "array"
+          },
+          "product_types": {
+            "items": {
+              "$ref": "#/components/schemas/FacetValue"
+            },
+            "title": "Product Types",
+            "type": "array"
+          },
+          "tags": {
+            "items": {
+              "$ref": "#/components/schemas/FacetValue"
+            },
+            "title": "Tags",
+            "type": "array"
           }
         },
         "required": [
           "categories",
-          "brands"
+          "brands",
+          "product_types",
+          "tags"
         ],
         "title": "Facets",
         "type": "object"
@@ -431,6 +486,65 @@
           "message"
         ],
         "title": "MessageOut",
+        "type": "object"
+      },
+      "Nutrition": {
+        "description": "Per labeled serving, as on a US nutrition facts panel.",
+        "properties": {
+          "added_sugars_g": {
+            "title": "Added Sugars G",
+            "type": "number"
+          },
+          "calories": {
+            "title": "Calories",
+            "type": "integer"
+          },
+          "fiber_g": {
+            "title": "Fiber G",
+            "type": "number"
+          },
+          "protein_g": {
+            "title": "Protein G",
+            "type": "number"
+          },
+          "saturated_fat_g": {
+            "title": "Saturated Fat G",
+            "type": "number"
+          },
+          "serving_size": {
+            "title": "Serving Size",
+            "type": "string"
+          },
+          "sodium_mg": {
+            "title": "Sodium Mg",
+            "type": "integer"
+          },
+          "total_carbs_g": {
+            "title": "Total Carbs G",
+            "type": "number"
+          },
+          "total_fat_g": {
+            "title": "Total Fat G",
+            "type": "number"
+          },
+          "total_sugars_g": {
+            "title": "Total Sugars G",
+            "type": "number"
+          }
+        },
+        "required": [
+          "serving_size",
+          "calories",
+          "total_fat_g",
+          "saturated_fat_g",
+          "sodium_mg",
+          "total_carbs_g",
+          "fiber_g",
+          "total_sugars_g",
+          "added_sugars_g",
+          "protein_g"
+        ],
+        "title": "Nutrition",
         "type": "object"
       },
       "OrderDetail": {
@@ -893,13 +1007,22 @@
         "enum": [
           "standard",
           "inspection",
-          "final_sale"
+          "final_sale",
+          "perishable"
         ],
         "title": "PolicyClass",
         "type": "string"
       },
       "ProductDetail": {
         "properties": {
+          "allergens": {
+            "description": "Major food allergens, e.g. [\"milk\", \"soy\"]",
+            "items": {
+              "type": "string"
+            },
+            "title": "Allergens",
+            "type": "array"
+          },
           "as_of": {
             "description": "When price and stock were read from PostgreSQL",
             "format": "date-time",
@@ -934,10 +1057,37 @@
             "title": "In Stock",
             "type": "boolean"
           },
+          "ingredients": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ingredients"
+          },
+          "nutrition": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Nutrition"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Food only"
+          },
           "price_minor": {
             "description": "Lowest current variant price",
             "title": "Price Minor",
             "type": "integer"
+          },
+          "product_type": {
+            "description": "What a shopper would call it, e.g. \"milk\"",
+            "title": "Product Type",
+            "type": "string"
           },
           "rating_average": {
             "anyOf": [
@@ -958,6 +1108,21 @@
           "slug": {
             "title": "Slug",
             "type": "string"
+          },
+          "specs": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Key facts, e.g. {\"Milkfat\": \"0%\"}",
+            "title": "Specs",
+            "type": "object"
+          },
+          "tags": {
+            "items": {
+              "$ref": "#/components/schemas/TagOut"
+            },
+            "title": "Tags",
+            "type": "array"
           },
           "title": {
             "title": "Title",
@@ -981,6 +1146,8 @@
           "title",
           "brand",
           "category",
+          "product_type",
+          "tags",
           "image_path",
           "price_minor",
           "currency",
@@ -989,6 +1156,10 @@
           "rating_average",
           "rating_count",
           "description",
+          "nutrition",
+          "ingredients",
+          "allergens",
+          "specs",
           "variants",
           "as_of"
         ],
@@ -1073,6 +1244,11 @@
             "title": "Price Minor",
             "type": "integer"
           },
+          "product_type": {
+            "description": "What a shopper would call it, e.g. \"milk\"",
+            "title": "Product Type",
+            "type": "string"
+          },
           "rating_average": {
             "anyOf": [
               {
@@ -1093,6 +1269,13 @@
             "title": "Slug",
             "type": "string"
           },
+          "tags": {
+            "items": {
+              "$ref": "#/components/schemas/TagOut"
+            },
+            "title": "Tags",
+            "type": "array"
+          },
           "title": {
             "title": "Title",
             "type": "string"
@@ -1108,6 +1291,8 @@
           "title",
           "brand",
           "category",
+          "product_type",
+          "tags",
           "image_path",
           "price_minor",
           "currency",
@@ -1876,6 +2061,115 @@
         "title": "SortOrder",
         "type": "string"
       },
+      "StoreOut": {
+        "properties": {
+          "address_line1": {
+            "title": "Address Line1",
+            "type": "string"
+          },
+          "city": {
+            "title": "City",
+            "type": "string"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "hours": {
+            "items": {
+              "$ref": "#/components/schemas/DayHours"
+            },
+            "title": "Hours",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "latitude": {
+            "title": "Latitude",
+            "type": "number"
+          },
+          "longitude": {
+            "title": "Longitude",
+            "type": "number"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "open_now": {
+            "description": "Whether the store is open at the time of the request",
+            "title": "Open Now",
+            "type": "boolean"
+          },
+          "phone": {
+            "title": "Phone",
+            "type": "string"
+          },
+          "postal_code": {
+            "title": "Postal Code",
+            "type": "string"
+          },
+          "services": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Services",
+            "type": "array"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          },
+          "timezone": {
+            "title": "Timezone",
+            "type": "string"
+          },
+          "today_hours": {
+            "$ref": "#/components/schemas/DayHours"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "address_line1",
+          "city",
+          "state",
+          "postal_code",
+          "latitude",
+          "longitude",
+          "phone",
+          "timezone",
+          "hours",
+          "services",
+          "open_now",
+          "today_hours"
+        ],
+        "title": "StoreOut",
+        "type": "object"
+      },
+      "TagOut": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "value": {
+            "description": "Tag slug, usable in the tag / exclude_tag filters",
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "label"
+        ],
+        "title": "TagOut",
+        "type": "object"
+      },
       "UserOut": {
         "properties": {
           "display_name": {
@@ -2615,6 +2909,72 @@
             }
           },
           {
+            "description": "Any of these types, e.g. \"milk\", \"yogurt\"",
+            "in": "query",
+            "name": "product_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 10,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Any of these types, e.g. \"milk\", \"yogurt\"",
+              "title": "Product Type"
+            }
+          },
+          {
+            "description": "Every one of these tags, e.g. \"organic\", \"fat-free\"",
+            "in": "query",
+            "name": "tag",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 10,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Every one of these tags, e.g. \"organic\", \"fat-free\"",
+              "title": "Tag"
+            }
+          },
+          {
+            "description": "None of these tags, e.g. \"whole-milk\"",
+            "in": "query",
+            "name": "exclude_tag",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 10,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "None of these tags, e.g. \"whole-milk\"",
+              "title": "Exclude Tag"
+            }
+          },
+          {
             "in": "query",
             "name": "sort",
             "required": false,
@@ -2902,6 +3262,31 @@
         "summary": "Put My Review",
         "tags": [
           "reviews"
+        ]
+      }
+    },
+    "/v1/stores": {
+      "get": {
+        "operationId": "list_stores_v1_stores_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StoreOut"
+                  },
+                  "title": "Response List Stores V1 Stores Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Stores",
+        "tags": [
+          "stores"
         ]
       }
     }

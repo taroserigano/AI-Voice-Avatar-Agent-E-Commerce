@@ -49,7 +49,9 @@ def test_review_updates_product_rating_everywhere(
     detail = alice.get(f"/v1/products/{pid}").json()
     assert (detail["rating_average"], detail["rating_count"]) == (3.5, 2)
 
-    listing = alice.get("/v1/products", params={"category": "electronics"}).json()
+    listing = alice.get(
+        "/v1/products", params={"category": "electronics", "brand": "Sonora Audio"}
+    ).json()
     arc = next(i for i in listing["items"] if i["id"] == pid)
     assert (arc["rating_average"], arc["rating_count"]) == (3.5, 2)
     unrated = next(i for i in listing["items"] if i["id"] != pid)

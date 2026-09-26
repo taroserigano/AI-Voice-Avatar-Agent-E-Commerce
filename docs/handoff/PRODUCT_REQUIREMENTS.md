@@ -24,7 +24,7 @@ The sign-in screen is the first thing a visitor sees. After sign-in, the visitor
 
 ### Shopping
 
-Filter/search products by title, brand, category, price, and in-stock status. Product page shows variant, images, description, current price and availability. Cart survives refresh and sign-out. At checkout, the server recalculates price, discounts, and stock, and reserves inventory for the payment window. Tax is calculated by Stripe Tax at payment; the checkout quote shows "tax calculated at payment". Redirect to Stripe Checkout for payment collection (cards only). After a verified payment event, show an order with line items and fulfillment status. Handle failed or expired payment without creating a false paid order.
+Filter/search products by title, brand, category, product type, diet and feature tags (for example organic, fat free, sugar free, lactose free, gluten free, vegan), price, and in-stock status; tags can also be excluded. Product page shows variant, images, description, current price and availability, and, for food, nutrition facts, ingredients, and allergens. Tags have fixed meanings (`content/policies/product-labels.md`) that the seed data is tested against. Cart survives refresh and sign-out. At checkout, the server recalculates price, discounts, and stock, and reserves inventory for the payment window. Tax is calculated by Stripe Tax at payment; the checkout quote shows "tax calculated at payment". Redirect to Stripe Checkout for payment collection (cards only). After a verified payment event, show an order with line items and fulfillment status. Handle failed or expired payment without creating a false paid order.
 
 ### Returns
 
@@ -39,13 +39,21 @@ These fixed rules apply in development and tests. A responsible owner sets real 
 | Return window | 30 days after delivery |
 | Not returnable | "Final sale" category (for example, gift cards) |
 | Needs inspection | "Electronics" category |
-| Instant refund | Items under $25 that don't need inspection: refund when the carrier scans the package |
+| Perishable | Fresh and frozen food (Dairy & Eggs, Fresh Produce, Meat & Seafood, Bakery & Bread, Frozen) isn't sent back: a damaged or spoiled item reported within 7 days of delivery is refunded without a return shipment; after 7 days it isn't refundable |
+| Instant refund | Items under $25 that don't need inspection: refund when the carrier scans the package, or a Larkspur store scans it at return drop-off |
 | Other refunds | Refund after warehouse inspection |
 | Restocking fee | None |
 | Shipping refund | Only when the whole order is returned |
 | Partial returns | Refund = the line's saved price − saved discount + saved tax, per unit |
 | Rounding | Split cents evenly across units; the **last** unit returned takes any remainder. For example, a $10.00 discount over 3 units is 333, 333, 334 cents. Refunds for a line can never add up to more than that line's saved total. |
 | Refund destination | The original payment method only; no store credit |
+| Shipping charge (for reference) | $5.99, free at $35 or more after discounts and before tax |
+
+The customer-facing wording lives in `content/policies/` (versioned, with effective dates); it's what the assistant retrieves and cites.
+
+### Stores
+
+A store locator lists the Larkspur stores around Dallas-Fort Worth (demo locations) on a Google map, with address, phone, hours, open-now status, services, and directions. Any store accepts packaged returns at its return drop-off. Stores don't sell online inventory or hold orders for pickup; online orders ship from one warehouse.
 
 ### Help and voice
 
@@ -53,7 +61,7 @@ Public policy questions use approved versioned content and show citations. Curre
 
 ## Pages
 
-Sign-in, create account, privacy, terms, accessibility statement (all public); and, behind sign-in: home/category, search results, product detail, cart, checkout/status, account orders, order detail/returns, support panel, basic staff support queue, and accessible error/empty/loading states. The support panel stays usable on mobile. Show a clear indication when sandbox payments, development sign-in, or simulated shipping is in use.
+Sign-in, create account, privacy, terms, accessibility statement (all public); and, behind sign-in: home/category, search results, product detail, store locator, cart, checkout/status, account orders, order detail/returns, support panel, basic staff support queue, and accessible error/empty/loading states. The support panel stays usable on mobile. Show a clear indication when sandbox payments, development sign-in, or simulated shipping is in use.
 
 ## Accessibility
 
@@ -61,7 +69,7 @@ Target WCAG 2.2 AA.
 
 ## Pilot scope
 
-First-party US products, English, USD, one stock location and one shipping/label adapter, responsive web. Seed a modest original catalog and policy set. Do not build guest access, store credit, marketplace payouts, real-time store pickup, international taxes, loyalty, personalization, native mobile apps, or nationwide fulfillment in this release.
+First-party US products, English, USD, one stock location and one shipping/label adapter, responsive web. Seed a large original catalog (about 2,000 products, mostly grocery, with detailed diet, nutrition, and allergen data so the assistant can answer detailed product questions), the policy set, and, for development accounts, an order history that covers every return case. Do not build guest access, store credit, marketplace payouts, real-time store pickup, international taxes, loyalty, personalization, native mobile apps, or nationwide fulfillment in this release.
 
 ## Product outcomes
 

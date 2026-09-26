@@ -3,6 +3,7 @@ import { type APIRequestContext, type Page, expect } from "@playwright/test";
 export const ALICE = { email: "alice@example.com", password: "alice-dev-password", name: "Alice" };
 export const BOB = { email: "bob@example.com", password: "bob-dev-password", name: "Bob" };
 export const API_URL = process.env.COMMERCE_API_URL ?? "http://localhost:8000";
+export const WEB_URL = (process.env.WEB_URL ?? "http://localhost:3000").replace(/\/$/, "");
 
 export async function signIn(page: Page, user: { email: string; password: string }) {
   await page.getByLabel("Email").fill(user.email);

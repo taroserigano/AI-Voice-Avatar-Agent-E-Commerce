@@ -30,6 +30,10 @@ export type PaymentOut = Schemas["PaymentOut"];
 export type ShipmentOut = Schemas["ShipmentOut"];
 export type ReturnOut = Schemas["ReturnOut"];
 export type ActivityOut = Schemas["ActivityOut"];
+export type TagOut = Schemas["TagOut"];
+export type Nutrition = Schemas["Nutrition"];
+export type StoreOut = Schemas["StoreOut"];
+export type DayHours = Schemas["DayHours"];
 
 export function createCommerceClient(options: ClientOptions) {
   return createClient<paths>(options);

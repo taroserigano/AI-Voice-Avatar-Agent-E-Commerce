@@ -21,6 +21,8 @@ export type ListingParams = {
   q?: string;
   category?: string;
   brand?: string | string[];
+  product_type?: string | string[];
+  tag?: string | string[];
   min_price?: string;
   max_price?: string;
   in_stock?: string;
@@ -49,6 +51,37 @@ export function dollarsToMinor(value: string | undefined): number | undefined {
   const match = /^\s*(\d{1,6})(?:\.(\d{1,2}))?\s*$/.exec(value);
   if (!match) return undefined;
   return Number(match[1]) * 100 + Number((match[2] ?? "").padEnd(2, "0") || 0);
+}
+
+type Facet = ProductPage["facets"]["brands"][number];
+
+/** A checkbox group for a facet; checked values are submitted as repeated query params. */
+function CheckboxFacet({ legend, name, facets, selected }: { legend: string; name: string; facets: Facet[]; selected: string[] }) {
+  if (facets.length === 0) return null;
+  return (
+    <fieldset className="px-1 py-4">
+      <legend className={cn(legendClasses, "px-2")}>{legend}</legend>
+      <div className="clear-both max-h-64 space-y-0.5 overflow-y-auto pt-2">
+        {facets.map((f) => (
+          <label key={f.value} className={optionRow}>
+            <input
+              type="checkbox"
+              name={name}
+              value={f.value}
+              defaultChecked={selected.includes(f.value)}
+              className={cn(controlClasses, "rounded")}
+            />
+            <span className="min-w-0 truncate">{f.label}</span>
+            <span className={countPill}>
+              <span className="sr-only">(</span>
+              {f.count}
+              <span className="sr-only">)</span>
+            </span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
 }
 
 function hrefWith(basePath: string, params: ListingParams, changes: Partial<ListingParams>): string {
@@ -97,6 +130,8 @@ export function Listing({
   category?: { slug: string; name: string };
 }) {
   const brands = asList(params.brand);
+  const types = asList(params.product_type);
+  const tags = asList(params.tag);
   const pageCount = Math.max(1, Math.ceil(page.total / page.page_size));
   const current = page.page;
   const sort = SORTS.some((s) => s.value === params.sort) ? (params.sort as string) : "relevance";
@@ -106,6 +141,8 @@ export function Listing({
   const activeCount =
     (params.category && showCategoryFacet ? 1 : 0) +
     brands.length +
+    types.length +
+    tags.length +
     (params.min_price ? 1 : 0) +
     (params.max_price ? 1 : 0) +
     (params.in_stock === "true" ? 1 : 0);
@@ -118,6 +155,17 @@ export function Listing({
   if (categoryFacet) chips.push({ label: categoryFacet.label, href: hrefWith(basePath, params, { category: undefined, page: undefined }) });
   for (const b of brands)
     chips.push({ label: b, href: hrefWith(basePath, params, { brand: brands.filter((x) => x !== b), page: undefined }) });
+  const labelOf = (facets: Facet[], value: string) => facets.find((f) => f.value === value)?.label ?? value;
+  for (const t of types)
+    chips.push({
+      label: labelOf(page.facets.product_types, t),
+      href: hrefWith(basePath, params, { product_type: types.filter((x) => x !== t), page: undefined }),
+    });
+  for (const t of tags)
+    chips.push({
+      label: labelOf(page.facets.tags, t),
+      href: hrefWith(basePath, params, { tag: tags.filter((x) => x !== t), page: undefined }),
+    });
   if (params.min_price) chips.push({ label: `From $${params.min_price}`, href: hrefWith(basePath, params, { min_price: undefined, page: undefined }) });
   if (params.max_price) chips.push({ label: `Up to $${params.max_price}`, href: hrefWith(basePath, params, { max_price: undefined, page: undefined }) });
   if (params.in_stock === "true") chips.push({ label: "In stock only", href: hrefWith(basePath, params, { in_stock: undefined, page: undefined }) });
@@ -192,30 +240,9 @@ export function Listing({
                     </div>
                   </fieldset>
                 ) : null}
-                {page.facets.brands.length > 0 ? (
-                  <fieldset className="px-1 py-4">
-                    <legend className={cn(legendClasses, "px-2")}>Brand</legend>
-                    <div className="clear-both max-h-64 space-y-0.5 overflow-y-auto pt-2">
-                      {page.facets.brands.map((f) => (
-                        <label key={f.value} className={optionRow}>
-                          <input
-                            type="checkbox"
-                            name="brand"
-                            value={f.value}
-                            defaultChecked={brands.includes(f.value)}
-                            className={cn(controlClasses, "rounded")}
-                          />
-                          <span className="min-w-0 truncate">{f.label}</span>
-                          <span className={countPill}>
-                            <span className="sr-only">(</span>
-                            {f.count}
-                            <span className="sr-only">)</span>
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </fieldset>
-                ) : null}
+                <CheckboxFacet legend="Type" name="product_type" facets={page.facets.product_types} selected={types} />
+                <CheckboxFacet legend="Diet & features" name="tag" facets={page.facets.tags} selected={tags} />
+                <CheckboxFacet legend="Brand" name="brand" facets={page.facets.brands} selected={brands} />
                 <fieldset className="px-3 py-4">
                   <legend className={cn(legendClasses)}>Price</legend>
                   <div className="clear-both flex items-center gap-2 pt-3">

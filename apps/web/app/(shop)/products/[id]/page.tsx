@@ -1,6 +1,6 @@
 import { ChevronRightIcon, DepartmentIcon, InfoIcon, LockIcon, ReturnIcon, type Icon } from "@/components/icons";
 import { ProductReviews } from "@/components/reviews/product-reviews";
-import { ProductGrid } from "@/components/shop/product-card";
+import { ProductGrid, TagBadges } from "@/components/shop/product-card";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Stars } from "@/components/ui/stars";
 import { WebVitalsReporter } from "@/components/web-vitals";
@@ -12,6 +12,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache, type ReactNode } from "react";
 import { AddToCart } from "./add-to-cart";
+import { ProductFacts } from "./product-facts";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -56,6 +57,13 @@ function returnPolicy(category: CategoryOut): { title: string; detail: string; t
   }
   if (category.policy_class === "inspection") {
     return { title: "30-day returns", detail: "Returnable within 30 days of delivery; refunded after inspection.", tone: "ok" };
+  }
+  if (category.policy_class === "perishable") {
+    return {
+      title: "Freshness guarantee",
+      detail: "Fresh food isn't sent back. If it arrives damaged or spoiled, tell us within 7 days of delivery for a refund.",
+      tone: "ok",
+    };
   }
   return { title: "30-day returns", detail: "Returnable within 30 days of delivery.", tone: "ok" };
 }
@@ -166,6 +174,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             <div className="mt-2">
               <RatingLink average={product.rating_average} count={product.rating_count} />
             </div>
+            <TagBadges tags={product.tags} className="mt-3" />
 
             <div className="mt-5 rounded-3xl border border-line bg-raised p-5 shadow-sm sm:p-7">
               <AddToCart
@@ -223,6 +232,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                 </div>
               ) : null}
             </dl>
+            <ProductFacts product={product} />
           </div>
         </section>
       </div>

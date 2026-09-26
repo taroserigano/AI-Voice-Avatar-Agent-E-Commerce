@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>html,body{margin:0;background:#222}canvas{display:block;width:600px;height:600px}</style>
+<script type="importmap">
+{ "imports": {
+  "three": "/node_modules/three/build/three.module.js",
+  "three/addons/": "/node_modules/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<script type="module">
+import { renderProduct } from "/studio.js";
+const q = new URLSearchParams(location.search);
+const slug = q.get("p");
+try {
+  const mod = await import(slug.startsWith("_") ? `/debug/${slug}.js` : `/products/${slug}.js`);
+  window.__result = await renderProduct(mod, {
+    frames: Number(q.get("n") ?? 48),
+    ss: Number(q.get("ss") ?? 2),
+    quality: Number(q.get("q") ?? 0.9),
+    override: JSON.parse(q.get("cfg") ?? "{}"),
+  });
+} catch (e) {
+  console.error(e);
+  window.__result = { error: String(e && e.stack || e) };
+}
+</script>
+</body>
+</html>

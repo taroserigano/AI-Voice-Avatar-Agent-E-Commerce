@@ -1,7 +1,8 @@
-import { SearchIcon, ArrowRightIcon } from "@/components/icons";
+import { ArrowRightIcon, MapIcon, SearchIcon } from "@/components/icons";
 import { Logo } from "@/components/logo";
 import { containerClasses } from "@/components/ui/container";
 import type { CartOut, CategoryOut, UserOut } from "@ai-commerce/contracts";
+import Link from "next/link";
 import { AccountMenu } from "./account-menu";
 import { CartLink } from "./cart-link";
 import { DepartmentNav } from "./department-nav";
@@ -58,6 +59,13 @@ export function Header({
           </div>
         </form>
         <nav aria-label="Account" className="ml-auto flex shrink-0 items-center gap-0.5 md:ml-0 md:gap-1">
+          <Link
+            href="/stores"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full px-3 text-sm font-semibold text-ink transition-colors duration-200 hover:bg-sunken"
+          >
+            <MapIcon className="size-5 text-muted" />
+            <span className="max-md:sr-only">Stores</span>
+          </Link>
           <AccountMenu displayName={user.display_name} email={user.email} />
           <CartLink initialCart={cart} />
         </nav>

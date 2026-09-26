@@ -13,26 +13,76 @@ from opensearchpy.exceptions import NotFoundError
 from commerce.config import get_settings
 from commerce.search.documents import ProductSearchDoc
 
+# Applied at search time only, so changing them needs no reindex of the data itself (just
+# `pnpm reindex` to recreate the index settings). Rules can't contain English stopwords
+# such as "no" or "not": those are removed before synonyms apply.
+SYNONYMS = [
+    "nonfat, non fat, fat free, skim, zero fat",
+    "sugar free, zero sugar, sugarless",
+    "dairy free, non dairy, nondairy",
+    "decaf, decaffeinated",
+    "soda, pop, soft drink",
+    "tv, television",
+    "earbuds, earphones",
+    "sneakers, trainers, tennis shoes",
+    # One way: "shoes" also finds boots and sandals, but "boots" doesn't find every shoe.
+    "shoes => shoes, boots, sneakers, sandals, footwear",
+    "hoodie, hooded sweatshirt",
+    "cilantro, coriander",
+]
+
+# English analysis like the built-in "english" analyzer, plus shop synonyms when searching.
+_EN = {"type": "text", "analyzer": "shop", "search_analyzer": "shop_search"}
+
 INDEX_BODY: dict[str, Any] = {
-    "settings": {"number_of_shards": 1, "number_of_replicas": 0},
+    "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "analysis": {
+            "filter": {
+                "english_possessive": {"type": "stemmer", "language": "possessive_english"},
+                "english_stop": {"type": "stop", "stopwords": "_english_"},
+                "english_stemmer": {"type": "stemmer", "language": "english"},
+                "shop_synonyms": {"type": "synonym_graph", "synonyms": SYNONYMS},
+            },
+            "analyzer": {
+                "shop": {
+                    "tokenizer": "standard",
+                    "filter": [
+                        "english_possessive",
+                        "lowercase",
+                        "english_stop",
+                        "english_stemmer",
+                    ],
+                },
+                "shop_search": {
+                    "tokenizer": "standard",
+                    "filter": [
+                        "english_possessive",
+                        "lowercase",
+                        "english_stop",
+                        "shop_synonyms",
+                        "english_stemmer",
+                    ],
+                },
+            },
+        },
+    },
     "mappings": {
         "dynamic": "strict",
         "properties": {
-            "title": {
-                "type": "text",
-                "analyzer": "english",
-                "fields": {"raw": {"type": "keyword"}},
-            },
-            "brand": {
-                "type": "text",
-                "analyzer": "english",
-                "fields": {"raw": {"type": "keyword"}},
-            },
+            "title": {**_EN, "fields": {"raw": {"type": "keyword"}}},
+            "brand": {**_EN, "fields": {"raw": {"type": "keyword"}}},
             "category_slug": {"type": "keyword"},
-            "category_name": {"type": "text", "analyzer": "english"},
-            "description": {"type": "text", "analyzer": "english"},
-            "variant_text": {"type": "text", "analyzer": "english"},
+            "category_name": _EN,
+            "description": _EN,
+            "variant_text": _EN,
             "skus": {"type": "keyword"},
+            "product_type": {"type": "keyword"},
+            "type_text": _EN,
+            "tags": {"type": "keyword"},
+            "tag_text": _EN,
+            "specs_text": _EN,
         },
     },
 }
@@ -65,6 +115,11 @@ class KeywordIndex:
                     "description": d.description,
                     "variant_text": d.variant_text,
                     "skus": d.skus,
+                    "product_type": d.product_type,
+                    "type_text": d.type_text,
+                    "tags": d.tags,
+                    "tag_text": d.tag_text,
+                    "specs_text": d.specs_text,
                 },
             }
             for d in docs
@@ -91,9 +146,12 @@ class KeywordIndex:
                                 "query": query,
                                 "fields": [
                                     "title^3",
+                                    "type_text^3",
                                     "brand^2",
                                     "category_name^2",
+                                    "tag_text^2",
                                     "variant_text",
+                                    "specs_text",
                                     "description",
                                 ],
                                 "type": "best_fields",
@@ -104,11 +162,22 @@ class KeywordIndex:
                             }
                         },
                         {
+                            # Every term, but spread across fields: "dairy free milk" finds
+                            # a product titled "Almond Milk" whose tags say "Dairy free".
+                            "multi_match": {
+                                "query": query,
+                                "fields": ["title^3", "type_text^2", "tag_text^2", "brand"],
+                                "type": "cross_fields",
+                                "operator": "and",
+                                "boost": 3,
+                            }
+                        },
+                        {
                             # Partial matches rank below full ones but still show up, so
                             # "wireless headphones" also finds earbuds and wired headphones.
                             "multi_match": {
                                 "query": query,
-                                "fields": ["title^3", "brand^2", "variant_text"],
+                                "fields": ["title^3", "type_text^2", "brand^2", "variant_text"],
                                 "type": "best_fields",
                                 "operator": "or",
                             }

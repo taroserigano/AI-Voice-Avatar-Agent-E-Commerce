@@ -19,6 +19,7 @@ from commerce.payments.models import PaymentAttempt
 from commerce.returns.models import PolicyVersion, RefundAttempt, ReturnItem, ReturnRequest
 from commerce.reviews.models import Review
 from commerce.shipping.models import Shipment, ShipmentEvent
+from commerce.stores.models import Store
 from commerce.support.models import SupportCase
 
 __all__ = [
@@ -47,6 +48,7 @@ __all__ = [
     "ShipmentEvent",
     "StockLocation",
     "SupportCase",
+    "Store",
     "User",
     "Variant",
 ]

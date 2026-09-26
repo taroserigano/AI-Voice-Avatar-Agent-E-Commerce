@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Cat food illustration">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7c2d12"/>
+      <stop offset="1" stop-color="#7c2d12" stop-opacity=".72"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="640" fill="url(#g)"/>
+  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
+  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
+  <ellipse cx="320" cy="310" rx="60" ry="48" fill="#fff"/><circle cx="260" cy="245" r="22" fill="#fff"/><circle cx="300" cy="215" r="22" fill="#fff"/><circle cx="340" cy="215" r="22" fill="#fff"/><circle cx="380" cy="245" r="22" fill="#fff"/>
+  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Cat food</tspan></text>
+  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Pet Supplies</text>
+</svg>

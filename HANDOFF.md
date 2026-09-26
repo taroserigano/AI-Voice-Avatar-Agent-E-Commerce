@@ -14,7 +14,7 @@
 | Research: fact check of all 22 sources, best practices, OTel and Ragas facts | ✅ Done. Results are built into the plan. |
 | Build plan | ✅ Done: `docs/PLAN_ai-commerce-build.md` |
 | Step 0: project folder, docs unzipped, `CLAUDE.md`, `.gitignore`, `.gitattributes` | ✅ Done |
-| First Git commit, pushed to GitHub | ✅ Done: **public** repo `https://github.com/taroserigano777/ai-commerce`, branch `main` |
+| GitHub repo | ✅ 2026-09-26: **private** `https://github.com/taroserigano/ai-commerce` is `origin`; push here. (The first commits also went to an older public repo, `taroserigano777/ai-commerce`, which is no longer used.) |
 | Step 1: fix the handoff docs | ✅ Done (2026-09-25, Windows laptop) |
 | Step 2: Milestone 1 (sign-in and shopping foundation) | ✅ Built and tested locally (2026-09-25). Pinecone semantic search is waiting on a free index slot; see Open items. |
 | Steps 3–8: build | ⬜ Not started |
@@ -64,6 +64,11 @@ ai-commerce/
 | 11 | Temporal | **Used in Milestone 2** for the checkout workflow, and in Milestone 3 for returns. |
 | 12 | AWS | **Taro's personal AWS account only, never RealPage's.** Use a CLI profile named `personal`, and pin Terraform with `allowed_account_ids`. |
 | 13 | Sign-in mechanism | **Extremely simple: check the email and password only, no additional layer.** No rate limiting, CAPTCHA, password reset, or Cognito/OIDC. The session cookie and the sign-in wall stay. Decided 2026-09-25. |
+| 14 | Catalog size and detail | **A large catalog (about 2,000 products)** with enough detail for LLM product Q&A ("non fat organic milk, not regular milk", "sugar free yogurt"): product type, controlled diet/feature tags, nutrition facts, ingredients, allergens, specs. Plus scripted Q&A and return/refund conversations for the assistant evals. Decided 2026-09-26. |
+| 15 | Stores | **10 Larkspur stores around Dallas, shown on a Google map.** Store locator only: online orders still ship from one warehouse and there's no store pickup. Decided 2026-09-26. |
+| 16 | Local services | **No containers needed:** `pnpm local:up` runs PostgreSQL and OpenSearch natively. The app reads `COMMERCE_DATABASE_URL`, never the shared `.env`'s `DATABASE_URL` (another project's database). Decided 2026-09-26. |
+
+| 17 | Sandbox policy additions | **Accepted by Taro (2026-09-26):** a *perishable* return class (fresh and frozen food isn't sent back; spoiled or damaged items reported within 7 days of delivery are refunded without a return), a store return drop-off counts as the carrier scan, and shipping is $5.99, free at $35 after discounts. In the sandbox policy table in `docs/handoff/PRODUCT_REQUIREMENTS.md` and in `content/policies/`. |
 
 **Defaults Taro accepted** (from the plan): Stripe Checkout Sessions with cards only; refunds go only to the original card; WCAG 2.2 AA; Jev as an optional flagged experiment; the sandbox return policy in Step 1.
 
@@ -135,6 +140,21 @@ Built natively on Windows (Git Bash/PowerShell, Docker Desktop), not inside WSL;
 | Brand | "Larkspur": original name, logo, and placeholder art | README forbids copying another retailer. |
 
 Known gaps to pick up later: the search baseline was recorded keyword-only and should be re-recorded once Pinecone is connected.
+
+## Catalog, orders, and stores build notes (2026-09-26, branch `catalog-stores`)
+
+| Topic | Choice | Why |
+|---|---|---|
+| Generated catalog | `services/commerce/src/commerce/seed/gen/`, one module per department, deterministic (randomness seeded by each product's slug) | Adding or editing one product never changes another's stock or SKU; the data is reviewable code. |
+| Data correctness | `tests/unit/test_catalog_data.py` checks every tag against the nutrition facts and allergens (e.g. "fat free" means under 0.5 g fat; "vegan" means no milk, egg, honey, or gelatin) | The assistant will answer from this data, so a wrong tag is a wrong answer. |
+| Tags | Controlled vocabulary in `catalog/tags.py`; stored as a PostgreSQL array with a GIN index; filters `tag` (all of) and `exclude_tag` (none of) | Exact answers for "organic fat free, not whole milk" instead of hoping keywords line up. |
+| Keyword search | Custom English analyzer with search-time synonyms ("nonfat" = "fat free" = "skim"); a cross-field clause so "dairy free milk" matches a title plus a tag | Found by testing real questions against the data. |
+| Dev order history | `seed/orders.py`: 14 scenario orders for alice and bob, updated in place on every seed with fresh relative dates and stable IDs (two of them, `alice-partly-returned` and `alice-return-in-progress`, get their return history from the returns milestone); simulated 8.25% Texas tax (food and gift cards exempt) until Stripe Tax exists | Return conversations need real orders in every policy branch. |
+| Assistant scripts | `evals/assistant/*.jsonl`, checked against the seed data by `tests/unit/test_assistant_scenarios.py` (which recomputes every refund) | Two hand-computed refunds were wrong on the first draft; the test caught them. |
+| Policy text | `content/policies/*.md`, versioned with effective dates | What the assistant will retrieve from Pinecone and cite. |
+| Maps | Google's keyless embed (one store at a time) by default; with `GOOGLE_MAPS_API_KEY` set, the Maps JavaScript API shows all 10 pins | Works with no account; the key path upgrades it. |
+| Search eval | 20 new attribute queries labeled by rule (type + tags), keyword-only nDCG@10 0.95; baseline re-recorded for the 2,358-product catalog (overall nDCG@10 0.79, keyword-only) | The 54 original hand labels only know the first 51 products, so new correct results count as misses (e.g. every top-5 hit for "noise cancelling headphones for travel" is right but only one is labeled). **Relabel those queries and re-record once Pinecone is connected.** |
+| Parallel checkouts | `API_PORT` / `WEB_PORT` for `pnpm dev`; this worktree used 8200/3200, database `commerce_catalog`, `SEARCH_ENV=dev-catalog` | Another agent was running in another worktree at the same time. |
 
 ---
 

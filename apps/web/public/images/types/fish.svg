@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Fish illustration">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b91c1c"/>
+      <stop offset="1" stop-color="#b91c1c" stop-opacity=".72"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="640" fill="url(#g)"/>
+  <circle cx="540" cy="90" r="160" fill="#fff" fill-opacity=".08"/>
+  <circle cx="80" cy="600" r="140" fill="#000" fill-opacity=".06"/>
+  <path d="M220 270c40-60 140-60 180 0-40 60-140 60-180 0z" fill="#fff"/><path d="M400 270l40-40v80z" fill="#fff"/><circle cx="262" cy="262" r="8" fill="#b91c1c"/>
+  <text y="450" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#fff"><tspan x="320" dy="0">Fish</tspan></text>
+  <text x="320" y="600" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" fill="#fff" fill-opacity=".85">Meat &amp; Seafood</text>
+</svg>

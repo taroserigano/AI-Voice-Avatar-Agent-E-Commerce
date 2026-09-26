@@ -1,17 +1,51 @@
 // Run the commerce API, outbox worker, and web app together: `pnpm dev`.
 // Each process's output is prefixed; Ctrl+C stops all of them.
 import { spawn } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
+import { connect } from "node:net";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const env = {
-  ...process.env,
-  OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT ?? "http://localhost:4318",
-  COMMERCE_API_URL: process.env.COMMERCE_API_URL ?? "http://localhost:8000",
-};
+// The Python services read the repo-root .env themselves; Next.js only reads apps/web/.env.
+// Pass through just these keys from the root .env (never the whole file: it may hold other
+// projects' secrets). Real environment variables win.
+const PASS_THROUGH = ["APP_ENV", "API_PORT", "WEB_PORT", "GOOGLE_MAPS_API_KEY"];
+const rootEnv = join(dirname(fileURLToPath(import.meta.url)), "..", ".env");
+if (existsSync(rootEnv)) {
+  for (const line of readFileSync(rootEnv, "utf8").split(/\r?\n/)) {
+    const match = /^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*?)\s*$/.exec(line);
+    if (match && PASS_THROUGH.includes(match[1]) && process.env[match[1]] === undefined) {
+      process.env[match[1]] = match[2].replace(/^(["'])(.*)\1$/, "$2");
+    }
+  }
+}
+
+// Send telemetry to the local OTel Collector only when one is listening (it runs in
+// infra/compose.yaml; `pnpm local:up` doesn't start it). Otherwise every export would fail
+// and flood the output.
+function collectorListening() {
+  return new Promise((resolve) => {
+    const socket = connect({ host: "127.0.0.1", port: 4318 });
+    socket.setTimeout(500);
+    socket.once("connect", () => (socket.destroy(), resolve(true)));
+    socket.once("timeout", () => (socket.destroy(), resolve(false)));
+    socket.once("error", () => resolve(false));
+  });
+}
+
+// API_PORT / WEB_PORT let a second checkout (e.g. a git worktree) run beside the first.
+const apiPort = process.env.API_PORT ?? "8000";
+const webPort = process.env.WEB_PORT ?? "3000";
+const env = { ...process.env, COMMERCE_API_URL: process.env.COMMERCE_API_URL ?? `http://localhost:${apiPort}` };
+if (env.OTEL_EXPORTER_OTLP_ENDPOINT === undefined) {
+  if (await collectorListening()) env.OTEL_EXPORTER_OTLP_ENDPOINT = "http://localhost:4318";
+  else console.log("No OTel Collector on :4318, so telemetry isn't exported (start it with `pnpm infra:up`).");
+}
 
 const procs = [
-  { name: "api", color: 36, cmd: "pnpm", args: ["dev:api"] },
+  { name: "api", color: 36, cmd: "pnpm", args: ["dev:api", "--port", apiPort] },
   { name: "outbox", color: 35, cmd: "pnpm", args: ["dev:outbox"] },
-  { name: "web", color: 33, cmd: "pnpm", args: ["dev:web"] },
+  { name: "web", color: 33, cmd: "pnpm", args: ["--filter", "@ai-commerce/web", "exec", "next", "dev", "--port", webPort] },
 ];
 
 const children = procs.map(({ name, color, cmd, args }) => {
