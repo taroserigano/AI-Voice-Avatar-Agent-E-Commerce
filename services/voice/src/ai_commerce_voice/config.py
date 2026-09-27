@@ -1,0 +1,80 @@
+"""Voice agent settings, read from the environment and the repo-root ``.env``."""
+
+from __future__ import annotations
+
+from functools import lru_cache
+from pathlib import Path
+from typing import Literal
+
+from pydantic import AliasChoices, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+REPO_ROOT = Path(__file__).resolve().parents[4]
+
+# Cartesia's "Skylar - Friendly Guide": approachable American English, made for support.
+SKYLAR = "db6b0ed5-d5d3-463d-ae85-518a07d3c2b4"
+
+
+class VoiceSettings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=REPO_ROOT / ".env", env_file_encoding="utf-8", extra="ignore"
+    )
+
+    app_env: Literal["dev", "test", "ci", "staging", "prod"] = "dev"
+    voice_host: str = "127.0.0.1"
+    voice_port: int = Field(default=8103, validation_alias=AliasChoices("VOICE_PORT"))
+    # Browsers that may open the socket (cross-site WebSocket hijacking guard). The web app's
+    # own origin in dev; set it explicitly elsewhere.
+    voice_allowed_origins: list[str] = [
+        "http://localhost:3000",
+        "http://localhost:3100",
+        "http://localhost:3200",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3100",
+    ]
+
+    # Who the customer is: the commerce API checks the session cookie.
+    commerce_api_url: str = Field(
+        default="http://localhost:8000", validation_alias="COMMERCE_API_URL"
+    )
+    session_cookie_name: str = "ac_session"
+
+    # Speech out: Cartesia Sonic, streamed over one WebSocket per session.
+    cartesia_api_key: str | None = Field(
+        default=None, validation_alias=AliasChoices("CARTESIA_SONIC_API_KEY", "CARTESIA_API_KEY")
+    )
+    cartesia_model: str = "sonic-3.6-2026-08-27"
+    cartesia_version: str = "2026-08-14"
+    cartesia_voice_id: str = SKYLAR
+    cartesia_voice_name: str = "Skylar"
+
+    # Speech in and the model: OpenAI (decision 22).
+    openai_api_key: str | None = Field(
+        default=None, validation_alias=AliasChoices("OPEN_AI_API", "OPENAI_API_KEY")
+    )
+    voice_stt_model: str = "gpt-live-transcribe"
+    voice_llm_model: str = "gpt-6-luna"
+    # Low effort answers simple questions from the orders snapshot instead of calling a tool
+    # (measured: effort "none" looked up an order it already had). Priority processing took
+    # the first token from ~600-950 ms to ~450-590 ms (2026-09-26).
+    voice_llm_reasoning: Literal["none", "low", "medium"] = "low"
+    voice_llm_service_tier: Literal["default", "priority", "flex"] = "priority"
+    # "auto": the real model when a key is set, the labeled scripted one otherwise.
+    voice_llm_mode: Literal["auto", "openai", "scripted"] = "auto"
+
+    # Turn-taking. Silence that ends the customer's turn (server VAD), and how long Xana waits
+    # for answer audio before saying a filler.
+    voice_end_silence_ms: int = 450
+    voice_filler_after_ms: int = 900
+    voice_max_turn_s: float = 45.0
+    voice_max_tool_calls: int = 6
+    voice_max_session_s: int = 20 * 60
+
+    @property
+    def is_dev(self) -> bool:
+        return self.app_env in ("dev", "test", "ci")
+
+
+@lru_cache
+def get_settings() -> VoiceSettings:
+    return VoiceSettings()

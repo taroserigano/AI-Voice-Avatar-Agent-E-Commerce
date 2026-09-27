@@ -9,7 +9,7 @@ dependencies = []
 package = false
 
 [tool.uv.workspace]
-members = ["services/commerce", "services/assistant", "services/planner", "packages/telemetry", "packages/retrieval", "packages/assistant-stream"]
+members = ["services/commerce", "services/assistant", "services/planner", "services/voice", "packages/telemetry", "packages/retrieval", "packages/assistant-stream"]
 
 [dependency-groups]
 dev = [
@@ -37,7 +37,7 @@ ignore = [
 "**/assistant/scripted_support.py" = ["E501"]  # keyword-rule tables
 
 [tool.ruff.lint.isort]
-known-first-party = ["commerce", "assistant", "ai_commerce_telemetry", "ai_commerce_retrieval", "ai_commerce_planner", "ai_commerce_stream", "tests"]
+known-first-party = ["commerce", "assistant", "ai_commerce_telemetry", "ai_commerce_retrieval", "ai_commerce_planner", "ai_commerce_stream", "ai_commerce_voice", "tests"]
 
 [tool.mypy]
 python_version = "3.12"

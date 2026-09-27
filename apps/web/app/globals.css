@@ -384,6 +384,48 @@
     radial-gradient(50% 70% at 0% 100%, rgb(255 239 207 / 0.9) 0%, transparent 60%);
 }
 
+/* Xana's voice screen: a deep night-blue stage with a soft violet glow behind the orb. White
+   text on the base is 17:1; the muted captions (neutral-300) are 11:1. */
+@utility bg-voice-night {
+  background-color: #0b1024;
+  background-image:
+    radial-gradient(42% 48% at 50% 42%, rgb(103 64 222 / 0.34) 0%, transparent 70%),
+    radial-gradient(38% 50% at 88% 12%, rgb(34 138 196 / 0.16) 0%, transparent 70%),
+    linear-gradient(180deg, #0b1024 0%, #121638 55%, #0d1129 100%);
+}
+
+/* The orb's surface: a conic sweep of lavender, violet, and cyan (see xana-orb.tsx). */
+@utility bg-voice-orb {
+  background-image:
+    radial-gradient(38% 38% at 30% 78%, rgb(255 255 255 / 0.95) 0%, rgb(255 255 255 / 0.35) 30%, transparent 70%),
+    radial-gradient(70% 70% at 45% 30%, rgb(214 206 255 / 0.9) 0%, transparent 60%),
+    conic-gradient(from 200deg at 50% 50%, #7d64ef, #b8a6ff, #6c7cf5, #2fc6e0, #5b8ff0, #9c7cf9, #7d64ef);
+}
+
+@keyframes voice-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes voice-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+@keyframes voice-think {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 /* Respect reduced motion: kill animation/transition time, no smooth scroll, no shimmer sweep. */
 @media (prefers-reduced-motion: reduce) {
   *,

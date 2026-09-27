@@ -81,6 +81,14 @@ export default async function SupportPage({
           Ask Xana by voice or text: where an order is, what went wrong with a delivery, or how to return something.
           For a return, she shows your exact refund and starts it only when you confirm.
         </p>
+        <Link
+          href="/support/voice"
+          className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-brand-950 px-5 py-2.5 font-semibold text-white shadow-sm transition hover:bg-brand-900 focus-inverse"
+        >
+          <MicIcon className="size-5" />
+          Talk to Xana by voice
+          <span className="text-sm font-normal text-brand-200">real-time, full screen</span>
+        </Link>
       </header>
 
       <XanaConsole
