@@ -1,0 +1,42 @@
+{
+  "model": "jev-simulator",
+  "cases": 44,
+  "questions": {
+    "intent": {
+      "labeled": 39,
+      "accuracy": 0.974,
+      "act_rate": 1.0,
+      "acted_accuracy": 0.974
+    },
+    "return_reason": {
+      "labeled": 11,
+      "accuracy": 0.909,
+      "act_rate": 0.818,
+      "acted_accuracy": 1.0
+    },
+    "target_line": {
+      "labeled": 6,
+      "accuracy": 1.0,
+      "act_rate": 1.0,
+      "acted_accuracy": 1.0
+    },
+    "wants_person": {
+      "labeled": 3,
+      "accuracy": 1.0,
+      "act_rate": 1.0,
+      "acted_accuracy": 1.0
+    },
+    "policy_bypass": {
+      "labeled": 4,
+      "accuracy": 1.0,
+      "act_rate": 1.0,
+      "acted_accuracy": 1.0
+    }
+  },
+  "latency_ms": {
+    "p50": 0.0,
+    "p95": 0.0
+  },
+  "input_tokens": 0,
+  "cost_usd": 0.0
+}

@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Beef roast">
+  <title>Beef roast</title>
   <defs>
-    <radialGradient id="t-beef-roast-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-beef-roast-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fcf4f4"/>
       <stop offset="1" stop-color="#f3d8d8"/>
     </radialGradient>
-    <linearGradient id="t-beef-roast-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#c13737"/>
-      <stop offset="1" stop-color="#b91c1c"/>
-    </linearGradient>
     <filter id="t-beef-roast-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-beef-roast-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-beef-roast-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M220 270c40-60 140-60 180 0-40 60-140 60-180 0z" fill="url(#t-beef-roast-ink)"/><path d="M400 270l40-40v80z" fill="url(#t-beef-roast-ink)"/><circle cx="262" cy="262" r="8" fill="#b91c1c"/></g>
-  <rect x="215" y="500" width="210" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Beef roast</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-beef-roast-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#4a0b0b" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><rect x="172" y="396" width="296" height="44" rx="14" fill="#f7e4e4"/><path d="M204 322C198 262 262 238 334 246C408 254 452 290 446 346C440 400 380 426 310 420C240 414 210 384 204 322z" fill="#dd5a5f" stroke="#fde4dc" stroke-width="16" stroke-opacity="1"/><path d="M262 296Q300 318 290 360M344 286Q380 326 420 318M318 382Q360 372 382 402" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.5"/><g transform="translate(420 262) rotate(30) scale(1.2)" stroke-width="3.33"><path d="M-18 20C-22-6 0-22 22-22 22 2 6 20-18 20z" fill="#5fae3a"/><path d="M-14 16 10-8" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.7"/></g></g>
 </svg>

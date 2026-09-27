@@ -70,7 +70,7 @@ class Product(UUIDPk, Timestamps, Base):
 
     category: Mapped[Category] = relationship(back_populates="products")
     variants: Mapped[list[Variant]] = relationship(
-        back_populates="product", order_by="Variant.sort_order"
+        back_populates="product", order_by="[Variant.sort_order, Variant.sku]"
     )
 
 

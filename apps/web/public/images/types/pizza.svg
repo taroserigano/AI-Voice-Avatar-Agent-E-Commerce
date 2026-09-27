@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Pizza">
+  <title>Pizza</title>
   <defs>
-    <radialGradient id="t-pizza-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-pizza-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f3f8f9"/>
       <stop offset="1" stop-color="#d6e7ec"/>
     </radialGradient>
-    <linearGradient id="t-pizza-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#2b859d"/>
-      <stop offset="1" stop-color="#0e7490"/>
-    </linearGradient>
     <filter id="t-pizza-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-pizza-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-pizza-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M320 180v180M242 225l156 90M242 315l156-90" stroke="url(#t-pizza-ink)" stroke-width="16" stroke-linecap="round"/><circle cx="320" cy="270" r="20" fill="url(#t-pizza-ink)"/></g>
-  <rect x="252" y="500" width="135" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Pizza</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-pizza-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#062e3a" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><ellipse cx="320" cy="382" rx="150" ry="60" fill="#d99a4e"/><ellipse cx="320" cy="376" rx="134" ry="50" fill="#e8563f"/><ellipse cx="320" cy="376" rx="124" ry="44" fill="#f9d56e"/><ellipse cx="260" cy="366" rx="17" ry="8" fill="#c0392b"/><ellipse cx="320" cy="356" rx="17" ry="8" fill="#c0392b"/><ellipse cx="380" cy="368" rx="17" ry="8" fill="#c0392b"/><ellipse cx="290" cy="396" rx="17" ry="8" fill="#c0392b"/><ellipse cx="352" cy="396" rx="17" ry="8" fill="#c0392b"/><ellipse cx="230" cy="388" rx="17" ry="8" fill="#c0392b"/><ellipse cx="410" cy="390" rx="17" ry="8" fill="#c0392b"/><path d="M320 376L196 376M320 376L444 376M320 376L240 336M320 376L400 416M320 376L400 336M320 376L240 416" fill="none" stroke="#e9b35c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><g transform="translate(332 330) rotate(-20) scale(0.7)" stroke-width="5.71"><path d="M-18 20C-22-6 0-22 22-22 22 2 6 20-18 20z" fill="#5fae3a"/><path d="M-14 16 10-8" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.7"/></g><g transform="translate(380 400) rotate(40) scale(0.6)" stroke-width="6.67"><path d="M-18 20C-22-6 0-22 22-22 22 2 6 20-18 20z" fill="#5fae3a"/><path d="M-14 16 10-8" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.7"/></g></g>
 </svg>

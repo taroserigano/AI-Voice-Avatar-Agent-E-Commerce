@@ -1,9 +1,25 @@
 import { SectionHeading } from "@/components/ui/section-heading";
 import type { ViewedProduct } from "@/lib/activity";
+import { formatMoney } from "@/lib/format";
 import Link from "next/link";
 
+/**
+ * One entry per product (the first, i.e. newest, wins). Distinct products that would render as
+ * identical tiles (same title and art, e.g. two sizes of the same milk) collapse too.
+ */
+function unique(products: ViewedProduct[]): ViewedProduct[] {
+  const seen = new Set<string>();
+  return products.filter((p) => {
+    const keys = [`id:${p.id}`, `look:${p.title}|${p.image_path}`];
+    if (keys.some((k) => seen.has(k))) return false;
+    for (const k of keys) seen.add(k);
+    return true;
+  });
+}
+
 /** A compact rail of products the shopper looked at recently (newest first). */
-export function RecentlyViewed({ products }: { products: ViewedProduct[] }) {
+export function RecentlyViewed({ products: all }: { products: ViewedProduct[] }) {
+  const products = unique(all);
   if (products.length === 0) return null;
   return (
     <section aria-labelledby="recently-viewed">
@@ -34,6 +50,18 @@ export function RecentlyViewed({ products }: { products: ViewedProduct[] }) {
               </span>
               <span className="mt-2 line-clamp-2 px-0.5 text-[0.8125rem] font-medium leading-snug text-ink group-hover:text-brand-700">
                 {p.title}
+              </span>
+              <span className="mt-0.5 px-0.5 text-[0.8125rem] font-semibold tabular-nums text-ink">
+                {p.price_minor === null ? (
+                  <span className="font-normal text-muted">Unavailable</span>
+                ) : p.in_stock ? (
+                  formatMoney(p.price_minor, p.currency)
+                ) : (
+                  <>
+                    {formatMoney(p.price_minor, p.currency)}{" "}
+                    <span className="font-normal text-muted">· Out of stock</span>
+                  </>
+                )}
               </span>
             </Link>
           </li>

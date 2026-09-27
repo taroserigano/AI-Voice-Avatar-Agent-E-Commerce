@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Leafy greens">
+  <title>Leafy greens</title>
   <defs>
-    <radialGradient id="t-leafy-greens-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-leafy-greens-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f6f8f3"/>
       <stop offset="1" stop-color="#e1e9d6"/>
     </radialGradient>
-    <linearGradient id="t-leafy-greens-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#628c2c"/>
-      <stop offset="1" stop-color="#4d7c0f"/>
-    </linearGradient>
     <filter id="t-leafy-greens-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-leafy-greens-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-leafy-greens-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><circle cx="300" cy="285" r="62" fill="url(#t-leafy-greens-ink)"/><circle cx="345" cy="285" r="62" fill="url(#t-leafy-greens-ink)" fill-opacity=".85"/><path d="M322 222c0-24 12-40 34-46" stroke="url(#t-leafy-greens-ink)" stroke-width="10" fill="none" stroke-linecap="round"/></g>
-  <rect x="200" y="500" width="240" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Leafy greens</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-leafy-greens-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#1f3206" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><circle cx="246" cy="372" r="62" fill="#3f7f22"/><circle cx="394" cy="372" r="62" fill="#3f7f22"/><circle cx="320" cy="398" r="58" fill="#3f7f22"/><circle cx="320" cy="332" r="84" fill="#5fae3a"/><circle cx="284" cy="318" r="40" fill="#7fbe61"/><circle cx="356" cy="318" r="40" fill="#7fbe61"/><path d="M320 260V412M284 290Q300 330 320 340M356 290Q340 330 320 340M232 356Q260 372 280 400M408 356Q380 372 360 400" fill="none" stroke="#afd69c" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g>
 </svg>

@@ -59,6 +59,16 @@ def test_product_detail_has_fresh_price_and_stock(alice: TestClient, db: Session
     assert after["in_stock"] is False
 
 
+def test_detail_and_listing_agree_on_the_default_option(alice: TestClient) -> None:
+    items = alice.get("/v1/products", params={"q": "headphones", "page_size": 6}).json()["items"]
+    assert items
+    keys = ("type_label", "default_variant_id", "default_variant_name", "default_price_minor")
+    for item in items:
+        detail = alice.get(f"/v1/products/{item['id']}").json()
+        assert {k: detail[k] for k in keys} == {k: item[k] for k in keys}
+        assert detail["type_label"]
+
+
 def test_filters_and_facets(alice: TestClient) -> None:
     page = alice.get(
         "/v1/products", params={"category": "electronics", "max_price": 5000, "in_stock": "true"}

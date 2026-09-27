@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Corn">
+  <title>Corn</title>
   <defs>
-    <radialGradient id="t-corn-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-corn-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f6f8f3"/>
       <stop offset="1" stop-color="#e1e9d6"/>
     </radialGradient>
-    <linearGradient id="t-corn-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#628c2c"/>
-      <stop offset="1" stop-color="#4d7c0f"/>
-    </linearGradient>
     <filter id="t-corn-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-corn-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-corn-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><circle cx="300" cy="285" r="62" fill="url(#t-corn-ink)"/><circle cx="345" cy="285" r="62" fill="url(#t-corn-ink)" fill-opacity=".85"/><path d="M322 222c0-24 12-40 34-46" stroke="url(#t-corn-ink)" stroke-width="10" fill="none" stroke-linecap="round"/></g>
-  <rect x="260" y="500" width="120" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Corn</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-corn-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#1f3206" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><g transform="translate(330 350) rotate(-20)"><path d="M-150 30C-80-10 20 10 90 60C20 70-80 60-150 30z" fill="#3f7f22"/><path d="M-150-30C-80 10 20-10 90-60C20-70-80-60-150-30z" fill="#5fae3a"/></g><g transform="translate(340 334) rotate(-20)"><rect x="-130" y="-56" width="260" height="112" rx="56" fill="#f0b429"/><circle cx="-72" cy="-40" r="8" fill="#fbd96b"/><circle cx="-54" cy="-40" r="8" fill="#f5c542"/><circle cx="-36" cy="-40" r="8" fill="#fbd96b"/><circle cx="-18" cy="-40" r="8" fill="#f5c542"/><circle cx="0" cy="-40" r="8" fill="#fbd96b"/><circle cx="18" cy="-40" r="8" fill="#f5c542"/><circle cx="36" cy="-40" r="8" fill="#fbd96b"/><circle cx="54" cy="-40" r="8" fill="#f5c542"/><circle cx="72" cy="-40" r="8" fill="#fbd96b"/><circle cx="-108" cy="-20" r="8" fill="#f5c542"/><circle cx="-90" cy="-20" r="8" fill="#fbd96b"/><circle cx="-72" cy="-20" r="8" fill="#f5c542"/><circle cx="-54" cy="-20" r="8" fill="#fbd96b"/><circle cx="-36" cy="-20" r="8" fill="#f5c542"/><circle cx="-18" cy="-20" r="8" fill="#fbd96b"/><circle cx="0" cy="-20" r="8" fill="#f5c542"/><circle cx="18" cy="-20" r="8" fill="#fbd96b"/><circle cx="36" cy="-20" r="8" fill="#f5c542"/><circle cx="54" cy="-20" r="8" fill="#fbd96b"/><circle cx="72" cy="-20" r="8" fill="#f5c542"/><circle cx="90" cy="-20" r="8" fill="#fbd96b"/><circle cx="108" cy="-20" r="8" fill="#f5c542"/><circle cx="-108" cy="0" r="8" fill="#fbd96b"/><circle cx="-90" cy="0" r="8" fill="#f5c542"/><circle cx="-72" cy="0" r="8" fill="#fbd96b"/><circle cx="-54" cy="0" r="8" fill="#f5c542"/><circle cx="-36" cy="0" r="8" fill="#fbd96b"/><circle cx="-18" cy="0" r="8" fill="#f5c542"/><circle cx="0" cy="0" r="8" fill="#fbd96b"/><circle cx="18" cy="0" r="8" fill="#f5c542"/><circle cx="36" cy="0" r="8" fill="#fbd96b"/><circle cx="54" cy="0" r="8" fill="#f5c542"/><circle cx="72" cy="0" r="8" fill="#fbd96b"/><circle cx="90" cy="0" r="8" fill="#f5c542"/><circle cx="108" cy="0" r="8" fill="#fbd96b"/><circle cx="-108" cy="20" r="8" fill="#f5c542"/><circle cx="-90" cy="20" r="8" fill="#fbd96b"/><circle cx="-72" cy="20" r="8" fill="#f5c542"/><circle cx="-54" cy="20" r="8" fill="#fbd96b"/><circle cx="-36" cy="20" r="8" fill="#f5c542"/><circle cx="-18" cy="20" r="8" fill="#fbd96b"/><circle cx="0" cy="20" r="8" fill="#f5c542"/><circle cx="18" cy="20" r="8" fill="#fbd96b"/><circle cx="36" cy="20" r="8" fill="#f5c542"/><circle cx="54" cy="20" r="8" fill="#fbd96b"/><circle cx="72" cy="20" r="8" fill="#f5c542"/><circle cx="90" cy="20" r="8" fill="#fbd96b"/><circle cx="108" cy="20" r="8" fill="#f5c542"/><circle cx="-72" cy="40" r="8" fill="#fbd96b"/><circle cx="-54" cy="40" r="8" fill="#f5c542"/><circle cx="-36" cy="40" r="8" fill="#fbd96b"/><circle cx="-18" cy="40" r="8" fill="#f5c542"/><circle cx="0" cy="40" r="8" fill="#fbd96b"/><circle cx="18" cy="40" r="8" fill="#f5c542"/><circle cx="36" cy="40" r="8" fill="#fbd96b"/><circle cx="54" cy="40" r="8" fill="#f5c542"/><circle cx="72" cy="40" r="8" fill="#fbd96b"/></g><g transform="translate(300 380) rotate(-20)"><path d="M-150 40C-90 10-20 30 40 70C-20 90-100 80-150 40z" fill="#5fae3a"/></g></g>
 </svg>

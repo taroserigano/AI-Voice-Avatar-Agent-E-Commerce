@@ -5,6 +5,7 @@ import {
   CheckIcon,
   ClockIcon,
   CreditCardIcon,
+  MicIcon,
   PackageIcon,
   ReturnIcon,
   SearchIcon,
@@ -20,6 +21,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { cn } from "@/lib/cn";
 import { RETURN_STEPS } from "@/lib/orders";
 import type { Metadata } from "next";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import {
   BoltIcon,
@@ -47,11 +49,26 @@ const WINDOW_DAYS = 30;
 const PERISHABLE_DAYS = 7;
 const INSTANT_UNDER = "$25";
 
-const steps = [
+const inlineLink =
+  "font-medium text-brand-700 underline decoration-brand-300 underline-offset-4 hover:decoration-brand-700";
+
+const steps: { art: ReactNode; title: string; body: ReactNode }[] = [
   {
     art: <StepPickArt />,
     title: "Pick the item",
-    body: "Open the order under Orders & returns and choose Start a return. Or just ask the assistant.",
+    body: (
+      <>
+        Open the order under{" "}
+        <Link href="/orders" className={inlineLink}>
+          Orders &amp; returns
+        </Link>{" "}
+        and choose Start a return. Or just tell{" "}
+        <Link href="/support" className={inlineLink}>
+          Xana
+        </Link>
+        .
+      </>
+    ),
   },
   {
     art: <StepQuoteArt />,
@@ -61,7 +78,7 @@ const steps = [
   {
     art: <StepConfirmArt />,
     title: "Confirm it yourself",
-    body: "Tap Confirm return, or say a clear “yes” to the assistant. Nothing happens until you do.",
+    body: "Tap Confirm return, or say a clear “yes” to Xana. Nothing happens until you do.",
   },
   {
     art: <StepShipArt />,
@@ -101,11 +118,22 @@ export default function HowReturnsWorkPage() {
           <Fact icon={<CreditCardIcon className="size-4" />}>Refund to original payment</Fact>
           <Fact icon={<CheckIcon className="size-4" />}>No restocking fee</Fact>
         </ul>
-        <p className="mt-6 text-center text-sm text-muted">
-          <Badge tone="accent" className="mr-1.5 align-[1px]">
-            Soon
-          </Badge>
-          Online returns open in the next update. Each order already shows what you&apos;d get back.
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <ButtonLink href="/orders">
+            <ReturnIcon className="size-4.5" />
+            Start a return
+          </ButtonLink>
+          <ButtonLink href="/support" variant="outline">
+            <MicIcon className="size-4.5" />
+            Return with Xana
+          </ButtonLink>
+        </div>
+        <p className="mt-4 text-center text-sm text-muted">
+          Return shipping is free: use the prepaid label, or drop the package at{" "}
+          <Link href="/stores" className={inlineLink}>
+            any Serigan Mart store
+          </Link>
+          .
         </p>
       </section>
 
@@ -321,8 +349,11 @@ export default function HowReturnsWorkPage() {
               Just ask
             </h3>
             <p className="mt-1 text-muted">
-              Tell the assistant in your own words. If more than one item matches, it shows you cards to pick
-              from.
+              Tell{" "}
+              <Link href="/support" className={inlineLink}>
+                Xana on the Support page
+              </Link>{" "}
+              in your own words, by voice or text. If more than one item matches, she shows you cards to pick from.
             </p>
             {/* A picture of a chat, not a working chat. */}
             <div aria-hidden="true" className="mt-5 space-y-2 rounded-2xl bg-sunken p-3 text-sm">
@@ -339,8 +370,8 @@ export default function HowReturnsWorkPage() {
         <div className="mt-5 flex items-start gap-3 rounded-2xl bg-brand-50 p-4 text-brand-900 ring-1 ring-inset ring-brand-100">
           <ShieldCheckIcon className="mt-0.5 text-brand-600" />
           <p>
-            <strong className="font-semibold">You&apos;re always in charge.</strong> The assistant can find your
-            item and get a quote, but only you can confirm. Background noise or an unclear answer never counts as
+            <strong className="font-semibold">You&apos;re always in charge.</strong> Xana can find your item and
+            get a quote, but only you can confirm. Background noise or an unclear answer never counts as
             a “yes.”
           </p>
         </div>
@@ -355,13 +386,23 @@ export default function HowReturnsWorkPage() {
           <Faq q="What if I tap Confirm twice?">
             You still get exactly one return and one refund. We never refund twice.
           </Faq>
-          <Faq q="Can the assistant return something without asking me?">
+          <Faq q="Can Xana return something without asking me?">
             No. It can help, but a return is only created after you tap Confirm or say a clear “yes.”
           </Faq>
           <Faq q="My situation is unusual. Who can help?">
             Damaged items, disagreements, or anything out of the ordinary go to a person on our returns team.
           </Faq>
         </Card>
+        <p className="mt-4 text-sm text-muted">
+          Every rule, with worked examples:{" "}
+          <Link
+            href="/returns-policy"
+            className="font-medium text-brand-700 underline decoration-brand-300 underline-offset-4 hover:decoration-brand-700"
+          >
+            read the full return and refund policy
+          </Link>
+          .
+        </p>
       </section>
 
       {/* ---------- CTA ---------- */}
@@ -373,10 +414,28 @@ export default function HowReturnsWorkPage() {
         <UserIcon className="size-8 text-accent-300" />
         <h2 className="font-display text-2xl font-semibold sm:text-3xl">Ready to start a return?</h2>
         <p className="text-brand-200">Find the order, pick the item, and you&apos;re most of the way there.</p>
-        <ButtonLink href="/orders" variant="inverse" size="lg" className="mt-3">
-          Go to Orders &amp; returns
-          <ArrowRightIcon className="size-4.5" />
-        </ButtonLink>
+        <div className="mt-3 flex flex-wrap justify-center gap-3">
+          <ButtonLink href="/orders" variant="inverse" size="lg">
+            Go to Orders &amp; returns
+            <ArrowRightIcon className="size-4.5" />
+          </ButtonLink>
+          <ButtonLink
+            href="/support"
+            variant="ghost"
+            size="lg"
+            className="text-white ring-1 ring-inset ring-white/25 hover:bg-white/10 active:bg-white/15"
+          >
+            <MicIcon className="size-4.5" />
+            Talk to Xana
+          </ButtonLink>
+        </div>
+        <p className="text-sm text-brand-200">
+          More questions? Visit the{" "}
+          <Link href="/help" className="font-medium text-white underline decoration-white/40 underline-offset-4 hover:decoration-white">
+            help center
+          </Link>
+          .
+        </p>
       </section>
     </div>
   );
@@ -469,7 +528,7 @@ function Good({ children }: { children: ReactNode }) {
 }
 
 const laneTones = {
-  success: { head: "bg-success-600 text-white", dot: "bg-success-50 text-success-700", line: "bg-success-200", ring: "ring-success-200" },
+  success: { head: "bg-success-700 text-white", dot: "bg-success-50 text-success-700", line: "bg-success-200", ring: "ring-success-200" },
   brand: { head: "bg-brand-600 text-white", dot: "bg-brand-50 text-brand-700", line: "bg-brand-200", ring: "ring-brand-200" },
   warning: { head: "bg-warning-100 text-warning-900", dot: "bg-warning-50 text-warning-700", line: "bg-warning-200", ring: "ring-warning-200" },
 };
@@ -494,7 +553,7 @@ function Lane({
         {icon}
         <div>
           <h3 className="font-display text-lg font-semibold">{title}</h3>
-          <p className="text-sm opacity-90">{who}</p>
+          <p className="text-sm">{who}</p>
         </div>
       </div>
       <ol className="relative flex justify-between px-5 py-6">

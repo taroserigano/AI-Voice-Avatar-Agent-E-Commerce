@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Mangoes">
+  <title>Mangoes</title>
   <defs>
-    <radialGradient id="t-mangoes-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-mangoes-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f6f8f3"/>
       <stop offset="1" stop-color="#e1e9d6"/>
     </radialGradient>
-    <linearGradient id="t-mangoes-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#628c2c"/>
-      <stop offset="1" stop-color="#4d7c0f"/>
-    </linearGradient>
     <filter id="t-mangoes-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-mangoes-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-mangoes-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><circle cx="300" cy="285" r="62" fill="url(#t-mangoes-ink)"/><circle cx="345" cy="285" r="62" fill="url(#t-mangoes-ink)" fill-opacity=".85"/><path d="M322 222c0-24 12-40 34-46" stroke="url(#t-mangoes-ink)" stroke-width="10" fill="none" stroke-linecap="round"/></g>
-  <rect x="238" y="500" width="165" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Mangoes</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-mangoes-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#1f3206" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M236 300C250 238 340 222 392 258C444 294 440 380 390 418C340 452 256 440 232 390C220 364 228 332 236 300z" fill="#f6a531"/><path d="M390 258C444 294 440 380 390 418C420 360 410 300 372 250z" fill="#ef6b4a" fill-opacity="0.8"/><path d="M300 244Q296 220 310 204" fill="none" stroke="#8a5a33" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><path d="M306 222Q330 190 370 200Q346 234 306 222z" fill="#5fae3a"/><ellipse cx="262" cy="330" rx="12" ry="30" fill="#ffffff" fill-opacity="0.35" transform="rotate(15 262 330)"/></g>
 </svg>

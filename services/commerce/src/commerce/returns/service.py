@@ -258,6 +258,7 @@ def order_returns(db: Session, order: Order) -> list[ReturnOut]:
         out.append(
             ReturnOut(
                 id=r.id,
+                order_id=r.order_id,
                 rma_number=r.rma_number,
                 status=r.status,
                 reason=r.reason,

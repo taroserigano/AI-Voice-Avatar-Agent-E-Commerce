@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Muffins">
+  <title>Muffins</title>
   <defs>
-    <radialGradient id="t-muffins-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-muffins-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#faf5f3"/>
       <stop offset="1" stop-color="#ecdfd6"/>
     </radialGradient>
-    <linearGradient id="t-muffins-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#9f572b"/>
-      <stop offset="1" stop-color="#92400e"/>
-    </linearGradient>
     <filter id="t-muffins-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-muffins-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-muffins-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M230 300c0-60 40-90 90-90s90 30 90 90v40H230z" fill="url(#t-muffins-ink)"/><path d="M280 250l-12 40M320 240v48M360 250l12 40" stroke="#92400e" stroke-width="8" stroke-linecap="round" stroke-opacity=".5"/></g>
-  <rect x="238" y="500" width="165" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Muffins</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-muffins-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#3a1a06" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M236 330H404L386 432Q384 440 376 440H264Q256 440 254 432z" fill="#92400e"/><path d="M270 338L276 436M304 338L306 436M336 338L334 436M370 338L364 436" fill="none" stroke="#662d0a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><path d="M226 340C212 282 262 234 320 234C378 234 428 282 414 340z" fill="#c98646"/><circle cx="278" cy="298" r="10" fill="#4b4f9e"/><circle cx="322" cy="270" r="10" fill="#4b4f9e"/><circle cx="362" cy="306" r="10" fill="#4b4f9e"/><circle cx="318" cy="318" r="9" fill="#4b4f9e"/><ellipse cx="270" cy="270" rx="18" ry="9" fill="#ffffff" fill-opacity="0.3" transform="rotate(-30 270 270)"/></g>
 </svg>

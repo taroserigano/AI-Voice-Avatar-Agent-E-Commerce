@@ -80,7 +80,7 @@ export function PaymentSummary({ order }: { order: OrderDetail }) {
 }
 
 /** The one-line policy summary with a link to the full terms. */
-export function ReturnPolicyCard({ policyVersion }: { policyVersion?: string }) {
+export function ReturnPolicyCard() {
   return (
     <aside aria-labelledby="policy-heading" className="rounded-3xl bg-brand-50/70 p-5 ring-1 ring-inset ring-brand-100 sm:p-6">
       <div className="flex items-start gap-3.5">
@@ -99,7 +99,6 @@ export function ReturnPolicyCard({ policyVersion }: { policyVersion?: string }) 
             How returns work
             <ArrowRightIcon className="size-4 transition-transform duration-200 ease-snappy group-hover:translate-x-0.5" />
           </Link>
-          {policyVersion ? <p className="text-xs text-muted">Policy version {policyVersion}</p> : null}
         </div>
       </div>
     </aside>

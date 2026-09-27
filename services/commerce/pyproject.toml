@@ -23,6 +23,7 @@ dependencies = [
     "opentelemetry-instrumentation-httpx==0.66b0",
     "opentelemetry-instrumentation-urllib3==0.66b0",
     "tzdata>=2026.4",
+    "pyyaml==6.0.3",
 ]
 
 [project.scripts]

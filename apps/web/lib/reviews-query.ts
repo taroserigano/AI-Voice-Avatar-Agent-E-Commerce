@@ -146,27 +146,32 @@ async function check<T>(result: { data?: T; error?: unknown; response: Response 
   return result.data;
 }
 
-/** Every reviews query for a product (all sorts), for invalidation. */
-export function reviewsKey(productId: string, sort?: ReviewSort) {
-  return sort ? (["reviews", productId, sort] as const) : (["reviews", productId] as const);
+/** Every reviews query for a product (all sorts and star filters), for invalidation. */
+export function reviewsKey(productId: string, sort?: ReviewSort, rating?: number | null) {
+  return sort ? (["reviews", productId, sort, rating ?? "all"] as const) : (["reviews", productId] as const);
 }
 
 /**
- * Reviews for one product and sort, 10 at a time. `initialData` is the server-rendered first page
- * of the default sort ("newest"), so the section paints without a client round trip.
+ * Reviews for one product, sort and (optional) star rating, 10 at a time. `initialData` is the
+ * server-rendered first page of the default view (newest, every rating), so the section paints
+ * without a client round trip.
  */
-export function useReviews(productId: string, sort: ReviewSort, initialData?: ReviewPage) {
+export function useReviews(productId: string, sort: ReviewSort, rating: number | null, initialData?: ReviewPage) {
   return useInfiniteQuery({
-    queryKey: reviewsKey(productId, sort),
+    queryKey: reviewsKey(productId, sort, rating),
     queryFn: async ({ pageParam }) =>
       check(
         await browserApi.GET("/v1/products/{product_id}/reviews", {
-          params: { path: { product_id: productId }, query: { sort, page: pageParam, page_size: REVIEW_PAGE_SIZE } },
+          params: {
+            path: { product_id: productId },
+            query: { sort, page: pageParam, page_size: REVIEW_PAGE_SIZE, ...(rating ? { rating } : {}) },
+          },
         }),
       ),
     initialPageParam: 1,
     getNextPageParam: nextReviewPage,
-    initialData: initialData && sort === "newest" ? { pages: [initialData], pageParams: [1] } : undefined,
+    initialData:
+      initialData && sort === "newest" && rating === null ? { pages: [initialData], pageParams: [1] } : undefined,
     // Keep the old list on screen while a new sort loads.
     placeholderData: keepPreviousData,
   });

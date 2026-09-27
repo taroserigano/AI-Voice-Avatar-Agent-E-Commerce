@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Vacuum">
+  <title>Vacuum</title>
   <defs>
-    <radialGradient id="t-vacuum-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-vacuum-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fbf6f3"/>
       <stop offset="1" stop-color="#f2e2d5"/>
     </radialGradient>
-    <linearGradient id="t-vacuum-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#bd6827"/>
-      <stop offset="1" stop-color="#b45309"/>
-    </linearGradient>
     <filter id="t-vacuum-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-vacuum-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-vacuum-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M250 230h140v70a50 50 0 0 1-50 50h-40a50 50 0 0 1-50-50z" fill="url(#t-vacuum-ink)"/><path d="M390 250h22a22 22 0 0 1 0 44h-22" fill="none" stroke="url(#t-vacuum-ink)" stroke-width="14"/></g>
-  <rect x="245" y="500" width="150" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Vacuum</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-vacuum-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#482104" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M404 176L280 410" fill="none" stroke="#334155" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><rect x="388" y="160" width="50" height="30" rx="12" fill="#b45309" transform="rotate(28 413 175)"/><g transform="translate(350 296) rotate(28)"><rect x="-30" y="-66" width="60" height="132" rx="28" fill="#b45309"/><rect x="-18" y="-40" width="36" height="50" rx="14" fill="#f6eae1"/></g><path d="M206 404H320Q340 404 340 424V440H206Q190 440 190 424Q190 404 206 404z" fill="#334155"/><rect x="196" y="432" width="140" height="8" rx="4" fill="#f97316"/></g>
 </svg>

@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Phone case">
+  <title>Phone case</title>
   <defs>
-    <radialGradient id="t-phone-case-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-phone-case-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f4f7fe"/>
       <stop offset="1" stop-color="#dae4fc"/>
     </radialGradient>
-    <linearGradient id="t-phone-case-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#3f76ed"/>
-      <stop offset="1" stop-color="#2563eb"/>
-    </linearGradient>
     <filter id="t-phone-case-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-phone-case-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-phone-case-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M250 270a70 70 0 0 1 140 0" fill="none" stroke="url(#t-phone-case-ink)" stroke-width="18" stroke-linecap="round"/><rect x="228" y="262" width="36" height="64" rx="14" fill="url(#t-phone-case-ink)"/><rect x="376" y="262" width="36" height="64" rx="14" fill="url(#t-phone-case-ink)"/></g>
-  <rect x="215" y="500" width="210" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Phone case</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-phone-case-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#0f285e" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><g transform="translate(380 320) rotate(10) scale(0.85)" stroke-width="4.71"><rect x="-70" y="-130" width="140" height="260" rx="26" fill="#14b8a6"/><rect x="-54" y="-114" width="50" height="70" rx="14" fill="#334155"/><circle cx="-30" cy="-90" r="14" fill="#475569"/><circle cx="-30" cy="-60" r="8" fill="#475569"/></g><rect x="214" y="180" width="128" height="260" rx="22" fill="#334155"/><rect x="224" y="196" width="108" height="228" rx="12" fill="#2563eb"/><path d="M224 330L332 230V270L224 370z" fill="#ffffff" fill-opacity="0.18"/></g>
 </svg>

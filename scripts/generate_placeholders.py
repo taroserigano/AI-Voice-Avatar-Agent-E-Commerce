@@ -1,9 +1,10 @@
 """Generate original SVG placeholder images for the seed catalog.
 
-Run: uv run python scripts/generate_placeholders.py
+Run: uv run --directory services/commerce python ../../scripts/generate_placeholders.py [--force]
 Writes apps/web/public/images/products/<slug>.svg for the hand-written products and
 apps/web/public/images/types/<product-type>.svg, shared by every generated product of that
-type. Nothing is downloaded from anywhere.
+type; the type illustrations live in placeholder_glyphs.py. --force redraws the type images
+only; product images are never overwritten. Nothing is downloaded from anywhere.
 """
 
 from __future__ import annotations
@@ -12,6 +13,8 @@ import html
 import sys
 import textwrap
 from pathlib import Path
+
+from placeholder_glyphs import OUTLINE_W, art_for, shade
 
 from commerce.seed.catalog import PRODUCTS
 from commerce.seed.data import CATEGORIES
@@ -93,33 +96,29 @@ def _mix(hex_color: str, weight: float) -> str:
 
 def svg_for_type(product_type: str, color: str, category: str) -> str:
     """A shared image for every generated product of one type, in the storefront's
-    illustration style: a light, department-tinted studio sweep, the department glyph drawn
-    in the department color with a soft floor shadow, and a small label naming the type."""
+    illustration style: a light, department-tinted studio sweep with a soft floor shadow and
+    a flat illustration of the product family (see ``placeholder_glyphs``). There is no text
+    label: product cards already show the title, and the image is decorative."""
     uid = f"t-{product_type}"
     light, mid = _mix(color, 0.95), _mix(color, 0.83)
-    glyph = GLYPHS.get(category, "").replace('"#fff"', f'"url(#{uid}-ink)"')
     label = html.escape(type_label(product_type))
-    pill_w = min(520, 60 + 15 * len(label))
+    glyph = art_for(product_type, category, color)
+    outline = shade(color, 0.6)
     return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="{label}">
+  <title>{label}</title>
   <defs>
-    <radialGradient id="{uid}-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="{uid}-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="{light}"/>
       <stop offset="1" stop-color="{mid}"/>
     </radialGradient>
-    <linearGradient id="{uid}-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="{_mix(color, 0.12)}"/>
-      <stop offset="1" stop-color="{color}"/>
-    </linearGradient>
     <filter id="{uid}-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#{uid}-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#{uid}-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)">{glyph}</g>
-  <rect x="{320 - pill_w / 2:.0f}" y="500" width="{pill_w}" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">{label}</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#{uid}-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="{outline}" stroke-width="{OUTLINE_W}" stroke-linejoin="round" stroke-opacity=".45">{glyph}</g>
 </svg>
 """
 

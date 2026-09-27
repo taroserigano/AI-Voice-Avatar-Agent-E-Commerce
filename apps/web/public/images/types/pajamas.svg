@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Pajamas">
+  <title>Pajamas</title>
   <defs>
-    <radialGradient id="t-pajamas-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-pajamas-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fcf3f7"/>
       <stop offset="1" stop-color="#f4d8e3"/>
     </radialGradient>
-    <linearGradient id="t-pajamas-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#c63470"/>
-      <stop offset="1" stop-color="#be185d"/>
-    </linearGradient>
     <filter id="t-pajamas-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-pajamas-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-pajamas-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M262 200l-52 30 22 44 30-14v110h116V260l30 14 22-44-52-30c-8 20-28 32-58 32s-50-12-58-32z" fill="url(#t-pajamas-ink)"/></g>
-  <rect x="238" y="500" width="165" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Pajamas</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-pajamas-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#4c0a25" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M228 196H412L420 410H340L320 270L300 410H220z" fill="#db80a6"/><rect x="222" y="404" width="80" height="32" rx="10" fill="#af6685"/><rect x="338" y="404" width="80" height="32" rx="10" fill="#af6685"/><rect x="228" y="196" width="184" height="30" fill="#be185d"/><path d="M304 226l-8 36M336 226l8 36" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><circle cx="252" cy="260" r="7" fill="#ffffff"/><circle cx="288" cy="300" r="7" fill="#ffffff"/><circle cx="256" cy="350" r="7" fill="#ffffff"/><circle cx="382" cy="262" r="7" fill="#ffffff"/><circle cx="352" cy="304" r="7" fill="#ffffff"/><circle cx="386" cy="352" r="7" fill="#ffffff"/><circle cx="284" cy="390" r="7" fill="#ffffff"/><circle cx="356" cy="392" r="7" fill="#ffffff"/></g>
 </svg>

@@ -188,8 +188,8 @@ class PlannerExecutor(AgentExecutor):
 
 def agent_card(settings: PlannerSettings) -> pb.AgentCard:
     return pb.AgentCard(
-        name="larkspur-shopping-planner",
-        description="Builds baskets from the Larkspur catalog for multi-step goals: meal "
+        name="serigan-mart-shopping-planner",
+        description="Builds baskets from the Serigan Mart catalog for multi-step goals: meal "
         "plans, budgets, and allergen rules checked against product labels. Internal only.",
         version="0.1.0",
         supported_interfaces=[
@@ -243,7 +243,7 @@ def create_app(
         agent_card=card,
     )
     app = FastAPI(
-        title="Larkspur shopping planner (internal)",
+        title="Serigan Mart shopping planner (internal)",
         docs_url=None,
         redoc_url=None,
         openapi_url=None,

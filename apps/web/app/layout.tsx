@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { SessionGuard } from "@/components/session-guard";
 import { Bricolage_Grotesque, Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
@@ -32,6 +33,10 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, them
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${bricolage.variable}`}>
+      <head>
+        {/* Back/forward re-check of the session on private pages; see the component. */}
+        <SessionGuard />
+      </head>
       <body className="min-h-screen bg-canvas font-sans text-ink antialiased">
         <a
           href="#main"

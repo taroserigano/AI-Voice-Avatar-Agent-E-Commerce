@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Ground turkey">
+  <title>Ground turkey</title>
   <defs>
-    <radialGradient id="t-ground-turkey-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-ground-turkey-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fcf4f4"/>
       <stop offset="1" stop-color="#f3d8d8"/>
     </radialGradient>
-    <linearGradient id="t-ground-turkey-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#c13737"/>
-      <stop offset="1" stop-color="#b91c1c"/>
-    </linearGradient>
     <filter id="t-ground-turkey-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-ground-turkey-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-ground-turkey-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M220 270c40-60 140-60 180 0-40 60-140 60-180 0z" fill="url(#t-ground-turkey-ink)"/><path d="M400 270l40-40v80z" fill="url(#t-ground-turkey-ink)"/><circle cx="262" cy="262" r="8" fill="#b91c1c"/></g>
-  <rect x="192" y="500" width="255" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Ground turkey</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-ground-turkey-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#4a0b0b" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M188 352H452L436 430Q434 440 422 440H218Q206 440 204 430z" fill="#ffffff"/><path d="M218 350C212 300 280 280 320 286C380 278 432 300 424 350z" fill="#e39a92"/><circle cx="250" cy="330" r="7" fill="#b67b75"/><circle cx="280" cy="310" r="7" fill="#b67b75"/><circle cx="318" cy="322" r="7" fill="#b67b75"/><circle cx="350" cy="304" r="7" fill="#b67b75"/><circle cx="390" cy="330" r="7" fill="#b67b75"/><circle cx="300" cy="340" r="7" fill="#b67b75"/><circle cx="370" cy="336" r="7" fill="#b67b75"/><circle cx="236" cy="344" r="7" fill="#b67b75"/><path d="M186 356C200 300 440 300 454 356z" fill="#e0f2fe" fill-opacity="0.35"/><rect x="178" y="346" width="284" height="20" rx="10" fill="#eef2f6"/><rect x="370" y="380" width="64" height="40" rx="6" fill="#b91c1c"/><path d="M382 394H420M382 406H408" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g>
 </svg>

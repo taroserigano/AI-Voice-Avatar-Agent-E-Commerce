@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Lantern">
+  <title>Lantern</title>
   <defs>
-    <radialGradient id="t-lantern-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-lantern-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f3f9f5"/>
       <stop offset="1" stop-color="#d7e9de"/>
     </radialGradient>
-    <linearGradient id="t-lantern-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#318f54"/>
-      <stop offset="1" stop-color="#15803d"/>
-    </linearGradient>
     <filter id="t-lantern-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-lantern-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-lantern-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M320 180l110 170H210z" fill="url(#t-lantern-ink)"/><path d="M320 260l40 90h-80z" fill-opacity=".25" fill="#000"/></g>
-  <rect x="238" y="500" width="165" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Lantern</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-lantern-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#083318" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M290 196Q290 166 320 166Q350 166 350 196" fill="none" stroke="#334155" stroke-width="8" stroke-opacity="1"/><rect x="270" y="196" width="100" height="30" rx="10" fill="#15803d"/><rect x="278" y="226" width="84" height="160" fill="#fef3c7"/><circle cx="320" cy="306" r="30" fill="#f9c846"/><path d="M278 226V386M362 226V386" fill="none" stroke="#334155" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><rect x="262" y="386" width="116" height="50" rx="12" fill="#15803d"/></g>
 </svg>

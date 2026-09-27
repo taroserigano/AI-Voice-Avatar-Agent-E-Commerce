@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Popcorn">
+  <title>Popcorn</title>
   <defs>
-    <radialGradient id="t-popcorn-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-popcorn-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fcf6f3"/>
       <stop offset="1" stop-color="#f5dfd6"/>
     </radialGradient>
-    <linearGradient id="t-popcorn-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#c95829"/>
-      <stop offset="1" stop-color="#c2410c"/>
-    </linearGradient>
     <filter id="t-popcorn-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-popcorn-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-popcorn-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M250 200h140l-12 30 12 30-12 30 12 30-12 30 12 30H250l12-30-12-30 12-30-12-30 12-30z" fill="url(#t-popcorn-ink)"/></g>
-  <rect x="238" y="500" width="165" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Popcorn</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-popcorn-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#4e1a05" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><circle cx="262" cy="262" r="24" fill="#fff4c6"/><circle cx="270" cy="256" r="12" fill="#ffffff"/><circle cx="298" cy="240" r="24" fill="#fff4c6"/><circle cx="306" cy="234" r="12" fill="#ffffff"/><circle cx="338" cy="238" r="24" fill="#fff4c6"/><circle cx="346" cy="232" r="12" fill="#ffffff"/><circle cx="378" cy="258" r="24" fill="#fff4c6"/><circle cx="386" cy="252" r="12" fill="#ffffff"/><circle cx="318" cy="270" r="24" fill="#fff4c6"/><circle cx="326" cy="264" r="12" fill="#ffffff"/><circle cx="284" cy="286" r="24" fill="#fff4c6"/><circle cx="292" cy="280" r="12" fill="#ffffff"/><circle cx="356" cy="284" r="24" fill="#fff4c6"/><circle cx="364" cy="278" r="12" fill="#ffffff"/><circle cx="248" cy="294" r="24" fill="#fff4c6"/><circle cx="256" cy="288" r="12" fill="#ffffff"/><circle cx="392" cy="292" r="24" fill="#fff4c6"/><circle cx="400" cy="286" r="12" fill="#ffffff"/><path d="M238 294H402L380 440H260z" fill="#ffffff"/><path d="M262 294H290L296 440H274zM318 294H346L344 440H322zM374 294H400L382 440H366z" fill="#e5484d"/></g>
 </svg>

@@ -1,20 +1,42 @@
 import { ArrowRightIcon, ClockIcon, PackageIcon, ReturnIcon, TruckIcon } from "@/components/icons";
-import { OrderCard } from "@/components/orders/order-card";
+import { OrdersBrowser } from "@/components/orders/orders-browser";
 import { ButtonLink } from "@/components/ui/button";
 import { WebVitalsReporter } from "@/components/web-vitals";
 import { serverApi, unwrap } from "@/lib/api-server";
-import Link from "next/link";
+import { parseOrderRange } from "@/lib/order-search";
+import { blockedReturnText, parseOrderFilter } from "@/lib/orders";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = { title: "Orders" };
 
-export default async function OrdersPage() {
+type Search = { view?: string | string[]; q?: string | string[]; range?: string | string[] };
+
+export default async function OrdersPage({ searchParams }: { searchParams: Promise<Search> }) {
+  const { view, q, range } = await searchParams;
   const api = await serverApi();
-  const orders = await unwrap(await api.GET("/v1/orders"));
+  const [orders, returnsResult] = await Promise.all([
+    api.GET("/v1/orders").then(unwrap),
+    // The Returns tab is optional: if it fails, the orders still show.
+    api.GET("/v1/returns"),
+  ]);
+  const returns = returnsResult.data ?? [];
   const open = orders.filter((o) => o.status === "paid" || o.status === "fulfilling").length;
 
+  // For delivered orders with nothing returnable, ask the server why ("Final sale" for a gift card,
+  // "Return window closed"), so the list doesn't just say "No items left to return".
+  const unclear = orders.filter((o) => o.status === "delivered" && !o.return_window_ends_at && !o.has_open_return);
+  const reasons = await Promise.all(
+    unclear.map(async (o) => {
+      const r = await api.GET("/v1/orders/{order_id}/return-options", { params: { path: { order_id: o.id } } });
+      const text = r.data ? blockedReturnText(r.data.lines) : null;
+      return [o.id, text] as const;
+    }),
+  );
+  const blocked = Object.fromEntries(reasons.filter((r): r is readonly [string, string] => r[1] !== null));
+
   return (
-    <div className="pb-8 sm:pt-2">
+    <div className="pb-24 sm:pb-8 sm:pt-2">
       <WebVitalsReporter route="orders" />
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
         <div>
@@ -66,11 +88,15 @@ export default async function OrdersPage() {
           </ul>
         </div>
       ) : (
-        <ul aria-label="Your orders" className="mt-6 space-y-4 sm:mt-8">
-          {orders.map((o, i) => (
-            <OrderCard key={o.id} order={o} index={i} />
-          ))}
-        </ul>
+        <OrdersBrowser
+          orders={orders}
+          returns={returns}
+          blocked={blocked}
+          initialFilter={parseOrderFilter(view)}
+          initialQuery={(Array.isArray(q) ? q[0] : q)?.slice(0, 80) ?? ""}
+          initialRange={parseOrderRange(range)}
+          now={new Date().toISOString()}
+        />
       )}
     </div>
   );

@@ -1,5 +1,8 @@
 import { ArrowLeftIcon, PackageIcon } from "@/components/icons";
 import { ButtonLink } from "@/components/ui/button";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Order not found" };
 
 export default function OrderNotFound() {
   return (

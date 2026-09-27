@@ -1,4 +1,4 @@
-// Run the commerce API, outbox worker, and web app together: `pnpm dev`.
+// Run the commerce API, assistant API, outbox worker, and web app together: `pnpm dev`.
 // Each process's output is prefixed; Ctrl+C stops all of them.
 import { spawn } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 // The Python services read the repo-root .env themselves; Next.js only reads apps/web/.env.
 // Pass through just these keys from the root .env (never the whole file: it may hold other
 // projects' secrets). Real environment variables win.
-const PASS_THROUGH = ["APP_ENV", "API_PORT", "WEB_PORT", "GOOGLE_MAPS_API_KEY"];
+const PASS_THROUGH = ["APP_ENV", "API_PORT", "WEB_PORT", "ASSISTANT_PORT", "GOOGLE_MAPS_API_KEY"];
 const rootEnv = join(dirname(fileURLToPath(import.meta.url)), "..", ".env");
 if (existsSync(rootEnv)) {
   for (const line of readFileSync(rootEnv, "utf8").split(/\r?\n/)) {
@@ -33,10 +33,16 @@ function collectorListening() {
   });
 }
 
-// API_PORT / WEB_PORT let a second checkout (e.g. a git worktree) run beside the first.
+// API_PORT / ASSISTANT_PORT / WEB_PORT let a second checkout (e.g. a git worktree) run beside
+// the first.
 const apiPort = process.env.API_PORT ?? "8000";
+const assistantPort = process.env.ASSISTANT_PORT ?? "8001";
 const webPort = process.env.WEB_PORT ?? "3000";
-const env = { ...process.env, COMMERCE_API_URL: process.env.COMMERCE_API_URL ?? `http://localhost:${apiPort}` };
+const env = {
+  ...process.env,
+  COMMERCE_API_URL: process.env.COMMERCE_API_URL ?? `http://localhost:${apiPort}`,
+  ASSISTANT_API_URL: process.env.ASSISTANT_API_URL ?? `http://localhost:${assistantPort}`,
+};
 if (env.OTEL_EXPORTER_OTLP_ENDPOINT === undefined) {
   if (await collectorListening()) env.OTEL_EXPORTER_OTLP_ENDPOINT = "http://localhost:4318";
   else console.log("No OTel Collector on :4318, so telemetry isn't exported (start it with `pnpm infra:up`).");
@@ -44,6 +50,7 @@ if (env.OTEL_EXPORTER_OTLP_ENDPOINT === undefined) {
 
 const procs = [
   { name: "api", color: 36, cmd: "pnpm", args: ["dev:api", "--port", apiPort] },
+  { name: "assist", color: 32, cmd: "pnpm", args: ["dev:assistant", "--port", assistantPort] },
   { name: "outbox", color: 35, cmd: "pnpm", args: ["dev:outbox"] },
   { name: "web", color: 33, cmd: "pnpm", args: ["--filter", "@ai-commerce/web", "exec", "next", "dev", "--port", webPort] },
 ];

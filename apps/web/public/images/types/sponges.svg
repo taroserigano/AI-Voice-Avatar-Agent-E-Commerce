@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Sponges">
+  <title>Sponges</title>
   <defs>
-    <radialGradient id="t-sponges-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-sponges-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f3f8f8"/>
       <stop offset="1" stop-color="#d6e8e6"/>
     </radialGradient>
-    <linearGradient id="t-sponges-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#2c867f"/>
-      <stop offset="1" stop-color="#0f766e"/>
-    </linearGradient>
     <filter id="t-sponges-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-sponges-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-sponges-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M290 230h60l20 30v110H270V260z" fill="url(#t-sponges-ink)"/><path d="M300 230v-30h50l30 16-30 14" fill="url(#t-sponges-ink)" fill-opacity=".85"/></g>
-  <rect x="238" y="500" width="165" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Sponges</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-sponges-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#062f2c" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M200 340l56 -28h200l-56 28z" fill="#fde68a"/><path d="M400 340l56 -28v80l-56 28z" fill="#e0a41c"/><rect x="200" y="340" width="200" height="80" fill="#f9c846"/><path d="M200 340l56-28h200l-56 28z" fill="#5fae3a"/><path d="M200 318l56-28h200v22l-56 28H200z" fill="#3f7f22"/><path d="M200 318l56-28h200l-56 28z" fill="#5fae3a"/><circle cx="230" cy="370" r="5" fill="#e0a41c"/><circle cx="270" cy="392" r="5" fill="#e0a41c"/><circle cx="320" cy="364" r="5" fill="#e0a41c"/><circle cx="360" cy="396" r="5" fill="#e0a41c"/><circle cx="250" cy="404" r="5" fill="#e0a41c"/><circle cx="380" cy="372" r="5" fill="#e0a41c"/></g>
 </svg>

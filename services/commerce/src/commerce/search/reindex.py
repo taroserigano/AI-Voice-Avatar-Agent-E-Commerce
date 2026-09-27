@@ -10,6 +10,7 @@ import logging
 
 from commerce.config import get_settings
 from commerce.db import get_sessionmaker
+from commerce.policies.search import get_policy_keyword_index, upsert_policies_to_pinecone
 from commerce.search.documents import load_docs
 from commerce.search.keyword import get_keyword_index
 from commerce.search.semantic import get_semantic_index
@@ -25,6 +26,9 @@ def reindex() -> dict[str, int | str]:
     keyword.recreate_index()
     kw_count = keyword.upsert(docs)
     result: dict[str, int | str] = {"opensearch_index": keyword.index, "opensearch_docs": kw_count}
+    policies = get_policy_keyword_index()
+    result["opensearch_policy_index"] = policies.index
+    result["opensearch_policy_sections"] = policies.rebuild()
 
     try:
         semantic = get_semantic_index()
@@ -37,6 +41,8 @@ def reindex() -> dict[str, int | str]:
         semantic.clear()
         result["pinecone_namespace"] = settings.products_namespace
         result["pinecone_records"] = semantic.upsert(docs)
+        result["pinecone_policy_namespace"] = settings.policies_namespace
+        result["pinecone_policy_records"] = upsert_policies_to_pinecone() or 0
     return result
 
 

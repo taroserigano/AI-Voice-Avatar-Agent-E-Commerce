@@ -1,0 +1,44 @@
+{
+  "model": "scripted",
+  "passed": 18,
+  "total": 33,
+  "checks": {
+    "filters": [
+      18,
+      27
+    ],
+    "must_not_mention": [
+      7,
+      7
+    ],
+    "mentions": [
+      1,
+      7
+    ],
+    "cites": [
+      0,
+      2
+    ],
+    "empty": [
+      0,
+      1
+    ]
+  },
+  "failed": [
+    "qa-004",
+    "qa-005",
+    "qa-006",
+    "qa-007",
+    "qa-009",
+    "qa-013",
+    "qa-014",
+    "qa-015",
+    "qa-016",
+    "qa-017",
+    "qa-018",
+    "qa-020",
+    "qa-022",
+    "qa-023",
+    "qa-032"
+  ]
+}

@@ -2,14 +2,20 @@ import type { ReturnOut, ShipmentOut } from "@ai-commerce/contracts";
 import { describe, expect, it } from "vitest";
 import { formatMoney } from "./format";
 import {
+  addBusinessDays,
+  blockedReturnText,
   cardLabel,
+  deliveryEstimate,
   deliveryProgress,
   formatDay,
+  freeShippingProgress,
   ineligibleTitle,
+  orderFilterGroup,
   orderListDelivery,
   orderListReturnHint,
   orderNumber,
   orderStatusMeta,
+  variantLabel,
   primaryShipment,
   refundDisplay,
   refundTimingPhrase,
@@ -48,13 +54,14 @@ describe("dates", () => {
 });
 
 describe("order status", () => {
-  it("shows where the parcel is for open orders", () => {
-    expect(orderStatusMeta("fulfilling", shipment({ status: "out_for_delivery" })).label).toBe("Out for delivery");
-    expect(orderStatusMeta("fulfilling").label).toBe("In progress");
-  });
-  it("never lets a shipment relabel a finished order", () => {
-    expect(orderStatusMeta("canceled", shipment()).label).toBe("Canceled");
-    expect(orderStatusMeta("delivered", shipment({ status: "delivered" })).tone).toBe("success");
+  it("uses one label and tone per status, matching the list tabs", () => {
+    expect(orderStatusMeta("fulfilling")).toEqual({ label: "In progress", tone: "brand" });
+    expect(orderStatusMeta("delivered")).toEqual({ label: "Delivered", tone: "success" });
+    expect(orderStatusMeta("canceled").label).toBe("Canceled");
+    expect(orderFilterGroup("paid")).toBe("in_progress");
+    expect(orderFilterGroup("fulfilling")).toBe("in_progress");
+    expect(orderFilterGroup("delivered")).toBe("delivered");
+    expect(orderFilterGroup("canceled")).toBe("canceled");
   });
   it("describes delivery for the list", () => {
     expect(orderListDelivery({ status: "delivered", delivered_at: "2026-09-23T12:27:35-05:00" })).toBe("Delivered Sep 23");
@@ -80,6 +87,53 @@ describe("orderListReturnHint", () => {
   it("says when nothing can come back, and stays quiet before delivery", () => {
     expect(orderListReturnHint(delivered)?.kind).toBe("none");
     expect(orderListReturnHint({ ...delivered, status: "fulfilling" })).toBeNull();
+  });
+  it("names the server's reason when nothing is returnable", () => {
+    expect(orderListReturnHint(delivered, blockedReturnText([{ eligible: false, reason: "final_sale" }]))?.text).toBe(
+      "Final sale",
+    );
+    expect(blockedReturnText([{ eligible: false, reason: "fully_returned" }])).toBe("Returned");
+    expect(
+      blockedReturnText([
+        { eligible: false, reason: "outside_window" },
+        { eligible: false, reason: "perishable_past_7_days" },
+      ]),
+    ).toBe("Return window closed");
+    expect(
+      blockedReturnText([
+        { eligible: false, reason: "final_sale" },
+        { eligible: false, reason: "fully_returned" },
+      ]),
+    ).toBe("No items left to return");
+    expect(blockedReturnText([{ eligible: true, reason: "within_window" }])).toBeNull();
+  });
+});
+
+describe("variantLabel", () => {
+  it("hides placeholder variant names and keeps real ones", () => {
+    expect(variantLabel("Each")).toBeNull();
+    expect(variantLabel("Standard")).toBeNull();
+    expect(variantLabel("Sand")).toBe("Sand");
+    expect(variantLabel("$50")).toBe("$50");
+  });
+});
+
+describe("cart shipping and delivery", () => {
+  it("measures progress toward free shipping from the server's numbers", () => {
+    const cart = (remaining: number) => ({ free_shipping_threshold_minor: 3500, free_shipping_remaining_minor: remaining });
+    expect(freeShippingProgress(cart(3500))).toBe(0);
+    expect(freeShippingProgress(cart(1750))).toBe(0.5);
+    expect(freeShippingProgress(cart(0))).toBe(1);
+  });
+  it("skips weekends when counting business days", () => {
+    expect(addBusinessDays("2026-09-25", 1)).toBe("2026-09-28"); // Fri + 1 → Mon
+    expect(addBusinessDays("2026-09-26", 2)).toBe("2026-09-29"); // Sat + 2 → Tue
+    expect(addBusinessDays("2026-09-28", 5)).toBe("2026-10-05"); // Mon + 5 → next Mon
+  });
+  it("gives a 2–5 business day window counted in the store's time zone", () => {
+    // Saturday evening in Chicago (already Sunday in UTC).
+    const est = deliveryEstimate(new Date("2026-09-27T02:00:00Z"));
+    expect(est).toEqual({ from: "2026-09-29", to: "2026-10-02", text: "Tue, Sep 29 – Fri, Oct 2" });
   });
 });
 

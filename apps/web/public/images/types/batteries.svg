@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Batteries">
+  <title>Batteries</title>
   <defs>
-    <radialGradient id="t-batteries-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-batteries-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f3f8f8"/>
       <stop offset="1" stop-color="#d6e8e6"/>
     </radialGradient>
-    <linearGradient id="t-batteries-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#2c867f"/>
-      <stop offset="1" stop-color="#0f766e"/>
-    </linearGradient>
     <filter id="t-batteries-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-batteries-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-batteries-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M290 230h60l20 30v110H270V260z" fill="url(#t-batteries-ink)"/><path d="M300 230v-30h50l30 16-30 14" fill="url(#t-batteries-ink)" fill-opacity=".85"/></g>
-  <rect x="222" y="500" width="195" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Batteries</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-batteries-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#062f2c" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><g transform="translate(250 330) scale(0.92)" stroke-width="4.35"><rect x="-10" y="-124" width="20" height="16" rx="4" fill="#b6c2cf"/><rect x="-30" y="-110" width="60" height="220" rx="12" fill="#334155"/><rect x="-30" y="-110" width="60" height="74" rx="12" fill="#14b8a6"/><rect x="-30" y="-48" width="60" height="12" fill="#14b8a6"/><g stroke="none"><g transform="translate(0 30) scale(1.1)" stroke-width="3.64"><path d="M4-26-14 4H0l-4 22 18-30H0z" fill="#ffffff"/></g></g></g><g transform="translate(390 330) scale(0.92)" stroke-width="4.35"><rect x="-10" y="-124" width="20" height="16" rx="4" fill="#b6c2cf"/><rect x="-30" y="-110" width="60" height="220" rx="12" fill="#334155"/><rect x="-30" y="-110" width="60" height="74" rx="12" fill="#14b8a6"/><rect x="-30" y="-48" width="60" height="12" fill="#14b8a6"/><g stroke="none"><g transform="translate(0 30) scale(1.1)" stroke-width="3.64"><path d="M4-26-14 4H0l-4 22 18-30H0z" fill="#ffffff"/></g></g></g><g transform="translate(320 330)"><rect x="-10" y="-124" width="20" height="16" rx="4" fill="#b6c2cf"/><rect x="-30" y="-110" width="60" height="220" rx="12" fill="#334155"/><rect x="-30" y="-110" width="60" height="74" rx="12" fill="#14b8a6"/><rect x="-30" y="-48" width="60" height="12" fill="#14b8a6"/><g stroke="none"><g transform="translate(0 30) scale(1.1)" stroke-width="3.64"><path d="M4-26-14 4H0l-4 22 18-30H0z" fill="#ffffff"/></g></g></g></g>
 </svg>

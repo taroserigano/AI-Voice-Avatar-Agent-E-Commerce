@@ -1,14 +1,25 @@
 import { InfoIcon, StarFilledIcon } from "@/components/icons";
 import { Stars } from "@/components/ui/stars";
 import { distributionRows, pluralize } from "@/lib/reviews-query";
+import { cn } from "@/lib/cn";
 import type { RatingSummary } from "@ai-commerce/contracts";
 
 /**
- * Average, stars, count, and the 5 → 1 distribution. Each row is read as one sentence
- * ("5 stars, 8 reviews, 67%"); the bar and the visible numbers are hidden from assistive tech
- * so nothing is announced twice.
+ * Average, stars, count, and the 5 → 1 distribution. Each row is a toggle button that shows only
+ * that star rating, read as one sentence ("5 stars, 8 reviews, 67%"); the bar and the visible
+ * numbers are hidden from assistive tech so nothing is announced twice.
  */
-export function RatingSummaryPanel({ summary, showSampleNote }: { summary: RatingSummary; showSampleNote: boolean }) {
+export function RatingSummaryPanel({
+  summary,
+  showSampleNote,
+  selected = null,
+  onSelect,
+}: {
+  summary: RatingSummary;
+  showSampleNote: boolean;
+  selected?: number | null;
+  onSelect?: (stars: number | null) => void;
+}) {
   const rows = distributionRows(summary);
   const hasReviews = summary.count > 0 && summary.average != null;
   const average = hasReviews ? (summary.average as number).toFixed(1) : null;
@@ -35,23 +46,42 @@ export function RatingSummaryPanel({ summary, showSampleNote }: { summary: Ratin
         </div>
       )}
 
-      <ul className="mt-7 space-y-2.5" aria-label="Rating breakdown">
+      <ul className="mt-7 space-y-1" aria-label="Rating breakdown">
         {rows.map((row) => (
-          <li key={row.stars} className="grid grid-cols-[2.25rem_minmax(0,1fr)_2.5rem] items-center gap-3 text-sm">
-            <span aria-hidden="true" className="inline-flex items-center gap-1 font-medium tabular-nums text-ink">
-              {row.stars}
-              <StarFilledIcon className="size-3.5 text-star" />
-            </span>
-            <span aria-hidden="true" className="relative h-2 overflow-hidden rounded-full bg-sunken">
-              <span
-                className="absolute inset-y-0 left-0 rounded-full bg-star transition-[width] duration-700 ease-smooth"
-                style={{ width: `${row.percent}%` }}
-              />
-            </span>
-            <span aria-hidden="true" className="text-right tabular-nums text-muted">
-              {row.count}
-            </span>
-            <span className="sr-only">{row.label}</span>
+          <li key={row.stars}>
+            <button
+              type="button"
+              aria-pressed={selected === row.stars}
+              disabled={!onSelect || row.count === 0}
+              onClick={() => onSelect?.(selected === row.stars ? null : row.stars)}
+              className={cn(
+                "grid w-full grid-cols-[2.25rem_minmax(0,1fr)_2.5rem] items-center gap-3 rounded-lg px-2 py-1.5 text-sm transition-colors enabled:hover:bg-sunken disabled:cursor-default",
+                selected === row.stars && "bg-brand-50 ring-1 ring-inset ring-brand-200",
+                selected !== null && selected !== row.stars && "opacity-60",
+              )}
+            >
+              <span aria-hidden="true" className="inline-flex items-center gap-1 font-medium tabular-nums text-ink">
+                {row.stars}
+                <StarFilledIcon className="size-3.5 text-star" />
+              </span>
+              <span aria-hidden="true" className="relative h-2 overflow-hidden rounded-full bg-sunken">
+                <span
+                  className="absolute inset-y-0 left-0 rounded-full bg-star transition-[width] duration-700 ease-smooth"
+                  style={{ width: `${row.percent}%` }}
+                />
+              </span>
+              <span aria-hidden="true" className="text-right tabular-nums text-muted">
+                {row.count}
+              </span>
+              <span className="sr-only">
+                {row.label}
+                {onSelect && row.count > 0
+                  ? selected === row.stars
+                    ? ". Showing only these"
+                    : ". Show only these"
+                  : ""}
+              </span>
+            </button>
           </li>
         ))}
       </ul>

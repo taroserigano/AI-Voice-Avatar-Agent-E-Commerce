@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Pie">
+  <title>Pie</title>
   <defs>
-    <radialGradient id="t-pie-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-pie-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#faf5f3"/>
       <stop offset="1" stop-color="#ecdfd6"/>
     </radialGradient>
-    <linearGradient id="t-pie-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#9f572b"/>
-      <stop offset="1" stop-color="#92400e"/>
-    </linearGradient>
     <filter id="t-pie-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-pie-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-pie-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M230 300c0-60 40-90 90-90s90 30 90 90v40H230z" fill="url(#t-pie-ink)"/><path d="M280 250l-12 40M320 240v48M360 250l12 40" stroke="#92400e" stroke-width="8" stroke-linecap="round" stroke-opacity=".5"/></g>
-  <rect x="268" y="500" width="105" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Pie</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-pie-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#3a1a06" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><ellipse cx="320" cy="392" rx="156" ry="56" fill="#92400e"/><ellipse cx="320" cy="380" rx="150" ry="54" fill="#c98a45"/><ellipse cx="320" cy="374" rx="136" ry="46" fill="#e2a55a"/><ellipse cx="320" cy="370" rx="124" ry="40" fill="#a3243b"/><path d="M214 346H426M196 368H444M214 390H426M260 331V405M320 326V410M380 331V405" fill="none" stroke="#e2a55a" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><circle cx="460" cy="374" r="7" fill="#f0bd74"/><circle cx="449.343" cy="393.134" r="7" fill="#f0bd74"/><circle cx="418.995" cy="409.355" r="7" fill="#f0bd74"/><circle cx="373.576" cy="420.194" r="7" fill="#f0bd74"/><circle cx="320" cy="424" r="7" fill="#f0bd74"/><circle cx="266.424" cy="420.194" r="7" fill="#f0bd74"/><circle cx="221.005" cy="409.355" r="7" fill="#f0bd74"/><circle cx="190.657" cy="393.134" r="7" fill="#f0bd74"/><circle cx="180" cy="374" r="7" fill="#f0bd74"/><circle cx="190.657" cy="354.866" r="7" fill="#f0bd74"/><circle cx="221.005" cy="338.645" r="7" fill="#f0bd74"/><circle cx="266.424" cy="327.806" r="7" fill="#f0bd74"/><circle cx="320" cy="324" r="7" fill="#f0bd74"/><circle cx="373.576" cy="327.806" r="7" fill="#f0bd74"/><circle cx="418.995" cy="338.645" r="7" fill="#f0bd74"/><circle cx="449.343" cy="354.866" r="7" fill="#f0bd74"/></g>
 </svg>

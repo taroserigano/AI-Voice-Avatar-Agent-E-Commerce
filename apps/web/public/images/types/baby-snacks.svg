@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Baby snacks">
+  <title>Baby snacks</title>
   <defs>
-    <radialGradient id="t-baby-snacks-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-baby-snacks-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fdf4f8"/>
       <stop offset="1" stop-color="#f9dae8"/>
     </radialGradient>
-    <linearGradient id="t-baby-snacks-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#df4187"/>
-      <stop offset="1" stop-color="#db2777"/>
-    </linearGradient>
     <filter id="t-baby-snacks-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-baby-snacks-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-baby-snacks-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M300 210h40v30c20 10 30 25 30 45v85h-100v-85c0-20 10-35 30-45z" fill="url(#t-baby-snacks-ink)"/><rect x="305" y="180" width="30" height="30" rx="12" fill="url(#t-baby-snacks-ink)" fill-opacity=".85"/></g>
-  <rect x="208" y="500" width="225" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Baby snacks</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-baby-snacks-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#581030" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><rect x="260" y="234" width="120" height="206" rx="18" fill="#db2777"/><rect x="252" y="210" width="136" height="36" rx="12" fill="#f59e0b"/><rect x="260" y="292" width="120" height="96" fill="#ffffff"/><g stroke="none"><g transform="translate(320 340) scale(1.5)" stroke-width="2.67"><path d="M0-24l7 15 16 2-12 11 3 16-14-8-14 8 3-16-12-11 16-2z" fill="#f9c846"/></g></g><circle cx="212" cy="430" r="10" fill="#f8dfa6"/><circle cx="236" cy="430" r="10" fill="#f8dfa6"/><circle cx="404" cy="430" r="10" fill="#f8dfa6"/><circle cx="428" cy="430" r="10" fill="#f8dfa6"/><circle cx="224" cy="410" r="10" fill="#f8dfa6"/></g>
 </svg>

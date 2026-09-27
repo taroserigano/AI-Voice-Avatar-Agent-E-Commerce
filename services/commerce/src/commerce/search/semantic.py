@@ -78,6 +78,19 @@ class SemanticIndex:
         hits = resp.result.hits
         return [hit.id for hit in hits if (hit.score or 0.0) >= min_score]
 
+    def search_scored(
+        self, query: str, top_k: int, min_score: float = 0.0
+    ) -> list[tuple[str, float]]:
+        """Like :meth:`search`, with each hit's similarity score (comparable within one query)."""
+        resp = self.index.search(
+            namespace=self.namespace,
+            top_k=top_k,
+            inputs={"text": query},
+            fields=["title"],
+        )
+        hits = resp.result.hits
+        return [(hit.id, hit.score or 0.0) for hit in hits if (hit.score or 0.0) >= min_score]
+
 
 class PineconeConfigError(RuntimeError):
     pass

@@ -7,12 +7,12 @@ from datetime import timedelta
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
 from commerce.activity.models import CustomerEvent
 from commerce.auth.models import User
-from commerce.catalog.models import Category, Product, Variant
+from commerce.catalog.models import Category, InventoryBalance, Price, Product, Variant
 from commerce.db import utcnow
 from commerce.orders.models import Order, OrderLine, OrderStatus
 from commerce.seed.history import seed_order_history, seed_policy_versions
@@ -317,7 +317,7 @@ def test_activity_records_views_and_searches(
     alice: TestClient, bob: TestClient, db: Session
 ) -> None:
     product_id = str(db.scalar(select(Product.id).where(Product.slug == "summit-forge-headlamp")))
-    alice.get(f"/v1/products/{product_id}")
+    detail = alice.get(f"/v1/products/{product_id}").json()
     alice.get(f"/v1/products/{product_id}")  # a second look within 30 minutes is the same visit
     alice.get("/v1/products", params={"q": "rain boots"})
 
@@ -325,8 +325,35 @@ def test_activity_records_views_and_searches(
     assert [e["type"] for e in events[:2]] == ["searched", "viewed_product"]
     assert events[0]["data"]["query"] == "rain boots"
     assert events[1]["product"]["title"] == "Trailbeam Rechargeable Headlamp"
+    # the live price and stock, the same numbers the product page shows
+    assert events[1]["product"]["price_minor"] == detail["default_price_minor"]
+    assert events[1]["product"]["in_stock"] == detail["in_stock"]
     assert sum(e["type"] == "viewed_product" for e in events) == 1
     assert bob.get("/v1/activity").json() == []
+
+
+def test_recently_viewed_price_skips_sold_out_options(alice: TestClient, db: Session) -> None:
+    """The price follows the product cards: the cheapest option in stock, not a sold-out one."""
+    product = db.scalar(select(Product).where(Product.slug == "sonora-arc-wireless-headphones"))
+    assert product is not None
+    options = sorted(
+        (v for v in product.variants if v.is_active and v.price), key=lambda v: v.price.amount_minor
+    )
+    cheapest, *others = options
+    assert others, "needs a product with more than one option"
+    # make one option the cheapest by far, then sell it out
+    db.execute(update(Price).where(Price.variant_id == cheapest.id).values(amount_minor=100))
+    db.execute(
+        update(InventoryBalance)
+        .where(InventoryBalance.variant_id == cheapest.id)
+        .values(on_hand=0, reserved=0)
+    )
+    db.commit()
+    alice.get(f"/v1/products/{product.id}")
+    viewed = next(e for e in alice.get("/v1/activity").json() if e["type"] == "viewed_product")
+    in_stock = [v for v in others if sum(max(b.available, 0) for b in v.balances) > 0]
+    assert in_stock
+    assert viewed["product"]["price_minor"] == min(v.price.amount_minor for v in in_stock) > 100
 
 
 def test_order_list_shows_return_and_delivery_hints(alice: TestClient, db: Session) -> None:

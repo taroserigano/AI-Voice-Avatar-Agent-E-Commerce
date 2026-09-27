@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Hair dryer">
+  <title>Hair dryer</title>
   <defs>
-    <radialGradient id="t-hair-dryer-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-hair-dryer-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f3f8f8"/>
       <stop offset="1" stop-color="#d6e8e6"/>
     </radialGradient>
-    <linearGradient id="t-hair-dryer-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#2c867f"/>
-      <stop offset="1" stop-color="#0f766e"/>
-    </linearGradient>
     <filter id="t-hair-dryer-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-hair-dryer-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-hair-dryer-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><rect x="290" y="210" width="60" height="30" rx="6" fill="url(#t-hair-dryer-ink)"/><rect x="270" y="240" width="100" height="120" rx="22" fill="url(#t-hair-dryer-ink)"/></g>
-  <rect x="215" y="500" width="210" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Hair dryer</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-hair-dryer-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#062f2c" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><rect x="290" y="290" width="52" height="150" rx="20" fill="#f59e0b"/><rect x="220" y="216" width="200" height="96" rx="48" fill="#0f766e"/><circle cx="392" cy="264" r="34" fill="#0a534d"/><circle cx="392" cy="264" r="20" fill="#334155"/><rect x="170" y="240" width="60" height="48" rx="10" fill="#0a534d"/><circle cx="316" cy="350" r="8" fill="#ffffff"/></g>
 </svg>

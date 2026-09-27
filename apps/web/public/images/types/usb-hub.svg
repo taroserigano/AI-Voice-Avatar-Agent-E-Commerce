@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Usb hub">
+  <title>Usb hub</title>
   <defs>
-    <radialGradient id="t-usb-hub-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-usb-hub-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f4f7fe"/>
       <stop offset="1" stop-color="#dae4fc"/>
     </radialGradient>
-    <linearGradient id="t-usb-hub-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#3f76ed"/>
-      <stop offset="1" stop-color="#2563eb"/>
-    </linearGradient>
     <filter id="t-usb-hub-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-usb-hub-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-usb-hub-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M250 270a70 70 0 0 1 140 0" fill="none" stroke="url(#t-usb-hub-ink)" stroke-width="18" stroke-linecap="round"/><rect x="228" y="262" width="36" height="64" rx="14" fill="url(#t-usb-hub-ink)"/><rect x="376" y="262" width="36" height="64" rx="14" fill="url(#t-usb-hub-ink)"/></g>
-  <rect x="238" y="500" width="165" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Usb hub</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-usb-hub-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#0f285e" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><ellipse cx="320" cy="350" rx="110" ry="62" fill="none" stroke="#334155" stroke-width="12" stroke-opacity="1"/><ellipse cx="330" cy="340" rx="90" ry="48" fill="none" stroke="#475569" stroke-width="12" stroke-opacity="1"/><path d="M220 360Q190 400 200 430M424 330Q470 300 460 250" fill="none" stroke="#334155" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><rect x="186" y="420" width="30" height="20" rx="4" fill="#b6c2cf"/><rect x="180" y="404" width="42" height="22" rx="8" fill="#2563eb"/><rect x="446" y="226" width="30" height="22" rx="4" fill="#b6c2cf"/><rect x="440" y="242" width="42" height="24" rx="8" fill="#2563eb"/></g>
 </svg>

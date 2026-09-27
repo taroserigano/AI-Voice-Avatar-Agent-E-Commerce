@@ -30,7 +30,15 @@ from commerce.outbox.service import PRODUCT_UPSERTED, emit
 from commerce.seed.catalog import PRODUCTS
 from commerce.seed.data import CATEGORIES, DEV_USERS
 from commerce.seed.history import seed_order_history, seed_policy_versions
-from commerce.seed.orders import DEV_ORDERS, POLICY_VERSION, build_order
+from commerce.seed.orders import (
+    DEV_ORDERS,
+    DEV_SHIP_TO,
+    POLICY_VERSION,
+    RETIRED_ORDER_KEYS,
+    ShipTo,
+    build_order,
+    order_id,
+)
 from commerce.seed.return_history import seed_return_history
 from commerce.seed.reviews import seed_sample_reviews
 from commerce.seed.stores import STORES
@@ -194,6 +202,20 @@ def seed_dev_users(db: Session) -> int:
     return count
 
 
+def _ship_to_columns(ship_to: ShipTo | None) -> dict[str, object]:
+    """Order columns for a sample delivery address (all null when there isn't one)."""
+    return {
+        "ship_to_name": ship_to.name if ship_to else None,
+        "ship_to_line1": ship_to.line1 if ship_to else None,
+        "ship_to_line2": ship_to.line2 if ship_to else None,
+        "ship_to_city": ship_to.city if ship_to else None,
+        "ship_to_state": ship_to.state if ship_to else None,
+        "ship_to_postal_code": ship_to.postal_code if ship_to else None,
+        "ship_to_country": ship_to.country if ship_to else None,
+        "ship_to_is_sample": ship_to is not None,
+    }
+
+
 def seed_dev_orders(db: Session) -> int:
     """Reset the development accounts' scenario orders: same IDs, dates relative to now.
 
@@ -222,6 +244,7 @@ def seed_dev_orders(db: Session) -> int:
                 "total_minor": b.total_minor,
                 "placed_at": b.placed_at,
                 "delivered_at": b.delivered_at,
+                **_ship_to_columns(DEV_SHIP_TO.get(b.spec.email)),
             },
         )
         for ln in b.lines:
@@ -255,6 +278,9 @@ def seed_dev_orders(db: Session) -> int:
                 OrderLine.order_id == b.id, OrderLine.id.not_in([ln.id for ln in b.lines])
             )
         )
+    retired = [order_id(key) for key in RETIRED_ORDER_KEYS]
+    db.execute(delete(OrderLine).where(OrderLine.order_id.in_(retired)))
+    db.execute(delete(Order).where(Order.id.in_(retired)))
     db.flush()
     return len(DEV_ORDERS)
 

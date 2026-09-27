@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Pineapple">
+  <title>Pineapple</title>
   <defs>
-    <radialGradient id="t-pineapple-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-pineapple-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f6f8f3"/>
       <stop offset="1" stop-color="#e1e9d6"/>
     </radialGradient>
-    <linearGradient id="t-pineapple-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#628c2c"/>
-      <stop offset="1" stop-color="#4d7c0f"/>
-    </linearGradient>
     <filter id="t-pineapple-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-pineapple-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-pineapple-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><circle cx="300" cy="285" r="62" fill="url(#t-pineapple-ink)"/><circle cx="345" cy="285" r="62" fill="url(#t-pineapple-ink)" fill-opacity=".85"/><path d="M322 222c0-24 12-40 34-46" stroke="url(#t-pineapple-ink)" stroke-width="10" fill="none" stroke-linecap="round"/></g>
-  <rect x="222" y="500" width="195" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Pineapple</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-pineapple-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#1f3206" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M320 276L284 196L312 240L320 170L328 240L356 196z" fill="#5fae3a"/><path d="M320 280L262 222L300 256z" fill="#3f7f22"/><path d="M320 280L378 222L340 256z" fill="#3f7f22"/><ellipse cx="320" cy="360" rx="74" ry="86" fill="#f2b632"/><path d="M282 290l9 6 9-6M312 290l9 6 9-6M342 290l9 6 9-6M264 318l9 6 9-6M294 318l9 6 9-6M324 318l9 6 9-6M354 318l9 6 9-6M257 346l9 6 9-6M287 346l9 6 9-6M317 346l9 6 9-6M347 346l9 6 9-6M259 374l9 6 9-6M289 374l9 6 9-6M319 374l9 6 9-6M349 374l9 6 9-6M270 402l9 6 9-6M300 402l9 6 9-6M330 402l9 6 9-6M360 402l9 6 9-6" fill="none" stroke="#c9861a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g>
 </svg>

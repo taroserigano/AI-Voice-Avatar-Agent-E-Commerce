@@ -143,3 +143,38 @@ class RefundAttempt(UUIDPk, Timestamps, Base):
     settled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     return_request: Mapped[ReturnRequest] = relationship(back_populates="refunds")
+
+
+class ReturnQuote(UUIDPk, Base):
+    """The exact terms shown to a customer before they confirm a return.
+
+    ``quote_hash`` fingerprints those terms; confirming recomputes them and refuses if anything
+    changed. The confirmation token is single-use, stored only as a hash bound to the customer
+    and the quote hash, and minted only for the customer's own browser session, never for the
+    assistant (TECHNICAL_SPEC.md: the model never confirms or sees the token).
+    """
+
+    __tablename__ = "return_quotes"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), index=True)
+    order_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("orders.id"), index=True)
+    # [{order_line_id, quantity, refund_minor, unit_refunds, refund_timing, ...}], in line order.
+    lines: Mapped[list[dict[str, Any]]] = mapped_column(JSON)
+    reason: Mapped[str] = mapped_column(String(60))
+    note: Mapped[str | None] = mapped_column(Text)
+    shipping_refund_minor: Mapped[int] = mapped_column(Integer, default=0)
+    total_refund_minor: Mapped[int] = mapped_column(Integer)
+    currency: Mapped[str] = mapped_column(String(3), default="USD")
+    policy_version: Mapped[str] = mapped_column(String(64))
+    payment_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("payment_attempts.id"))
+    quote_hash: Mapped[str] = mapped_column(String(64))
+    created_via: Mapped[str] = mapped_column(String(20))  # "web" | "assistant"
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    token_hash: Mapped[str | None] = mapped_column(String(64))
+    token_issued_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    idempotency_key: Mapped[str | None] = mapped_column(String(120))
+    return_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("return_requests.id"), unique=True
+    )

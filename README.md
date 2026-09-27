@@ -8,8 +8,11 @@ The build follows [docs/PLAN_ai-commerce-build.md](docs/PLAN_ai-commerce-build.m
 requirements are in [docs/handoff/](docs/handoff/), and [HANDOFF.md](HANDOFF.md) has the
 current status and every decision made so far.
 
-**Status:** Milestone 1 (sign-in and shopping foundation) is built. Checkout, returns,
-the assistant, and voice come next.
+**Status:** Milestone 1 (sign-in and shopping foundation) is built, plus the redesign,
+reviews, order tracking, the return and refund policy, **Ask Steph** (the shopping
+assistant), **Xana** (voice and text returns and refunds on `/support`), return quotes and
+confirmation, and **Jev** decision signals. Stripe checkout and Temporal workflows come next. The current feature
+batch is planned in [docs/features/](docs/features/README.md).
 
 ## What works now
 
@@ -33,6 +36,40 @@ the assistant, and voice come next.
 - **Order history for the dev accounts:** 14 orders covering every return case (inspection,
   perishables, partial returns with cent rounding, final sale, late, not delivered, ...),
   reset to fresh dates on every `pnpm db:seed`.
+- **Ask Steph:** a shopping assistant behind the button at the bottom right of every shop
+  page (`services/assistant`, LangGraph + Claude). It searches the catalog with exact filters
+  ("non fat organic milk, not regular milk"), shows product, order, store, and cart cards,
+  adds to the cart, checks orders, and answers policy questions with numbered citations it
+  can only take from sections it actually retrieved. Conversations are saved per customer.
+  It calls the commerce API with its own service identity for the signed-in customer (never
+  the customer's cookie), and it has no tool that can confirm, pay, or refund. Without a
+  working `ANTHROPIC_API_KEY` a scripted model answers from the same tools and the chat says
+  **Simulated**.
+- **Support with Xana (`/support`):** talk (or type) to Xana about returns and refunds. She
+  finds the order and item, explains eligibility from the store's return options, prices the
+  return, and shows a quote card. The customer confirms with the **Confirm return** button, or
+  by voice: Xana reads the quote back (built by code, not the model) and only a clear, final
+  "yes" after the full read-back counts, checked by the app (a strict rule, plus Jev's vote
+  when enabled). The browser then confirms directly with the store using a single-use token the
+  assistant never sees; the conversation resumes and re-checks the outcome with the store.
+  Voice is turn-based over HTTP: Groq Whisper (or Deepgram, or the browser) for speech-to-text
+  and Cartesia `sonic-3.6-2026-08-27` (or the browser) for speech; talking over Xana stops her.
+  In development a "simulated speech" box drives the same path without a microphone. Order pages'
+  **Start a return** opens Xana on that item.
+- **Return quotes and confirmation (commerce API):** `POST /v1/returns/quote` prices a return
+  from the order's saved amounts (every seeded scenario matches the eval oracle to the cent);
+  `POST /v1/returns/quotes/{id}/confirmation` and `POST /v1/returns/confirm` (with an
+  `Idempotency-Key`) need the customer's own browser session, create exactly one return per
+  quote, and refuse altered, expired, stale, or reused quotes. Refunds are simulated until Stripe
+  is connected: perishables at confirmation, others at the (development-only) carrier scan,
+  warehouse receipt, or inspection, one refund per stage.
+- **Jev (TypeSafe):** one typed request per turn reads the intent, return reason, which order
+  line, escalation, and rule-bypass attempts; confident answers steer the assistant, and Jev can
+  veto (never cause) a spoken confirmation. A labeled simulator answers until `TYPESAFE_API_KEY`
+  is set; `pnpm eval:jev` compares the two.
+- **Return and refund policy:** a detailed, versioned policy plus the rules every channel
+  (site, Steph, Xana, staff) follows, public at `/returns-policy` with citable section anchors.
+  Its numbers are machine-readable and tested against the code.
 - **Assistant scripts:** scripted product Q&A and return conversations with known-right
   answers in `evals/assistant/`, and the policy text they cite in `content/policies/`.
 - **Durable cart** per customer. Customers can't reach each other's carts or orders.
@@ -131,6 +168,8 @@ says so. After fixing the settings, run `pnpm reindex`.
 |---|---|
 | Storefront | http://localhost:3000 |
 | API docs (development only) | http://localhost:8000/docs |
+| Assistant API docs (development only) | http://localhost:8001/docs |
+| Return and refund policy (public) | http://localhost:3000/returns-policy |
 | Grafana (traces, logs, metrics, dashboards) | http://localhost:3001 |
 | Temporal UI (used from Milestone 2) | http://localhost:8233 |
 
@@ -140,14 +179,15 @@ says so. After fixing the settings, run `pnpm reindex`.
 |---|---|
 | `pnpm local:up` / `local:down` / `local:status` | Start, stop, or check PostgreSQL and OpenSearch without containers |
 | `pnpm infra:up` / `infra:down` / `infra:reset` | Start, stop, or wipe all local services in containers (Docker or Podman) |
-| `pnpm dev` | Run the API, outbox worker, and web app together |
-| `pnpm db:migrate` / `pnpm db:seed` | Apply migrations / seed catalog and dev accounts (safe to repeat) |
+| `pnpm dev` | Run the commerce API, assistant API, outbox worker, and web app together |
+| `pnpm db:migrate` / `pnpm db:seed` | Apply migrations (commerce, then the assistant's tables and checkpoints) / seed catalog and dev accounts (safe to repeat) |
 | `pnpm reindex` | Rebuild OpenSearch and Pinecone from PostgreSQL |
 | `pnpm contracts` | Regenerate `packages/contracts` from the API's OpenAPI schema |
 | `pnpm lint` / `pnpm typecheck` | Ruff, ESLint, mypy (strict), tsc |
 | `pnpm test` | Python unit and integration tests, plus web unit tests |
 | `pnpm test:e2e` | Playwright browser tests (needs `pnpm dev` running) |
 | `pnpm eval:search` | Score search quality against the baseline |
+| `pnpm eval:jev` | Score Jev (or its simulator) on the labeled routing set |
 
 `make <target>` wrappers exist for the same commands on macOS and Linux.
 
@@ -161,7 +201,8 @@ themselves.
 ```
 apps/web/              Next.js storefront (App Router, Tailwind, TanStack Query)
   proxy.ts             sign-in wall (convenience only; the API enforces 401)
-services/commerce/     FastAPI: auth, catalog, cart, orders, search, outbox, seed
+services/commerce/     FastAPI: auth, catalog, cart, orders, returns, policies, search, outbox, seed
+services/assistant/    FastAPI + LangGraph: Steph (and Xana), tools, scripted model, prompts
 packages/telemetry/    shared Python OpenTelemetry setup and redaction
 packages/contracts/    OpenAPI schema and generated TypeScript client
 infra/                 Docker Compose, OTel Collector config, Grafana dashboards
@@ -170,7 +211,7 @@ tests/e2e/             Playwright browser tests
 docs/                  build plan and handoff docs
 ```
 
-`services/assistant`, `services/voice`, and `workers/workflows` arrive with their milestones.
+`services/voice` and `workers/workflows` arrive with their milestones.
 
 ## Connected vs. simulated (Milestone 1)
 
@@ -179,4 +220,9 @@ docs/                  build plan and handoff docs
 | PostgreSQL, Redis, OpenSearch, OTel Collector, Grafana | Real (local Docker or Podman) |
 | Pinecone | Real service; code and guards tested, but the semantic path hasn't run end to end yet because the account had no free index slot |
 | Sign-in | Email and password checked by the API (by design, no other layers) |
-| Stripe, Temporal workflows, LLM, voice | Not used yet (Milestones 2-4) |
+| LLM (Claude `claude-sonnet-5`) | Real when `ANTHROPIC_API_KEY` works; otherwise the labeled scripted model (the key in the shared `.env` was rejected on 2026-09-26) |
+| Policy search | OpenSearch keyword search over policy sections; Pinecone joins when its index slot is free |
+| Jev (TypeSafe) | Real when `TYPESAFE_API_KEY` is set; otherwise the labeled simulator |
+| Speech-to-text / text-to-speech | Real: Groq Whisper and Cartesia with the keys in `.env` (Deepgram if keyed); the browser's own voice features otherwise. LiveKit (the plan's streaming voice) isn't connected yet |
+| Refunds | Simulated (records and states as Stripe will use them); Stripe checkout comes next |
+| Stripe, Temporal workflows | Not used yet |

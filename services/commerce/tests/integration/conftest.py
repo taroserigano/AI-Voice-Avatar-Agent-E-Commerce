@@ -47,6 +47,7 @@ MUTABLE_TABLES = (
     "product_reviews",
     "customer_events",
     "support_cases",
+    "return_quotes",
     "refund_attempts",
     "return_items",
     "return_requests",

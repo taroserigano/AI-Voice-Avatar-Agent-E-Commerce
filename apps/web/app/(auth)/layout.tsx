@@ -6,25 +6,25 @@ import Link from "next/link";
 
 /** Product art for the brand collage (decorative: the tiles carry no information, so alt=""). */
 const COLLAGE = [
-  { src: "sonora-arc-wireless-headphones", tile: "left-[2%] top-[6%] w-[36%] -rotate-6", delay: "" },
-  { src: "kettleworth-french-press", tile: "right-[4%] top-0 w-[30%] rotate-[5deg]", delay: "animation-delay-60" },
-  { src: "stridewell-trail-runner-gtx", tile: "left-[33%] top-[30%] z-10 w-[36%] rotate-2", delay: "animation-delay-120" },
-  { src: "summit-forge-2p-tent", tile: "left-[5%] bottom-0 w-[28%] rotate-[4deg]", delay: "animation-delay-180" },
-  { src: "pebble-pine-plush-otter", tile: "right-0 bottom-[4%] w-[31%] -rotate-[5deg]", delay: "animation-delay-240" },
+  { src: "types/apples", tile: "left-[2%] top-[6%] w-[36%] -rotate-6", delay: "" },
+  { src: "types/milk", tile: "right-[4%] top-0 w-[30%] rotate-[5deg]", delay: "animation-delay-60" },
+  { src: "types/bread", tile: "left-[33%] top-[30%] z-10 w-[36%] rotate-2", delay: "animation-delay-120" },
+  { src: "products/kettleworth-french-press", tile: "left-[5%] bottom-0 w-[28%] rotate-[4deg]", delay: "animation-delay-180" },
+  { src: "products/sonora-arc-wireless-headphones", tile: "right-0 bottom-[4%] w-[31%] -rotate-[5deg]", delay: "animation-delay-240" },
 ] as const;
 
 const MOBILE_STRIP = [
-  "sonora-arc-wireless-headphones",
-  "kettleworth-french-press",
-  "stridewell-trail-runner-gtx",
-  "pebble-pine-plush-otter",
+  "types/apples",
+  "types/milk",
+  "types/bread",
+  "products/sonora-arc-wireless-headphones",
 ] as const;
 
 function ProductTile({ src, className }: { src: string; className?: string }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element -- local SVG product art
     <img
-      src={`/images/products/${src}.svg`}
+      src={`/images/${src}.svg`}
       alt=""
       width={640}
       height={640}
@@ -116,12 +116,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                   <ProductTile src={item.src} className="w-full" />
                 </div>
               ))}
-              {/* assistant chip: previews the text/voice helper (coming soon, per the copy below) */}
+              {/* assistant chip: the kind of thing Xana handles by voice or text */}
               <div className="absolute -bottom-3 left-[24%] z-20 flex animate-fade-up items-center gap-2.5 rounded-full border border-white/15 bg-brand-950/70 py-2 pl-2 pr-4 text-sm text-white whitespace-nowrap shadow-xl backdrop-blur-md animation-delay-400">
                 <span className="grid size-7 place-items-center rounded-full bg-accent-400 text-ink">
                   <ChatIcon className="size-4" />
                 </span>
-                &ldquo;Start a return for my rain boots&rdquo;
+                &ldquo;Return the headphones from last week&rdquo;
               </div>
             </div>
           </div>
@@ -132,8 +132,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               Everyday essentials, and a helper that actually helps.
             </p>
             <p className="mt-4 hidden max-w-md text-base leading-relaxed text-brand-200 sm:block lg:text-lg">
-              Shop headphones to hiking socks, with honest ratings from other shoppers. Returns and a shopping
-              assistant you can type or talk to are coming soon. Sign in or create an account to start browsing.
+              Groceries, household basics, and everything in between, with honest ratings from other shoppers.
+              Steph helps you shop, and Xana handles returns by voice or text. Sign in or create an account to
+              start shopping.
             </p>
           </div>
 
@@ -152,6 +153,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           {isDevelopment() ? <DevAccounts /> : null}
 
           <nav aria-label="Legal" className="mt-6 flex flex-wrap items-center justify-center gap-x-3 text-sm">
+            <Link className={legalLink} href="/returns-policy">
+              Returns &amp; refunds
+            </Link>
+            <span aria-hidden="true" className="text-line-strong">
+              ·
+            </span>
             <Link className={legalLink} href="/privacy">
               Privacy
             </Link>

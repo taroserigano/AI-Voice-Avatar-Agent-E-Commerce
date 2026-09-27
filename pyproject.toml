@@ -9,7 +9,7 @@ dependencies = []
 package = false
 
 [tool.uv.workspace]
-members = ["services/commerce", "services/planner", "packages/telemetry", "packages/retrieval", "packages/assistant-stream"]
+members = ["services/commerce", "services/assistant", "services/planner", "packages/telemetry", "packages/retrieval", "packages/assistant-stream"]
 
 [dependency-groups]
 dev = [
@@ -32,9 +32,12 @@ ignore = [
 "**/tests/**" = ["S105", "S106", "S311", "S603", "S607"]
 "**/seed/**" = ["S105", "S106", "E501"]  # dev passwords; one-row-per-item data tables
 "scripts/generate_placeholders.py" = ["E501"]  # inline SVG markup
+"**/assistant/jev/simulator.py" = ["E501"]  # keyword-rule tables
+"**/assistant/jev/questions.py" = ["E501"]  # option and rubric text for the decision model
+"**/assistant/scripted_support.py" = ["E501"]  # keyword-rule tables
 
 [tool.ruff.lint.isort]
-known-first-party = ["commerce", "ai_commerce_telemetry", "ai_commerce_retrieval", "ai_commerce_planner", "ai_commerce_stream", "tests"]
+known-first-party = ["commerce", "assistant", "ai_commerce_telemetry", "ai_commerce_retrieval", "ai_commerce_planner", "ai_commerce_stream", "tests"]
 
 [tool.mypy]
 python_version = "3.12"

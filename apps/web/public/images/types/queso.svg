@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Queso">
+  <title>Queso</title>
   <defs>
-    <radialGradient id="t-queso-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-queso-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fcf6f3"/>
       <stop offset="1" stop-color="#f5dfd6"/>
     </radialGradient>
-    <linearGradient id="t-queso-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#c95829"/>
-      <stop offset="1" stop-color="#c2410c"/>
-    </linearGradient>
     <filter id="t-queso-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-queso-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-queso-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M250 200h140l-12 30 12 30-12 30 12 30-12 30 12 30H250l12-30-12-30 12-30-12-30 12-30z" fill="url(#t-queso-ink)"/></g>
-  <rect x="252" y="500" width="135" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Queso</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-queso-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#4e1a05" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M256 236H384Q394 236 394 258V412Q394 440 366 440H274Q246 440 246 412V258Q246 236 256 236z" fill="#f2b233"/><rect x="252" y="196" width="136" height="44" rx="10" fill="#e5484d"/><path d="M266 210V228M284 210V228M356 210V228M374 210V228" fill="none" stroke="#b73a3e" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><rect x="246" y="292" width="148" height="104" fill="#ffffff"/><g stroke="none"><g transform="translate(320 344) scale(1.5)" stroke-width="2.67"><path d="M-18 18C-4 16 12 0 14-14 16-20 22-22 20-14 18 4 2 22-18 18z" fill="#5fae3a"/><path d="M16-16c2-6 6-8 10-8" fill="none" stroke="#5fae3a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g></g><path d="M262 266V282M262 408V400" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.55"/></g>
 </svg>

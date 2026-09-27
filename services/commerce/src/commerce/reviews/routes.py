@@ -33,10 +33,11 @@ def list_reviews(
     sort: ReviewSort = ReviewSort.NEWEST,
     page: Annotated[int, Query(ge=1, le=1000)] = 1,
     page_size: Annotated[int, Query(ge=1, le=50)] = 10,
+    rating: Annotated[int | None, Query(ge=1, le=5, description="Only this star rating")] = None,
 ) -> ReviewPage:
     try:
         return service.list_reviews(
-            db, product_id, principal.id, sort=sort, page=page, page_size=page_size
+            db, product_id, principal.id, sort=sort, page=page, page_size=page_size, rating=rating
         )
     except service.ProductNotFound:
         raise _not_found() from None

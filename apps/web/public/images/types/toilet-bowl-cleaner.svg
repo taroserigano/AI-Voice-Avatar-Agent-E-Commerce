@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Toilet bowl cleaner">
+  <title>Toilet bowl cleaner</title>
   <defs>
-    <radialGradient id="t-toilet-bowl-cleaner-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-toilet-bowl-cleaner-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f3f8f8"/>
       <stop offset="1" stop-color="#d6e8e6"/>
     </radialGradient>
-    <linearGradient id="t-toilet-bowl-cleaner-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#2c867f"/>
-      <stop offset="1" stop-color="#0f766e"/>
-    </linearGradient>
     <filter id="t-toilet-bowl-cleaner-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-toilet-bowl-cleaner-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-toilet-bowl-cleaner-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M290 230h60l20 30v110H270V260z" fill="url(#t-toilet-bowl-cleaner-ink)"/><path d="M300 230v-30h50l30 16-30 14" fill="url(#t-toilet-bowl-cleaner-ink)" fill-opacity=".85"/></g>
-  <rect x="148" y="500" width="345" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Toilet bowl cleaner</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-toilet-bowl-cleaner-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#062f2c" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M322 262L344 200L388 186" fill="none" stroke="#84cc16" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><g transform="translate(400 182) rotate(-70)"><rect x="-16" y="-18" width="32" height="36" rx="6" fill="#0f766e"/></g><path d="M272 250H372Q392 250 392 272V424Q392 440 376 440H268Q252 440 252 424V272Q252 250 272 250z" fill="#84cc16"/><rect x="252" y="310" width="140" height="96" fill="#ffffff"/><g stroke="none"><g transform="translate(322 358) scale(1.3)" stroke-width="3.08"><path d="M0-24C10-10 18 0 18 8A18 18 0 0 1-18 8C-18 0-10-10 0-24z" fill="#0f766e"/></g></g></g>
 </svg>

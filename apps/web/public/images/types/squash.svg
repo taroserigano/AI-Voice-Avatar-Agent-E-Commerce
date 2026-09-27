@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Squash">
+  <title>Squash</title>
   <defs>
-    <radialGradient id="t-squash-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-squash-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f6f8f3"/>
       <stop offset="1" stop-color="#e1e9d6"/>
     </radialGradient>
-    <linearGradient id="t-squash-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#628c2c"/>
-      <stop offset="1" stop-color="#4d7c0f"/>
-    </linearGradient>
     <filter id="t-squash-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-squash-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-squash-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><circle cx="300" cy="285" r="62" fill="url(#t-squash-ink)"/><circle cx="345" cy="285" r="62" fill="url(#t-squash-ink)" fill-opacity=".85"/><path d="M322 222c0-24 12-40 34-46" stroke="url(#t-squash-ink)" stroke-width="10" fill="none" stroke-linecap="round"/></g>
-  <rect x="245" y="500" width="150" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Squash</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-squash-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#1f3206" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M300 222C332 214 346 240 344 280C342 320 404 338 404 390C404 430 372 444 330 440C288 436 240 420 246 378C252 338 292 320 290 280C288 240 288 224 300 222z" fill="#f3b562"/><rect x="306" y="196" width="14" height="32" rx="5" fill="#8a5a33"/><ellipse cx="270" cy="380" rx="12" ry="26" fill="#ffffff" fill-opacity="0.3"/><circle cx="360" cy="408" r="10" fill="#e29a45"/></g>
 </svg>

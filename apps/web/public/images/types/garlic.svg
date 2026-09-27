@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Garlic">
+  <title>Garlic</title>
   <defs>
-    <radialGradient id="t-garlic-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-garlic-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f6f8f3"/>
       <stop offset="1" stop-color="#e1e9d6"/>
     </radialGradient>
-    <linearGradient id="t-garlic-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#628c2c"/>
-      <stop offset="1" stop-color="#4d7c0f"/>
-    </linearGradient>
     <filter id="t-garlic-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-garlic-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-garlic-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><circle cx="300" cy="285" r="62" fill="url(#t-garlic-ink)"/><circle cx="345" cy="285" r="62" fill="url(#t-garlic-ink)" fill-opacity=".85"/><path d="M322 222c0-24 12-40 34-46" stroke="url(#t-garlic-ink)" stroke-width="10" fill="none" stroke-linecap="round"/></g>
-  <rect x="245" y="500" width="150" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Garlic</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-garlic-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#1f3206" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M320 232C326 262 400 300 400 370C400 420 366 440 320 440C274 440 240 420 240 370C240 300 314 262 320 232z" fill="#f6efe4"/><path d="M320 256V434M290 300Q268 370 292 434M350 300Q372 370 348 434" fill="none" stroke="#d9cbb6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><path d="M320 236V210" fill="none" stroke="#d9cbb6" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g>
 </svg>

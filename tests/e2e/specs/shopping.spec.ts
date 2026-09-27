@@ -8,7 +8,7 @@ test.describe("shopping journey", () => {
   });
 
   test("search, open a product, add to cart, change quantity, remove", async ({ page }) => {
-    await page.getByRole("searchbox", { name: "Search products" }).fill("wireless headphones");
+    await page.getByRole("combobox", { name: "Search products" }).fill("wireless headphones");
     await page.getByRole("button", { name: "Search", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Results for “wireless headphones”" })).toBeVisible();
 
@@ -72,6 +72,7 @@ test.describe("shopping journey", () => {
   test("Bob never sees Alice's cart", async ({ page, browser }) => {
     await page.goto("/search?q=yoga+mat");
     await page.getByRole("link", { name: /Grip Yoga Mat/ }).first().click();
+    await page.getByText("Plum", { exact: true }).click(); // colours start unselected
     await page.getByRole("button", { name: "Add to cart" }).click();
     await expect(page.getByRole("status").filter({ hasText: "Added to cart" })).toBeVisible();
     const aliceCart = await (await page.request.get("/api/v1/cart")).json();

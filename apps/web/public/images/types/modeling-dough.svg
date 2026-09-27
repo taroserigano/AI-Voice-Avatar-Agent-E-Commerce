@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Modeling dough">
+  <title>Modeling dough</title>
   <defs>
-    <radialGradient id="t-modeling-dough-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-modeling-dough-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f8f5fe"/>
       <stop offset="1" stop-color="#e9defc"/>
     </radialGradient>
-    <linearGradient id="t-modeling-dough-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#8c52ef"/>
-      <stop offset="1" stop-color="#7c3aed"/>
-    </linearGradient>
     <filter id="t-modeling-dough-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-modeling-dough-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-modeling-dough-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><rect x="240" y="210" width="70" height="70" rx="10" fill="url(#t-modeling-dough-ink)"/><rect x="330" y="210" width="70" height="70" rx="10" fill="url(#t-modeling-dough-ink)" fill-opacity=".8"/><rect x="285" y="290" width="70" height="70" rx="10" fill="url(#t-modeling-dough-ink)" fill-opacity=".9"/></g>
-  <rect x="185" y="500" width="270" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Modeling dough</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-modeling-dough-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#32175f" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M200 350C180 280 260 240 330 250C420 262 470 320 440 380C420 420 380 400 360 420C330 450 220 430 200 350z" fill="#f3d9a6"/><circle cx="340" cy="380" r="22" fill="#efe7fd"/><circle cx="250" cy="320" r="16" fill="#e5484d"/><circle cx="296" cy="290" r="16" fill="#f9c846"/><circle cx="350" cy="286" r="16" fill="#3b82f6"/><circle cx="398" cy="306" r="16" fill="#5fae3a"/><circle cx="262" cy="372" r="16" fill="#8b5cf6"/><path d="M440 180L360 330" fill="none" stroke="#d9a066" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><path d="M356 326l-10 30 22-14z" fill="#334155"/></g>
 </svg>

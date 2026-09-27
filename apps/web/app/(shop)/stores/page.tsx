@@ -1,4 +1,5 @@
 import { serverApi, unwrap } from "@/lib/api-server";
+import { openingText } from "@/lib/store-hours";
 import type { Metadata } from "next";
 import { StoreLocator } from "./store-locator";
 
@@ -11,14 +12,18 @@ export default async function StoresPage() {
   // Google Cloud console), so passing it to the browser is expected. Without one, the page
   // uses Google's keyless embed, one store at a time.
   const mapsKey = process.env.GOOGLE_MAPS_API_KEY || null;
+  // Worded on the server, at the same moment the API decided open_now, so it can't drift on hydration.
+  const now = new Date();
+  const status = Object.fromEntries(stores.map((s) => [s.code, openingText(s, s.open_now, now)]));
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold">Stores near Dallas</h1>
-      <p className="mt-1 text-muted">
-        {stores.length} Serigan Mart stores around Dallas-Fort Worth. Drop off a packaged return at any of them.
+    <div className="pb-24 sm:pb-8 sm:pt-2">
+      <h1 className="font-display text-3xl font-semibold text-ink sm:text-4xl">Stores near Dallas</h1>
+      <p className="mt-2 max-w-2xl text-muted">
+        {stores.length} Serigan Mart stores around Dallas-Fort Worth. Drop off a packaged return at any of them.{" "}
+        <span className="text-sm">These are demo locations; the addresses and phone numbers are made up.</span>
       </p>
-      <p className="mt-1 text-sm text-muted">Demo locations for this sandbox store; the addresses and phone numbers are made up.</p>
-      <StoreLocator stores={stores} mapsKey={mapsKey} />
+      <StoreLocator stores={stores} mapsKey={mapsKey} status={status} />
     </div>
   );
 }

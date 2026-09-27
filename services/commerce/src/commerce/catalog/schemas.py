@@ -26,6 +26,7 @@ class VariantOut(ApiModel):
     currency: str
     available: int = Field(description="Units available right now, from PostgreSQL")
     in_stock: bool
+    unit_price: str | None = Field(default=None, description='Price per ounce, e.g. "2.6¢/oz"')
 
 
 class TagOut(ApiModel):
@@ -50,6 +51,15 @@ class ProductSummary(ApiModel):
         description="Mean review rating to one decimal; null with no reviews"
     )
     rating_count: int
+    default_variant_id: uuid.UUID | None = Field(
+        default=None, description="What quick-add puts in the cart: the cheapest in-stock option"
+    )
+    default_variant_name: str | None = Field(default=None, description='e.g. "1 gallon"')
+    default_price_minor: int | None = Field(default=None, description="Price of that option")
+    unit_price: str | None = Field(default=None, description='Price per ounce, e.g. "2.6¢/oz"')
+    type_label: str = Field(
+        default="", description='The product type for shoppers, e.g. "USB-C charger"'
+    )
 
 
 class Nutrition(ApiModel):
@@ -102,6 +112,20 @@ class SearchMeta(ApiModel):
     notice: str | None = Field(
         default=None, description="Shown to the shopper when search quality is reduced"
     )
+    exact_match: bool = Field(
+        default=True,
+        description=(
+            "False when no product matched the query's words well, so the results are only "
+            'related items (e.g. "ipad" in a store without iPads)'
+        ),
+    )
+    total_capped: bool = Field(
+        default=False,
+        description=(
+            "True when search stopped collecting candidates at its limit, so `total` is a lower "
+            'bound: show it as "400+"'
+        ),
+    )
 
 
 class SortOrder(StrEnum):
@@ -119,3 +143,37 @@ class ProductPage(ApiModel):
     page_size: int
     facets: Facets
     search: SearchMeta | None = Field(default=None, description="Present when a text query was run")
+
+
+class SuggestedType(ApiModel):
+    value: str = Field(description="Product type slug, usable in the product_type filter")
+    label: str
+    category_slug: str = Field(description="The department most of these products are in")
+    category_name: str
+    count: int
+
+
+class SuggestedDepartment(ApiModel):
+    slug: str
+    name: str
+
+
+class SuggestedProduct(ApiModel):
+    id: uuid.UUID
+    title: str
+    brand: str
+    image_path: str
+    price_minor: int = Field(description="Lowest current variant price, from PostgreSQL")
+    currency: str
+    in_stock: bool
+
+
+class SearchSuggestions(ApiModel):
+    """Search-as-you-type: a few completed queries, matching types and departments, and top
+    products. Word-prefix matching in PostgreSQL only; no semantic search per keystroke."""
+
+    query: str
+    completions: list[str] = Field(description='Completed queries, e.g. "lactose-free milk"')
+    product_types: list[SuggestedType]
+    departments: list[SuggestedDepartment]
+    products: list[SuggestedProduct]

@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from commerce.api_model import ApiModel
 from commerce.auth.deps import CurrentUser
+from commerce.catalog.models import Variant
 from commerce.db import get_db, utcnow
 from commerce.metrics import ownership_denials
 from commerce.orders.models import Order, OrderStatus
@@ -24,15 +25,34 @@ DbDep = Annotated[Session, Depends(get_db)]
 class OrderLineOut(ApiModel):
     id: uuid.UUID
     variant_id: uuid.UUID
+    product_id: uuid.UUID | None = Field(
+        default=None, description="For linking to the product and buying it again"
+    )
     product_title: str
     variant_name: str
     sku: str
     image_path: str
     quantity: int
     unit_price_minor: int
+    amount_subtotal_minor: int = Field(
+        description="Unit price times quantity, before discount and tax (the receipt's line amount)"
+    )
     amount_discount_minor: int
     amount_tax_minor: int
     amount_total_minor: int
+
+
+class ShippingAddressOut(ApiModel):
+    """Where the order was sent, as recorded when it was placed."""
+
+    name: str
+    line1: str
+    line2: str | None
+    city: str
+    state: str
+    postal_code: str
+    country: str = Field(description='ISO 3166-1 alpha-2, e.g. "US"')
+    is_sample: bool = Field(description="Seeded demo address; label it as a sample on screen")
 
 
 class OrderSummary(ApiModel):
@@ -44,6 +64,9 @@ class OrderSummary(ApiModel):
     placed_at: datetime
     delivered_at: datetime | None
     preview_images: list[str] = Field(description="Up to 4 line images, for the order list")
+    item_titles: list[str] = Field(
+        description="Every line's product title, so the order list can be searched by item"
+    )
     estimated_delivery_at: datetime | None = Field(description="While it's still on its way")
     return_window_ends_at: datetime | None = Field(
         description="Latest time any item can still be returned; null if nothing can be"
@@ -56,6 +79,9 @@ class OrderDetail(OrderSummary):
     discount_minor: int
     tax_minor: int
     shipping_minor: int
+    shipping_address: ShippingAddressOut | None = Field(
+        description="Null when no delivery address was recorded"
+    )
     lines: list[OrderLineOut]
     payment: PaymentOut | None
     shipments: list[ShipmentOut]
@@ -78,6 +104,7 @@ def _summary(
         placed_at=o.placed_at,
         delivered_at=o.delivered_at,
         preview_images=[line.image_path for line in o.lines[:4]],
+        item_titles=[line.product_title for line in o.lines],
         estimated_delivery_at=estimated_delivery_at,
         return_window_ends_at=return_window_ends_at,
         has_open_return=has_open_return,
@@ -109,6 +136,21 @@ def list_orders(principal: CurrentUser, db: DbDep) -> list[OrderSummary]:
     ]
 
 
+def _shipping_address(o: Order) -> ShippingAddressOut | None:
+    if not (o.ship_to_name and o.ship_to_line1 and o.ship_to_city and o.ship_to_postal_code):
+        return None
+    return ShippingAddressOut(
+        name=o.ship_to_name,
+        line1=o.ship_to_line1,
+        line2=o.ship_to_line2,
+        city=o.ship_to_city,
+        state=o.ship_to_state or "",
+        postal_code=o.ship_to_postal_code,
+        country=o.ship_to_country or "US",
+        is_sample=o.ship_to_is_sample,
+    )
+
+
 def _own_order(db: Session, order_id: uuid.UUID, user_id: uuid.UUID) -> Order:
     order = db.scalar(
         select(Order)
@@ -134,12 +176,20 @@ def get_order(order_id: uuid.UUID, principal: CurrentUser, db: DbDep) -> OrderDe
         return_window_ends_at=returns.return_window_ends_at(db, order, now),
         has_open_return=bool(returns.orders_with_open_returns(db, [order.id])),
     )
+    variant_ids = [line.variant_id for line in order.lines]
+    product_of: dict[uuid.UUID, uuid.UUID] = {
+        vid: pid
+        for vid, pid in db.execute(
+            select(Variant.id, Variant.product_id).where(Variant.id.in_(variant_ids))
+        ).all()
+    }
     return OrderDetail(
         **summary.model_dump(),
         subtotal_minor=order.subtotal_minor,
         discount_minor=order.discount_minor,
         tax_minor=order.tax_minor,
         shipping_minor=order.shipping_minor,
+        shipping_address=_shipping_address(order),
         payment=returns.order_payment(db, order.id),
         shipments=returns.order_shipments(db, order.id),
         returns=returns.order_returns(db, order),
@@ -147,12 +197,14 @@ def get_order(order_id: uuid.UUID, principal: CurrentUser, db: DbDep) -> OrderDe
             OrderLineOut(
                 id=line.id,
                 variant_id=line.variant_id,
+                product_id=product_of.get(line.variant_id),
                 product_title=line.product_title,
                 variant_name=line.variant_name,
                 sku=line.sku,
                 image_path=line.image_path,
                 quantity=line.quantity,
                 unit_price_minor=line.unit_price_minor,
+                amount_subtotal_minor=line.unit_price_minor * line.quantity,
                 amount_discount_minor=line.amount_discount_minor,
                 amount_tax_minor=line.amount_tax_minor,
                 amount_total_minor=line.amount_total_minor,

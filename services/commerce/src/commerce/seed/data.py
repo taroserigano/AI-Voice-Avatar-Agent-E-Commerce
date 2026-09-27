@@ -127,6 +127,14 @@ def _sizes(sizes: tuple[str, ...], stock: int, color: str | None = None) -> tupl
     return tuple(out)
 
 
+def _values(*dollars: int) -> tuple[VariantSeed, ...]:
+    """Gift card amounts. Gift cards are digital, so they never run out."""
+    return tuple(
+        VariantSeed(str(d), f"${d}", 999, price_cents=d * 100, attributes={"value": f"${d}"})
+        for d in dollars
+    )
+
+
 _HANDWRITTEN: tuple[ProductSeed, ...] = (
     # --- Electronics (returns need inspection) ---
     ProductSeed(
@@ -649,6 +657,39 @@ _HANDWRITTEN: tuple[ProductSeed, ...] = (
             VariantSeed("100", "$100", 999, price_cents=10000, attributes={"value": "$100"}),
         ),
     ),
+    ProductSeed(
+        "serigan-mart-birthday-gift-card",
+        "Happy Birthday Gift Card",
+        "Serigan Mart",
+        "gift-cards",
+        2500,
+        "A digital Serigan Mart gift card with a birthday design, delivered by email. Good for "
+        "groceries and everything else in the store. Gift cards are final sale and can't be "
+        "returned.",
+        _values(25, 50, 100),
+    ),
+    ProductSeed(
+        "serigan-mart-thank-you-gift-card",
+        "Thank You Gift Card",
+        "Serigan Mart",
+        "gift-cards",
+        1500,
+        "A digital Serigan Mart gift card with a thank-you design, delivered by email: an easy "
+        "thanks for a teacher, neighbor, or host. Gift cards are final sale and can't be "
+        "returned.",
+        _values(15, 25, 50),
+    ),
+    ProductSeed(
+        "serigan-mart-holiday-gift-card",
+        "Holiday Gift Card",
+        "Serigan Mart",
+        "gift-cards",
+        2500,
+        "A digital Serigan Mart gift card with a winter holiday design, delivered by email. Good "
+        "for holiday groceries, gifts, and everything else in the store. Gift cards are final "
+        "sale and can't be returned.",
+        _values(25, 50, 100, 200),
+    ),
 )
 
 
@@ -705,7 +746,10 @@ _ENRICHMENT: dict[str, tuple[str, tuple[str, ...]]] = {
     "pebble-pine-board-game": ("board-game", ()),
     "pebble-pine-plush-otter": ("plush-toy", ("kids",)),
     "pebble-pine-rc-car": ("rc-car", ("rechargeable", "kids")),
-    "verdant-botanicals-face-moisturizer": ("face-moisturizer", ("cruelty-free",)),
+    "verdant-botanicals-face-moisturizer": (
+        "face-moisturizer",
+        ("fragrance-free", "sensitive-skin", "cruelty-free"),
+    ),
     "verdant-botanicals-shampoo-bar": ("shampoo", ("cruelty-free", "vegan", "sulfate-free")),
     "verdant-botanicals-electric-toothbrush": ("electric-toothbrush", ("rechargeable",)),
     "verdant-botanicals-hand-cream": ("hand-cream", ("cruelty-free",)),
@@ -714,10 +758,271 @@ _ENRICHMENT: dict[str, tuple[str, tuple[str, ...]]] = {
     "quillmark-desk-lamp": ("desk-lamp", ("energy-efficient", "usb-c")),
     "quillmark-laptop-backpack": ("backpack", ("water-resistant",)),
     "serigan-mart-gift-card": ("gift-card", ()),
+    "serigan-mart-birthday-gift-card": ("gift-card", ()),
+    "serigan-mart-thank-you-gift-card": ("gift-card", ()),
+    "serigan-mart-holiday-gift-card": ("gift-card", ()),
 }
 
+_WARRANTY_1Y = "1-year limited"
+_GIFT_CARD = {
+    "Format": "Digital, delivered by email",
+    "Redeemable for": "Anything sold at Serigan Mart",
+    "Returns": "Final sale: can't be returned, exchanged, or refunded",
+    "Cash value": "None, except where the law requires it",
+}
+
+# Specification rows for the hand-written products, taken from what each description says.
+# commerce.seed.specs adds the rest (options, sizes, model numbers) on the way out.
+_SPECS: dict[str, dict[str, str]] = {
+    "sonora-arc-wireless-headphones": {
+        "Type": "Over-ear", "Connection": "Bluetooth", "Noise cancelling": "Active",
+        "Battery life": "Up to 40 hours", "Charging": "USB-C (braided cable included)",
+        "Ear cushions": "Memory foam", "Folds flat": "Yes, for travel",
+        "In the box": "Headphones, braided USB-C cable", "Warranty": _WARRANTY_1Y,
+    },
+    "sonora-pulse-wireless-earbuds": {
+        "Type": "True wireless, in-ear", "Connection": "Bluetooth",
+        "Water resistance": "Sweat-resistant", "Transparency mode": "Yes",
+        "Charging case": "Pocket-size", "In the box": "Earbuds, charging case",
+        "Warranty": _WARRANTY_1Y,
+    },
+    "sonora-studio-wired-headphones": {
+        "Type": "Over-ear, closed back", "Connection": "Wired, 3.5 mm",
+        "Cable": "Detachable, coiled", "Adapter": "3.5 mm to 6.35 mm, included",
+        "Use": "Home recording and focused listening",
+        "In the box": "Headphones, coiled cable, 6.35 mm adapter", "Warranty": _WARRANTY_1Y,
+    },
+    "lumen-beam-bluetooth-speaker": {
+        "Connection": "Bluetooth", "Battery life": "Up to 12 hours",
+        "Water resistance": "Waterproof, floats", "Stereo pairing": "With a second Beam speaker",
+        "Strap": "Clip-on", "Warranty": _WARRANTY_1Y,
+    },
+    "lumen-glow-smart-bulb-4pk": {
+        "Count": "4 bulbs", "Connection": "Wi-Fi (no hub required)",
+        "Colors": "Warm white to daylight, plus 16 million colors", "Dimmable": "Yes",
+        "Control": "Phone app or voice assistant, with schedules", "Warranty": _WARRANTY_1Y,
+    },
+    "lumen-tablet-10": {
+        "Screen size": "10 in, HD", "Processor": "Quad-core", "Storage": "64 GB or 128 GB",
+        "Expandable storage": "microSD card slot", "Charging": "USB-C",
+        "Profiles": "Kid-safe profile mode", "Use": "Streaming, reading, and video calls",
+        "Warranty": _WARRANTY_1Y,
+    },
+    "lumen-power-bank-20k": {
+        "Capacity": "20,000 mAh", "USB-C": "Fast charging, in and out",
+        "Phone charges": "About 4 full charges",
+        "Air travel": "Carry-on friendly (74 Wh, under the 100 Wh airline limit)",
+        "In the box": "Power bank, USB-C to USB-C cable", "Warranty": _WARRANTY_1Y,
+    },
+    "lumen-hd-webcam": {
+        "Resolution": "1080p Full HD", "Microphone": "Dual, noise-reducing",
+        "Light correction": "Automatic", "Privacy cover": "Built-in shutter",
+        "Mount": "Clips onto monitors and laptops", "Warranty": _WARRANTY_1Y,
+    },
+    "sonora-kids-headphones": {
+        "Type": "On-ear", "Connection": "Wired, 3.5 mm", "Volume limit": "85 dB",
+        "Headband": "Bendable", "Sharing port": "Yes, for a second pair of headphones",
+        "Weight": "Lightweight", "Warranty": _WARRANTY_1Y,
+    },
+    "kettleworth-gooseneck-kettle": {
+        "Temperature control": "Variable, with keep-warm setting", "Spout": "Gooseneck",
+        "Body": "Stainless steel", "Use": "Pour-over coffee and tea", "Warranty": _WARRANTY_1Y,
+    },
+    "kettleworth-cast-iron-skillet": {
+        "Diameter": "12 in", "Material": "Cast iron", "Seasoning": "Pre-seasoned",
+        "Use on": "Stove, oven, grill, or campfire",
+        "Care": "Hand wash, dry right away, and oil lightly", "Warranty": "Limited lifetime",
+    },
+    "kettleworth-chef-knife": {
+        "Blade length": "8 in", "Blade": "Forged high-carbon stainless steel",
+        "Construction": "Full tang", "Handle": "Balanced, non-slip",
+        "Includes": "Blade guard", "Care": "Hand wash", "Warranty": "Limited lifetime",
+    },
+    "harbor-home-linen-sheets": {
+        "Material": "Stone-washed linen",
+        "Includes": "Fitted sheet, flat sheet, and two pillowcases",
+        "Feel": "Breathable; softens with every wash",
+    },
+    "harbor-home-throw-blanket": {
+        "Material": "Acrylic chunky knit yarn", "Size": "Oversized throw",
+        "Shedding": "Doesn't shed", "Care": "Machine washable on gentle",
+    },
+    "harbor-home-glass-containers": {
+        "Pieces": "10", "Material": "Borosilicate glass", "Lids": "Leak-proof, locking",
+        "Oven safe": "Glass containers", "Microwave, freezer, and dishwasher safe": "Yes",
+        "Use": "Meal prep and leftovers",
+    },
+    "kettleworth-french-press": {
+        "Capacity": "34 oz", "Material": "Double-wall insulated stainless steel",
+        "Keeps hot": "About 1 hour", "Filter": "Four-level", "Warranty": "Limited lifetime",
+    },
+    "harbor-home-scented-candle": {
+        "Scent": "Cedar and sea salt", "Wax": "Soy", "Wick": "Cotton",
+        "Burn time": "About 45 hours", "Made": "Hand-poured",
+    },
+    "kettleworth-mixing-bowls": {
+        "Pieces": "5 nesting bowls", "Sizes": "1 to 5 quarts", "Material": "Stainless steel",
+        "Base": "Non-slip", "Rim": "Pouring lips",
+    },
+    "stridewell-rain-boots": {
+        "Material": "Rubber", "Waterproof": "Fully waterproof", "Height": "Mid-calf",
+        "Insole": "Cushioned", "Outsole": "Grippy, for wet sidewalks",
+        "Closure": "Pull-on, with tabs",
+    },
+    "stridewell-trail-runner-gtx": {
+        "Waterproof": "Breathable waterproof membrane", "Outsole": "Lugged",
+        "Protection": "Rock plate", "Use": "Trail running in rain and mud",
+        "Closure": "Lace-up",
+    },
+    "stridewell-everyday-sneaker": {
+        "Upper": "Canvas", "Sole": "Vulcanized rubber", "Footbed": "Cushioned",
+        "Style": "Low-top", "Closure": "Lace-up",
+    },
+    "driftwood-rain-shell": {
+        "Waterproof": "Yes, with taped seams", "Hood": "Adjustable",
+        "Packable": "Into its own pocket", "Weight": "Lightweight",
+        "Use": "Commutes and travel",
+    },
+    "driftwood-merino-crew": {
+        "Material": "Merino wool", "Neckline": "Crew",
+        "Features": "Itch-free, temperature-regulating, odor-resistant",
+        "Season": "Fall to spring",
+    },
+    "driftwood-organic-tee": {
+        "Material": "Organic cotton", "Weight": "Midweight", "Fit": "Relaxed",
+        "Neckline": "Crew", "Care": "Machine washable; holds its shape after washing",
+    },
+    "driftwood-wool-socks-3pk": {
+        "Material": "Merino wool blend", "Count": "3 pairs", "Cushioning": "Cushioned",
+        "Moisture-wicking": "Yes", "Use": "Hiking and long walks",
+    },
+    "summit-forge-2p-tent": {
+        "Capacity": "2 people", "Doors": "2", "Rain fly": "Full coverage",
+        "Setup": "Freestanding, color-coded poles", "Use": "Backpacking",
+        "Warranty": "Limited lifetime",
+    },
+    "summit-forge-sleeping-bag": {
+        "Temperature rating": "30°F", "Fill": "Synthetic (stays warm when damp)",
+        "Shape": "Mummy", "Stuff sack": "Included", "Warranty": "Limited lifetime",
+    },
+    "summit-forge-headlamp": {
+        "Brightness": "400 lumens", "Night mode": "Red light", "Beam": "Tilting",
+        "Water resistance": "Water-resistant", "Power": "Rechargeable, USB-C",
+        "Warranty": _WARRANTY_1Y,
+    },
+    "summit-forge-water-bottle": {
+        "Capacity": "32 oz", "Material": "Vacuum-insulated stainless steel",
+        "Keeps cold": "24 hours", "Lid": "Leak-proof, with carry loop", "BPA-free": "Yes",
+    },
+    "verdant-raised-garden-bed": {
+        "Size": "4 x 2 ft", "Material": "Untreated cedar",
+        "Assembly": "Tool-free, slide-in corner posts", "Use": "Vegetables and herbs",
+    },
+    "verdant-garden-hose": {
+        "Length": "50 ft", "Fittings": "Crush-proof brass", "Kink-free": "Yes",
+        "Nozzle included": "Yes, 8 spray patterns",
+    },
+    "summit-forge-camp-chair": {
+        "Style": "Folding", "Cup holder": "Yes", "Storage": "Side pocket",
+        "Carry bag": "Shoulder bag, included", "Use": "Camping, beach days, and sidelines",
+    },
+    "tempo-yoga-mat": {
+        "Thickness": "6 mm", "Surface": "Non-slip, cushioned", "Alignment lines": "Yes",
+        "Carry strap": "Included", "Care": "Wipe clean",
+    },
+    "tempo-adjustable-dumbbells": {
+        "Weight range": "5 to 25 lb per dumbbell", "Sold as": "Pair",
+        "Adjustment": "Turn-dial selector", "Replaces": "10 sets of weights",
+    },
+    "tempo-jump-rope": {
+        "Type": "Speed rope", "Bearings": "Ball-bearing", "Length": "Adjustable",
+        "Handles": "Foam", "Use": "Cardio and double-unders",
+    },
+    "tempo-resistance-bands": {
+        "Pieces": "5", "Resistance": "Extra light to extra heavy", "Type": "Loop bands",
+        "Latex": "Latex-free", "Use": "Strength training, physical therapy, and stretching",
+    },
+    "tempo-foam-roller": {
+        "Length": "18 in", "Firmness": "Firm", "Material": "High-density foam",
+        "Use": "Post-workout recovery and myofascial release",
+    },
+    "pebble-pine-wooden-blocks": {
+        "Pieces": "60", "Material": "Sustainably sourced hardwood",
+        "Finish": "Child-safe paint", "Ages": "2+",
+    },
+    "pebble-pine-puzzle-1000": {
+        "Pieces": "1000", "Image": "A harbor at dusk", "Material": "Thick recycled board",
+        "Includes": "Reference poster",
+    },
+    "pebble-pine-board-game": {
+        "Players": "2-5", "Ages": "10+", "Play time": "About 45 minutes",
+        "Style": "Cooperative strategy",
+    },
+    "pebble-pine-plush-otter": {
+        "Size": "12 in", "Eyes": "Embroidered", "Ages": "All ages", "Care": "Surface washable",
+    },
+    "pebble-pine-rc-car": {
+        "Top speed": "20 mph", "Power": "Rechargeable battery", "Tires": "Rubber",
+        "Body": "Splash-proof", "Terrain": "Grass, dirt, and puddles",
+    },
+    "verdant-botanicals-face-moisturizer": {
+        "SPF": "30, broad spectrum", "Key ingredients": "Hyaluronic acid",
+        "Fragrance": "Fragrance-free", "Skin type": "All, including sensitive",
+        "Form": "Lightweight lotion", "Use": "Every morning",
+    },
+    "verdant-botanicals-shampoo-bar": {
+        "Form": "Solid bar", "Scent": "Rosemary mint (rosemary and peppermint oils)",
+        "Washes": "About 80", "Packaging": "Plastic-free", "Sulfates": "None",
+    },
+    "verdant-botanicals-electric-toothbrush": {
+        "Type": "Sonic", "Modes": "3", "Timer": "2 minutes", "Power": "Rechargeable",
+        "Brush heads": "2 included", "Case": "Travel case", "Warranty": _WARRANTY_1Y,
+    },
+    "verdant-botanicals-hand-cream": {
+        "Count": "3 travel-size tubes", "Key ingredients": "Shea butter",
+        "Scents": "Lavender, citrus, and unscented", "Form": "Cream",
+    },
+    "quillmark-dotted-notebook": {
+        "Size": "A5", "Pages": "192", "Paper": "Dotted, fountain-pen friendly",
+        "Cover": "Hardcover", "Extras": "Ribbon marker and elastic closure",
+    },
+    "quillmark-gel-pens-12pk": {
+        "Count": "12", "Point": "0.5 mm", "Ink": "Gel, quick-dry and smear-resistant",
+        "Colors": "Assorted",
+    },
+    "quillmark-desk-lamp": {
+        "Light": "LED, dimmable", "Color temperatures": "5",
+        "Charging port": "USB-C, for a phone", "Arm": "Flexible", "Warranty": _WARRANTY_1Y,
+    },
+    "quillmark-laptop-backpack": {
+        "Laptop sleeve": "Padded, fits up to 16 in", "Water resistance": "Water-resistant",
+        "Luggage pass-through": "Yes", "Security": "Hidden anti-theft pocket",
+    },
+    "serigan-mart-gift-card": {**_GIFT_CARD, "Design": "Serigan Mart flower"},
+    "serigan-mart-birthday-gift-card": {**_GIFT_CARD, "Design": "Happy birthday"},
+    "serigan-mart-thank-you-gift-card": {**_GIFT_CARD, "Design": "Thank you"},
+    "serigan-mart-holiday-gift-card": {**_GIFT_CARD, "Design": "Winter holiday"},
+}  # fmt: skip
+
+# Products with a photoreal 3D render (apps/web/public/images/products-3d/, made with the
+# scripts in docs/design). Everything else uses its illustration in images/products/.
+_RENDERED_3D = frozenset(
+    {
+        "verdant-botanicals-face-moisturizer",
+        "verdant-botanicals-shampoo-bar",
+        "verdant-botanicals-electric-toothbrush",
+        "verdant-botanicals-hand-cream",
+    }
+)
+
 HANDWRITTEN_PRODUCTS: tuple[ProductSeed, ...] = tuple(
-    replace(p, product_type=_ENRICHMENT[p.slug][0], tags=_ENRICHMENT[p.slug][1])
+    replace(
+        p,
+        product_type=_ENRICHMENT[p.slug][0],
+        tags=_ENRICHMENT[p.slug][1],
+        specs=_SPECS.get(p.slug, {}),
+        image_path=f"/images/products-3d/{p.slug}.webp" if p.slug in _RENDERED_3D else None,
+    )
     for p in _HANDWRITTEN
 )
 

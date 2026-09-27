@@ -1,12 +1,34 @@
 "use client";
 
-import { ChevronDownIcon, ClockIcon, PackageIcon, ReturnIcon, SitemapIcon } from "@/components/icons";
+import {
+  ChevronDownIcon,
+  ClockIcon,
+  HeadsetIcon,
+  InfoIcon,
+  MapIcon,
+  PackageIcon,
+  ReturnIcon,
+  SitemapIcon,
+} from "@/components/icons";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { SignOutButton } from "./sign-out-button";
 
 const itemClasses =
   "flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-left text-sm font-medium text-ink transition-colors duration-150 hover:bg-sunken focus-visible:bg-sunken [&_svg]:text-muted";
+
+const ACCOUNT_ITEMS = [
+  { href: "/orders", label: "Orders & returns", Icon: PackageIcon },
+  { href: "/activity", label: "Activity", Icon: ClockIcon },
+] as const;
+
+const HELP_ITEMS = [
+  { href: "/help", label: "Help center", Icon: InfoIcon },
+  { href: "/support", label: "Support (Xana)", Icon: HeadsetIcon },
+  { href: "/help/returns", label: "How returns work", Icon: ReturnIcon },
+  { href: "/stores", label: "Stores", Icon: MapIcon },
+  { href: "/sitemap", label: "Site map", Icon: SitemapIcon },
+] as const;
 
 /**
  * Account disclosure built on <details>/<summary> (works without JS). With JS it also closes on
@@ -56,7 +78,7 @@ export function AccountMenu({ displayName, email }: { displayName: string; email
         </span>
         <ChevronDownIcon className="hidden size-4 text-muted transition-transform duration-200 ease-snappy group-open/account:rotate-180 sm:block" />
       </summary>
-      <div className="absolute right-0 top-full z-50 mt-2 w-72 origin-top-right animate-scale-in rounded-2xl border border-line bg-raised p-2 shadow-xl">
+      <div className="absolute right-0 top-full z-50 mt-2 max-h-[calc(100dvh-5rem)] w-72 origin-top-right animate-scale-in overflow-y-auto overscroll-contain rounded-2xl border border-line bg-raised p-2 shadow-xl">
         <div className="flex items-center gap-3 rounded-xl bg-mesh-light px-3 py-3">
           <span
             aria-hidden="true"
@@ -70,30 +92,28 @@ export function AccountMenu({ displayName, email }: { displayName: string; email
           </span>
         </div>
         <ul className="mt-2 space-y-0.5">
-          <li>
-            <Link href="/orders" className={itemClasses} onClick={close}>
-              <PackageIcon />
-              Orders &amp; returns
-            </Link>
-          </li>
-          <li>
-            <Link href="/help/returns" className={itemClasses} onClick={close}>
-              <ReturnIcon />
-              How returns work
-            </Link>
-          </li>
-          <li>
-            <Link href="/activity" className={itemClasses} onClick={close}>
-              <ClockIcon />
-              Activity
-            </Link>
-          </li>
-          <li>
-            <Link href="/sitemap" className={itemClasses} onClick={close}>
-              <SitemapIcon />
-              Site map
-            </Link>
-          </li>
+          {ACCOUNT_ITEMS.map(({ href, label, Icon }) => (
+            <li key={href}>
+              <Link href={href} className={itemClasses} onClick={close}>
+                <Icon />
+                {label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <div className="my-2 border-t border-line" />
+        <p id="account-menu-help" className="px-3 pb-1 pt-1 text-xs font-semibold uppercase tracking-eyebrow text-muted">
+          Help
+        </p>
+        <ul aria-labelledby="account-menu-help" className="space-y-0.5">
+          {HELP_ITEMS.map(({ href, label, Icon }) => (
+            <li key={href}>
+              <Link href={href} className={itemClasses} onClick={close}>
+                <Icon />
+                {label}
+              </Link>
+            </li>
+          ))}
         </ul>
         <div className="my-2 border-t border-line" />
         <SignOutButton className={itemClasses} />

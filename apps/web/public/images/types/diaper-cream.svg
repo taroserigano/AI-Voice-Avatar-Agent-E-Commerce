@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Diaper cream">
+  <title>Diaper cream</title>
   <defs>
-    <radialGradient id="t-diaper-cream-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-diaper-cream-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fdf4f8"/>
       <stop offset="1" stop-color="#f9dae8"/>
     </radialGradient>
-    <linearGradient id="t-diaper-cream-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#df4187"/>
-      <stop offset="1" stop-color="#db2777"/>
-    </linearGradient>
     <filter id="t-diaper-cream-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-diaper-cream-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-diaper-cream-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M300 210h40v30c20 10 30 25 30 45v85h-100v-85c0-20 10-35 30-45z" fill="url(#t-diaper-cream-ink)"/><rect x="305" y="180" width="30" height="30" rx="12" fill="url(#t-diaper-cream-ink)" fill-opacity=".85"/></g>
-  <rect x="200" y="500" width="240" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Diaper cream</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-diaper-cream-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#581030" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><rect x="290" y="390" width="60" height="50" rx="8" fill="#8b5cf6"/><rect x="284" y="384" width="72" height="14" rx="5" fill="#6c48c0"/><path d="M252 180H388L354 386H286z" fill="#ffffff"/><path d="M258 244H382L372 306H268z" fill="#db2777"/><rect x="246" y="160" width="148" height="26" rx="4" fill="#ebebeb"/><path d="M262 166V180M278 166V180M294 166V180M310 166V180M326 166V180M342 166V180M358 166V180M374 166V180" fill="none" stroke="#cccccc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><g stroke="none"><g transform="translate(320 275) scale(1.1)" stroke-width="3.64"><path d="M0 20C-26 2-22-20-8-20c4 0 7 2 8 6 1-4 4-6 8-6 14 0 18 22-8 40z" fill="#ffffff"/></g></g><path d="M270 196L290 372" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.8"/></g>
 </svg>

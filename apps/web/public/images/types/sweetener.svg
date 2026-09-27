@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Sweetener">
+  <title>Sweetener</title>
   <defs>
-    <radialGradient id="t-sweetener-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-sweetener-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#faf7f3"/>
       <stop offset="1" stop-color="#efe4d5"/>
     </radialGradient>
-    <linearGradient id="t-sweetener-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#ac7525"/>
-      <stop offset="1" stop-color="#a16207"/>
-    </linearGradient>
     <filter id="t-sweetener-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-sweetener-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-sweetener-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><rect x="260" y="200" width="120" height="30" rx="8" fill="url(#t-sweetener-ink)" fill-opacity=".85"/><rect x="250" y="230" width="140" height="140" rx="20" fill="url(#t-sweetener-ink)"/><rect x="275" y="275" width="90" height="50" rx="6" fill="#a16207" fill-opacity=".35"/></g>
-  <rect x="222" y="500" width="195" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Sweetener</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-sweetener-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#402703" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><g transform="translate(270 380) rotate(-14)"><rect x="-66" y="-46" width="132" height="92" rx="8" fill="#60a5fa"/><rect x="-66" y="-46" width="132" height="16" rx="6" fill="#528cd4"/><path d="M-40 6H40M-40 22H20" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g><g transform="translate(370 380) rotate(12)"><rect x="-66" y="-46" width="132" height="92" rx="8" fill="#f9c846"/><rect x="-66" y="-46" width="132" height="16" rx="6" fill="#d4aa3c"/><path d="M-40 6H40M-40 22H20" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g><g transform="translate(320 340) rotate(-2)"><rect x="-66" y="-46" width="132" height="92" rx="8" fill="#f472b6"/><rect x="-66" y="-46" width="132" height="16" rx="6" fill="#cf619b"/><path d="M-40 6H40M-40 22H20" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g></g>
 </svg>

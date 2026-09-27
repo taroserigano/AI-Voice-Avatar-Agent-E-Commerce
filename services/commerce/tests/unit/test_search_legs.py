@@ -40,7 +40,8 @@ def test_both_backends_are_fused(monkeypatch: pytest.MonkeyPatch, pinecone_on: N
     monkeypatch.setattr(service, "get_keyword_index", lambda: Keyword(["a", "b"]))
     monkeypatch.setattr(service, "get_semantic_index", lambda: SemanticIndex(standin, "ns"))
 
-    ids, meta = service._run_legs("rain boots")
+    legs = service._run_legs("rain boots")
+    ids, meta = legs.ids, legs.meta
 
     assert ids[0] == "b"  # found by both
     assert set(ids) == {"a", "b", "c"}
@@ -55,13 +56,15 @@ def test_slow_semantic_leg_is_cut_off_at_the_budget(
     monkeypatch.setattr(service, "get_semantic_index", lambda: slow)
 
     started = time.perf_counter()
-    ids, meta = service._run_legs("rain boots")
+    legs = service._run_legs("rain boots")
+    ids, meta = legs.ids, legs.meta
     elapsed = time.perf_counter() - started
 
     assert elapsed < 0.6
     assert ids == ["a"]
     assert meta.semantic == LegStatus.UNAVAILABLE
-    assert meta.notice
+    # Recorded (and measured), but not shown to shoppers: keyword results still answer.
+    assert meta.notice is None
 
 
 def test_semantic_setup_failure_degrades_to_keyword(
@@ -73,7 +76,8 @@ def test_semantic_setup_failure_degrades_to_keyword(
     monkeypatch.setattr(service, "get_keyword_index", lambda: Keyword(["a"]))
     monkeypatch.setattr(service, "get_semantic_index", broken)
 
-    ids, meta = service._run_legs("q")
+    legs = service._run_legs("q")
+    ids, meta = legs.ids, legs.meta
     assert ids == ["a"]
     assert (meta.keyword, meta.semantic) == (LegStatus.OK, LegStatus.UNAVAILABLE)
 
@@ -82,10 +86,11 @@ def test_no_pinecone_key_means_disabled_not_faked(monkeypatch: pytest.MonkeyPatc
     monkeypatch.setattr(get_settings(), "pinecone_api_key", None)
     monkeypatch.setattr(service, "get_keyword_index", lambda: Keyword(["a"]))
 
-    ids, meta = service._run_legs("q")
+    legs = service._run_legs("q")
+    ids, meta = legs.ids, legs.meta
     assert ids == ["a"]
     assert meta.semantic == LegStatus.DISABLED
-    assert meta.notice and "Pinecone" in meta.notice
+    assert meta.notice is None  # disabled is reported in the metadata, not as a shopper notice
 
 
 def test_both_backends_down_reports_reduced_mode(
@@ -97,7 +102,37 @@ def test_both_backends_down_reports_reduced_mode(
     monkeypatch.setattr(service, "get_keyword_index", lambda: Keyword([], fail=True))
     monkeypatch.setattr(service, "get_semantic_index", broken)
 
-    ids, meta = service._run_legs("q")
+    legs = service._run_legs("q")
+    ids, meta = legs.ids, legs.meta
     assert ids == []
     assert meta.keyword == meta.semantic == LegStatus.UNAVAILABLE
     assert meta.notice and "reduced mode" in meta.notice
+
+
+def test_weak_meaning_only_hits_are_cut_relative_to_the_best_one(
+    monkeypatch: pytest.MonkeyPatch, pinecone_on: None
+) -> None:
+    monkeypatch.setattr(get_settings(), "semantic_relative_score", 0.8)
+    standin = PineconeIndexStandIn(
+        scripted_hits=[("tablet", 0.50), ("case", 0.41), ("puppy-pads", 0.31), ("pad", 0.30)]
+    )
+    monkeypatch.setattr(service, "get_keyword_index", lambda: Keyword(["pad"]))
+    monkeypatch.setattr(service, "get_semantic_index", lambda: SemanticIndex(standin, "ns"))
+
+    legs = service._run_legs("ipad")
+
+    # 0.31 < 0.8 x 0.50: dropped. "pad" scored low too, but OpenSearch found it by its words.
+    assert set(legs.ids) == {"tablet", "case", "pad"}
+    assert legs.semantic_ids == {"tablet", "case", "pad"}
+
+
+def test_a_full_keyword_list_is_reported_so_the_total_reads_as_a_lower_bound(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(get_settings(), "pinecone_api_key", None)
+    monkeypatch.setattr(get_settings(), "keyword_top_k", 3)
+    monkeypatch.setattr(service, "get_keyword_index", lambda: Keyword(["a", "b", "c"]))
+    assert service._run_legs("q").keyword_last == "c"
+
+    monkeypatch.setattr(service, "get_keyword_index", lambda: Keyword(["a", "b"]))
+    assert service._run_legs("q").keyword_last is None

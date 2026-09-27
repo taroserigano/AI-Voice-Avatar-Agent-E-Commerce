@@ -61,3 +61,12 @@ def test_bob_gets_404_not_403_for_alices_order(
     resp = bob.get(f"/v1/orders/{alice_order}")
     assert resp.status_code == 404
     assert "Arc" not in resp.text
+
+
+def test_order_without_a_recorded_address_has_none(alice: TestClient, db: Session) -> None:
+    order = _make_order(db, "alice@example.com")
+    detail = alice.get(f"/v1/orders/{order}").json()
+    assert detail["shipping_address"] is None
+    assert [o["item_titles"] for o in alice.get("/v1/orders").json()] == [
+        ["Arc Wireless Over-Ear Headphones"]
+    ]

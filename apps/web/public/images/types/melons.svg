@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Melons">
+  <title>Melons</title>
   <defs>
-    <radialGradient id="t-melons-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-melons-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f6f8f3"/>
       <stop offset="1" stop-color="#e1e9d6"/>
     </radialGradient>
-    <linearGradient id="t-melons-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#628c2c"/>
-      <stop offset="1" stop-color="#4d7c0f"/>
-    </linearGradient>
     <filter id="t-melons-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-melons-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-melons-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><circle cx="300" cy="285" r="62" fill="url(#t-melons-ink)"/><circle cx="345" cy="285" r="62" fill="url(#t-melons-ink)" fill-opacity=".85"/><path d="M322 222c0-24 12-40 34-46" stroke="url(#t-melons-ink)" stroke-width="10" fill="none" stroke-linecap="round"/></g>
-  <rect x="245" y="500" width="150" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Melons</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-melons-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#1f3206" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><g transform="rotate(-12 320 360) translate(0 20)"><path d="M190 300H450A130 130 0 0 1 190 300z" fill="#3f7f22"/><path d="M202 300H438A118 118 0 0 1 202 300z" fill="#e9f9d2"/><path d="M212 300H428A108 108 0 0 1 212 300z" fill="#f25c6a"/><ellipse cx="270" cy="334" rx="5" ry="9" fill="#334155" transform="rotate(20 270 334)"/><ellipse cx="320" cy="352" rx="5" ry="9" fill="#334155" transform="rotate(0 320 352)"/><ellipse cx="370" cy="334" rx="5" ry="9" fill="#334155" transform="rotate(-20 370 334)"/><ellipse cx="296" cy="380" rx="5" ry="9" fill="#334155" transform="rotate(10 296 380)"/><ellipse cx="346" cy="380" rx="5" ry="9" fill="#334155" transform="rotate(-10 346 380)"/></g></g>
 </svg>

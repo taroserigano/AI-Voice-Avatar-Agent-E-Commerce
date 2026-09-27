@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Puffer jacket">
+  <title>Puffer jacket</title>
   <defs>
-    <radialGradient id="t-puffer-jacket-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-puffer-jacket-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fcf3f7"/>
       <stop offset="1" stop-color="#f4d8e3"/>
     </radialGradient>
-    <linearGradient id="t-puffer-jacket-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#c63470"/>
-      <stop offset="1" stop-color="#be185d"/>
-    </linearGradient>
     <filter id="t-puffer-jacket-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-puffer-jacket-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-puffer-jacket-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M262 200l-52 30 22 44 30-14v110h116V260l30 14 22-44-52-30c-8 20-28 32-58 32s-50-12-58-32z" fill="url(#t-puffer-jacket-ink)"/></g>
-  <rect x="192" y="500" width="255" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Puffer jacket</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-puffer-jacket-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#4c0a25" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M262 196L196 228L170 410L220 418L238 300V440H402V300L420 418L470 410L444 228L378 196z" fill="#be185d"/><path d="M238 250H402M238 300H402M238 350H402M238 396H402M180 300l50 4M460 300l-50 4M176 356l52 4M464 356l-52 4" fill="none" stroke="#851141" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><path d="M270 196Q320 168 370 196L360 214Q320 196 280 214z" fill="#851141"/><path d="M320 206V440" fill="none" stroke="#0ea5e9" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g>
 </svg>

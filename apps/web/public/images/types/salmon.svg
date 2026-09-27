@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Salmon">
+  <title>Salmon</title>
   <defs>
-    <radialGradient id="t-salmon-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-salmon-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fcf4f4"/>
       <stop offset="1" stop-color="#f3d8d8"/>
     </radialGradient>
-    <linearGradient id="t-salmon-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#c13737"/>
-      <stop offset="1" stop-color="#b91c1c"/>
-    </linearGradient>
     <filter id="t-salmon-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-salmon-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-salmon-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M220 270c40-60 140-60 180 0-40 60-140 60-180 0z" fill="url(#t-salmon-ink)"/><path d="M400 270l40-40v80z" fill="url(#t-salmon-ink)"/><circle cx="262" cy="262" r="8" fill="#b91c1c"/></g>
-  <rect x="245" y="500" width="150" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Salmon</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-salmon-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#4a0b0b" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><rect x="172" y="400" width="296" height="40" rx="14" fill="#f7e4e4"/><path d="M186 356C214 290 330 270 446 292C466 316 456 380 434 400C330 424 240 410 186 356z" fill="#f7875f"/><path d="M186 356C240 410 330 424 434 400L440 412C330 438 236 424 186 356z" fill="#c9d3db"/><path d="M250 322Q270 352 252 390M300 306Q322 348 302 398M352 298Q374 346 354 402M402 296Q422 342 404 400" fill="none" stroke="#ffd2bf" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><g transform="translate(430 270) rotate(20) scale(1.1)" stroke-width="3.64"><path d="M-18 20C-22-6 0-22 22-22 22 2 6 20-18 20z" fill="#5fae3a"/><path d="M-14 16 10-8" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.7"/></g></g>
 </svg>

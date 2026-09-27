@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Jump rope">
+  <title>Jump rope</title>
   <defs>
-    <radialGradient id="t-jump-rope-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-jump-rope-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fcf6f3"/>
       <stop offset="1" stop-color="#f5dfd6"/>
     </radialGradient>
-    <linearGradient id="t-jump-rope-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#c95829"/>
-      <stop offset="1" stop-color="#c2410c"/>
-    </linearGradient>
     <filter id="t-jump-rope-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-jump-rope-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-jump-rope-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><circle cx="320" cy="270" r="80" fill="none" stroke="url(#t-jump-rope-ink)" stroke-width="16"/><path d="M240 270h160M320 190c-40 50-40 110 0 160M320 190c40 50 40 110 0 160" stroke="url(#t-jump-rope-ink)" stroke-width="10" fill="none"/></g>
-  <rect x="222" y="500" width="195" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Jump rope</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-jump-rope-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#4e1a05" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M236 250Q200 460 320 440Q440 460 404 250" fill="none" stroke="#10b981" stroke-width="8" stroke-opacity="1"/><g transform="translate(236 240) rotate(-10)"><rect x="-14" y="-70" width="28" height="90" rx="14" fill="#c2410c"/><rect x="-10" y="20" width="20" height="14" rx="4" fill="#334155"/></g><g transform="translate(404 240) rotate(10)"><rect x="-14" y="-70" width="28" height="90" rx="14" fill="#c2410c"/><rect x="-10" y="20" width="20" height="14" rx="4" fill="#334155"/></g></g>
 </svg>

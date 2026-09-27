@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Pretzels">
+  <title>Pretzels</title>
   <defs>
-    <radialGradient id="t-pretzels-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-pretzels-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fcf6f3"/>
       <stop offset="1" stop-color="#f5dfd6"/>
     </radialGradient>
-    <linearGradient id="t-pretzels-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#c95829"/>
-      <stop offset="1" stop-color="#c2410c"/>
-    </linearGradient>
     <filter id="t-pretzels-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-pretzels-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-pretzels-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M250 200h140l-12 30 12 30-12 30 12 30-12 30 12 30H250l12-30-12-30 12-30-12-30 12-30z" fill="url(#t-pretzels-ink)"/></g>
-  <rect x="230" y="500" width="180" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Pretzels</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-pretzels-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#4e1a05" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M262 408C196 380 200 280 262 268C318 258 344 336 320 380C296 336 322 258 378 268C440 280 444 380 378 408M262 408L372 318M378 408L268 318" fill="none" stroke="#8a4a22" stroke-width="34" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><path d="M262 408C196 380 200 280 262 268C318 258 344 336 320 380C296 336 322 258 378 268C440 280 444 380 378 408M262 408L372 318M378 408L268 318" fill="none" stroke="#b8692f" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><rect x="230" y="320" width="8" height="4" rx="2" fill="#ffffff" stroke="none"/><rect x="260" y="282" width="8" height="4" rx="2" fill="#ffffff" stroke="none"/><rect x="380" y="282" width="8" height="4" rx="2" fill="#ffffff" stroke="none"/><rect x="410" y="330" width="8" height="4" rx="2" fill="#ffffff" stroke="none"/><rect x="300" y="350" width="8" height="4" rx="2" fill="#ffffff" stroke="none"/><rect x="338" y="350" width="8" height="4" rx="2" fill="#ffffff" stroke="none"/><rect x="270" y="396" width="8" height="4" rx="2" fill="#ffffff" stroke="none"/><rect x="366" y="396" width="8" height="4" rx="2" fill="#ffffff" stroke="none"/></g>
 </svg>

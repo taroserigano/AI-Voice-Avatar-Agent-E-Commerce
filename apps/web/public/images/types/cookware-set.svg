@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Cookware set">
+  <title>Cookware set</title>
   <defs>
-    <radialGradient id="t-cookware-set-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-cookware-set-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fbf6f3"/>
       <stop offset="1" stop-color="#f2e2d5"/>
     </radialGradient>
-    <linearGradient id="t-cookware-set-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#bd6827"/>
-      <stop offset="1" stop-color="#b45309"/>
-    </linearGradient>
     <filter id="t-cookware-set-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-cookware-set-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-cookware-set-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M250 230h140v70a50 50 0 0 1-50 50h-40a50 50 0 0 1-50-50z" fill="url(#t-cookware-set-ink)"/><path d="M390 250h22a22 22 0 0 1 0 44h-22" fill="none" stroke="url(#t-cookware-set-ink)" stroke-width="14"/></g>
-  <rect x="200" y="500" width="240" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Cookware set</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-cookware-set-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#482104" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><rect x="180" y="300" width="40" height="22" rx="10" fill="#334155"/><rect x="420" y="300" width="40" height="22" rx="10" fill="#334155"/><rect x="204" y="290" width="232" height="150" rx="20" fill="#b45309"/><rect x="204" y="290" width="232" height="20" fill="#7e3a06"/><path d="M196 290Q320 220 444 290z" fill="#d6a078"/><rect x="300" y="238" width="40" height="22" rx="10" fill="#334155"/><path d="M222 324V420" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.35"/></g>
 </svg>

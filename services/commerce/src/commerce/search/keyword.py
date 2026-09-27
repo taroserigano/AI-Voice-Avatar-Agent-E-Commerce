@@ -31,6 +31,14 @@ SYNONYMS = [
     "cilantro, coriander",
 ]
 
+# Typo tolerance, applied at search time (no reindex). OpenSearch's plain "AUTO" allows one
+# edit from 3 letters, so "ipad" matched "pad" (Puppy Training Pads, Pad Thai) and "milk"
+# matched "mild". Words under 5 letters must be spelled right; 5-7 letters may be one edit
+# off ("bananna", "yoghurt", "lactos"), longer words two. The first letter must match. The
+# re-ranker (search.ranking.close_spelling) uses the same rule.
+FUZZINESS = "AUTO:5,8"
+FUZZY_PREFIX_LENGTH = 1
+
 # English analysis like the built-in "english" analyzer, plus shop synonyms when searching.
 _EN = {"type": "text", "analyzer": "shop", "search_analyzer": "shop_search"}
 
@@ -155,7 +163,8 @@ class KeywordIndex:
                                     "description",
                                 ],
                                 "type": "best_fields",
-                                "fuzziness": "AUTO",
+                                "fuzziness": FUZZINESS,
+                                "prefix_length": FUZZY_PREFIX_LENGTH,
                                 # 1-2 terms: all must match; more: at least 75% must.
                                 "minimum_should_match": "2<75%",
                                 "boost": 3,

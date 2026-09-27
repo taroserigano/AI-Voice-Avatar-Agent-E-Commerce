@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Soil">
+  <title>Soil</title>
   <defs>
-    <radialGradient id="t-soil-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-soil-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f3f9f5"/>
       <stop offset="1" stop-color="#d7e9de"/>
     </radialGradient>
-    <linearGradient id="t-soil-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#318f54"/>
-      <stop offset="1" stop-color="#15803d"/>
-    </linearGradient>
     <filter id="t-soil-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-soil-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-soil-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M320 180l110 170H210z" fill="url(#t-soil-ink)"/><path d="M320 260l40 90h-80z" fill-opacity=".25" fill="#000"/></g>
-  <rect x="260" y="500" width="120" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Soil</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-soil-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#083318" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M226.0 208H414.0L428.0 418Q430.0 440 408.0 440H232.0Q210.0 440 212.0 418z" fill="#5b3a24"/><rect x="224" y="180" width="192" height="36" rx="6" fill="#4d311f"/><path d="M234.0 206H406.0" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.7" stroke-dasharray="8 8"/><rect x="218" y="262" width="204" height="112" fill="#15803d"/><g stroke="none"><g transform="translate(320 318) scale(1.9)" stroke-width="2.11"><path d="M-18 20C-22-6 0-22 22-22 22 2 6 20-18 20z" fill="#a3d97a"/><path d="M-14 16 10-8" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.7"/></g></g><path d="M234.0 236L228.0 408" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.4"/></g>
 </svg>

@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Keyboard">
+  <title>Keyboard</title>
   <defs>
-    <radialGradient id="t-keyboard-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-keyboard-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f4f7fe"/>
       <stop offset="1" stop-color="#dae4fc"/>
     </radialGradient>
-    <linearGradient id="t-keyboard-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#3f76ed"/>
-      <stop offset="1" stop-color="#2563eb"/>
-    </linearGradient>
     <filter id="t-keyboard-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-keyboard-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-keyboard-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M250 270a70 70 0 0 1 140 0" fill="none" stroke="url(#t-keyboard-ink)" stroke-width="18" stroke-linecap="round"/><rect x="228" y="262" width="36" height="64" rx="14" fill="url(#t-keyboard-ink)"/><rect x="376" y="262" width="36" height="64" rx="14" fill="url(#t-keyboard-ink)"/></g>
-  <rect x="230" y="500" width="180" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Keyboard</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-keyboard-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#0f285e" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M160 300H480L470 430H170z" fill="#334155"/><rect x="196" y="318" width="28" height="24" rx="5" fill="#ffffff"/><rect x="232" y="318" width="28" height="24" rx="5" fill="#ffffff"/><rect x="268" y="318" width="28" height="24" rx="5" fill="#ffffff"/><rect x="304" y="318" width="28" height="24" rx="5" fill="#ffffff"/><rect x="340" y="318" width="28" height="24" rx="5" fill="#ffffff"/><rect x="376" y="318" width="28" height="24" rx="5" fill="#ffffff"/><rect x="412" y="318" width="28" height="24" rx="5" fill="#ffffff"/><rect x="206" y="350" width="28" height="24" rx="5" fill="#ffffff"/><rect x="242" y="350" width="28" height="24" rx="5" fill="#ffffff"/><rect x="278" y="350" width="28" height="24" rx="5" fill="#ffffff"/><rect x="314" y="350" width="28" height="24" rx="5" fill="#ffffff"/><rect x="350" y="350" width="28" height="24" rx="5" fill="#ffffff"/><rect x="386" y="350" width="28" height="24" rx="5" fill="#ffffff"/><rect x="422" y="350" width="28" height="24" rx="5" fill="#ffffff"/><rect x="196" y="382" width="28" height="24" rx="5" fill="#ffffff"/><rect x="232" y="382" width="28" height="24" rx="5" fill="#ffffff"/><rect x="268" y="382" width="28" height="24" rx="5" fill="#ffffff"/><rect x="304" y="382" width="28" height="24" rx="5" fill="#ffffff"/><rect x="340" y="382" width="28" height="24" rx="5" fill="#ffffff"/><rect x="376" y="382" width="28" height="24" rx="5" fill="#ffffff"/><rect x="412" y="382" width="28" height="24" rx="5" fill="#ffffff"/><rect x="250" y="402" width="140" height="20" rx="5" fill="#ffffff"/><path d="M170 430H470" fill="none" stroke="#2563eb" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g>
 </svg>

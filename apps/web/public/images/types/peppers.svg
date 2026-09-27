@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Peppers">
+  <title>Peppers</title>
   <defs>
-    <radialGradient id="t-peppers-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-peppers-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f6f8f3"/>
       <stop offset="1" stop-color="#e1e9d6"/>
     </radialGradient>
-    <linearGradient id="t-peppers-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#628c2c"/>
-      <stop offset="1" stop-color="#4d7c0f"/>
-    </linearGradient>
     <filter id="t-peppers-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-peppers-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-peppers-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><circle cx="300" cy="285" r="62" fill="url(#t-peppers-ink)"/><circle cx="345" cy="285" r="62" fill="url(#t-peppers-ink)" fill-opacity=".85"/><path d="M322 222c0-24 12-40 34-46" stroke="url(#t-peppers-ink)" stroke-width="10" fill="none" stroke-linecap="round"/></g>
-  <rect x="238" y="500" width="165" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Peppers</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-peppers-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#1f3206" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><g transform="translate(392 370) scale(0.72)" stroke-width="5.56"><path d="M0-78C40-96 100-78 106-10C112 60 72 100 38 96C24 94 16 88 0 88C-16 88-24 94-38 96C-72 100-112 60-106-10C-100-78-40-96 0-78z" fill="#f9c846"/><path d="M-2-70V80" fill="none" stroke="#c7a038" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.5"/><ellipse cx="-50" cy="-30" rx="12" ry="26" fill="#ffffff" fill-opacity="0.3"/><ellipse cx="0" cy="-78" rx="34" ry="10" fill="#5fae3a"/><path d="M-8-76C-10-110 10-124 30-126L32-112C18-108 12-96 12-76z" fill="#3f7f22"/></g><g transform="translate(300 344)"><path d="M0-78C40-96 100-78 106-10C112 60 72 100 38 96C24 94 16 88 0 88C-16 88-24 94-38 96C-72 100-112 60-106-10C-100-78-40-96 0-78z" fill="#e5484d"/><path d="M-2-70V80" fill="none" stroke="#b73a3e" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.5"/><ellipse cx="-50" cy="-30" rx="12" ry="26" fill="#ffffff" fill-opacity="0.3"/><ellipse cx="0" cy="-78" rx="34" ry="10" fill="#5fae3a"/><path d="M-8-76C-10-110 10-124 30-126L32-112C18-108 12-96 12-76z" fill="#3f7f22"/></g></g>
 </svg>
