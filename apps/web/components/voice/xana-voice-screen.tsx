@@ -1,0 +1,292 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { MicIcon, SparklesIcon, XIcon } from "@/components/icons";
+import { cn } from "@/lib/cn";
+import { confirmQuote } from "@/lib/returns-confirm";
+import { useVoiceAgent } from "@/lib/use-voice-agent";
+import { captionFor, dollars } from "@/lib/voice-captions";
+import type { QuoteCard } from "@/lib/voice-protocol";
+import { XanaOrb } from "./xana-orb";
+
+/**
+ * The Xana voice screen: a full-screen, voice-first conversation for orders, returns, and
+ * refunds. Separate from the chat. Everything Xana says is streamed as audio with captions
+ * that follow her voice word by word; the customer's words appear live as they speak.
+ *
+ * A return is only ever confirmed by the customer: by the button, or by a clear spoken yes
+ * that the server checks with a strict rule after the read-back played in full. The browser
+ * then confirms with the store itself (the model never can).
+ */
+
+const STATUS = {
+  off: { title: "Tap to talk", hint: "Ask about an order, a return, or a refund." },
+  connecting: { title: "Connecting", hint: "Getting Xana on the line…" },
+  listening: { title: "Listening", hint: "Speak naturally. Xana answers when you pause." },
+  hearing: { title: "Listening", hint: "Go on, Xana's listening." },
+  thinking: { title: "Thinking", hint: "One moment…" },
+  speaking: { title: "Speaking", hint: "Talk anytime to interrupt." },
+  error: { title: "Voice is off", hint: "Something went wrong." },
+} satisfies Record<string, { title: string; hint: string }>;
+
+export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstName: string; closeHref?: string }) {
+  const voice = useVoiceAgent();
+  const { state, quote, confirmDecision, quoteOutcome } = voice;
+  const [confirming, setConfirming] = useState(false);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
+  const handled = useRef<string | null>(null);
+
+  // A clear spoken yes (checked by the server's rule, never the model) confirms like the button.
+  useEffect(() => {
+    if (!quote || !confirmDecision || handled.current === `${quote.quote_id}:${confirmDecision}`) return;
+    handled.current = `${quote.quote_id}:${confirmDecision}`;
+    if (confirmDecision === "yes") void onConfirm(quote);
+    else if (confirmDecision === "no") quoteOutcome(quote.quote_id, "declined");
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per decision
+  }, [quote, confirmDecision]);
+
+  async function onConfirm(q: QuoteCard) {
+    setConfirming(true);
+    setConfirmError(null);
+    try {
+      // The browser confirms with the store itself; Xana only hears the outcome, then checks it.
+      const result = await confirmQuote(q.quote_id);
+      if (result.ok) quoteOutcome(q.quote_id, "confirmed");
+      else setConfirmError(result.message);
+    } finally {
+      setConfirming(false);
+    }
+  }
+
+  const status = STATUS[state];
+  const hint = state === "thinking" && voice.toolLabel ? voice.toolLabel : status.hint;
+  const caption = captionFor(voice.segments);
+  const level = state === "speaking" ? voice.speechLevel : voice.micLevel;
+  const live = state !== "off" && state !== "error";
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-voice-night text-white focus-inverse">
+      {/* Header */}
+      <header className="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-10">
+        <div className="flex items-center gap-3">
+          <span className="grid size-11 place-items-center rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 shadow-[0_8px_24px_-8px_rgb(103_64_222/0.9)] sm:size-12">
+            <SparklesIcon className="size-6 text-white" />
+          </span>
+          <div className="leading-tight">
+            <p className="font-display text-lg font-extrabold tracking-[0.2em]">XANA</p>
+            <p className="text-sm text-neutral-300">Your AI voice assistant</p>
+          </div>
+        </div>
+        <Link
+          href={closeHref}
+          onClick={() => voice.stop()}
+          className="grid size-11 place-items-center rounded-2xl border border-white/15 bg-white/5 text-white transition hover:bg-white/10 sm:size-12"
+          aria-label="Close voice assistant"
+        >
+          <XIcon className="size-6" />
+        </Link>
+      </header>
+
+      {/* Stage */}
+      <main id="main" className="flex flex-1 flex-col items-center overflow-y-auto px-4 pb-6 pt-8 text-center sm:pt-12">
+        <p className="text-xs font-bold uppercase tracking-[0.32em] text-brand-200 sm:text-sm">
+          Orders &amp; returns, in conversation
+        </p>
+        <h1 className="mt-3 font-display text-5xl font-extrabold tracking-[-0.04em] sm:text-7xl">Meet Xana</h1>
+
+        <button
+          type="button"
+          onClick={() => {
+            if (!live) void voice.start();
+            else if (state === "speaking") voice.interrupt();
+          }}
+          className="mt-6 rounded-full sm:mt-8"
+          aria-label={!live ? "Start talking to Xana" : state === "speaking" ? "Interrupt Xana" : "Xana is listening"}
+        >
+          <XanaOrb state={state} level={level} />
+        </button>
+
+        <div aria-live="polite" className="mt-2 min-h-24">
+          <p className="font-display text-3xl font-bold tracking-tight">
+            {status.title}
+            {state === "thinking" ? <ThinkingDots /> : null}
+          </p>
+          <p className="mt-3 text-base text-neutral-300 sm:text-lg">
+            {state === "error" && voice.error ? voice.error : hint}
+          </p>
+        </div>
+
+        {/* Live transcript: the customer's words as they speak, then Xana's as she says them. */}
+        <div className="mt-4 w-full max-w-2xl space-y-3 text-lg leading-relaxed sm:text-xl">
+          {voice.userText ? (
+            <p className={cn("text-neutral-300", !voice.userFinal && "italic")}>
+              <span className="sr-only">You said: </span>“{voice.userText}”
+            </p>
+          ) : live ? (
+            <p className="text-neutral-400">Your words will appear here as you speak…</p>
+          ) : null}
+          {caption ? (
+            <p className="font-medium text-white" aria-live="off">
+              <span className="sr-only">Xana: </span>
+              {caption}
+            </p>
+          ) : null}
+          {voice.citations.length ? (
+            <p className="text-sm text-brand-200">
+              From{" "}
+              {voice.citations.map((c, i) => (
+                <span key={c.cite}>
+                  {i ? ", " : ""}
+                  {c.title}
+                  {c.section ? ` §${c.section}` : ""}
+                </span>
+              ))}
+            </p>
+          ) : null}
+        </div>
+
+        {quote ? (
+          <QuotePanel
+            quote={quote}
+            error={confirmError}
+            busy={confirming}
+            unclear={confirmDecision === "unclear"}
+            onConfirm={() => void onConfirm(quote)}
+            onDecline={() => quoteOutcome(quote.quote_id, "declined")}
+          />
+        ) : null}
+
+        {voice.error && state !== "error" ? (
+          <p role="alert" className="mt-4 text-sm text-danger-200">
+            {voice.error}
+          </p>
+        ) : null}
+      </main>
+
+      {/* Controls */}
+      <footer className="border-t border-white/10 px-4 pb-4 pt-5 text-center">
+        {live ? (
+          <button
+            type="button"
+            onClick={() => voice.setMuted(!voice.muted)}
+            aria-pressed={voice.muted}
+            className={cn(
+              "inline-flex min-w-40 items-center justify-center gap-2 rounded-2xl border px-6 py-3.5 text-lg font-medium transition",
+              voice.muted
+                ? "border-accent-300/60 bg-accent-400/15 text-accent-200"
+                : "border-white/15 bg-white/5 hover:bg-white/10",
+            )}
+          >
+            <MicIcon className="size-6" />
+            {voice.muted ? "Unmute" : "Mute"}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => void voice.start()}
+            className="inline-flex min-w-40 items-center justify-center gap-2 rounded-2xl bg-brand-600 px-6 py-3.5 text-lg font-semibold transition hover:bg-brand-500"
+          >
+            <MicIcon className="size-6" />
+            {state === "error" ? "Try again" : "Start talking"}
+          </button>
+        )}
+        <p className="mt-4 text-xs text-neutral-400 sm:text-sm">
+          AI can make mistakes. Check important details on your order page.
+          {voice.ready?.llm.simulated ? " Simulated answers (no AI model connected)." : ""}
+        </p>
+        {process.env.NODE_ENV === "development" && voice.metrics?.first_audio_ms !== undefined ? (
+          <p className="mt-1 font-mono text-[0.6875rem] text-neutral-500">
+            first audio {Math.round(voice.metrics.first_audio_ms)} ms
+            {voice.metrics.stt_ms !== undefined ? ` · transcript ${Math.round(voice.metrics.stt_ms)} ms` : ""}
+            {voice.metrics.llm_first_token_ms !== undefined
+              ? ` · first token ${Math.round(voice.metrics.llm_first_token_ms)} ms`
+              : ""}
+            {voice.metrics.filler ? " · filler" : ""}
+          </p>
+        ) : null}
+        <span className="sr-only">Signed in as {firstName}.</span>
+      </footer>
+    </div>
+  );
+}
+
+function ThinkingDots() {
+  return (
+    <span aria-hidden className="ml-1 inline-flex gap-1 align-middle">
+      {[0, 180, 360].map((d) => (
+        <span
+          key={d}
+          className="size-1.5 rounded-full bg-white animate-[voice-think_1.1s_ease-in-out_infinite]"
+          style={{ animationDelay: `${d}ms` }}
+        />
+      ))}
+    </span>
+  );
+}
+
+function QuotePanel({
+  quote,
+  error,
+  busy,
+  unclear,
+  onConfirm,
+  onDecline,
+}: {
+  quote: QuoteCard;
+  error: string | null;
+  busy: boolean;
+  unclear: boolean;
+  onConfirm: () => void;
+  onDecline: () => void;
+}) {
+  return (
+    <section
+      aria-label="Return quote"
+      className="mt-6 w-full max-w-md rounded-3xl border border-white/15 bg-white/[0.06] p-5 text-left backdrop-blur"
+    >
+      <h2 className="font-display text-xl font-bold">Confirm your return</h2>
+      <ul className="mt-3 space-y-1.5 text-neutral-200">
+        {(quote.lines ?? []).map((ln, i) => (
+          <li key={i} className="flex justify-between gap-4">
+            <span>
+              {ln.quantity} × {ln.title}
+            </span>
+            <span className="tabular-nums">{dollars(ln.refund_minor)}</span>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-3 flex justify-between border-t border-white/10 pt-3 font-semibold">
+        <span>Refund{quote.refund_destination ? ` to ${String(quote.refund_destination)}` : ""}</span>
+        <span className="tabular-nums">{dollars(quote.total_refund_minor)}</span>
+      </p>
+      {error ? (
+        <p role="alert" className="mt-3 text-sm text-danger-200">
+          {error}
+        </p>
+      ) : unclear ? (
+        <p className="mt-3 text-sm text-accent-200">I need a clear yes. Say “yes, confirm”, or tap Confirm.</p>
+      ) : (
+        <p className="mt-3 text-sm text-neutral-300">Say “yes, confirm” or tap Confirm. Nothing is returned until you do.</p>
+      )}
+      <div className="mt-4 flex gap-3">
+        <button
+          type="button"
+          disabled={busy}
+          onClick={onConfirm}
+          className="flex-1 rounded-2xl bg-brand-600 px-4 py-3 font-semibold transition hover:bg-brand-500 disabled:opacity-60"
+        >
+          {busy ? "Confirming…" : "Confirm return"}
+        </button>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={onDecline}
+          className="rounded-2xl border border-white/15 px-4 py-3 font-medium transition hover:bg-white/10 disabled:opacity-60"
+        >
+          Not now
+        </button>
+      </div>
+    </section>
+  );
+}

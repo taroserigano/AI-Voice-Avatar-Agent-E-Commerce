@@ -25,3 +25,6 @@ next-env.d.ts
 test-results/
 playwright-report/
 evals/results/
+
+# Xana voice: pre-rendered filler audio (rebuildable)
+services/voice/.cache/
