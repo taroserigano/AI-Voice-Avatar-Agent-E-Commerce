@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Card game">
+  <title>Card game</title>
   <defs>
-    <radialGradient id="t-card-game-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-card-game-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f8f5fe"/>
       <stop offset="1" stop-color="#e9defc"/>
     </radialGradient>
-    <linearGradient id="t-card-game-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#8c52ef"/>
-      <stop offset="1" stop-color="#7c3aed"/>
-    </linearGradient>
     <filter id="t-card-game-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-card-game-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-card-game-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><rect x="240" y="210" width="70" height="70" rx="10" fill="url(#t-card-game-ink)"/><rect x="330" y="210" width="70" height="70" rx="10" fill="url(#t-card-game-ink)" fill-opacity=".8"/><rect x="285" y="290" width="70" height="70" rx="10" fill="url(#t-card-game-ink)" fill-opacity=".9"/></g>
-  <rect x="222" y="500" width="195" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Card game</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-card-game-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#32175f" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><g transform="translate(270 330) rotate(-16)"><rect x="-60" y="-90" width="120" height="180" rx="12" fill="#ffffff"/><rect x="-48" y="-78" width="96" height="156" rx="8" fill="#7c3aed"/></g><g transform="translate(370 330) rotate(16)"><rect x="-60" y="-90" width="120" height="180" rx="12" fill="#ffffff"/><rect x="-48" y="-78" width="96" height="156" rx="8" fill="#7c3aed"/></g><g transform="translate(320 320)"><rect x="-60" y="-90" width="120" height="180" rx="12" fill="#ffffff"/><g stroke="none"><g transform="translate(0 0) scale(1.8)" stroke-width="2.22"><path d="M0 20C-26 2-22-20-8-20c4 0 7 2 8 6 1-4 4-6 8-6 14 0 18 22-8 40z" fill="#e5484d"/></g></g></g></g>
 </svg>

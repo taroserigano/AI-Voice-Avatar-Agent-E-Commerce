@@ -40,3 +40,13 @@ class CartOut(ApiModel):
         "tax is calculated at payment."
     )
     warnings: list[str] = Field(default_factory=list)
+    shipping_minor: int = Field(
+        default=0, description="Standard shipping for this subtotal: $5.99, free at the threshold"
+    )
+    free_shipping_threshold_minor: int = 0
+    free_shipping_remaining_minor: int = Field(
+        default=0, description="How much more for free shipping; 0 when it already applies"
+    )
+    estimated_total_minor: int = Field(
+        default=0, description="Subtotal plus shipping, before tax (tax is calculated at payment)"
+    )

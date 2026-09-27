@@ -1,29 +1,23 @@
-import { ChevronRightIcon, DepartmentIcon, InfoIcon, LockIcon, ReturnIcon, type Icon } from "@/components/icons";
+import { ChevronRightIcon, DepartmentIcon, InfoIcon, ReturnIcon, type Icon } from "@/components/icons";
+import { DeliveryInfo } from "@/components/product/delivery-info";
 import { ProductReviews } from "@/components/reviews/product-reviews";
 import { ProductGrid, TagBadges } from "@/components/shop/product-card";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Stars } from "@/components/ui/stars";
 import { WebVitalsReporter } from "@/components/web-vitals";
-import { redirectToSignIn, serverApi, unwrap } from "@/lib/api-server";
+import { redirectToSignIn, serverApi } from "@/lib/api-server";
 import { cn } from "@/lib/cn";
-import type { CategoryOut, ProductDetail, ReviewPage } from "@ai-commerce/contracts";
+import type { CategoryOut, ProductDetail, ProductSummary, ReviewPage } from "@ai-commerce/contracts";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { cache, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { AddToCart } from "./add-to-cart";
+import { loadProduct, UUID_RE } from "./load-product";
 import { ProductFacts } from "./product-facts";
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-// Deduped per request: generateMetadata and the page share one product read.
-const load = cache(async (id: string) => {
-  if (!UUID_RE.test(id)) notFound();
-  const api = await serverApi();
-  const result = await api.GET("/v1/products/{product_id}", { params: { path: { product_id: id } } });
-  if (result.response.status === 404) notFound();
-  return unwrap(result);
-});
+// The layout already gated the route on this read (a real 404 for unknown ids); it's deduped per
+// request, so generateMetadata and the page reuse it.
+const load = loadProduct;
 
 /** First page of reviews for a fast first paint. A failure here shouldn't take down the page. */
 async function loadReviews(id: string): Promise<ReviewPage | undefined> {
@@ -36,13 +30,52 @@ async function loadReviews(id: string): Promise<ReviewPage | undefined> {
   return result.data;
 }
 
-/** A few other products from the same department (optional; empty on failure). */
-async function loadRelated(product: ProductDetail) {
+/** "usb-c-charger" -> "Usb c charger": a last resort when the API has no label. */
+function humanize(slug: string) {
+  const words = slug.replace(/-/g, " ");
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+/** "USB-C charger" -> "USB-C chargers", "Headphones" -> "headphones", "TV" -> "TVs". */
+function pluralType(label: string): string {
+  const [firstWord = ""] = label.split(" ");
+  // Keep acronyms ("TV", "USB-C", "SSD") as written; lowercase ordinary words mid-sentence.
+  const cased = /[A-Z].*[A-Z]/.test(firstWord) ? label : label.charAt(0).toLowerCase() + label.slice(1);
+  if (/s$/i.test(cased)) return cased;
+  if (/(x|ch|sh)$/i.test(cased)) return `${cased}es`;
+  if (/[^aeiou]y$/i.test(cased)) return `${cased.slice(0, -1)}ies`;
+  return `${cased}s`;
+}
+
+type Related = { typeLabel: string; similar: ProductSummary[]; fromBrand: ProductSummary[] };
+
+/**
+ * "Similar <type>" (same product type in this department, featured order) and "More from
+ * <brand>". Optional: empty on failure. Also resolves the shopper-facing type label.
+ */
+async function loadRelated(product: ProductDetail): Promise<Related> {
   const api = await serverApi();
-  const result = await api.GET("/v1/products", {
-    params: { query: { category: product.category.slug, page_size: 5 } },
-  });
-  return (result.data?.items ?? []).filter((p) => p.id !== product.id).slice(0, 4);
+  const [sameType, sameBrand] = await Promise.all([
+    api
+      .GET("/v1/products", {
+        params: { query: { category: product.category.slug, product_type: [product.product_type], page_size: 5 } },
+      })
+      .then((r) => r.data)
+      .catch(() => undefined),
+    api
+      .GET("/v1/products", { params: { query: { brand: [product.brand], page_size: 9 } } })
+      .then((r) => r.data)
+      .catch(() => undefined),
+  ]);
+  const similar = (sameType?.items ?? []).filter((p) => p.id !== product.id).slice(0, 4);
+  const shown = new Set([product.id, ...similar.map((p) => p.id)]);
+  const fromBrand = (sameBrand?.items ?? []).filter((p) => !shown.has(p.id)).slice(0, 4);
+  const typeLabel =
+    product.type_label ||
+    sameType?.items.find((p) => p.type_label)?.type_label ||
+    sameType?.facets.product_types.find((f) => f.value === product.product_type)?.label ||
+    humanize(product.product_type);
+  return { typeLabel, similar, fromBrand };
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
@@ -51,21 +84,28 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 }
 
 // Keep the policy meaning exactly as before; only the presentation changed.
-function returnPolicy(category: CategoryOut): { title: string; detail: string; tone: "final" | "ok" } {
+// `section` is the matching part of the return policy (/returns-policy#…).
+function returnPolicy(category: CategoryOut): { title: string; detail: string; tone: "final" | "ok"; section: string } {
   if (category.policy_class === "final_sale") {
-    return { title: "Final sale", detail: "This item can't be returned.", tone: "final" };
+    return { title: "Final sale", detail: "This item can't be returned.", tone: "final", section: "rr-3-1" };
   }
   if (category.policy_class === "inspection") {
-    return { title: "30-day returns", detail: "Returnable within 30 days of delivery; refunded after inspection.", tone: "ok" };
+    return {
+      title: "30-day returns",
+      detail: "Returnable within 30 days of delivery; refunded after inspection.",
+      tone: "ok",
+      section: "rr-11-3",
+    };
   }
   if (category.policy_class === "perishable") {
     return {
       title: "Freshness guarantee",
       detail: "Fresh food isn't sent back. If it arrives damaged or spoiled, tell us within 7 days of delivery for a refund.",
       tone: "ok",
+      section: "rr-2-2",
     };
   }
-  return { title: "30-day returns", detail: "Returnable within 30 days of delivery.", tone: "ok" };
+  return { title: "30-day returns", detail: "Returnable within 30 days of delivery. Return shipping is free.", tone: "ok", section: "rr-2-1" };
 }
 
 function TrustItem({ icon: IconCmp, title, children, className }: { icon: Icon; title: string; children: ReactNode; className?: string }) {
@@ -113,34 +153,46 @@ function RatingLink({ average, count }: { average: number | null; count: number 
   );
 }
 
+const crumbLink =
+  "inline-flex min-h-11 items-center rounded-md hover:text-ink hover:underline hover:underline-offset-4 sm:min-h-8";
+
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [product, reviews] = await Promise.all([load(id), loadReviews(id)]);
-  const related = await loadRelated(product);
+  const productP = load(id);
+  // Related products need the product, but not the reviews: fetch them alongside the reviews.
+  const [product, reviews, related] = await Promise.all([productP, loadReviews(id), productP.then(loadRelated)]);
   const policy = returnPolicy(product.category);
+  const typeHref = `/c/${product.category.slug}?product_type=${encodeURIComponent(product.product_type)}`;
+  const brandHref = `/search?brand=${encodeURIComponent(product.brand)}`;
+  const similarTitle = `Similar ${pluralType(related.typeLabel)}`;
+  const brandTitle = `More from ${product.brand}`;
 
   return (
-    <div className="pb-8 pt-2 sm:pt-4">
+    // Room at the bottom on phones for the sticky Add to cart bar.
+    <div className="pb-28 pt-2 sm:pt-4 lg:pb-8">
       <WebVitalsReporter route="product" />
 
       <nav aria-label="Breadcrumb">
         <ol className="flex items-center gap-x-1.5 text-sm text-muted">
           <li className="flex shrink-0 items-center gap-1.5">
-            <Link href="/" className="inline-flex min-h-11 items-center rounded-md hover:text-ink hover:underline hover:underline-offset-4 sm:min-h-8">
+            <Link href="/" className={crumbLink}>
               Home
             </Link>
             <ChevronRightIcon className="size-3.5 text-subtle" />
           </li>
-          <li className="flex shrink-0 items-center gap-1.5">
-            <Link
-              href={`/c/${product.category.slug}`}
-              className="inline-flex min-h-11 items-center rounded-md hover:text-ink hover:underline hover:underline-offset-4 sm:min-h-8"
-            >
+          <li className="flex min-w-0 shrink items-center gap-1.5">
+            <Link href={`/c/${product.category.slug}`} className={cn(crumbLink, "truncate")}>
               {product.category.name}
             </Link>
-            <ChevronRightIcon className="size-3.5 text-subtle" />
+            <ChevronRightIcon className="size-3.5 shrink-0 text-subtle" />
           </li>
-          <li aria-current="page" className="min-w-0 truncate font-medium text-ink">
+          <li className="flex min-w-0 shrink items-center gap-1.5">
+            <Link href={typeHref} className={cn(crumbLink, "truncate")}>
+              {related.typeLabel}
+            </Link>
+            <ChevronRightIcon className="size-3.5 shrink-0 text-subtle max-sm:hidden" />
+          </li>
+          <li aria-current="page" className="min-w-0 truncate font-medium text-ink max-sm:sr-only">
             {product.title}
           </li>
         </ol>
@@ -169,27 +221,41 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         {/* Buy box: sticky beside the gallery on large screens */}
         <div className="lg:col-span-5 lg:row-span-2">
           <div className="lg:sticky lg:top-36">
-            <p className="text-xs font-semibold uppercase tracking-eyebrow text-brand-700">{product.brand}</p>
-            <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">{product.title}</h1>
+            <Link
+              href={brandHref}
+              className="inline-flex min-h-6 items-center text-xs font-semibold uppercase tracking-eyebrow text-brand-700 hover:text-brand-900 hover:underline hover:underline-offset-4"
+            >
+              <span className="sr-only">Shop more from </span>
+              {product.brand}
+            </Link>
+            <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">{product.title}</h1>
             <div className="mt-2">
               <RatingLink average={product.rating_average} count={product.rating_count} />
             </div>
-            <TagBadges tags={product.tags} className="mt-3" />
+            <TagBadges
+              tags={product.tags}
+              className="mt-3 gap-1.5"
+              hrefFor={(t) => `/c/${product.category.slug}?tag=${encodeURIComponent(t.value)}`}
+            />
 
             <div className="mt-5 rounded-3xl border border-line bg-raised p-5 shadow-sm sm:p-7">
               <AddToCart
                 product={product}
                 trust={
                   <ul className="mt-6 divide-y divide-line border-t border-line pt-5">
+                    <DeliveryInfo />
                     <TrustItem
                       icon={ReturnIcon}
                       title={policy.title}
                       className={policy.tone === "final" ? "bg-danger-50 text-danger-700" : undefined}
                     >
-                      <span className={policy.tone === "final" ? "font-medium text-danger-700" : undefined}>{policy.detail}</span>
-                    </TrustItem>
-                    <TrustItem icon={LockIcon} title="Secure checkout">
-                      Checkout is handled by Stripe. Larkspur never stores your card number.
+                      <span className={policy.tone === "final" ? "font-medium text-danger-700" : undefined}>{policy.detail}</span>{" "}
+                      <Link
+                        href={`/returns-policy#${policy.section}`}
+                        className="whitespace-nowrap font-medium text-brand-700 underline decoration-brand-300 underline-offset-4 hover:decoration-brand-700"
+                      >
+                        Return policy
+                      </Link>
                     </TrustItem>
                   </ul>
                 }
@@ -197,7 +263,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             </div>
             <p className="mt-4 flex items-start gap-2 px-1 text-xs text-muted">
               <InfoIcon className="mt-px size-3.5 shrink-0 text-brand-600" />
-              <span>Sandbox store: checkout uses Stripe test mode. Nothing ships and no real money moves.</span>
+              <span>Demo store: checkout isn&apos;t open yet, so nothing ships and no money moves.</span>
             </p>
           </div>
         </div>
@@ -208,31 +274,13 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             <h2 id="about" className="font-display text-xl font-semibold text-ink sm:text-2xl">
               About this item
             </h2>
-            <p className="mt-4 max-w-prose text-base leading-relaxed text-ink-soft">{product.description}</p>
-            <dl className="mt-6 grid gap-x-6 gap-y-4 border-t border-line pt-6 text-sm sm:grid-cols-2">
-              <div>
-                <dt className="text-muted">Brand</dt>
-                <dd className="mt-0.5 font-medium text-ink">{product.brand}</dd>
-              </div>
-              <div>
-                <dt className="text-muted">Department</dt>
-                <dd className="mt-0.5">
-                  <Link
-                    href={`/c/${product.category.slug}`}
-                    className="font-medium text-brand-700 underline decoration-brand-300 underline-offset-4 hover:decoration-brand-700"
-                  >
-                    {product.category.name}
-                  </Link>
-                </dd>
-              </div>
-              {product.variants.length > 1 ? (
-                <div>
-                  <dt className="text-muted">Options</dt>
-                  <dd className="mt-0.5 font-medium text-ink">{product.variants.map((v) => v.name).join(", ")}</dd>
-                </div>
-              ) : null}
-            </dl>
-            <ProductFacts product={product} />
+            <section aria-labelledby="details" className="mt-5">
+              <h3 id="details" className="text-lg font-semibold text-ink">
+                Details
+              </h3>
+              <p className="mt-2 max-w-prose text-base leading-relaxed text-ink-soft">{product.description}</p>
+            </section>
+            <ProductFacts product={product} typeLabel={related.typeLabel} />
           </div>
         </section>
       </div>
@@ -241,16 +289,30 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         <ProductReviews productId={product.id} productTitle={product.title} initialData={reviews} />
       </div>
 
-      {related.length > 0 ? (
-        <section aria-labelledby="related" className="mt-20 sm:mt-28">
+      {related.similar.length > 0 ? (
+        <section aria-labelledby="similar" className="mt-20 sm:mt-28">
           <SectionHeading
-            id="related"
-            eyebrow="Keep exploring"
-            title={`More from ${product.category.name}`}
-            action={{ href: `/c/${product.category.slug}`, label: "See all", srLabel: product.category.name }}
+            id="similar"
+            eyebrow="Compare"
+            title={similarTitle}
+            action={{ href: typeHref, label: "See all", srLabel: pluralType(related.typeLabel) }}
           />
           <div className="mt-6 sm:mt-8">
-            <ProductGrid products={related} label={`More from ${product.category.name}`} />
+            <ProductGrid products={related.similar} label={similarTitle} />
+          </div>
+        </section>
+      ) : null}
+
+      {related.fromBrand.length > 0 ? (
+        <section aria-labelledby="from-brand" className="mt-16 sm:mt-20">
+          <SectionHeading
+            id="from-brand"
+            eyebrow="Same brand"
+            title={brandTitle}
+            action={{ href: brandHref, label: "See all", srLabel: `from ${product.brand}` }}
+          />
+          <div className="mt-6 sm:mt-8">
+            <ProductGrid products={related.fromBrand} label={brandTitle} />
           </div>
         </section>
       ) : null}

@@ -10,6 +10,7 @@ import {
   returnProgress,
   returnReasonLabel,
   returnStatusMeta,
+  variantLabel,
   type Tone,
 } from "@/lib/orders";
 import type { LineReturnOption, ReturnOut } from "@ai-commerce/contracts";
@@ -144,7 +145,7 @@ function ReturnCard({
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold text-ink">{item.product_title}</p>
                   <p className="mt-0.5 text-xs text-muted">
-                    {item.variant_name !== "Standard" ? `${item.variant_name} · ` : null}
+                    {variantLabel(item.variant_name) ? `${item.variant_name} · ` : null}
                     Qty {item.quantity} · Condition: {conditionLabel(item.condition)}
                   </p>
                 </div>

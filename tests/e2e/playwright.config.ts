@@ -14,6 +14,8 @@ export default defineConfig({
   use: {
     baseURL: process.env.WEB_URL ?? "http://localhost:3000",
     trace: "retain-on-failure",
+    // Axe measures contrast mid-animation otherwise; the site honors reduced motion.
+    contextOptions: { reducedMotion: "reduce" },
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },

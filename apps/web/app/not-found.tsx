@@ -1,6 +1,9 @@
 import { ArrowLeftIcon, SearchIcon } from "@/components/icons";
 import { Logo } from "@/components/logo";
 import { ButtonLink, buttonClasses } from "@/components/ui/button";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Page not found" };
 
 export default function NotFound() {
   return (
@@ -23,6 +26,7 @@ export default function NotFound() {
             alt=""
             width={640}
             height={640}
+            loading="lazy"
             className="absolute left-1/2 top-1/2 size-28 -translate-x-1/2 -translate-y-1/2 -rotate-6 rounded-3xl shadow-xl ring-4 ring-raised sm:size-36"
           />
           <span className="absolute right-[18%] top-[8%] grid size-10 place-items-center rounded-full bg-accent-400 font-display text-xl font-semibold text-ink shadow-md sm:size-12">

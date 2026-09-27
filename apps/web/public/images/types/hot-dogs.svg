@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Hot dogs">
+  <title>Hot dogs</title>
   <defs>
-    <radialGradient id="t-hot-dogs-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-hot-dogs-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fcf4f4"/>
       <stop offset="1" stop-color="#f3d8d8"/>
     </radialGradient>
-    <linearGradient id="t-hot-dogs-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#c13737"/>
-      <stop offset="1" stop-color="#b91c1c"/>
-    </linearGradient>
     <filter id="t-hot-dogs-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-hot-dogs-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-hot-dogs-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M220 270c40-60 140-60 180 0-40 60-140 60-180 0z" fill="url(#t-hot-dogs-ink)"/><path d="M400 270l40-40v80z" fill="url(#t-hot-dogs-ink)"/><circle cx="262" cy="262" r="8" fill="#b91c1c"/></g>
-  <rect x="230" y="500" width="180" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Hot dogs</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-hot-dogs-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#4a0b0b" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><g transform="translate(246 382) rotate(-22)"><rect x="-62" y="-28" width="124" height="56" rx="28" fill="#b5562f"/><path d="M-40-12H36" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.35"/></g><g transform="translate(342 356) rotate(4)"><rect x="-62" y="-28" width="124" height="56" rx="28" fill="#b5562f"/><path d="M-40-12H36" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.35"/></g><g transform="translate(404 300) rotate(-58)"><rect x="-62" y="-28" width="124" height="56" rx="28" fill="#b5562f"/><path d="M-40-12H36" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.35"/></g><circle cx="296" cy="364" r="9" fill="#8c3f1f"/><circle cx="386" cy="334" r="9" fill="#8c3f1f"/></g>
 </svg>

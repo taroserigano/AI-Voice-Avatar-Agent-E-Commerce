@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Asparagus">
+  <title>Asparagus</title>
   <defs>
-    <radialGradient id="t-asparagus-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-asparagus-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f6f8f3"/>
       <stop offset="1" stop-color="#e1e9d6"/>
     </radialGradient>
-    <linearGradient id="t-asparagus-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#628c2c"/>
-      <stop offset="1" stop-color="#4d7c0f"/>
-    </linearGradient>
     <filter id="t-asparagus-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-asparagus-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-asparagus-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><circle cx="300" cy="285" r="62" fill="url(#t-asparagus-ink)"/><circle cx="345" cy="285" r="62" fill="url(#t-asparagus-ink)" fill-opacity=".85"/><path d="M322 222c0-24 12-40 34-46" stroke="url(#t-asparagus-ink)" stroke-width="10" fill="none" stroke-linecap="round"/></g>
-  <rect x="222" y="500" width="195" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Asparagus</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-asparagus-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#1f3206" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><g transform="translate(270 432) rotate(-10)"><rect x="-9" y="-190" width="18" height="200" rx="9" fill="#7cb342"/><path d="M-12-176Q0-214 12-176z" fill="#557f2a"/><path d="M-5-120l8-6M-5-60l8-6" fill="none" stroke="#557f2a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g><g transform="translate(294 432) rotate(-5)"><rect x="-9" y="-190" width="18" height="200" rx="9" fill="#7cb342"/><path d="M-12-176Q0-214 12-176z" fill="#557f2a"/><path d="M-5-120l8-6M-5-60l8-6" fill="none" stroke="#557f2a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g><g transform="translate(320 432)"><rect x="-9" y="-190" width="18" height="200" rx="9" fill="#7cb342"/><path d="M-12-176Q0-214 12-176z" fill="#557f2a"/><path d="M-5-120l8-6M-5-60l8-6" fill="none" stroke="#557f2a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g><g transform="translate(346 432) rotate(5)"><rect x="-9" y="-190" width="18" height="200" rx="9" fill="#7cb342"/><path d="M-12-176Q0-214 12-176z" fill="#557f2a"/><path d="M-5-120l8-6M-5-60l8-6" fill="none" stroke="#557f2a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g><g transform="translate(370 432) rotate(10)"><rect x="-9" y="-190" width="18" height="200" rx="9" fill="#7cb342"/><path d="M-12-176Q0-214 12-176z" fill="#557f2a"/><path d="M-5-120l8-6M-5-60l8-6" fill="none" stroke="#557f2a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g><rect x="274" y="366" width="92" height="24" rx="6" fill="#4d7c0f"/></g>
 </svg>

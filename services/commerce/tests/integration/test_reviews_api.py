@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import uuid
 
 import pytest
@@ -7,9 +8,10 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from commerce.auth.models import User
 from commerce.catalog.models import Product
 from commerce.reviews.models import Review
-from commerce.seed.reviews import seed_sample_reviews
+from commerce.seed.reviews import SAMPLE_REVIEWERS, seed_sample_reviews
 
 from .test_orders_api import _make_order
 
@@ -187,6 +189,20 @@ def test_review_sort_orders(alice: TestClient, bob: TestClient, db: Session) -> 
     ]
 
 
+def test_reviews_can_be_filtered_to_one_star_rating(
+    alice: TestClient, bob: TestClient, db: Session
+) -> None:
+    pid = _pid(db, ARC)
+    _review(alice, pid, rating=2)
+    _review(bob, pid, rating=5)
+    url = f"/v1/products/{pid}/reviews"
+    fives = alice.get(url, params={"rating": 5}).json()
+    assert [r["rating"] for r in fives["items"]] == [5]
+    assert fives["total"] == 1 and fives["summary"]["count"] == 2  # the summary stays whole
+    assert alice.get(url, params={"rating": 3}).json()["items"] == []
+    assert alice.get(url, params={"rating": 6}).status_code == 422
+
+
 def test_sample_reviews_are_labeled_and_seeding_is_repeatable(
     alice: TestClient, db: Session
 ) -> None:
@@ -201,3 +217,69 @@ def test_sample_reviews_are_labeled_and_seeding_is_repeatable(
     assert page["total"] >= 2
     assert all(r["is_sample"] and not r["is_mine"] for r in page["items"])
     assert alice.get(f"/v1/products/{pid}").json()["rating_count"] == page["total"]
+    # Shown as "First L.", and a seeded row never reads as edited.
+    assert all(re.fullmatch(r"[A-Z][a-z]+ [A-Z]\.", r["author_name"]) for r in page["items"])
+    assert all(r["created_at"] == r["updated_at"] for r in page["items"])
+
+
+def _samples(db: Session) -> dict[tuple[uuid.UUID, uuid.UUID], tuple[object, ...]]:
+    db.expire_all()
+    return {
+        (r.product_id, r.user_id): (r.id, r.rating, r.title, r.body, r.created_at)
+        for r in db.scalars(select(Review).where(Review.is_sample.is_(True)))
+    }
+
+
+def test_reseeding_refreshes_sample_reviews_in_place_and_never_touches_real_ones(
+    alice: TestClient, db: Session
+) -> None:
+    seed_sample_reviews(db)
+    db.commit()
+    before = _samples(db)
+    pid = uuid.UUID(_pid(db, ARC))
+    mine = _review(alice, str(pid), rating=2, title="Mine", body="My own words.")
+
+    # Make the table look like an older seed: stale template text on one row, a row that
+    # is missing, and a sample row the current seed doesn't produce.
+    arc = sorted(k for k in before if k[0] == pid)
+    stale, missing = (db.get(Review, before[k][0]) for k in arc[:2])
+    assert stale is not None and missing is not None
+    stale.rating, stale.body = 5, "The item feels well made and it arrived quickly."
+    db.delete(missing)
+    reviewers = {k[1] for k in arc}
+    spare = db.scalar(
+        select(User.id).where(
+            User.email.in_([email for email, _ in SAMPLE_REVIEWERS]), User.id.not_in(reviewers)
+        )
+    )
+    db.add(Review(product_id=pid, user_id=spare, rating=5, body="Five stars.", is_sample=True))
+    db.commit()
+
+    assert seed_sample_reviews(db) == 1  # only the missing row is created again
+    db.commit()
+    after = _samples(db)
+    assert after.keys() == before.keys()  # the extra sample row is gone, no duplicates
+    for key, (review_id, *content) in after.items():
+        assert content[:3] == list(before[key][1:4])  # text and rating restored
+        if key != arc[1]:
+            assert review_id == before[key][0]  # refreshed in place, not re-inserted
+
+    real = db.get(Review, uuid.UUID(mine["id"]))
+    assert real is not None and not real.is_sample
+    assert (real.rating, real.title, real.body) == (2, "Mine", "My own words.")
+
+    # Running it again changes nothing.
+    assert seed_sample_reviews(db) == 0
+    db.commit()
+    assert _samples(db) == after
+
+
+def test_sample_reviews_suit_the_product(alice: TestClient, db: Session) -> None:
+    seed_sample_reviews(db)
+    db.commit()
+    milk = db.scalar(select(Product.id).where(Product.slug == "larkspur-kitchen-whole-milk"))
+    page = alice.get(f"/v1/products/{milk}/reviews", params={"page_size": 50}).json()
+    text = " ".join(f"{r['title']} {r['body']}" for r in page["items"]).lower()
+    assert page["total"] >= 5
+    assert "milk" in text
+    assert not re.search(r"colors|well made|device|fabric|battery", text)

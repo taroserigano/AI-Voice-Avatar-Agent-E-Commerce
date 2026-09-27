@@ -58,7 +58,8 @@ export function ProductReviews({
   const router = useRouter();
   const uid = useId();
   const [sort, setSort] = useState<ReviewSort>("newest");
-  const reviews = useReviews(productId, sort, initialData);
+  const [rating, setRating] = useState<number | null>(null);
+  const reviews = useReviews(productId, sort, rating, initialData);
   const save = useSaveReview(productId);
   const remove = useDeleteReview(productId);
 
@@ -167,7 +168,12 @@ export function ProductReviews({
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,23rem)_minmax(0,1fr)] lg:gap-12 xl:gap-16">
         <div className="lg:sticky lg:top-36 lg:self-start">
           {summary ? (
-            <RatingSummaryPanel summary={summary} showSampleNote={items.some((r) => r.is_sample)} />
+            <RatingSummaryPanel
+              summary={summary}
+              showSampleNote={items.some((r) => r.is_sample)}
+              selected={rating}
+              onSelect={setRating}
+            />
           ) : (
             <div className="h-80 animate-shimmer rounded-3xl bg-shimmer" aria-hidden="true" />
           )}
@@ -222,9 +228,20 @@ export function ProductReviews({
           )}
 
           <div className="mt-10 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-b border-line pb-4">
-            <h3 id={listHeadingId} className="font-display text-xl font-semibold text-ink">
-              {total > 0 ? pluralize(total, "review") : "Reviews"}
-            </h3>
+            <div className="flex flex-wrap items-center gap-3">
+              <h3 id={listHeadingId} className="font-display text-xl font-semibold text-ink">
+                {rating ? pluralize(total, `${rating}-star review`) : total > 0 ? pluralize(total, "review") : "Reviews"}
+              </h3>
+              {rating ? (
+                <button
+                  type="button"
+                  onClick={() => setRating(null)}
+                  className="rounded-full bg-neutral-100 px-3 py-1 text-sm font-medium text-ink-soft hover:bg-neutral-200"
+                >
+                  Show all reviews
+                </button>
+              ) : null}
+            </div>
             {total > 1 ? (
               <div className="flex items-center gap-3">
                 <label htmlFor={sortId} className="text-sm font-medium text-muted">

@@ -70,6 +70,7 @@ class ReturnItemOut(ApiModel):
 
 class ReturnOut(ApiModel):
     id: uuid.UUID
+    order_id: uuid.UUID
     rma_number: str
     status: ReturnStatus
     reason: str

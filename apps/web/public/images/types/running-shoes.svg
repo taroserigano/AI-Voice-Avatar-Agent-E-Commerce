@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Running shoes">
+  <title>Running shoes</title>
   <defs>
-    <radialGradient id="t-running-shoes-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-running-shoes-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fcf3f7"/>
       <stop offset="1" stop-color="#f4d8e3"/>
     </radialGradient>
-    <linearGradient id="t-running-shoes-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#c63470"/>
-      <stop offset="1" stop-color="#be185d"/>
-    </linearGradient>
     <filter id="t-running-shoes-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-running-shoes-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-running-shoes-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M262 200l-52 30 22 44 30-14v110h116V260l30 14 22-44-52-30c-8 20-28 32-58 32s-50-12-58-32z" fill="url(#t-running-shoes-ink)"/></g>
-  <rect x="192" y="500" width="255" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Running shoes</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-running-shoes-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#4c0a25" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M176 410V330Q176 300 206 300H250Q280 340 330 350L420 370Q464 380 464 410z" fill="#be185d"/><path d="M170 404H470V428Q470 440 458 440H182Q170 440 170 428z" fill="#ffffff"/><path d="M250 316l18 14M266 304l18 14M282 296l18 14" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><path d="M320 360Q380 360 440 380" fill="none" stroke="#84cc16" stroke-width="10" stroke-opacity="1"/><rect x="170" y="424" width="300" height="8" fill="#f7e3ec"/></g>
 </svg>

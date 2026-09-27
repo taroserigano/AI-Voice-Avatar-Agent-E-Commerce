@@ -344,6 +344,16 @@ export const HeadphonesIcon = createIcon(
     <rect x="16" y="14" width="4.5" height="6.5" rx="1.5" />
   </>,
 );
+/** Customer support (a headset with a mic). */
+export const HeadsetIcon = createIcon(
+  "HeadsetIcon",
+  <>
+    <path d="M4.5 13v-1.5a7.5 7.5 0 0 1 15 0V13" />
+    <rect x="3.5" y="12.5" width="3.5" height="5.5" rx="1.5" />
+    <rect x="17" y="12.5" width="3.5" height="5.5" rx="1.5" />
+    <path d="M19 18v.5a2.5 2.5 0 0 1-2.5 2.5H13" />
+  </>,
+);
 export const PotIcon = createIcon(
   "PotIcon",
   <>

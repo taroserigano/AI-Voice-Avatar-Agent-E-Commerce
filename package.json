@@ -13,20 +13,23 @@
     "local:down": "node scripts/local-services.mjs down",
     "local:status": "node scripts/local-services.mjs status",
     "bootstrap": "uv sync --all-packages && pnpm install && pnpm db:migrate && pnpm db:seed && pnpm reindex",
-    "db:migrate": "uv run --directory services/commerce alembic upgrade head",
+    "db:migrate": "uv run --directory services/commerce alembic upgrade head && uv run --directory services/assistant assistant-migrate",
     "db:seed": "uv run --directory services/commerce commerce-seed",
     "reindex": "uv run --directory services/commerce commerce-reindex",
     "dev": "node scripts/dev.mjs",
     "dev:api": "uv run --directory services/commerce uvicorn commerce.main:build_instrumented_app --factory --reload",
+    "dev:assistant": "uv run --directory services/assistant uvicorn assistant.main:build_instrumented_app --factory --reload",
     "dev:outbox": "uv run --directory services/commerce commerce-outbox",
     "dev:web": "pnpm --filter @ai-commerce/web dev",
     "contracts": "uv run --directory services/commerce commerce-openapi && pnpm --filter @ai-commerce/contracts generate",
     "lint": "uv run ruff check . && uv run ruff format --check . && pnpm --filter @ai-commerce/web lint",
-    "typecheck": "uv run mypy services/commerce/src packages/telemetry/src && pnpm -r typecheck",
+    "typecheck": "uv run mypy services/commerce/src services/assistant/src packages/telemetry/src && pnpm -r typecheck",
     "test": "pnpm test:unit && pnpm test:integration && pnpm --filter @ai-commerce/web test",
-    "test:unit": "uv run --directory services/commerce pytest tests/unit -q",
-    "test:integration": "uv run --directory services/commerce pytest tests/integration -q",
+    "test:unit": "uv run --directory services/commerce pytest tests/unit -q && uv run --directory services/assistant pytest tests/unit -q",
+    "test:integration": "uv run --directory services/commerce pytest tests/integration -q && uv run --directory services/assistant pytest tests/integration -q",
     "test:e2e": "pnpm --filter @ai-commerce/e2e test",
-    "eval:search": "uv run --directory services/commerce python ../../evals/search_eval.py"
+    "eval:search": "uv run --directory services/commerce python ../../evals/search_eval.py",
+    "eval:jev": "uv run --directory services/assistant python ../../evals/jev_eval.py",
+    "eval:assistant": "uv run --directory services/assistant python ../../evals/assistant_eval.py"
   }
 }

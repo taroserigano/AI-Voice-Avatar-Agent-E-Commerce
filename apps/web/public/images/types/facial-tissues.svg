@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Facial tissues">
+  <title>Facial tissues</title>
   <defs>
-    <radialGradient id="t-facial-tissues-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-facial-tissues-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f3f8f8"/>
       <stop offset="1" stop-color="#d6e8e6"/>
     </radialGradient>
-    <linearGradient id="t-facial-tissues-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#2c867f"/>
-      <stop offset="1" stop-color="#0f766e"/>
-    </linearGradient>
     <filter id="t-facial-tissues-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-facial-tissues-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-facial-tissues-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M290 230h60l20 30v110H270V260z" fill="url(#t-facial-tissues-ink)"/><path d="M300 230v-30h50l30 16-30 14" fill="url(#t-facial-tissues-ink)" fill-opacity=".85"/></g>
-  <rect x="185" y="500" width="270" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Facial tissues</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-facial-tissues-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#062f2c" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M214 294l48 -24h180l-48 24z" fill="#bcd9d6"/><path d="M394 294l48 -24v146l-48 24z" fill="#0a534d"/><rect x="214" y="294" width="180" height="146" fill="#0f766e"/><ellipse cx="328" cy="282" rx="56" ry="10" fill="#0a534d"/><path d="M290 282C280 242 314 220 326 244C338 214 380 226 366 262C382 266 374 286 362 286z" fill="#ffffff"/><g stroke="none"><g transform="translate(304 368) scale(1.6)" stroke-width="2.50"><circle cx="0" cy="-12" r="9" fill="#ffffff"/><circle cx="11" cy="-4" r="9" fill="#ffffff"/><circle cx="7" cy="10" r="9" fill="#ffffff"/><circle cx="-7" cy="10" r="9" fill="#ffffff"/><circle cx="-11" cy="-4" r="9" fill="#ffffff"/><circle cx="0" cy="0" r="7" fill="#f9c846"/></g></g></g>
 </svg>

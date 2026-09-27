@@ -1,15 +1,14 @@
 import { Listing, type ListingParams } from "@/components/shop/listing";
 import { WebVitalsReporter } from "@/components/web-vitals";
 import { serverApi, unwrap } from "@/lib/api-server";
-import { toProductQuery } from "@/lib/listing-query";
+import { isLandingView, toProductQuery } from "@/lib/listing-query";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { loadDepartment } from "./load-department";
 
+// The layout already answered 404 for an unknown slug; this reuses its (deduped) read.
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params;
-  const api = await serverApi();
-  const categories = await unwrap(await api.GET("/v1/categories"));
-  return { title: categories.find((c) => c.slug === slug)?.name ?? "Department" };
+  return { title: (await loadDepartment((await params).slug)).name };
 }
 
 export default async function CategoryPage({
@@ -22,12 +21,20 @@ export default async function CategoryPage({
   const { slug } = await params;
   const query = await searchParams;
   const api = await serverApi();
-  const categories = await unwrap(await api.GET("/v1/categories"));
+  const landing = isLandingView(query);
+  const [categories, page, topRated] = await Promise.all([
+    api.GET("/v1/categories").then(unwrap),
+    api.GET("/v1/products", { params: { query: toProductQuery(query, slug) } }).then(unwrap),
+    // The "Top rated" strip is optional: only on the unfiltered first page, and never fatal.
+    landing
+      ? api
+          .GET("/v1/products", { params: { query: { category: slug, sort: "top_rated", in_stock: true, page_size: 6 } } })
+          .then((r) => (r.data?.items ?? []).filter((p) => p.rating_count > 0))
+          .catch(() => [])
+      : Promise.resolve([]),
+  ]);
   const category = categories.find((c) => c.slug === slug);
   if (!category) notFound();
-  const page = await unwrap(
-    await api.GET("/v1/products", { params: { query: toProductQuery(query, slug) } }),
-  );
   return (
     <>
       <WebVitalsReporter route="category" />
@@ -38,6 +45,8 @@ export default async function CategoryPage({
         heading={category.name}
         showCategoryFacet={false}
         category={{ slug: category.slug, name: category.name }}
+        departments={categories.filter((c) => c.slug !== slug)}
+        topRated={topRated.length >= 4 ? topRated : []}
       />
     </>
   );

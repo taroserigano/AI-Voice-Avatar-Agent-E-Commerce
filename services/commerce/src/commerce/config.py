@@ -6,10 +6,11 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import AliasChoices, Field, field_validator
+from pydantic import AliasChoices, Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
+DEV_ASSISTANT_TOKEN = "dev-only-assistant-service-token"  # noqa: S105 - refused outside dev
 
 
 class Settings(BaseSettings):
@@ -45,15 +46,30 @@ class Settings(BaseSettings):
     search_env: str = "dev-local"
     semantic_top_k: int = 20
     semantic_min_score: float = 0.0
+    # A meaning-only hit (one OpenSearch didn't find) must score at least this fraction of the
+    # query's best Pinecone score: the top K always has a tail of barely related products.
+    semantic_relative_score: float = Field(default=0.8, ge=0.0, le=1.0)
     # How long a search waits for Pinecone before answering with keyword results only.
     semantic_timeout_ms: int = 250
-    keyword_top_k: int = 100
+    # Keyword candidates per search. A search that fills it reports its total as a lower bound
+    # ("400+") rather than an exact count.
+    keyword_top_k: int = 400
+
+    # Standard shipping (content/policies/shipping-and-delivery.md): $5.99, free at $35
+    # after discounts and before tax. Shown in the cart before checkout.
+    shipping_minor: int = 599
+    free_shipping_at_minor: int = 3500
 
     # Keys the one-way customer hash put on telemetry (never the raw customer ID).
     session_secret: str = Field(default="dev-only-session-secret-change-me", min_length=16)
     session_ttl_hours: int = 12
     cookie_secure: bool = False
     session_cookie_name: str = "ac_session"
+
+    # Shared secret the assistant service sends (with X-On-Behalf-Of) to act for a signed-in
+    # customer on a short list of routes (see commerce.auth.deps). Outside development it must
+    # be set to a long random value; the development default is refused there.
+    assistant_service_token: str | None = DEV_ASSISTANT_TOKEN
 
     otel_exporter_otlp_endpoint: str | None = None
     log_level: str = "INFO"
@@ -66,6 +82,20 @@ class Settings(BaseSettings):
             if url.startswith(prefix):
                 return "postgresql+psycopg://" + url.removeprefix(prefix)
         return url
+
+    @model_validator(mode="after")
+    def _no_dev_secrets_outside_dev(self) -> Settings:
+        if not self.is_dev and self.assistant_service_token == DEV_ASSISTANT_TOKEN:
+            raise ValueError("Set ASSISTANT_SERVICE_TOKEN; the development default isn't allowed")
+        return self
+
+    @property
+    def policies_index(self) -> str:
+        return f"policies-{self.search_env}"
+
+    @property
+    def policies_namespace(self) -> str:
+        return f"policies-{self.search_env}"
 
     @property
     def products_index(self) -> str:

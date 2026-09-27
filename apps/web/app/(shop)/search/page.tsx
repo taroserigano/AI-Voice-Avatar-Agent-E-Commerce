@@ -12,7 +12,14 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
 export default async function SearchPage({ searchParams }: { searchParams: Promise<ListingParams> }) {
   const params = await searchParams;
   const api = await serverApi();
-  const page = await unwrap(await api.GET("/v1/products", { params: { query: toProductQuery(params) } }));
+  const [page, departments] = await Promise.all([
+    api.GET("/v1/products", { params: { query: toProductQuery(params) } }).then(unwrap),
+    // Department names for the breadcrumb and the empty state; optional.
+    api
+      .GET("/v1/categories")
+      .then((r) => r.data ?? [])
+      .catch(() => []),
+  ]);
   const q = params.q?.trim();
   return (
     <>
@@ -23,6 +30,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         basePath="/search"
         heading={q ? `Results for “${q}”` : "All products"}
         showCategoryFacet
+        departments={departments}
       />
     </>
   );

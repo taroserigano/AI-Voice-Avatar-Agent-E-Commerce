@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Kitchen utensils">
+  <title>Kitchen utensils</title>
   <defs>
-    <radialGradient id="t-kitchen-utensils-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-kitchen-utensils-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fbf6f3"/>
       <stop offset="1" stop-color="#f2e2d5"/>
     </radialGradient>
-    <linearGradient id="t-kitchen-utensils-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#bd6827"/>
-      <stop offset="1" stop-color="#b45309"/>
-    </linearGradient>
     <filter id="t-kitchen-utensils-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-kitchen-utensils-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-kitchen-utensils-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M250 230h140v70a50 50 0 0 1-50 50h-40a50 50 0 0 1-50-50z" fill="url(#t-kitchen-utensils-ink)"/><path d="M390 250h22a22 22 0 0 1 0 44h-22" fill="none" stroke="url(#t-kitchen-utensils-ink)" stroke-width="14"/></g>
-  <rect x="170" y="500" width="300" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Kitchen utensils</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-kitchen-utensils-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#482104" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M280 330L250 190" fill="none" stroke="#d9a066" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><ellipse cx="246" cy="176" rx="18" ry="26" fill="#d9a066" transform="rotate(-12 246 176)"/><path d="M320 330V180" fill="none" stroke="#b6c2cf" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><path d="M300 150Q320 220 340 150Q340 200 320 210Q300 200 300 150z" fill="none" stroke="#b6c2cf" stroke-width="6" stroke-opacity="1"/><path d="M360 330L392 200" fill="none" stroke="#334155" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><rect x="376" y="150" width="44" height="56" rx="8" fill="#334155" transform="rotate(14 398 178)"/><path d="M246 300H394L380 432Q378 440 368 440H272Q262 440 260 432z" fill="#b45309"/><rect x="240" y="296" width="160" height="18" rx="8" fill="#7e3a06"/></g>
 </svg>

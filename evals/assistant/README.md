@@ -44,7 +44,7 @@ Each line is one conversation:
 | `expect_empty` | No product matches exactly; the assistant must say so rather than pass off a near miss |
 | `mentions` / `mentions_any` | Text the reply must contain (all / at least one) |
 | `must_not_mention` / `must_not` | Text the reply must not contain / tool actions it must not take (for example `create_return`) |
-| `cite` | Policy documents (by `id` in `content/policies/`) the reply must cite |
+| `cite` | Policy documents the reply must cite: a document `id` from `content/policies/`, optionally with a section, such as `returns-and-refunds#rr-7-3` (section IDs are the anchors on `/returns-policy`) |
 | `uses` | Tools it should call, such as `list_stores` |
 
 Return scripts also have `order` (a scenario key from `seed/orders.py`) and an `outcome`: the

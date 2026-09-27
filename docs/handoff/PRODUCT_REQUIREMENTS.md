@@ -49,7 +49,7 @@ These fixed rules apply in development and tests. A responsible owner sets real 
 | Refund destination | The original payment method only; no store credit |
 | Shipping charge (for reference) | $5.99, free at $35 or more after discounts and before tax |
 
-The customer-facing wording lives in `content/policies/` (versioned, with effective dates); it's what the assistant retrieves and cites.
+The customer-facing wording lives in `content/policies/` (versioned, with effective dates, and citable section IDs such as `rr-7-3`); it's what the assistant retrieves and cites. The return policy's front matter carries these rules in machine-readable form, and a unit test checks them against the code. `returns-regulations.md` holds the operating rules every channel follows (AI limits, voice confirmation, escalation) and a map of the US consumer rules the policy is designed around.
 
 ### Stores
 
@@ -61,7 +61,7 @@ Public policy questions use approved versioned content and show citations. Curre
 
 ## Pages
 
-Sign-in, create account, privacy, terms, accessibility statement (all public); and, behind sign-in: home/category, search results, product detail, store locator, cart, checkout/status, account orders, order detail/returns, support panel, basic staff support queue, and accessible error/empty/loading states. The support panel stays usable on mobile. Show a clear indication when sandbox payments, development sign-in, or simulated shipping is in use.
+Sign-in, create account, privacy, terms, accessibility statement, return and refund policy (`/returns-policy`, rendered from `content/policies/returns-and-refunds.md` and `returns-regulations.md`) (all public); and, behind sign-in: home/category, search results, product detail, store locator, cart, checkout/status, account orders, order detail/returns, support panel, basic staff support queue, and accessible error/empty/loading states. The support panel stays usable on mobile. Show a clear indication when sandbox payments, development sign-in, or simulated shipping is in use.
 
 ## Accessibility
 

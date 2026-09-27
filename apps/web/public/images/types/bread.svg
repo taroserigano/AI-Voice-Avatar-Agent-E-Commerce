@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Bread">
+  <title>Bread</title>
   <defs>
-    <radialGradient id="t-bread-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-bread-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#faf5f3"/>
       <stop offset="1" stop-color="#ecdfd6"/>
     </radialGradient>
-    <linearGradient id="t-bread-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#9f572b"/>
-      <stop offset="1" stop-color="#92400e"/>
-    </linearGradient>
     <filter id="t-bread-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-bread-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-bread-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M230 300c0-60 40-90 90-90s90 30 90 90v40H230z" fill="url(#t-bread-ink)"/><path d="M280 250l-12 40M320 240v48M360 250l12 40" stroke="#92400e" stroke-width="8" stroke-linecap="round" stroke-opacity=".5"/></g>
-  <rect x="252" y="500" width="135" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Bread</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-bread-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#3a1a06" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M262 440V300C262 250 302 226 362 226C422 226 462 250 462 300V440z" fill="#c97d38"/><path d="M318 262l20-18M362 258l20-18M406 262l20-18" fill="none" stroke="#e8a860" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><path d="M186 440V330C162 318 164 262 210 254C232 226 312 226 334 254C380 262 382 318 358 330V440z" fill="#c97d38"/><path d="M200 440V338C180 324 180 272 218 266C238 242 308 242 326 266C364 272 364 324 344 338V440z" fill="#f7e2b5"/><circle cx="240" cy="320" r="5" fill="#e8c88a"/><circle cx="290" cy="300" r="4" fill="#e8c88a"/><circle cx="306" cy="360" r="5" fill="#e8c88a"/><circle cx="250" cy="390" r="4" fill="#e8c88a"/></g>
 </svg>

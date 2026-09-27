@@ -18,9 +18,16 @@ from dataclasses import dataclass
 from typing import Any
 
 from opentelemetry import trace
-from sqlalchemy import Select, Subquery, and_, func, or_, select
+from sqlalchemy import Select, Subquery, and_, case, func, or_, select
 from sqlalchemy.orm import Session, selectinload
 
+from commerce.catalog.display import (
+    PRIOR_MEAN,
+    PRIOR_WEIGHT,
+    bayesian_rating,
+    type_label,
+    unit_price,
+)
 from commerce.catalog.models import Category, InventoryBalance, Price, Product, Variant
 from commerce.catalog.schemas import (
     CategoryOut,
@@ -48,13 +55,15 @@ from commerce.metrics import (
 from commerce.money import DEFAULT_CURRENCY
 from commerce.reviews.service import rating_stats_subquery, round_average
 from commerce.search.keyword import get_keyword_index
+from commerce.search.ranking import Candidate, Ranking, rank_candidates
 from commerce.search.rrf import reciprocal_rank_fusion
 from commerce.search.semantic import get_semantic_index
 
 log = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
 _pool = ThreadPoolExecutor(max_workers=8, thread_name_prefix="search-leg")
-FACET_LIMIT = 40  # most common product types / tags shown as filters
+FACET_LIMIT = 40  # most common product types / tags shown as filters across departments
+DEPARTMENT_FACET_LIMIT = 200  # within one department, show every type
 
 
 @dataclass(frozen=True)
@@ -146,7 +155,7 @@ def _tags_out(tags: list[str] | None) -> list[TagOut]:
     return [TagOut(value=t, label=tag_label(t)) for t in tags or []]
 
 
-def _timed_leg(name: str, fn: Callable[[], list[str]]) -> tuple[list[str] | None, float]:
+def _timed_leg[T](name: str, fn: Callable[[], list[T]]) -> tuple[list[T] | None, float]:
     start = time.perf_counter()
     with tracer.start_as_current_span(f"search.{name}") as span:
         try:
@@ -161,23 +170,37 @@ def _timed_leg(name: str, fn: Callable[[], list[str]]) -> tuple[list[str] | None
             return None, (time.perf_counter() - start) * 1000
 
 
-def _run_legs(query: str) -> tuple[list[str], SearchMeta]:
+@dataclass(frozen=True)
+class LegResults:
+    ids: list[str]  # fused, best first
+    meta: SearchMeta
+    semantic_ids: frozenset[str] = frozenset()  # meaning-based hits that passed the score cut
+    # The weakest keyword hit, when the leg returned as many hits as it asks for (so more
+    # matches may exist past it); None when the list ended on its own.
+    keyword_last: str | None = None
+
+
+def _semantic_keep(
+    hits: list[tuple[str, float]], keyword_ids: set[str], relative: float
+) -> list[str]:
+    """Drop the weak tail of meaning-only hits: below `relative` x the best score, a hit
+    OpenSearch didn't also find is more likely noise than a synonym."""
+    if not hits:
+        return []
+    cut = max(score for _, score in hits) * relative
+    return [doc_id for doc_id, score in hits if score >= cut or doc_id in keyword_ids]
+
+
+def _run_legs(query: str) -> LegResults:
     settings = get_settings()
 
     def keyword() -> list[str]:
         return get_keyword_index().search(query, settings.keyword_top_k)
 
-    semantic_index_error = False
-
-    def semantic() -> list[str]:
-        nonlocal semantic_index_error
-        try:
-            index = get_semantic_index()
-        except Exception:
-            semantic_index_error = True
-            raise
+    def semantic() -> list[tuple[str, float]]:
+        index = get_semantic_index()
         assert index is not None
-        return index.search(query, settings.semantic_top_k, settings.semantic_min_score)
+        return index.search_scored(query, settings.semantic_top_k, settings.semantic_min_score)
 
     semantic_enabled = bool(settings.pinecone_api_key)
     started = time.perf_counter()
@@ -190,41 +213,48 @@ def _run_legs(query: str) -> tuple[list[str], SearchMeta]:
     )
     kw_ids, kw_ms = kw_future.result()
     search_leg_duration.record(kw_ms, {"backend": "opensearch"})
-    sem_ids: list[str] | None = None
+    sem_hits: list[tuple[str, float]] | None = None
     if sem_future is not None:
         # Meaning-based results are worth waiting for only within the latency budget; after
         # that, answer with keyword results rather than miss the search p95 target.
         remaining = max(0.0, settings.semantic_timeout_ms / 1000 - (time.perf_counter() - started))
         try:
-            sem_ids, sem_ms = sem_future.result(timeout=remaining)
+            sem_hits, sem_ms = sem_future.result(timeout=remaining)
             search_leg_duration.record(sem_ms, {"backend": "pinecone"})
         except FuturesTimeout:
             search_leg_errors.add(1, {"backend": "pinecone", "reason": "timeout"})
             trace.get_current_span().set_attribute("search.semantic_timeout", True)
 
+    # Shoppers see a notice only when keyword search itself failed. Meaning-based search
+    # being off or unreachable is an operations problem (logged and measured), not theirs.
     meta = SearchMeta(
         keyword=LegStatus.OK if kw_ids is not None else LegStatus.UNAVAILABLE,
         semantic=(
             LegStatus.DISABLED
             if not semantic_enabled
             else LegStatus.OK
-            if sem_ids is not None
+            if sem_hits is not None
             else LegStatus.UNAVAILABLE
         ),
     )
     if meta.keyword != LegStatus.OK and meta.semantic != LegStatus.OK:
         meta.notice = "Search is running in a reduced mode right now; results may be less relevant."
-    elif meta.semantic == LegStatus.DISABLED:
-        meta.notice = (
-            "Meaning-based search is off (Pinecone is not configured); keyword search only."
-        )
-    elif meta.semantic == LegStatus.UNAVAILABLE or meta.keyword == LegStatus.UNAVAILABLE:
+    elif meta.keyword == LegStatus.UNAVAILABLE:
         meta.notice = "Part of search is temporarily unavailable; results may be less relevant."
+    sem_ids = _semantic_keep(sem_hits or [], set(kw_ids or ()), settings.semantic_relative_score)
     fused = reciprocal_rank_fusion([ids for ids in (kw_ids, sem_ids) if ids])
-    return fused, meta
+    return LegResults(
+        ids=fused,
+        meta=meta,
+        semantic_ids=frozenset(sem_ids),
+        keyword_last=(kw_ids[-1] if kw_ids and len(kw_ids) >= settings.keyword_top_k else None),
+    )
 
 
-def _fallback_ids(db: Session, query: str, limit: int = 100) -> list[str]:
+FALLBACK_LIMIT = 100
+
+
+def _fallback_ids(db: Session, query: str, limit: int = FALLBACK_LIMIT) -> list[str]:
     """Last resort when both engines are down: a plain SQL text match."""
     terms = [t for t in query.split() if len(t) > 1][:6]
     if not terms:
@@ -241,6 +271,41 @@ def _fallback_ids(db: Session, query: str, limit: int = 100) -> list[str]:
         select(Product.id).where(Product.is_active.is_(True), and_(*conds)).limit(limit)
     )
     return [str(r) for r in rows]
+
+
+def _rank(db: Session, query: str, ids: list[uuid.UUID], semantic_ids: set[uuid.UUID]) -> Ranking:
+    """Re-rank fused candidates by the words they share with the query (text from PostgreSQL)."""
+    if not ids:
+        return Ranking([], 0, False)  # nothing matched, so nothing matched exactly
+    rows = {
+        r.id: r
+        for r in db.execute(
+            select(
+                Product.id,
+                Product.title,
+                Product.brand,
+                Product.product_type,
+                Product.tags,
+                Product.description,
+            ).where(Product.id.in_(ids), Product.is_active.is_(True))
+        )
+    }
+    return rank_candidates(
+        query,
+        [
+            Candidate(
+                id=pid,
+                title=r.title,
+                product_type=r.product_type,
+                brand=r.brand,
+                tag_labels=[tag_label(t) for t in r.tags or []],
+                description=r.description,
+                semantic=pid in semantic_ids,
+            )
+            for pid in ids
+            if (r := rows.get(pid)) is not None
+        ],
+    )
 
 
 def list_products(
@@ -261,17 +326,25 @@ def list_products(
 
     q = (query or "").strip()
     if q:
-        fused, meta = _run_legs(q)
+        legs = _run_legs(q)
+        meta, fused, last = legs.meta, legs.ids, legs.keyword_last
         if meta.keyword != LegStatus.OK and meta.semantic != LegStatus.OK:
             fused = _fallback_ids(db, q)
-        candidate_ids = []
-        for i, raw in enumerate(fused):
+            last = fused[-1] if len(fused) >= FALLBACK_LIMIT else None
+        parsed: list[uuid.UUID] = []
+        for raw in fused:
             try:
-                pid = uuid.UUID(raw)
+                parsed.append(uuid.UUID(raw))
             except ValueError:
                 continue  # a stale or foreign ID in a projection is ignored, not trusted
-            candidate_ids.append(pid)
-            rank[pid] = i
+        semantic_ids = {pid for pid in parsed if str(pid) in legs.semantic_ids}
+        ranking = _rank(db, q, parsed, semantic_ids)
+        candidate_ids = [pid for pid in ranking.ids if isinstance(pid, uuid.UUID)]
+        rank = {pid: i for i, pid in enumerate(candidate_ids)}
+        meta.exact_match = ranking.exact
+        # The candidate list stopped at its limit. If even its weakest hit is a real match
+        # (it survived re-ranking), more lie past the limit and the total is a lower bound.
+        meta.total_capped = last is not None and last in {str(pid) for pid in rank}
 
     stmt = _apply_filters(_base(stats, ratings, candidate_ids), stats, filters)
     start = (page - 1) * page_size
@@ -288,24 +361,37 @@ def list_products(
         elif sort == SortOrder.NEWEST:
             rows.sort(key=lambda r: r[0].created_at, reverse=True)
         elif sort == SortOrder.TOP_RATED:
-            rows.sort(key=lambda r: (-(r.rating_avg or 0), -r.rating_count, r[0].title))
+            rows.sort(key=lambda r: (-bayesian_rating(r.rating_avg, r.rating_count), r[0].title))
         total = len(rows)
         rows = rows[start : start + page_size]
     else:
         # Browsing can span the whole catalog: sort and page in SQL.
+        # Rating blended with a prior, so a few perfect reviews don't beat many good ones.
+        count = func.coalesce(ratings.c.rating_count, 0)
+        blended = case(
+            (
+                count > 0,
+                (ratings.c.rating_avg * count + PRIOR_MEAN * PRIOR_WEIGHT) / (count + PRIOR_WEIGHT),
+            ),
+            else_=PRIOR_MEAN - 0.5,
+        )
         order_by = {
             SortOrder.PRICE_ASC: (stats.c.min_price.asc(), Product.title),
             SortOrder.PRICE_DESC: (stats.c.min_price.desc(), Product.title),
             SortOrder.NEWEST: (Product.created_at.desc(), Product.title),
-            SortOrder.TOP_RATED: (
-                func.coalesce(ratings.c.rating_avg, 0).desc(),
-                func.coalesce(ratings.c.rating_count, 0).desc(),
-                Product.title,
+            SortOrder.TOP_RATED: (blended.desc(), count.desc(), Product.title),
+            # "Featured": well-reviewed, in-stock products first, in a stable but varied order
+            # (not alphabetical, which put "1% Low Fat…" first everywhere).
+            SortOrder.RELEVANCE: (
+                (stats.c.available > 0).desc(),
+                func.round(blended * 2).desc(),
+                func.md5(Product.slug),
             ),
-        }.get(sort, (Category.sort_order, Product.title))
+        }[sort]
         total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
         rows = list(db.execute(stmt.order_by(*order_by).offset(start).limit(page_size)).all())
 
+    defaults = _default_variants(db, [r[0].id for r in rows])
     items = [
         ProductSummary(
             id=p.id,
@@ -322,6 +408,8 @@ def list_products(
             variant_count=int(variant_count),
             rating_average=round_average(rating_avg),
             rating_count=int(rating_count),
+            type_label=type_label(p.product_type),
+            **defaults.get(p.id, {}),
         )
         for p, c, min_price, available, variant_count, rating_avg, rating_count in rows
     ]
@@ -339,6 +427,61 @@ def list_products(
     return ProductPage(
         items=items, total=total, page=page, page_size=page_size, facets=facets, search=meta
     )
+
+
+@dataclass(frozen=True)
+class Offer:
+    price_minor: int
+    in_stock: bool
+
+
+def product_offers(db: Session, product_ids: set[uuid.UUID]) -> dict[uuid.UUID, Offer]:
+    """Per product, the price product cards show (the default option: cheapest in stock, else
+    cheapest) and whether any option is in stock."""
+    if not product_ids:
+        return {}
+    defaults = _default_variants(db, list(product_ids))
+    stats = _stats_subquery()
+    rows = db.execute(
+        select(stats.c.product_id, stats.c.available).where(stats.c.product_id.in_(product_ids))
+    ).all()
+    return {
+        pid: Offer(int(defaults[pid]["default_price_minor"]), int(avail) > 0)
+        for pid, avail in rows
+        if pid in defaults
+    }
+
+
+def _default_variants(db: Session, product_ids: list[uuid.UUID]) -> dict[uuid.UUID, dict[str, Any]]:
+    """Per product, the option quick-add uses: the cheapest in-stock one (else the cheapest)."""
+    if not product_ids:
+        return {}
+    available = func.coalesce(
+        func.sum(func.greatest(InventoryBalance.on_hand - InventoryBalance.reserved, 0)), 0
+    )
+    rows = db.execute(
+        select(Variant, Price.amount_minor, available.label("available"))
+        .join(Price, and_(Price.variant_id == Variant.id, Price.currency == DEFAULT_CURRENCY))
+        .outerjoin(InventoryBalance, InventoryBalance.variant_id == Variant.id)
+        .where(Variant.product_id.in_(product_ids), Variant.is_active.is_(True))
+        .group_by(Variant.id, Price.amount_minor)
+    ).all()
+    # in stock first, then cheapest, then the product page's option order (so the two agree)
+    best: dict[uuid.UUID, tuple[tuple[bool, int, int, str], Variant]] = {}
+    for variant, price, avail in rows:
+        key = (int(avail) <= 0, int(price), variant.sort_order, variant.sku)
+        current = best.get(variant.product_id)
+        if current is None or key < current[0]:
+            best[variant.product_id] = (key, variant)
+    return {
+        pid: {
+            "default_variant_id": v.id,
+            "default_variant_name": v.name,
+            "default_price_minor": key[1],
+            "unit_price": unit_price(key[1], v.attributes),
+        }
+        for pid, (key, v) in best.items()
+    }
 
 
 def _facets(
@@ -380,7 +523,7 @@ def _facets(
         .where(Product.is_active.is_(True))
         .group_by(Product.product_type)
         .order_by(func.count(Product.id).desc(), Product.product_type)
-        .limit(FACET_LIMIT),
+        .limit(DEPARTMENT_FACET_LIMIT if f.category else FACET_LIMIT),
         stats,
         f,
         skip_type=True,
@@ -408,8 +551,7 @@ def _facets(
         categories=[FacetValue(value=s, label=n, count=c) for s, n, c in db.execute(cat_stmt)],
         brands=[FacetValue(value=b, label=b, count=c) for b, c in db.execute(brand_stmt)],
         product_types=[
-            FacetValue(value=t, label=t.replace("-", " ").capitalize(), count=c)
-            for t, c in db.execute(type_stmt)
+            FacetValue(value=t, label=type_label(t), count=c) for t, c in db.execute(type_stmt)
         ],
         tags=[FacetValue(value=t, label=tag_label(t), count=c) for t, c in db.execute(tag_stmt)],
     )
@@ -442,6 +584,7 @@ def get_product(db: Session, product_id: uuid.UUID) -> ProductDetail | None:
                 currency=v.price.currency,
                 available=available,
                 in_stock=available > 0,
+                unit_price=unit_price(v.price.amount_minor, v.attributes),
             )
         )
     if not variants:
@@ -453,6 +596,8 @@ def get_product(db: Session, product_id: uuid.UUID) -> ProductDetail | None:
         )
     ).first()
     details = product.details or {}
+    # the option quick add would pick: cheapest in stock, else cheapest (as in listings)
+    default = min(variants, key=lambda v: (not v.in_stock, v.price_minor))
     return ProductDetail(
         id=product.id,
         slug=product.slug,
@@ -468,6 +613,11 @@ def get_product(db: Session, product_id: uuid.UUID) -> ProductDetail | None:
         variant_count=len(variants),
         rating_average=round_average(rating.rating_avg) if rating else None,
         rating_count=int(rating.rating_count) if rating else 0,
+        type_label=type_label(product.product_type),
+        default_variant_id=default.id,
+        default_variant_name=default.name,
+        default_price_minor=default.price_minor,
+        unit_price=default.unit_price,
         description=product.description,
         nutrition=Nutrition(**details["nutrition"]) if details.get("nutrition") else None,
         ingredients=details.get("ingredients"),

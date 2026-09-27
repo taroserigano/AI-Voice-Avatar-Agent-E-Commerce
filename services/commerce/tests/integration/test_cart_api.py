@@ -76,6 +76,27 @@ def test_cart_shows_the_current_price_after_a_price_change(alice: TestClient, db
     assert alice.get("/v1/cart").json()["subtotal_minor"] == 9999
 
 
+def test_shipping_is_charged_below_the_threshold_and_free_at_it(
+    alice: TestClient, db: Session
+) -> None:
+    empty = alice.get("/v1/cart").json()
+    assert empty["shipping_minor"] == 0 and empty["estimated_total_minor"] == 0
+
+    vid = variant_id_for(db, *HEADPHONES)
+    db.execute(update(Price).where(Price.variant_id == vid).values(amount_minor=3000))
+    db.commit()
+    cart = alice.put("/v1/cart/items", json={"variant_id": vid, "quantity": 1}).json()
+    assert cart["shipping_minor"] == 599
+    assert cart["free_shipping_remaining_minor"] == 500
+    assert cart["estimated_total_minor"] == 3599
+
+    db.execute(update(Price).where(Price.variant_id == vid).values(amount_minor=3500))
+    db.commit()
+    cart = alice.get("/v1/cart").json()
+    assert cart["shipping_minor"] == 0 and cart["free_shipping_remaining_minor"] == 0
+    assert cart["estimated_total_minor"] == 3500
+
+
 def test_bob_cannot_see_or_touch_alices_cart(
     alice: TestClient, bob: TestClient, db: Session
 ) -> None:

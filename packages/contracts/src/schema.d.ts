@@ -160,6 +160,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/catalog/vocabulary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Vocabulary */
+        get: operations["vocabulary_v1_catalog_vocabulary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/categories": {
         parameters: {
             query?: never;
@@ -224,6 +241,40 @@ export interface paths {
          *     starting a return needs a quote and the shopper's confirmation (Milestone 3a).
          */
         get: operations["get_return_options_v1_orders__order_id__return_options_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/policies/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search */
+        get: operations["search_v1_policies_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/policies/{doc_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Document */
+        get: operations["get_document_v1_policies__doc_id__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -301,6 +352,166 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/returns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Returns
+         * @description The customer's returns, newest first, with refund status.
+         */
+        get: operations["list_returns_v1_returns_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/returns/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm Return
+         * @description Create the return for a quote. Repeats return the same return (200), never a second.
+         */
+        post: operations["confirm_return_v1_returns_confirm_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/returns/dev-reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Dev Reset
+         * @description Development only: undo the returns this customer made through quotes (not the seeded
+         *     sample history), so browser tests and demos can start over.
+         */
+        post: operations["dev_reset_v1_returns_dev_reset_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/returns/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Quote
+         * @description Price a return from the order's saved amounts. Nothing is returned until the customer
+         *     confirms this exact quote (valid 15 minutes).
+         */
+        post: operations["create_quote_v1_returns_quote_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/returns/quotes/{quote_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Quote */
+        get: operations["get_quote_v1_returns_quotes__quote_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/returns/quotes/{quote_id}/confirmation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mint Confirmation
+         * @description A single-use confirmation token for this quote, for the customer's own browser only.
+         */
+        post: operations["mint_confirmation_v1_returns_quotes__quote_id__confirmation_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/returns/{return_id}/dev-advance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Dev Advance
+         * @description Development only: simulate the carrier scan, warehouse receipt, or inspection.
+         */
+        post: operations["dev_advance_v1_returns__return_id__dev_advance_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/search/suggest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search Suggest
+         * @description Typeahead for the search box: completed queries, matching types and departments, and a
+         *     few products. Fast word-prefix matching in PostgreSQL; nothing is recorded.
+         */
+        get: operations["search_suggest_v1_search_suggest_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/stores": {
         parameters: {
             query?: never;
@@ -312,6 +523,27 @@ export interface paths {
         get: operations["list_stores_v1_stores_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/support/cases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Cases */
+        get: operations["list_cases_v1_support_cases_get"];
+        put?: never;
+        /**
+         * Create Case
+         * @description Open a case for a person to handle. The order, if given, must be the customer's own.
+         */
+        post: operations["create_case_v1_support_cases_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -350,6 +582,8 @@ export interface components {
         };
         /** ActivityProduct */
         ActivityProduct: {
+            /** Currency */
+            currency: string;
             /**
              * Id
              * Format: uuid
@@ -357,6 +591,13 @@ export interface components {
             id: string;
             /** Image Path */
             image_path: string;
+            /** In Stock */
+            in_stock: boolean;
+            /**
+             * Price Minor
+             * @description Live lowest price; null if no active option
+             */
+            price_minor: number | null;
             /** Title */
             title: string;
         };
@@ -406,6 +647,23 @@ export interface components {
             /** Currency */
             currency: string;
             /**
+             * Estimated Total Minor
+             * @description Subtotal plus shipping, before tax (tax is calculated at payment)
+             * @default 0
+             */
+            estimated_total_minor: number;
+            /**
+             * Free Shipping Remaining Minor
+             * @description How much more for free shipping; 0 when it already applies
+             * @default 0
+             */
+            free_shipping_remaining_minor: number;
+            /**
+             * Free Shipping Threshold Minor
+             * @default 0
+             */
+            free_shipping_threshold_minor: number;
+            /**
              * Id
              * Format: uuid
              */
@@ -414,6 +672,12 @@ export interface components {
             item_count: number;
             /** Items */
             items: components["schemas"]["CartLineOut"][];
+            /**
+             * Shipping Minor
+             * @description Standard shipping for this subtotal: $5.99, free at the threshold
+             * @default 0
+             */
+            shipping_minor: number;
             /**
              * Subtotal Minor
              * @description Estimate at current prices. Checkout recalculates on the server; tax is calculated at payment.
@@ -424,6 +688,53 @@ export interface components {
             /** Warnings */
             warnings: string[];
         };
+        /**
+         * CaseChannel
+         * @enum {string}
+         */
+        CaseChannel: "chat" | "voice" | "email";
+        /** CaseOut */
+        CaseOut: {
+            channel: components["schemas"]["CaseChannel"];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Opened At
+             * Format: date-time
+             */
+            opened_at: string;
+            /** Order Id */
+            order_id: string | null;
+            /** Reference */
+            reference: string;
+            /**
+             * Reply Within
+             * @default 1 business day
+             */
+            reply_within: string;
+            status: components["schemas"]["CaseStatus"];
+            /** Subject */
+            subject: string;
+        };
+        /**
+         * CaseStatus
+         * @enum {string}
+         */
+        CaseStatus: "open" | "waiting_on_customer" | "resolved";
+        /**
+         * CatalogVocabulary
+         * @description Every product type and tag in the active catalog, with counts: the values the assistant
+         *     may pass to the product_type / tag / exclude_tag filters.
+         */
+        CatalogVocabulary: {
+            /** Product Types */
+            product_types: components["schemas"]["FacetValue"][];
+            /** Tags */
+            tags: components["schemas"]["FacetValue"][];
+        };
         /** CategoryOut */
         CategoryOut: {
             /** Name */
@@ -431,6 +742,59 @@ export interface components {
             policy_class: components["schemas"]["PolicyClass"];
             /** Slug */
             slug: string;
+        };
+        /** ConfirmReturnOut */
+        ConfirmReturnOut: {
+            label: components["schemas"]["ReturnLabelOut"] | null;
+            /**
+             * Refunded Now Minor
+             * @description Refunded at confirmation (perishables)
+             */
+            refunded_now_minor: number;
+            return: components["schemas"]["ReturnOut"];
+            /**
+             * Simulated
+             * @description Refunds are simulated until Stripe is connected
+             */
+            simulated: boolean;
+        };
+        /** ConfirmReturnRequest */
+        ConfirmReturnRequest: {
+            /** Confirmation Token */
+            confirmation_token: string;
+            /**
+             * Quote Id
+             * Format: uuid
+             */
+            quote_id: string;
+        };
+        /** ConfirmationTokenOut */
+        ConfirmationTokenOut: {
+            /**
+             * Confirmation Token
+             * @description Single use; valid until the quote expires
+             */
+            confirmation_token: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+        };
+        /** CreateCase */
+        CreateCase: {
+            /**
+             * Channel
+             * @default chat
+             * @enum {string}
+             */
+            channel: "chat" | "voice" | "email";
+            /** Order Id */
+            order_id?: string | null;
+            /** Subject */
+            subject: string;
+            /** Summary */
+            summary: string;
         };
         /** DayHours */
         DayHours: {
@@ -446,6 +810,14 @@ export interface components {
              * @description "07:00" local time; null when closed
              */
             opens: string | null;
+        };
+        /** DevAdvanceRequest */
+        DevAdvanceRequest: {
+            /**
+             * Event
+             * @enum {string}
+             */
+            event: "carrier_scan" | "warehouse_receive" | "inspect_pass" | "inspect_fail";
         };
         /**
          * EventType
@@ -482,6 +854,18 @@ export interface components {
          * @enum {string}
          */
         LegStatus: "ok" | "unavailable" | "disabled";
+        /** LineProblem */
+        LineProblem: {
+            /** Message */
+            message: string;
+            /**
+             * Order Line Id
+             * Format: uuid
+             */
+            order_line_id: string;
+            /** Reason */
+            reason: string;
+        };
         /** LineReturnOption */
         LineReturnOption: {
             /** Currency */
@@ -581,6 +965,11 @@ export interface components {
             id: string;
             /** Item Count */
             item_count: number;
+            /**
+             * Item Titles
+             * @description Every line's product title, so the order list can be searched by item
+             */
+            item_titles: string[];
             /** Lines */
             lines: components["schemas"]["OrderLineOut"][];
             payment: components["schemas"]["PaymentOut"] | null;
@@ -603,6 +992,8 @@ export interface components {
             returns: components["schemas"]["ReturnOut"][];
             /** Shipments */
             shipments: components["schemas"]["ShipmentOut"][];
+            /** @description Null when no delivery address was recorded */
+            shipping_address: components["schemas"]["ShippingAddressOut"] | null;
             /** Shipping Minor */
             shipping_minor: number;
             status: components["schemas"]["OrderStatus"];
@@ -617,6 +1008,11 @@ export interface components {
         OrderLineOut: {
             /** Amount Discount Minor */
             amount_discount_minor: number;
+            /**
+             * Amount Subtotal Minor
+             * @description Unit price times quantity, before discount and tax (the receipt's line amount)
+             */
+            amount_subtotal_minor: number;
             /** Amount Tax Minor */
             amount_tax_minor: number;
             /** Amount Total Minor */
@@ -628,6 +1024,11 @@ export interface components {
             id: string;
             /** Image Path */
             image_path: string;
+            /**
+             * Product Id
+             * @description For linking to the product and buying it again
+             */
+            product_id: string | null;
             /** Product Title */
             product_title: string;
             /** Quantity */
@@ -672,6 +1073,11 @@ export interface components {
             id: string;
             /** Item Count */
             item_count: number;
+            /**
+             * Item Titles
+             * @description Every line's product title, so the order list can be searched by item
+             */
+            item_titles: string[];
             /**
              * Placed At
              * Format: date-time
@@ -745,6 +1151,68 @@ export interface components {
          * @enum {string}
          */
         PolicyClass: "standard" | "inspection" | "final_sale" | "perishable";
+        /** PolicyDocumentOut */
+        PolicyDocumentOut: {
+            /**
+             * Effective Date
+             * Format: date
+             */
+            effective_date: string;
+            /** Id */
+            id: string;
+            /** Sections */
+            sections: components["schemas"]["PolicySectionOut"][];
+            /** Status */
+            status: string;
+            /** Summary */
+            summary: string[];
+            /** Title */
+            title: string;
+            /** Url */
+            url: string | null;
+            /** Version */
+            version: string;
+        };
+        /** PolicySearchOut */
+        PolicySearchOut: {
+            /** Query */
+            query: string;
+            /** Results */
+            results: components["schemas"]["PolicySectionOut"][];
+            /**
+             * Semantic
+             * @enum {string}
+             */
+            semantic: "used" | "unavailable" | "disabled";
+        };
+        /** PolicySectionOut */
+        PolicySectionOut: {
+            /** Body */
+            body: string;
+            /** Cite */
+            cite: string;
+            /** Doc Id */
+            doc_id: string;
+            /** Doc Title */
+            doc_title: string;
+            /**
+             * Effective Date
+             * Format: date
+             */
+            effective_date: string;
+            /** Number */
+            number: string;
+            /** Parent Title */
+            parent_title: string | null;
+            /** Section Id */
+            section_id: string;
+            /** Title */
+            title: string;
+            /** Url */
+            url: string | null;
+            /** Version */
+            version: string;
+        };
         /** ProductDetail */
         ProductDetail: {
             /**
@@ -763,6 +1231,21 @@ export interface components {
             category: components["schemas"]["CategoryOut"];
             /** Currency */
             currency: string;
+            /**
+             * Default Price Minor
+             * @description Price of that option
+             */
+            default_price_minor: number | null;
+            /**
+             * Default Variant Id
+             * @description What quick-add puts in the cart: the cheapest in-stock option
+             */
+            default_variant_id: string | null;
+            /**
+             * Default Variant Name
+             * @description e.g. "1 gallon"
+             */
+            default_variant_name: string | null;
             /** Description */
             description: string;
             /**
@@ -808,6 +1291,17 @@ export interface components {
             tags: components["schemas"]["TagOut"][];
             /** Title */
             title: string;
+            /**
+             * Type Label
+             * @description The product type for shoppers, e.g. "USB-C charger"
+             * @default
+             */
+            type_label: string;
+            /**
+             * Unit Price
+             * @description Price per ounce, e.g. "2.6¢/oz"
+             */
+            unit_price: string | null;
             /** Variant Count */
             variant_count: number;
             /** Variants */
@@ -834,6 +1328,21 @@ export interface components {
             category: components["schemas"]["CategoryOut"];
             /** Currency */
             currency: string;
+            /**
+             * Default Price Minor
+             * @description Price of that option
+             */
+            default_price_minor: number | null;
+            /**
+             * Default Variant Id
+             * @description What quick-add puts in the cart: the cheapest in-stock option
+             */
+            default_variant_id: string | null;
+            /**
+             * Default Variant Name
+             * @description e.g. "1 gallon"
+             */
+            default_variant_name: string | null;
             /**
              * Id
              * Format: uuid
@@ -866,8 +1375,76 @@ export interface components {
             tags: components["schemas"]["TagOut"][];
             /** Title */
             title: string;
+            /**
+             * Type Label
+             * @description The product type for shoppers, e.g. "USB-C charger"
+             * @default
+             */
+            type_label: string;
+            /**
+             * Unit Price
+             * @description Price per ounce, e.g. "2.6¢/oz"
+             */
+            unit_price: string | null;
             /** Variant Count */
             variant_count: number;
+        };
+        /** QuoteLineIn */
+        QuoteLineIn: {
+            /**
+             * Order Line Id
+             * Format: uuid
+             */
+            order_line_id: string;
+            /** Quantity */
+            quantity: number;
+        };
+        /** QuoteLineOut */
+        QuoteLineOut: {
+            /** Image Path */
+            image_path: string;
+            /**
+             * Order Line Id
+             * Format: uuid
+             */
+            order_line_id: string;
+            /** Policy Class */
+            policy_class: string;
+            /** Product Title */
+            product_title: string;
+            /** Quantity */
+            quantity: number;
+            /** Refund Minor */
+            refund_minor: number;
+            refund_timing: components["schemas"]["RefundTiming"];
+            /** Timing Message */
+            timing_message: string;
+            /** Variant Name */
+            variant_name: string;
+        };
+        /** QuoteRejected */
+        QuoteRejected: {
+            /** Detail */
+            detail: string;
+            /** Problems */
+            problems: components["schemas"]["LineProblem"][];
+        };
+        /** QuoteRequest */
+        QuoteRequest: {
+            /** Lines */
+            lines: components["schemas"]["QuoteLineIn"][];
+            /** Note */
+            note?: string | null;
+            /**
+             * Order Id
+             * Format: uuid
+             */
+            order_id: string;
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "damaged" | "defective" | "wrong_item" | "not_as_described" | "spoiled_or_expired" | "missing_parts" | "no_longer_needed" | "better_price" | "arrived_late" | "other";
         };
         /** RatingBucket */
         RatingBucket: {
@@ -944,6 +1521,17 @@ export interface components {
             /** Variant Name */
             variant_name: string;
         };
+        /** ReturnLabelOut */
+        ReturnLabelOut: {
+            /** Carrier */
+            carrier: string;
+            /** Drop Off */
+            drop_off: string;
+            /** Simulated */
+            simulated: boolean;
+            /** Tracking Number */
+            tracking_number: string;
+        };
         /** ReturnOptions */
         ReturnOptions: {
             /**
@@ -988,6 +1576,11 @@ export interface components {
             is_sample: boolean;
             /** Items */
             items: components["schemas"]["ReturnItemOut"][];
+            /**
+             * Order Id
+             * Format: uuid
+             */
+            order_id: string;
             /** Reason */
             reason: string;
             /** @description The latest refund attempt, if any */
@@ -997,6 +1590,51 @@ export interface components {
             /** Shipping Refund Minor */
             shipping_refund_minor: number;
             status: components["schemas"]["ReturnStatus"];
+        };
+        /** ReturnQuoteOut */
+        ReturnQuoteOut: {
+            /** Currency */
+            currency: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Items Refund Minor */
+            items_refund_minor: number;
+            /** Lines */
+            lines: components["schemas"]["QuoteLineOut"][];
+            /**
+             * Needs Shipping
+             * @description False when nothing has to be sent back (perishables)
+             */
+            needs_shipping: boolean;
+            /**
+             * Order Id
+             * Format: uuid
+             */
+            order_id: string;
+            /** Policy Version */
+            policy_version: string;
+            /** Reason */
+            reason: string;
+            refund_destination: components["schemas"]["PaymentMethodOut"] | null;
+            /** Return Id */
+            return_id: string | null;
+            /** Shipping Refund Minor */
+            shipping_refund_minor: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "expired" | "confirmed";
+            /** Total Refund Minor */
+            total_refund_minor: number;
         };
         /**
          * ReturnStatus
@@ -1085,6 +1723,12 @@ export interface components {
         Role: "customer" | "staff" | "admin";
         /** SearchMeta */
         SearchMeta: {
+            /**
+             * Exact Match
+             * @description False when no product matched the query's words well, so the results are only related items (e.g. "ipad" in a store without iPads)
+             * @default true
+             */
+            exact_match: boolean;
             keyword: components["schemas"]["LegStatus"];
             /**
              * Notice
@@ -1092,6 +1736,32 @@ export interface components {
              */
             notice: string | null;
             semantic: components["schemas"]["LegStatus"];
+            /**
+             * Total Capped
+             * @description True when search stopped collecting candidates at its limit, so `total` is a lower bound: show it as "400+"
+             * @default false
+             */
+            total_capped: boolean;
+        };
+        /**
+         * SearchSuggestions
+         * @description Search-as-you-type: a few completed queries, matching types and departments, and top
+         *     products. Word-prefix matching in PostgreSQL only; no semantic search per keystroke.
+         */
+        SearchSuggestions: {
+            /**
+             * Completions
+             * @description Completed queries, e.g. "lactose-free milk"
+             */
+            completions: string[];
+            /** Departments */
+            departments: components["schemas"]["SuggestedDepartment"][];
+            /** Product Types */
+            product_types: components["schemas"]["SuggestedType"][];
+            /** Products */
+            products: components["schemas"]["SuggestedProduct"][];
+            /** Query */
+            query: string;
         };
         /** SetCartItemRequest */
         SetCartItemRequest: {
@@ -1149,6 +1819,34 @@ export interface components {
          * @enum {string}
          */
         ShipmentStatus: "label_created" | "in_transit" | "out_for_delivery" | "delivered" | "exception";
+        /**
+         * ShippingAddressOut
+         * @description Where the order was sent, as recorded when it was placed.
+         */
+        ShippingAddressOut: {
+            /** City */
+            city: string;
+            /**
+             * Country
+             * @description ISO 3166-1 alpha-2, e.g. "US"
+             */
+            country: string;
+            /**
+             * Is Sample
+             * @description Seeded demo address; label it as a sample on screen
+             */
+            is_sample: boolean;
+            /** Line1 */
+            line1: string;
+            /** Line2 */
+            line2: string | null;
+            /** Name */
+            name: string;
+            /** Postal Code */
+            postal_code: string;
+            /** State */
+            state: string;
+        };
         /** SignInRequest */
         SignInRequest: {
             /**
@@ -1214,6 +1912,55 @@ export interface components {
             timezone: string;
             today_hours: components["schemas"]["DayHours"];
         };
+        /** SuggestedDepartment */
+        SuggestedDepartment: {
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+        };
+        /** SuggestedProduct */
+        SuggestedProduct: {
+            /** Brand */
+            brand: string;
+            /** Currency */
+            currency: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Image Path */
+            image_path: string;
+            /** In Stock */
+            in_stock: boolean;
+            /**
+             * Price Minor
+             * @description Lowest current variant price, from PostgreSQL
+             */
+            price_minor: number;
+            /** Title */
+            title: string;
+        };
+        /** SuggestedType */
+        SuggestedType: {
+            /** Category Name */
+            category_name: string;
+            /**
+             * Category Slug
+             * @description The department most of these products are in
+             */
+            category_slug: string;
+            /** Count */
+            count: number;
+            /** Label */
+            label: string;
+            /**
+             * Value
+             * @description Product type slug, usable in the product_type filter
+             */
+            value: string;
+        };
         /** TagOut */
         TagOut: {
             /** Label */
@@ -1276,6 +2023,11 @@ export interface components {
             price_minor: number;
             /** Sku */
             sku: string;
+            /**
+             * Unit Price
+             * @description Price per ounce, e.g. "2.6¢/oz"
+             */
+            unit_price: string | null;
         };
     };
     responses: never;
@@ -1571,6 +2323,26 @@ export interface operations {
             };
         };
     };
+    vocabulary_v1_catalog_vocabulary_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogVocabulary"];
+                };
+            };
+        };
+    };
     categories_v1_categories_get: {
         parameters: {
             query?: never;
@@ -1687,6 +2459,76 @@ export interface operations {
             };
         };
     };
+    search_v1_policies_search_get: {
+        parameters: {
+            query: {
+                q: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicySearchOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_document_v1_policies__doc_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyDocumentOut"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     products_v1_products_get: {
         parameters: {
             query?: {
@@ -1779,6 +2621,8 @@ export interface operations {
                 sort?: components["schemas"]["ReviewSort"];
                 page?: number;
                 page_size?: number;
+                /** @description Only this star rating */
+                rating?: number | null;
             };
             header?: never;
             path: {
@@ -1890,6 +2734,332 @@ export interface operations {
             };
         };
     };
+    list_returns_v1_returns_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReturnOut"][];
+                };
+            };
+        };
+    };
+    confirm_return_v1_returns_confirm_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmReturnRequest"];
+            };
+        };
+        responses: {
+            /** @description Already confirmed: the same return */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfirmReturnOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuoteRejected"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuoteRejected"];
+                };
+            };
+            /** @description Gone */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuoteRejected"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dev_reset_v1_returns_dev_reset_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not a development environment */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    create_quote_v1_returns_quote_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuoteRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReturnQuoteOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuoteRejected"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuoteRejected"];
+                };
+            };
+        };
+    };
+    get_quote_v1_returns_quotes__quote_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quote_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReturnQuoteOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuoteRejected"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mint_confirmation_v1_returns_quotes__quote_id__confirmation_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quote_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfirmationTokenOut"];
+                };
+            };
+            /** @description Not the customer's browser */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuoteRejected"];
+                };
+            };
+            /** @description Gone */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuoteRejected"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dev_advance_v1_returns__return_id__dev_advance_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                return_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DevAdvanceRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReturnOut"];
+                };
+            };
+            /** @description Not found, or not a development environment */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_suggest_v1_search_suggest_get: {
+        parameters: {
+            query: {
+                /** @description What the shopper has typed so far */
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchSuggestions"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_stores_v1_stores_get: {
         parameters: {
             query?: never;
@@ -1906,6 +3076,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StoreOut"][];
+                };
+            };
+        };
+    };
+    list_cases_v1_support_cases_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseOut"][];
+                };
+            };
+        };
+    };
+    create_case_v1_support_cases_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCase"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

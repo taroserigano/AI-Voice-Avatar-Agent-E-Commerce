@@ -35,6 +35,9 @@ AFTER_OPENING = "Store in a cool, dry place. Refrigerate after opening."
 C8 = "8 fl oz (240 mL)"
 CAN = "1 can (12 fl oz / 355 mL)"
 DRINK_CLAIMS = ("sugar-free", "zero-calorie", "no-added-sugar", "low-sugar")
+# Coffee beans, grounds, pods and tea bags: nobody shops them as "zero calorie" (the facts are
+# for the brewed cup), so they carry no nutrition claims; ready-to-drink versions use DRINK_CLAIMS.
+BREWED_CLAIMS: tuple[str, ...] = ()
 
 
 def N(
@@ -110,7 +113,7 @@ def coffee() -> list[ProductSeed]:
                  **({"Decaf process": "Swiss Water Process (chemical free)"} if decaf else {})},
                 f"{roast} roast {form.lower()} coffee from {origin}{', decaffeinated with the chemical-free Swiss Water Process' if decaf else ''}."
                 f"{' Certified organic.' if organic else ''}{' Fair Trade Certified.' if fair else ''}",
-            )], ("zero-calorie",))  # fmt: skip
+            )], BREWED_CLAIMS)  # fmt: skip
     mesa_rows = [  # title, roast, form, decaf, flavored, sizes, caffeine, intro
         ("Original Medium Roast Ground Coffee", "Medium", "Ground", False, False, "can", CAFF, "Smooth, balanced medium roast ground coffee."),
         ("Dark Roast Ground Coffee", "Dark", "Ground", False, False, "can", CAFF, "Bold, rich dark roast ground coffee."),
@@ -144,7 +147,7 @@ def coffee() -> list[ProductSeed]:
         out += _rows([(
             MESA, title, "coffee", n, size_sets[sizes], ing[0].upper() + ing[1:], (), ("decaf",) if decaf else (),
             {"Roast": roast, "Form": form, "Caffeine": caffeine, **({"Flavor": title.split(" Flavored")[0]} if flavored else {})}, intro,
-        )], ("zero-calorie",))  # fmt: skip
+        )], BREWED_CLAIMS)  # fmt: skip
     rows: list[Row] = [
         (STORE_BRAND, "Medium Roast Ground Coffee", "coffee", BREWED, [S("30OZ", "30.5 oz canister", 9.99, 30.5)], "100% arabica coffee.", (), (),
          {"Roast": "Medium", "Form": "Ground", "Caffeine": CAFF}, "Everyday medium roast ground coffee."),
@@ -182,7 +185,7 @@ def coffee() -> list[ProductSeed]:
          "Cold brewed coffee (water, coffee).", (), ("unsweetened", "vegan", "dairy-free"), {"Caffeine": "About 150 mg per 8 fl oz", "Sweetened": "No"},
          "Unsweetened black cold brew."),
     ]  # fmt: skip
-    out += _rows(rows[:8], ("zero-calorie",))
+    out += _rows(rows[:8], BREWED_CLAIMS)
     out += _rows(rows[8:], DRINK_CLAIMS, REFRIGERATED)
     return out
 
@@ -226,7 +229,7 @@ def tea() -> list[ProductSeed]:
          {"Tea type": "Black", "Caffeine": "About 30 mg per 8 fl oz"}, "Family-size black tea bags; each brews a quart of iced tea."),
         (STORE_BRAND, "Green Tea Bags", "tea", bag, [S("40CT", "40 tea bags", 2.99)], "Green tea.", (), (), {"Tea type": "Green", "Caffeine": green}, "Everyday green tea bags."),
     ]  # fmt: skip
-    out = _rows(rows, ("zero-calorie",))
+    out = _rows(rows, BREWED_CLAIMS)
     rows = [
         (PORCH, "Southern Sweet Tea", "iced-tea", N(C8, 90, 0, 0, 15, 23, 0, 22, 22, 0), [S("GAL", "1 gallon jug", 3.49, 128), S("59OZ", "59 fl oz bottle", 2.99, 59)],
          "Brewed black tea (filtered water, black tea), cane sugar, citric acid.", (), ("vegan", "gluten-free"), {"Caffeine": "About 20 mg per 8 fl oz", "Sweetened": "Yes, cane sugar"},

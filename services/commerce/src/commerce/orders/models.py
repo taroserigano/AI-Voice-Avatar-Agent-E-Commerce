@@ -9,7 +9,7 @@ import enum
 import uuid
 from datetime import datetime
 
-from sqlalchemy import CheckConstraint, DateTime, Enum, ForeignKey, Integer, String
+from sqlalchemy import Boolean, CheckConstraint, DateTime, Enum, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from commerce.db import Base, Timestamps, UUIDPk
@@ -38,6 +38,18 @@ class Order(UUIDPk, Timestamps, Base):
     total_minor: Mapped[int] = mapped_column(Integer)
     placed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     delivered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    # Where it was sent, snapshotted when the order was placed (a later address-book edit
+    # doesn't rewrite history). All null when there's no delivery address on file.
+    ship_to_name: Mapped[str | None] = mapped_column(String(120))
+    ship_to_line1: Mapped[str | None] = mapped_column(String(200))
+    ship_to_line2: Mapped[str | None] = mapped_column(String(200))
+    ship_to_city: Mapped[str | None] = mapped_column(String(100))
+    ship_to_state: Mapped[str | None] = mapped_column(String(40))
+    ship_to_postal_code: Mapped[str | None] = mapped_column(String(20))
+    ship_to_country: Mapped[str | None] = mapped_column(String(2))
+    # Seeded demo address (development accounts only); the storefront labels it as a sample.
+    ship_to_is_sample: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
 
     lines: Mapped[list[OrderLine]] = relationship(
         back_populates="order", cascade="all, delete-orphan"

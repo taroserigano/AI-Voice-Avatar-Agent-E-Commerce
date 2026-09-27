@@ -124,6 +124,7 @@ def list_reviews(
     sort: ReviewSort,
     page: int,
     page_size: int,
+    rating: int | None = None,
 ) -> ReviewPage:
     if not _product_exists(db, product_id):
         raise ProductNotFound
@@ -133,11 +134,14 @@ def list_reviews(
         ReviewSort.LOWEST: (Review.rating.asc(), Review.created_at.desc(), Review.id),
     }[sort]
     rating_summary = summary(db, product_id)
+    matching = [Review.product_id == product_id]
+    if rating is not None:
+        matching.append(Review.rating == rating)
     reviews = list(
         db.scalars(
             select(Review)
             .options(selectinload(Review.user))
-            .where(Review.product_id == product_id)
+            .where(*matching)
             .order_by(*order_by)
             .offset((page - 1) * page_size)
             .limit(page_size)
@@ -154,7 +158,9 @@ def list_reviews(
     return ReviewPage(
         summary=rating_summary,
         items=[_out(r, viewer_id, purchasers) for r in reviews],
-        total=rating_summary.count,
+        total=rating_summary.count
+        if rating is None
+        else next((b.count for b in rating_summary.distribution if b.stars == rating), 0),
         page=page,
         page_size=page_size,
         my_review=_out(mine, viewer_id, purchasers) if mine else None,

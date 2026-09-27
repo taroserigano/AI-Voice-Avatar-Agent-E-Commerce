@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Ice cream">
+  <title>Ice cream</title>
   <defs>
-    <radialGradient id="t-ice-cream-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-ice-cream-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f3f8f9"/>
       <stop offset="1" stop-color="#d6e7ec"/>
     </radialGradient>
-    <linearGradient id="t-ice-cream-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#2b859d"/>
-      <stop offset="1" stop-color="#0e7490"/>
-    </linearGradient>
     <filter id="t-ice-cream-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-ice-cream-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-ice-cream-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M320 180v180M242 225l156 90M242 315l156-90" stroke="url(#t-ice-cream-ink)" stroke-width="16" stroke-linecap="round"/><circle cx="320" cy="270" r="20" fill="url(#t-ice-cream-ink)"/></g>
-  <rect x="222" y="500" width="195" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Ice cream</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-ice-cream-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#062e3a" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M242.0 236L254.0 428Q255.0 440 268.0 440H372.0Q385.0 440 386.0 428L398.0 236z" fill="#0e7490"/><path d="M245.0 302.0H395.0L389.5 374.0H250.5z" fill="#0a5165"/><rect x="234" y="210" width="172" height="36" rx="12" fill="#e2eef2"/><rect x="234" y="236" width="172" height="10" rx="5" fill="#b9c3c6"/><g stroke="none"><g transform="translate(320 343) scale(1.5)" stroke-width="2.67"><path d="M-14 4H14L0 26z" fill="#d9a066"/><circle cx="0" cy="-6" r="15" fill="#f9a8d4"/><circle cx="-8" cy="-12" r="4" fill="#ffffff" fill-opacity="0.5"/></g></g><path d="M258.0 262L266.0 420" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.45"/></g>
 </svg>

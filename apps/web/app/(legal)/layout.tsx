@@ -1,7 +1,9 @@
-import { EyeIcon, NotebookIcon, ShieldCheckIcon } from "@/components/icons";
+import { ArrowLeftIcon, EyeIcon, NotebookIcon, PackageIcon, ReturnIcon, ShieldCheckIcon } from "@/components/icons";
 import { Logo } from "@/components/logo";
 import { buttonClasses } from "@/components/ui/button";
 import { containerClasses } from "@/components/ui/container";
+import { SESSION_COOKIE } from "@/lib/api-server";
+import { cookies } from "next/headers";
 import Link from "next/link";
 
 /**
@@ -9,6 +11,13 @@ import Link from "next/link";
  * `:has()` to highlight the current document without needing a client component.
  */
 const DOCS = [
+  {
+    slug: "returns-policy",
+    href: "/returns-policy",
+    label: "Returns & refunds",
+    Icon: ReturnIcon,
+    current: "group-has-[[data-doc=returns-policy]]/legal:bg-raised group-has-[[data-doc=returns-policy]]/legal:text-brand-800 group-has-[[data-doc=returns-policy]]/legal:shadow-sm group-has-[[data-doc=returns-policy]]/legal:ring-line",
+  },
   {
     slug: "privacy",
     href: "/privacy",
@@ -32,15 +41,34 @@ const DOCS = [
   },
 ] as const;
 
-export default function LegalLayout({ children }: { children: React.ReactNode }) {
+const footerLink =
+  "inline-flex min-h-11 items-center font-medium text-brand-700 underline decoration-brand-300 underline-offset-4 hover:decoration-brand-700";
+
+export default async function LegalLayout({ children }: { children: React.ReactNode }) {
+  // The pages stay public. The session cookie only swaps the header and footer links; it isn't
+  // verified here (the store checks it on the next page), and nothing private is shown.
+  const signedIn = Boolean((await cookies()).get(SESSION_COOKIE)?.value);
   return (
     <div className="group/legal relative flex min-h-screen flex-col bg-canvas">
       <header className="sticky top-0 z-40 border-b border-line bg-raised/85 backdrop-blur-xl backdrop-saturate-150">
         <div className={containerClasses("default", "flex h-16 items-center justify-between gap-4")}>
           <Logo />
-          <Link href="/sign-in" className={buttonClasses("outline", "sm")}>
-            Sign in
-          </Link>
+          {signedIn ? (
+            <nav aria-label="Store" className="flex items-center gap-1 sm:gap-2">
+              <Link href="/orders" className={buttonClasses("ghost", "sm", "max-sm:hidden")}>
+                <PackageIcon className="size-4" />
+                Orders &amp; returns
+              </Link>
+              <Link href="/" className={buttonClasses("outline", "sm")}>
+                <ArrowLeftIcon className="size-4" />
+                Back to the store
+              </Link>
+            </nav>
+          ) : (
+            <Link href="/sign-in" className={buttonClasses("outline", "sm")}>
+              Sign in
+            </Link>
+          )}
         </div>
       </header>
 
@@ -73,9 +101,20 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
       <footer className="border-t border-line bg-raised">
         <div className={containerClasses("default", "flex flex-wrap items-center justify-between gap-4 py-6 text-sm text-muted")}>
           <p>© Larkspur (demo store). A portfolio demonstration, not a real store.</p>
-          <Link href="/sign-in" className="inline-flex min-h-11 items-center font-medium text-brand-700 underline decoration-brand-300 underline-offset-4 hover:decoration-brand-700">
-            Sign in to shop
-          </Link>
+          {signedIn ? (
+            <p className="flex flex-wrap gap-x-5">
+              <Link href="/" className={footerLink}>
+                Back to the store
+              </Link>
+              <Link href="/help" className={footerLink}>
+                Help center
+              </Link>
+            </p>
+          ) : (
+            <Link href="/sign-in" className={footerLink}>
+              Sign in to shop
+            </Link>
+          )}
         </div>
       </footer>
     </div>

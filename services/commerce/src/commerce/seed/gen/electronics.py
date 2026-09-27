@@ -223,7 +223,7 @@ def power_and_cables() -> list[ProductSeed]:
           one(19.99), ["wireless", "usb-c"], {"Wattage": "15 W max", "Standard": "Universal wireless charging", "Input": "USB-C (adapter not included)"}),
         P(VOLTWAVE, "wireless-charger", "3-in-1 Magnetic Wireless Charging Stand",
           "Magnetic wireless stand that charges a phone, earbuds, and a smartwatch at once. Includes a 30 W wall adapter.",
-          one(49.99), ["wireless", "usb-c"], {"Wattage": "15 W phone, 5 W earbuds, 2.5 W watch", "Standard": "Magnetic wireless charging", "Adapter included": "Yes, 30 W"}),
+          one(49.99), ["wireless", "usb-c"], {"Charging output": "15 W phone, 5 W earbuds, 2.5 W watch", "Standard": "Magnetic wireless charging", "Adapter included": "Yes, 30 W"}),
         P(VOLTWAVE, "usb-c-cable", "USB-C to USB-C Cable, 60W",
           "Durable nylon-braided USB-C to USB-C cable for charging at up to 60 W and USB 2.0 data. Choose your length.",
           sz(("3FT", "3 ft", 8.99), ("6FT", "6 ft", 10.99), ("10FT", "10 ft", 13.99)), ["usb-c"],

@@ -42,7 +42,7 @@ describe("groupByDay", () => {
 });
 
 describe("recentlyViewed", () => {
-  const p = (id: string) => ({ id, title: id, image_path: `/images/${id}.svg` });
+  const p = (id: string) => ({ id, title: id, image_path: `/images/${id}.svg`, price_minor: 499, currency: "USD", in_stock: true });
   it("dedupes by product, keeps newest first, and caps the count", () => {
     const events = [
       event("2026-09-26T06:00:00Z", { type: "viewed_product", product: p("a") }),

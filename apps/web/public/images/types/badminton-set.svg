@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Badminton set">
+  <title>Badminton set</title>
   <defs>
-    <radialGradient id="t-badminton-set-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-badminton-set-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fcf6f3"/>
       <stop offset="1" stop-color="#f5dfd6"/>
     </radialGradient>
-    <linearGradient id="t-badminton-set-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#c95829"/>
-      <stop offset="1" stop-color="#c2410c"/>
-    </linearGradient>
     <filter id="t-badminton-set-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-badminton-set-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-badminton-set-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><circle cx="320" cy="270" r="80" fill="none" stroke="url(#t-badminton-set-ink)" stroke-width="16"/><path d="M240 270h160M320 190c-40 50-40 110 0 160M320 190c40 50 40 110 0 160" stroke="url(#t-badminton-set-ink)" stroke-width="10" fill="none"/></g>
-  <rect x="192" y="500" width="255" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Badminton set</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-badminton-set-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#4e1a05" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><g transform="translate(300 270) rotate(20)"><path d="M0 80V200" fill="none" stroke="#334155" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><rect x="-12" y="130" width="24" height="80" rx="10" fill="#c2410c"/><ellipse cx="0" cy="-20" rx="90" ry="110" fill="#e0f2fe"/><g transform="translate(-320 -270)"><path d="M262 190V350M282 190V350M302 190V350M322 190V350M342 190V350M362 190V350M242 210H398M242 230H398M242 250H398M242 270H398M242 290H398M242 310H398M242 330H398" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g><ellipse cx="0" cy="-20" rx="90" ry="110" fill="none" stroke="#c2410c" stroke-width="16" stroke-opacity="1"/></g><circle cx="424" cy="400" r="34" fill="#c6e14b"/><path d="M398 388q26 12 52 0" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g>
 </svg>

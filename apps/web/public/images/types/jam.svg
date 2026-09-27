@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Jam">
+  <title>Jam</title>
   <defs>
-    <radialGradient id="t-jam-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-jam-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#faf7f3"/>
       <stop offset="1" stop-color="#efe4d5"/>
     </radialGradient>
-    <linearGradient id="t-jam-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#ac7525"/>
-      <stop offset="1" stop-color="#a16207"/>
-    </linearGradient>
     <filter id="t-jam-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-jam-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-jam-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><rect x="260" y="200" width="120" height="30" rx="8" fill="url(#t-jam-ink)" fill-opacity=".85"/><rect x="250" y="230" width="140" height="140" rx="20" fill="url(#t-jam-ink)"/><rect x="275" y="275" width="90" height="50" rx="6" fill="#a16207" fill-opacity=".35"/></g>
-  <rect x="268" y="500" width="105" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Jam</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-jam-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#402703" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M256 236H384Q394 236 394 258V412Q394 440 366 440H274Q246 440 246 412V258Q246 236 256 236z" fill="#8e1b3a"/><rect x="252" y="196" width="136" height="44" rx="10" fill="#e5484d"/><path d="M266 210V228M284 210V228M356 210V228M374 210V228" fill="none" stroke="#b73a3e" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><rect x="246" y="292" width="148" height="104" fill="#ffffff"/><g stroke="none"><g transform="translate(320 344) scale(1.5)" stroke-width="2.67"><path d="M0 24C-16 16-22 2-20-8-14-14-6-12 0-10 6-12 14-14 20-8 22 2 16 16 0 24z" fill="#e5484d"/><path d="M-12-12 0-6 12-12 6-18 0-14-6-18z" fill="#5fae3a"/><circle cx="-7" cy="2" r="2" fill="#f9c846"/><circle cx="6" cy="0" r="2" fill="#f9c846"/><circle cx="0" cy="12" r="2" fill="#f9c846"/></g></g><path d="M262 266V282M262 408V400" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.55"/><path d="M232 212Q320 176 408 212L398 254Q384 244 370 256Q356 244 342 256Q328 244 314 256Q300 244 286 256Q272 244 258 256Q246 244 242 254z" fill="#e5484d"/><rect x="258" y="212" width="14" height="14" rx="2" fill="#ffffff" fill-opacity="0.8"/><rect x="298" y="200" width="14" height="14" rx="2" fill="#ffffff" fill-opacity="0.8"/><rect x="338" y="200" width="14" height="14" rx="2" fill="#ffffff" fill-opacity="0.8"/><rect x="378" y="212" width="14" height="14" rx="2" fill="#ffffff" fill-opacity="0.8"/><rect x="278" y="232" width="14" height="14" rx="2" fill="#ffffff" fill-opacity="0.8"/><rect x="318" y="222" width="14" height="14" rx="2" fill="#ffffff" fill-opacity="0.8"/><rect x="358" y="232" width="14" height="14" rx="2" fill="#ffffff" fill-opacity="0.8"/></g>
 </svg>

@@ -9,14 +9,16 @@ import {
   TruckIcon,
 } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { Notice } from "@/components/ui/notice";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/format";
-import { cardLabel, formatDay, ineligibleTitle, ineligibleTone, refundTimingPhrase } from "@/lib/orders";
+import { cardLabel, formatDay, ineligibleTitle, ineligibleTone, refundTimingPhrase, variantLabel } from "@/lib/orders";
 import type { LineReturnOption, OrderDetail, ReturnOptions } from "@ai-commerce/contracts";
+import Link from "next/link";
+import { AddToCartButton } from "@/components/account/add-to-cart-button";
 
-const HELPER = "Returns open in the next update: this shows what you'd get back.";
+const HELPER = "Xana, our support assistant, shows your exact refund. Nothing is returned until you confirm.";
 
 /**
  * Every line of the order with what the server says about returning it. Nothing here decides
@@ -74,9 +76,20 @@ export function OrderItems({ order, options }: { order: OrderDetail; options: Re
                 />
                 <div className="flex min-w-0 flex-1 flex-col justify-between gap-2 sm:flex-row sm:gap-6">
                   <div className="min-w-0">
-                    <h3 className="font-sans text-base font-semibold leading-snug text-ink">{line.product_title}</h3>
+                    <h3 className="font-sans text-base font-semibold leading-snug text-ink">
+                      {line.product_id ? (
+                        <Link
+                          href={`/products/${line.product_id}`}
+                          className="transition-colors hover:text-brand-700 hover:underline hover:underline-offset-4"
+                        >
+                          {line.product_title}
+                        </Link>
+                      ) : (
+                        line.product_title
+                      )}
+                    </h3>
                     <p className="mt-1 text-sm text-muted">
-                      {line.variant_name !== "Standard" ? `${line.variant_name} · ` : null}
+                      {variantLabel(line.variant_name) ? `${line.variant_name} · ` : null}
                       Qty {line.quantity}
                     </p>
                     {line.amount_discount_minor > 0 ? (
@@ -94,10 +107,21 @@ export function OrderItems({ order, options }: { order: OrderDetail; options: Re
                       {line.quantity > 1 ? `${formatMoney(line.unit_price_minor, order.currency)} each · ` : null}
                       paid incl. tax
                     </p>
+                    {line.product_id ? (
+                      <AddToCartButton
+                        variantId={line.variant_id}
+                        productTitle={line.product_title}
+                        label="Buy again"
+                        again
+                        variant="outline"
+                        showCartLink
+                        className="mt-2.5 sm:items-end"
+                      />
+                    ) : null}
                   </div>
                 </div>
               </div>
-              {opt && !shared ? <Eligibility option={opt} destination={destination} lineId={line.id} /> : null}
+              {opt && !shared ? <Eligibility option={opt} destination={destination} lineId={line.id} orderId={order.id} /> : null}
             </li>
           );
         })}
@@ -116,7 +140,17 @@ export function OrderItems({ order, options }: { order: OrderDetail; options: Re
   );
 }
 
-function Eligibility({ option, destination, lineId }: { option: LineReturnOption; destination: string; lineId: string }) {
+function Eligibility({
+  option,
+  destination,
+  lineId,
+  orderId,
+}: {
+  option: LineReturnOption;
+  destination: string;
+  lineId: string;
+  orderId: string;
+}) {
   const partlyReturned = option.returned_quantity > 0 && option.reason !== "fully_returned";
   if (option.eligible) {
     const helperId = `return-help-${lineId}`;
@@ -153,19 +187,16 @@ function Eligibility({ option, destination, lineId }: { option: LineReturnOption
           <p className="mt-3 text-xs leading-relaxed text-muted">{option.message}</p>
         </div>
         <div className="mt-4 shrink-0 sm:mt-0 sm:w-52 sm:text-right">
-          <Button
-            variant="outline"
-            aria-disabled="true"
+          <ButtonLink
+            href={`/support?order=${orderId}&line=${lineId}`}
+            variant="primary"
             aria-describedby={helperId}
-            className="w-full bg-raised/80 text-ink-soft shadow-none ring-success-200 aria-disabled:opacity-100 sm:w-auto"
+            className="w-full sm:w-auto"
           >
-            <ReturnIcon className="size-4.5 text-muted" />
+            <ReturnIcon className="size-4.5" />
             Start a return
-            <span className="rounded-full bg-accent-100 px-1.5 py-px text-[0.6875rem] font-semibold uppercase tracking-eyebrow text-accent-800">
-              Soon
-            </span>
             <span className="sr-only"> for {option.product_title}</span>
-          </Button>
+          </ButtonLink>
           <p id={helperId} className="mt-2 text-xs leading-snug text-muted">
             {HELPER}
           </p>

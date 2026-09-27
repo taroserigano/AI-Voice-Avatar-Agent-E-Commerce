@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Cookies">
+  <title>Cookies</title>
   <defs>
-    <radialGradient id="t-cookies-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-cookies-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#faf5f3"/>
       <stop offset="1" stop-color="#ecdfd6"/>
     </radialGradient>
-    <linearGradient id="t-cookies-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#9f572b"/>
-      <stop offset="1" stop-color="#92400e"/>
-    </linearGradient>
     <filter id="t-cookies-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-cookies-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-cookies-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M230 300c0-60 40-90 90-90s90 30 90 90v40H230z" fill="url(#t-cookies-ink)"/><path d="M280 250l-12 40M320 240v48M360 250l12 40" stroke="#92400e" stroke-width="8" stroke-linecap="round" stroke-opacity=".5"/></g>
-  <rect x="238" y="500" width="165" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Cookies</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-cookies-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#3a1a06" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><g transform="translate(386 334) scale(0.8)" stroke-width="5.00"><circle cx="0" cy="0" r="76" fill="#c98a48"/><path d="M0-8C6-4 8 2 6 6-2 10-8 6-8 0-6-6 0-8 0-8z" fill="#5b3a24" transform="translate(-30 -30) rotate(-90)"/><path d="M0-8C6-4 8 2 6 6-2 10-8 6-8 0-6-6 0-8 0-8z" fill="#5b3a24" transform="translate(20 -40) rotate(60)"/><path d="M0-8C6-4 8 2 6 6-2 10-8 6-8 0-6-6 0-8 0-8z" fill="#5b3a24" transform="translate(40 4) rotate(120)"/><path d="M0-8C6-4 8 2 6 6-2 10-8 6-8 0-6-6 0-8 0-8z" fill="#5b3a24" transform="translate(-10 10) rotate(-30)"/><path d="M0-8C6-4 8 2 6 6-2 10-8 6-8 0-6-6 0-8 0-8z" fill="#5b3a24" transform="translate(-44 20) rotate(-132)"/><path d="M0-8C6-4 8 2 6 6-2 10-8 6-8 0-6-6 0-8 0-8z" fill="#5b3a24" transform="translate(14 44) rotate(42)"/><path d="M0-8C6-4 8 2 6 6-2 10-8 6-8 0-6-6 0-8 0-8z" fill="#5b3a24" transform="translate(-8 -32) rotate(-24)"/></g><g transform="translate(290 362)"><circle cx="0" cy="0" r="76" fill="#d9a060"/><path d="M0-8C6-4 8 2 6 6-2 10-8 6-8 0-6-6 0-8 0-8z" fill="#5b3a24" transform="translate(-30 -30) rotate(-90)"/><path d="M0-8C6-4 8 2 6 6-2 10-8 6-8 0-6-6 0-8 0-8z" fill="#5b3a24" transform="translate(20 -40) rotate(60)"/><path d="M0-8C6-4 8 2 6 6-2 10-8 6-8 0-6-6 0-8 0-8z" fill="#5b3a24" transform="translate(40 4) rotate(120)"/><path d="M0-8C6-4 8 2 6 6-2 10-8 6-8 0-6-6 0-8 0-8z" fill="#5b3a24" transform="translate(-10 10) rotate(-30)"/><path d="M0-8C6-4 8 2 6 6-2 10-8 6-8 0-6-6 0-8 0-8z" fill="#5b3a24" transform="translate(-44 20) rotate(-132)"/><path d="M0-8C6-4 8 2 6 6-2 10-8 6-8 0-6-6 0-8 0-8z" fill="#5b3a24" transform="translate(14 44) rotate(42)"/><path d="M0-8C6-4 8 2 6 6-2 10-8 6-8 0-6-6 0-8 0-8z" fill="#5b3a24" transform="translate(-8 -32) rotate(-24)"/></g></g>
 </svg>

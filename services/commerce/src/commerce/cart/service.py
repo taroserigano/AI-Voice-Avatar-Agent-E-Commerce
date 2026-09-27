@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session, selectinload
 from commerce.cart.models import MAX_LINE_QUANTITY, Cart, CartItem
 from commerce.cart.schemas import CartLineOut, CartOut
 from commerce.catalog.models import Product, Variant
+from commerce.config import get_settings
 from commerce.money import DEFAULT_CURRENCY, line_total
 
 
@@ -158,6 +159,9 @@ def cart_view(db: Session, user_id: uuid.UUID) -> CartOut:
                 max_quantity=min(MAX_LINE_QUANTITY, max(available, 0)),
             )
         )
+    settings = get_settings()
+    remaining = max(settings.free_shipping_at_minor - subtotal, 0)
+    shipping = settings.shipping_minor if lines and remaining else 0
     return CartOut(
         id=cart.id,
         version=cart.version,
@@ -166,4 +170,8 @@ def cart_view(db: Session, user_id: uuid.UUID) -> CartOut:
         item_count=sum(line.quantity for line in lines),
         subtotal_minor=subtotal,
         warnings=warnings,
+        shipping_minor=shipping,
+        estimated_total_minor=subtotal + shipping,
+        free_shipping_threshold_minor=settings.free_shipping_at_minor,
+        free_shipping_remaining_minor=remaining if lines else settings.free_shipping_at_minor,
     )

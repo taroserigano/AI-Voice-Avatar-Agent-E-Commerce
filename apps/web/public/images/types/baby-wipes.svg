@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Baby wipes">
+  <title>Baby wipes</title>
   <defs>
-    <radialGradient id="t-baby-wipes-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-baby-wipes-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fdf4f8"/>
       <stop offset="1" stop-color="#f9dae8"/>
     </radialGradient>
-    <linearGradient id="t-baby-wipes-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#df4187"/>
-      <stop offset="1" stop-color="#db2777"/>
-    </linearGradient>
     <filter id="t-baby-wipes-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-baby-wipes-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-baby-wipes-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M300 210h40v30c20 10 30 25 30 45v85h-100v-85c0-20 10-35 30-45z" fill="url(#t-baby-wipes-ink)"/><rect x="305" y="180" width="30" height="30" rx="12" fill="url(#t-baby-wipes-ink)" fill-opacity=".85"/></g>
-  <rect x="215" y="500" width="210" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Baby wipes</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-baby-wipes-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#581030" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><rect x="190" y="290" width="260" height="150" rx="40" fill="#fbe5ef"/><rect x="254" y="306" width="132" height="60" rx="24" fill="#db2777"/><rect x="270" y="318" width="100" height="36" rx="18" fill="#991b53"/><path d="M290 330C286 300 318 288 326 306C340 288 362 304 350 330z" fill="#ffffff"/><g stroke="none"><g transform="translate(320 402) scale(1.2)" stroke-width="3.33"><path d="M0 20C-26 2-22-20-8-20c4 0 7 2 8 6 1-4 4-6 8-6 14 0 18 22-8 40z" fill="#db2777"/></g></g></g>
 </svg>

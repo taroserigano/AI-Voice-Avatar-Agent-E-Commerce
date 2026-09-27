@@ -1,5 +1,6 @@
 import { InfoIcon } from "@/components/icons";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = { title: "Terms" };
 
@@ -24,8 +25,14 @@ export default function TermsPage() {
           Returns
         </h2>
         <p className="mt-3 text-[1.0625rem] leading-relaxed text-ink-soft">
-          The sandbox return policy is 30 days from delivery. Gift cards are final sale. Electronics are refunded after
-          inspection. Refunds go back to the original payment method.
+          Returns and refunds are covered by our{" "}
+          <Link
+            href="/returns-policy"
+            className="font-medium text-brand-700 underline decoration-brand-300 underline-offset-4 hover:decoration-brand-700"
+          >
+            return and refund policy
+          </Link>
+          : most items within 30 days after delivery, refunded to the original payment method.
         </p>
       </section>
     </article>

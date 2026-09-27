@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Toilet paper">
+  <title>Toilet paper</title>
   <defs>
-    <radialGradient id="t-toilet-paper-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-toilet-paper-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f3f8f8"/>
       <stop offset="1" stop-color="#d6e8e6"/>
     </radialGradient>
-    <linearGradient id="t-toilet-paper-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#2c867f"/>
-      <stop offset="1" stop-color="#0f766e"/>
-    </linearGradient>
     <filter id="t-toilet-paper-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-toilet-paper-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-toilet-paper-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M290 230h60l20 30v110H270V260z" fill="url(#t-toilet-paper-ink)"/><path d="M300 230v-30h50l30 16-30 14" fill="url(#t-toilet-paper-ink)" fill-opacity=".85"/></g>
-  <rect x="200" y="500" width="240" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Toilet paper</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-toilet-paper-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#062f2c" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><rect x="324" y="290" width="124" height="136" fill="#ffffff"/><ellipse cx="386" cy="426" rx="62" ry="16" fill="#ffffff"/><ellipse cx="386" cy="290" rx="62" ry="16" fill="#eef5f5"/><ellipse cx="386" cy="290" rx="18" ry="7" fill="#bcd9d6"/><path d="M334 310V422" fill="none" stroke="#e2efee" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><rect x="192" y="252" width="152" height="172" fill="#ffffff"/><ellipse cx="268" cy="424" rx="76" ry="16" fill="#ffffff"/><ellipse cx="268" cy="252" rx="76" ry="16" fill="#eef5f5"/><ellipse cx="268" cy="252" rx="18" ry="7" fill="#bcd9d6"/><path d="M202 272V420" fill="none" stroke="#e2efee" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><path d="M344 330V420Q360 436 380 430V332z" fill="#ffffff"/></g>
 </svg>

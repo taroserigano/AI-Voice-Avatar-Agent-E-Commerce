@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Citrus">
+  <title>Citrus</title>
   <defs>
-    <radialGradient id="t-citrus-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-citrus-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f6f8f3"/>
       <stop offset="1" stop-color="#e1e9d6"/>
     </radialGradient>
-    <linearGradient id="t-citrus-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#628c2c"/>
-      <stop offset="1" stop-color="#4d7c0f"/>
-    </linearGradient>
     <filter id="t-citrus-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-citrus-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-citrus-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><circle cx="300" cy="285" r="62" fill="url(#t-citrus-ink)"/><circle cx="345" cy="285" r="62" fill="url(#t-citrus-ink)" fill-opacity=".85"/><path d="M322 222c0-24 12-40 34-46" stroke="url(#t-citrus-ink)" stroke-width="10" fill="none" stroke-linecap="round"/></g>
-  <rect x="245" y="500" width="150" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Citrus</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-citrus-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#1f3206" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><circle cx="280" cy="338" r="94" fill="#f59331"/><ellipse cx="246" cy="300" rx="15" ry="26" fill="#ffffff" fill-opacity="0.3" transform="rotate(30 246 300)"/><path d="M284 246Q300 212 336 214Q322 248 284 246z" fill="#5fae3a"/><circle cx="280" cy="248" r="5" fill="#3f7f22"/><circle cx="394" cy="384" r="58" fill="#f59331"/><circle cx="394" cy="384" r="50" fill="#fde7b0"/><circle cx="394" cy="384" r="44" fill="#fbbf24"/><path d="M394 342V426M352 384H436M364 354L424 414M364 414L424 354" fill="none" stroke="#fde7b0" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><circle cx="394" cy="384" r="7" fill="#fde7b0"/></g>
 </svg>

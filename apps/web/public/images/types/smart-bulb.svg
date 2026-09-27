@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Smart bulb">
+  <title>Smart bulb</title>
   <defs>
-    <radialGradient id="t-smart-bulb-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-smart-bulb-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f4f7fe"/>
       <stop offset="1" stop-color="#dae4fc"/>
     </radialGradient>
-    <linearGradient id="t-smart-bulb-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#3f76ed"/>
-      <stop offset="1" stop-color="#2563eb"/>
-    </linearGradient>
     <filter id="t-smart-bulb-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-smart-bulb-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-smart-bulb-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M250 270a70 70 0 0 1 140 0" fill="none" stroke="url(#t-smart-bulb-ink)" stroke-width="18" stroke-linecap="round"/><rect x="228" y="262" width="36" height="64" rx="14" fill="url(#t-smart-bulb-ink)"/><rect x="376" y="262" width="36" height="64" rx="14" fill="url(#t-smart-bulb-ink)"/></g>
-  <rect x="215" y="500" width="210" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Smart bulb</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-smart-bulb-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#0f285e" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M250 196l-16-16M390 196l16-16M320 170v-22" fill="none" stroke="#84cc16" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><g transform="translate(320 328)"><path d="M-30 36C-30 10-70-10-70-54A70 70 0 1 1 70-54C70-10 30 10 30 36z" fill="#c8e896"/><path d="M-16 30V-10L0-26L16-10V30" fill="none" stroke="#e0a41c" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><rect x="-32" y="36" width="64" height="44" rx="6" fill="#b6c2cf"/><path d="M-32 50H32M-32 64H32" fill="none" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><rect x="-18" y="80" width="36" height="16" rx="6" fill="#334155"/><ellipse cx="-34" cy="-70" rx="12" ry="22" fill="#ffffff" fill-opacity="0.8" transform="rotate(30 -34 -70)"/></g><path d="M400 212a40 40 0 0 1 40-40M398 186a70 70 0 0 1 70-70" fill="none" stroke="#2563eb" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g>
 </svg>

@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Tortillas">
+  <title>Tortillas</title>
   <defs>
-    <radialGradient id="t-tortillas-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-tortillas-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#faf5f3"/>
       <stop offset="1" stop-color="#ecdfd6"/>
     </radialGradient>
-    <linearGradient id="t-tortillas-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#9f572b"/>
-      <stop offset="1" stop-color="#92400e"/>
-    </linearGradient>
     <filter id="t-tortillas-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-tortillas-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-tortillas-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M230 300c0-60 40-90 90-90s90 30 90 90v40H230z" fill="url(#t-tortillas-ink)"/><path d="M280 250l-12 40M320 240v48M360 250l12 40" stroke="#92400e" stroke-width="8" stroke-linecap="round" stroke-opacity=".5"/></g>
-  <rect x="222" y="500" width="195" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Tortillas</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-tortillas-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#3a1a06" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><ellipse cx="320" cy="426" rx="146" ry="36" fill="#e2bd7c"/><ellipse cx="320" cy="423" rx="144" ry="34" fill="#f6e2b3"/><ellipse cx="320" cy="414" rx="146" ry="36" fill="#e2bd7c"/><ellipse cx="320" cy="411" rx="144" ry="34" fill="#f6e2b3"/><ellipse cx="320" cy="402" rx="146" ry="36" fill="#e2bd7c"/><ellipse cx="320" cy="399" rx="144" ry="34" fill="#f6e2b3"/><ellipse cx="320" cy="390" rx="146" ry="36" fill="#e2bd7c"/><ellipse cx="320" cy="387" rx="144" ry="34" fill="#f6e2b3"/><ellipse cx="320" cy="378" rx="146" ry="36" fill="#e2bd7c"/><ellipse cx="320" cy="375" rx="144" ry="34" fill="#f6e2b3"/><ellipse cx="270" cy="370" rx="10" ry="5" fill="#d6a45a"/><ellipse cx="340" cy="362" rx="10" ry="5" fill="#d6a45a"/><ellipse cx="390" cy="378" rx="10" ry="5" fill="#d6a45a"/><ellipse cx="300" cy="388" rx="10" ry="5" fill="#d6a45a"/><ellipse cx="228" cy="378" rx="10" ry="5" fill="#d6a45a"/><ellipse cx="360" cy="392" rx="10" ry="5" fill="#d6a45a"/><path d="M254 406H386V440H254z" fill="#92400e"/><path d="M274 422H366" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/></g>
 </svg>

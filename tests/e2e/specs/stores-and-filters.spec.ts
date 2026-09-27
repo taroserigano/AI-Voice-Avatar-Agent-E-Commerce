@@ -7,7 +7,7 @@ test.describe("stores and diet filters", () => {
   });
 
   test("the store locator lists ten stores and shows the chosen one on a map", async ({ page }) => {
-    await page.getByRole("link", { name: "Stores", exact: true }).click();
+    await page.getByRole("banner").getByRole("link", { name: "Stores", exact: true }).click();
     await expect(page.getByRole("heading", { level: 1, name: "Stores near Dallas" })).toBeVisible();
     const list = page.getByRole("list", { name: "Store list" });
     await expect(list.getByRole("listitem")).toHaveCount(10);

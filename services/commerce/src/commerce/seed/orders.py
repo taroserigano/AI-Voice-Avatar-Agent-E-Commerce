@@ -10,6 +10,9 @@ simulated Texas sales tax (8.25% on general merchandise; grocery food and gift c
 exempt) standing in for what Stripe Tax will return once checkout exists. Shipping is $5.99
 under $35 (after discounts, before tax) and free above. Orders created by real checkouts
 (Milestone 2) never go through this file.
+
+Each account ships to one made-up Dallas-Fort Worth address (real street names, invented
+house numbers), flagged ``ship_to_is_sample`` so the storefront labels it as sample data.
 """
 
 from __future__ import annotations
@@ -33,6 +36,26 @@ _NAMESPACE = uuid.UUID("5d0e4f1c-6a57-4c38-9d8e-2b0f7e3a91c4")
 
 
 @dataclass(frozen=True)
+class ShipTo:
+    name: str
+    line1: str
+    city: str
+    state: str
+    postal_code: str
+    line2: str | None = None
+    country: str = "US"
+
+
+# Sample delivery addresses for the development accounts (made up; labeled on screen).
+DEV_SHIP_TO: dict[str, ShipTo] = {
+    "alice@example.com": ShipTo(
+        "Alice Rivera", "4127 Bluebonnet Ln", "Plano", "TX", "75023", line2="Apt 2B"
+    ),
+    "bob@example.com": ShipTo("Bob Chen", "918 W Magnolia Ave", "Fort Worth", "TX", "76104"),
+}
+
+
+@dataclass(frozen=True)
 class LineSpec:
     slug: str
     variant_code: str
@@ -50,6 +73,10 @@ class OrderSpec:
     lines: tuple[LineSpec, ...]
     scenario: str  # what this order is for, in one line
 
+
+# Scenario keys that were renamed or removed. Reseeding deletes their orders, so an older dev
+# database doesn't keep a stale copy (alice-toys became alice-small-order on 2026-09-26).
+RETIRED_ORDER_KEYS: tuple[str, ...] = ("alice-toys",)
 
 DEV_ORDERS: tuple[OrderSpec, ...] = (
     OrderSpec(

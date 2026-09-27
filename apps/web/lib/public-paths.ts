@@ -8,6 +8,7 @@ export const PUBLIC_PAGES = [
   "/privacy",
   "/terms",
   "/accessibility",
+  "/returns-policy",
 ] as const;
 
 export function isPublicPath(pathname: string): boolean {

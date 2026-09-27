@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Parchment paper">
+  <title>Parchment paper</title>
   <defs>
-    <radialGradient id="t-parchment-paper-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-parchment-paper-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f3f8f8"/>
       <stop offset="1" stop-color="#d6e8e6"/>
     </radialGradient>
-    <linearGradient id="t-parchment-paper-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#2c867f"/>
-      <stop offset="1" stop-color="#0f766e"/>
-    </linearGradient>
     <filter id="t-parchment-paper-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-parchment-paper-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-parchment-paper-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><path d="M290 230h60l20 30v110H270V260z" fill="url(#t-parchment-paper-ink)"/><path d="M300 230v-30h50l30 16-30 14" fill="url(#t-parchment-paper-ink)" fill-opacity=".85"/></g>
-  <rect x="178" y="500" width="285" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Parchment paper</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-parchment-paper-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#062f2c" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><path d="M200 356L180 420H430L440 356z" fill="#f3e7c9" fill-opacity="0.95"/><path d="M168 316l52 -26h280l-52 26z" fill="#d2986b"/><path d="M448 316l52 -26v76l-52 26z" fill="#904207"/><rect x="168" y="316" width="280" height="76" fill="#b45309"/><ellipse cx="468" cy="328" rx="16" ry="26" fill="#6c3205"/><ellipse cx="468" cy="328" rx="8" ry="13" fill="#e2e8f0"/><rect x="190" y="334" width="120" height="40" rx="8" fill="#ffffff"/><path d="M206 350H292M206 362H260" fill="none" stroke="#b45309" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1"/><path d="M168 392H448L430 440H186z" fill="#f3e7c9"/></g>
 </svg>

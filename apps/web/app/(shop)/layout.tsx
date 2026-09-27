@@ -1,4 +1,4 @@
-import { SessionGuard } from "@/components/session-guard";
+import { StephLauncher } from "@/components/assistant/steph-launcher";
 import { Footer } from "@/components/shop/footer";
 import { Header } from "@/components/shop/header";
 import { containerClasses } from "@/components/ui/container";
@@ -15,7 +15,6 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
 
   return (
     <div className="flex min-h-screen flex-col">
-      <SessionGuard />
       {isDevelopment() ? (
         <p
           role="region"
@@ -25,8 +24,12 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
           <strong className="mr-2 inline-flex -translate-y-px items-center rounded-full bg-accent-400 px-2 py-px text-[0.6875rem] font-semibold uppercase tracking-eyebrow text-ink">
             Sandbox store
           </strong>
-          Development sign-in, test data, and Stripe test-mode payments.{" "}
-          <span className="text-white">Nothing ships and no real money moves.</span>
+          {/* One line on phones; the full notice from sm up. */}
+          <span className="sm:hidden">Test data. No real money moves.</span>
+          <span className="max-sm:hidden">
+            Development sign-in, test data, and Stripe test-mode payments.{" "}
+            <span className="text-white">Nothing ships and no real money moves.</span>
+          </span>
         </p>
       ) : null}
       <Header user={user} categories={categories} cart={cart} />
@@ -34,6 +37,7 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
         {children}
       </main>
       <Footer categories={categories} />
+      <StephLauncher />
     </div>
   );
 }

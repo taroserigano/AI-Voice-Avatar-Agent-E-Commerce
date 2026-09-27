@@ -71,25 +71,42 @@ export function humanize(code: string): string {
 
 export type StatusMeta = { label: string; tone: Tone };
 
+/**
+ * The one order-status vocabulary, used by the list, the detail page, and the filter tabs.
+ * Where the parcel is (in transit, out for delivery) is the delivery card's job, not the badge's,
+ * so an order never reads "In progress" in one place and "In transit" in another.
+ */
 const ORDER_STATUS: Record<OrderSummary["status"], StatusMeta> = {
-  paid: { label: "Order placed", tone: "brand" },
-  fulfilling: { label: "In progress", tone: "accent" },
+  paid: { label: "Preparing", tone: "brand" },
+  fulfilling: { label: "In progress", tone: "brand" },
   delivered: { label: "Delivered", tone: "success" },
   canceled: { label: "Canceled", tone: "neutral" },
 };
 
 const SHIPMENT_STATUS: Record<ShipmentOut["status"], StatusMeta> = {
-  label_created: { label: "Preparing to ship", tone: "accent" },
+  label_created: { label: "Preparing to ship", tone: "brand" },
   in_transit: { label: "In transit", tone: "brand" },
   out_for_delivery: { label: "Out for delivery", tone: "brand" },
   delivered: { label: "Delivered", tone: "success" },
   exception: { label: "Delivery issue", tone: "warning" },
 };
 
-/** Badge for an order. With a shipment (order detail), open orders show where the parcel is. */
-export function orderStatusMeta(status: OrderSummary["status"], shipment?: ShipmentOut | null): StatusMeta {
-  if (shipment && (status === "paid" || status === "fulfilling")) return SHIPMENT_STATUS[shipment.status];
+/** Badge for an order: the same label and tone everywhere the order appears. */
+export function orderStatusMeta(status: OrderSummary["status"]): StatusMeta {
   return ORDER_STATUS[status] ?? { label: humanize(status), tone: "neutral" };
+}
+
+export type OrderFilter = "all" | "in_progress" | "delivered" | "returns";
+
+/** Read the orders list's `?view=` value, falling back to "all". */
+export function parseOrderFilter(v: string | string[] | undefined): OrderFilter {
+  return v === "in_progress" || v === "delivered" || v === "returns" ? v : "all";
+}
+
+/** Which list tab an order belongs to (the "returns" tab lists returns, not orders). */
+export function orderFilterGroup(status: OrderSummary["status"]): "in_progress" | "delivered" | "canceled" {
+  if (status === "paid" || status === "fulfilling") return "in_progress";
+  return status === "delivered" ? "delivered" : "canceled";
 }
 
 export function shipmentStatusLabel(status: ShipmentOut["status"]): string {
@@ -110,16 +127,80 @@ export function orderListDelivery(
 
 export type ReturnHint = { kind: "open" | "returning" | "none"; text: string };
 
-/** The return line under a delivered order in the list, from the server's summary fields. */
+/**
+ * Why nothing in a delivered order can come back, from the server's per-line reasons: "Final
+ * sale" for a gift card rather than a vague "No items left to return".
+ */
+export function blockedReturnText(lines: Pick<LineReturnOption, "eligible" | "reason">[]): string | null {
+  if (lines.length === 0 || lines.some((l) => l.eligible)) return null;
+  const reasons = new Set(lines.map((l) => l.reason));
+  const closed = (r: LineReturnOption["reason"]) => r === "outside_window" || r === "perishable_past_7_days";
+  if (reasons.size === 1 && reasons.has("final_sale")) return "Final sale";
+  if (reasons.size === 1 && reasons.has("fully_returned")) return "Returned";
+  if ([...reasons].every(closed)) return "Return window closed";
+  return "No items left to return";
+}
+
+/**
+ * The return line under a delivered order in the list, from the server's summary fields.
+ * `blocked` is `blockedReturnText(...)` when the page looked up why nothing is returnable.
+ */
 export function orderListReturnHint(
   order: Pick<OrderSummary, "status" | "return_window_ends_at" | "has_open_return">,
+  blocked?: string | null,
 ): ReturnHint | null {
   if (order.has_open_return) return { kind: "returning", text: "Return in progress" };
   if (order.status !== "delivered") return null;
   if (order.return_window_ends_at) {
     return { kind: "open", text: `Returnable until ${formatDay(order.return_window_ends_at)}` };
   }
-  return { kind: "none", text: "No items left to return" };
+  return { kind: "none", text: blocked ?? "No items left to return" };
+}
+
+/** Variant names that add nothing ("Each", "Standard") are hidden; real ones ("Sand", "$50") show. */
+const PLAIN_VARIANTS = new Set(["", "each", "standard", "default", "default title", "one size"]);
+export function variantLabel(name: string | null | undefined): string | null {
+  if (!name) return null;
+  return PLAIN_VARIANTS.has(name.trim().toLowerCase()) ? null : name;
+}
+
+/* ---------- Cart: free shipping and the delivery promise ---------- */
+
+/** How far the cart is toward free shipping, 0–1, from the server's threshold and remainder. */
+export function freeShippingProgress(cart: {
+  free_shipping_threshold_minor: number;
+  free_shipping_remaining_minor: number;
+}): number {
+  const { free_shipping_threshold_minor: threshold, free_shipping_remaining_minor: remaining } = cart;
+  if (threshold <= 0 || remaining <= 0) return 1;
+  return Math.min(1, Math.max(0, (threshold - remaining) / threshold));
+}
+
+/** Add business days (Mon–Fri) to a calendar date "YYYY-MM-DD". */
+export function addBusinessDays(ymd: string, days: number): string {
+  const [y = 0, m = 1, d = 1] = ymd.split("-").map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+  let left = days;
+  while (left > 0) {
+    date.setUTCDate(date.getUTCDate() + 1);
+    const dow = date.getUTCDay();
+    if (dow !== 0 && dow !== 6) left -= 1;
+  }
+  return date.toISOString().slice(0, 10);
+}
+
+const ymdWeekday = new Intl.DateTimeFormat(LOCALE, { timeZone: "UTC", weekday: "short", month: "short", day: "numeric" });
+const formatYmd = (ymd: string) => ymdWeekday.format(new Date(`${ymd}T12:00:00Z`));
+
+/**
+ * "Tue, Sep 29 – Fri, Oct 2": our shipping promise (arrives in 2–5 business days, weekends
+ * skipped), counted from today in the store's time zone.
+ */
+export function deliveryEstimate(now: Date, minDays = 2, maxDays = 5): { from: string; to: string; text: string } {
+  const today = dayKey(now);
+  const from = addBusinessDays(today, minDays);
+  const to = addBusinessDays(today, maxDays);
+  return { from, to, text: `${formatYmd(from)} – ${formatYmd(to)}` };
 }
 
 /* ---------- Delivery progress ---------- */

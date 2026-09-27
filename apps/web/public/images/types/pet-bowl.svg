@@ -1,21 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="Pet bowl">
+  <title>Pet bowl</title>
   <defs>
-    <radialGradient id="t-pet-bowl-bg" cx="320" cy="240" r="520" gradientUnits="userSpaceOnUse">
+    <radialGradient id="t-pet-bowl-bg" cx="320" cy="260" r="520" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f8f4f3"/>
       <stop offset="1" stop-color="#e9dbd7"/>
     </radialGradient>
-    <linearGradient id="t-pet-bowl-ink" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#8c462e"/>
-      <stop offset="1" stop-color="#7c2d12"/>
-    </linearGradient>
     <filter id="t-pet-bowl-blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
   </defs>
   <rect width="640" height="640" fill="url(#t-pet-bowl-bg)"/>
-  <circle cx="320" cy="280" r="190" fill="#fff" fill-opacity=".5"/>
-  <ellipse cx="320" cy="412" rx="120" ry="18" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-pet-bowl-blur)"/>
-  <g transform="translate(320 290) scale(1.3) translate(-320 -275)"><ellipse cx="320" cy="310" rx="60" ry="48" fill="url(#t-pet-bowl-ink)"/><circle cx="260" cy="245" r="22" fill="url(#t-pet-bowl-ink)"/><circle cx="300" cy="215" r="22" fill="url(#t-pet-bowl-ink)"/><circle cx="340" cy="215" r="22" fill="url(#t-pet-bowl-ink)"/><circle cx="380" cy="245" r="22" fill="url(#t-pet-bowl-ink)"/></g>
-  <rect x="230" y="500" width="180" height="56" rx="28" fill="#fff" fill-opacity=".85"/>
-  <text x="320" y="537" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="600" fill="#2a2540">Pet bowl</text>
+  <circle cx="320" cy="312" r="216" fill="#fff" fill-opacity=".5"/>
+  <ellipse cx="320" cy="494" rx="160" ry="16" fill="#1e1b4b" fill-opacity=".14" filter="url(#t-pet-bowl-blur)"/>
+  <g transform="translate(320 318) scale(1.2) translate(-320 -295)" stroke="#321207" stroke-width="4" stroke-linejoin="round" stroke-opacity=".45"><ellipse cx="250" cy="352" rx="13" ry="9" fill="#a8642f"/><ellipse cx="280" cy="340" rx="13" ry="9" fill="#a8642f"/><ellipse cx="312" cy="348" rx="13" ry="9" fill="#a8642f"/><ellipse cx="344" cy="338" rx="13" ry="9" fill="#a8642f"/><ellipse cx="376" cy="350" rx="13" ry="9" fill="#a8642f"/><ellipse cx="296" cy="332" rx="13" ry="9" fill="#a8642f"/><ellipse cx="360" cy="330" rx="13" ry="9" fill="#a8642f"/><ellipse cx="390" cy="340" rx="13" ry="9" fill="#a8642f"/><path d="M200 356H440L416 430Q412 440 398 440H242Q228 440 224 430z" fill="#7c2d12"/><ellipse cx="320" cy="356" rx="120" ry="14" fill="#571f0d"/><g stroke="none"><g transform="translate(320 400) scale(1.3)" stroke-width="3.08"><rect x="-16" y="-5" width="32" height="10" fill="#ffffff"/><circle cx="-18" cy="-6" r="7" fill="#ffffff"/><circle cx="-18" cy="6" r="7" fill="#ffffff"/><circle cx="18" cy="-6" r="7" fill="#ffffff"/><circle cx="18" cy="6" r="7" fill="#ffffff"/></g></g></g>
 </svg>

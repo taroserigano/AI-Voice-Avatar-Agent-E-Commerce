@@ -3,15 +3,28 @@ from __future__ import annotations
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response, status
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from commerce.activity.models import EventType
 from commerce.activity.service import record
+from commerce.api_model import ApiModel
 from commerce.auth.deps import CurrentUser
-from commerce.catalog.schemas import CategoryOut, ProductDetail, ProductPage, SortOrder
+from commerce.catalog.display import type_label
+from commerce.catalog.models import Product
+from commerce.catalog.schemas import (
+    CategoryOut,
+    FacetValue,
+    ProductDetail,
+    ProductPage,
+    SearchSuggestions,
+    SortOrder,
+)
 from commerce.catalog.service import ProductFilters, get_product, list_categories, list_products
+from commerce.catalog.tags import tag_label
 from commerce.db import get_db
+from commerce.search.suggest import suggest
 
 router = APIRouter(prefix="/v1", tags=["catalog"])
 DbDep = Annotated[Session, Depends(get_db)]
@@ -70,6 +83,21 @@ def products(
     return result
 
 
+@router.get("/search/suggest", response_model=SearchSuggestions)
+def search_suggest(
+    db: DbDep,
+    principal: CurrentUser,
+    response: Response,
+    q: Annotated[str, Query(max_length=100, description="What the shopper has typed so far")],
+) -> SearchSuggestions:
+    """Typeahead for the search box: completed queries, matching types and departments, and a
+    few products. Fast word-prefix matching in PostgreSQL; nothing is recorded."""
+    # Private (per session) but identical for everyone: a short browser cache makes
+    # backspacing and retyping instant.
+    response.headers["Cache-Control"] = "private, max-age=60"
+    return suggest(db, q)
+
+
 @router.get(
     "/products/{product_id}",
     response_model=ProductDetail,
@@ -83,3 +111,28 @@ def product_detail(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Product not found")
     background.add_task(record, principal.id, EventType.VIEWED_PRODUCT, product_id=product.id)
     return product
+
+
+class CatalogVocabulary(ApiModel):
+    """Every product type and tag in the active catalog, with counts: the values the assistant
+    may pass to the product_type / tag / exclude_tag filters."""
+
+    product_types: list[FacetValue]
+    tags: list[FacetValue]
+
+
+@router.get("/catalog/vocabulary", response_model=CatalogVocabulary)
+def vocabulary(db: DbDep) -> CatalogVocabulary:
+    active = Product.is_active.is_(True)
+    types = db.execute(
+        select(Product.product_type, func.count())
+        .where(active)
+        .group_by(Product.product_type)
+        .order_by(Product.product_type)
+    )
+    tag = func.unnest(Product.tags).label("tag")
+    tag_rows = db.execute(select(tag, func.count()).where(active).group_by(tag).order_by(tag))
+    return CatalogVocabulary(
+        product_types=[FacetValue(value=t, label=type_label(t), count=c) for t, c in types],
+        tags=[FacetValue(value=t, label=tag_label(t), count=c) for t, c in tag_rows],
+    )
