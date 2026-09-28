@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import random
 
+from ai_commerce_voice.brain import retrieval_query, wants_policy
 from ai_commerce_voice.fillers import BY_TOOL, GENERIC, FillerPicker, all_phrases
 from ai_commerce_voice.speech_text import SpeechChunker, speakable, spell_order_numbers
 
@@ -73,3 +74,19 @@ def test_tool_fillers_say_what_xana_is_doing() -> None:
     assert picker.pick("get_order_status") in BY_TOOL["get_order_status"]
     assert picker.pick("not_a_tool") in GENERIC
     assert len(all_phrases()) == len(set(all_phrases()))
+
+
+def test_policy_questions_become_search_queries_without_the_small_talk() -> None:
+    assert retrieval_query("What's your return policy for opened headphones?") == (
+        "return opened headphones"
+    )
+    assert retrieval_query("Do refunds go back to my card? And how long do they take?") == (
+        "refunds back card timing take"
+    )
+    assert retrieval_query("What's your policy?") == "What's your policy?"  # nothing left
+
+
+def test_only_policy_questions_are_searched_before_the_model() -> None:
+    assert wants_policy("Can I return opened headphones?")
+    assert wants_policy("how long do refunds take")
+    assert not wants_policy("Where's my order? When will it arrive?")

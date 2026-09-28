@@ -14,6 +14,7 @@ from ai_commerce_voice.ports import (
     TextDelta,
     ToolStarted,
 )
+from ai_commerce_voice.speech_text import speakable
 from tests.fakes import FakeBrain, Harness, Step, harness
 
 QUOTE = {
@@ -228,7 +229,9 @@ def test_the_quote_read_back_is_spoken_word_for_word_from_code() -> None:
         assert h.of("quote")[0]["quote"]["quote_id"] == "q-1"
         confirm = [s for s in h.of("segment.start") if s["kind"] == "confirm"]
         assert len(confirm) == 1
-        assert h.mouth.spoken()[-1] == QUOTE["readback"]
+        assert h.mouth.spoken()[-1] == speakable(
+            QUOTE["readback"]
+        )  # "1 × Oat milk" -> "1 Oat milk"
         await h.session.close()
 
     run(t)
@@ -383,6 +386,48 @@ def test_a_reply_to_a_quote_waits_for_the_final_transcript() -> None:
         h.ears.hear(Final("Yes, confirm.", at=5.3, item_id="item-3"))
         await settle(h)
         assert h.of("confirm.result")[-1]["decision"] == "yes"
+        await h.session.close()
+
+    run(t)
+
+
+def test_the_store_answering_doesnt_cut_off_the_confirming_line_or_add_a_filler() -> None:
+    async def t() -> None:
+        brain = FakeBrain(
+            scripts=[[Step(QuoteOut(QUOTE))]],
+            resumes=[[Step(TextDelta("It's confirmed; your refund is on its way."), delay_s=1.2)]],
+        )
+        h = harness(brain, filler_after_ms=60, first_audio_s=0.05)
+        await _quoted(h)
+        await play_all(h)
+        h.ears.hear(Final("Yes, confirm.", at=5.0))
+        while not h.of("confirm.result"):
+            await asyncio.sleep(0.005)
+        # The browser confirmed with the store almost at once.
+        await h.session.on_message(
+            {"type": "quote.outcome", "quote_id": "q-1", "outcome": "confirmed"}
+        )
+        await settle(h, 1.5)
+        spoken = h.mouth.spoken()
+        assert "Thanks, confirming your return now." in spoken
+        assert spoken[-1] == "It's confirmed; your refund is on its way."
+        assert h.of("drop") == []
+        kinds = [s["kind"] for s in h.of("segment.start")]
+        assert "filler" not in kinds[kinds.index("confirm") :]
+        await h.session.close()
+
+    run(t)
+
+
+def test_the_read_back_caption_is_exact_but_the_voice_skips_the_times_sign() -> None:
+    async def t() -> None:
+        quote = {**QUOTE, "readback": "Here's your return: 1 × Oat milk. Confirm?"}
+        h = harness(FakeBrain(scripts=[[Step(QuoteOut(quote))]]))
+        await _quoted(h)
+        confirm = next(s["segment"] for s in h.of("segment.start") if s["kind"] == "confirm")
+        caption = [m["text"] for m in h.of("segment.text") if m["segment"] == confirm]
+        assert caption == ["Here's your return: 1 × Oat milk. Confirm?"]
+        assert h.mouth.spoken()[-1] == "Here's your return: 1 Oat milk. Confirm?"
         await h.session.close()
 
     run(t)

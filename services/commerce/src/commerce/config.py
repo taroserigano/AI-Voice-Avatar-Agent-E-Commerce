@@ -51,6 +51,9 @@ class Settings(BaseSettings):
     semantic_relative_score: float = Field(default=0.8, ge=0.0, le=1.0)
     # How long a search waits for Pinecone before answering with keyword results only.
     semantic_timeout_ms: int = 250
+    # Policy search waits longer for meaning search (it embeds the question first): the
+    # assistants answer from these sections, so recall matters more than a few hundred ms.
+    policy_semantic_timeout_ms: int = 1500
     # Keyword candidates per search. A search that fills it reports its total as a lower bound
     # ("400+") rather than an exact count.
     keyword_top_k: int = 400

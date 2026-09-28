@@ -68,6 +68,7 @@ NOTICE = (
     "text and isn't stored; the transcript is saved with this conversation."
 )
 _pool = ThreadPoolExecutor(max_workers=16, thread_name_prefix="voice-io")
+_background: set[asyncio.Task[None]] = set()
 
 
 def confirm_rule(
@@ -176,9 +177,9 @@ def _own_or_new(customer: Customer, conversation_id: str | None) -> Conversation
     with get_sessionmaker()() as db:
         if conversation_id:
             with contextlib.suppress(ValueError):
-                conv = db.get(Conversation, uuid.UUID(conversation_id))
-                if conv is not None and conv.user_id == customer.id and conv.agent == "xana":
-                    return conv
+                found: Conversation | None = db.get(Conversation, uuid.UUID(conversation_id))
+                if found is not None and found.user_id == customer.id and found.agent == "xana":
+                    return found
         conv = Conversation(user_id=customer.id, agent="xana", title="Voice call with Xana")
         db.add(conv)
         db.commit()
@@ -198,6 +199,14 @@ def _count_turn(conversation_id: uuid.UUID, text: str, limit: int) -> bool:
         conv.updated_at = utcnow()
         db.commit()
         return True
+
+
+def _warm_policy_search(client: CommerceClient) -> None:
+    """One throwaway policy search while the call connects, so the first real question doesn't
+    pay for a cold connection, embedding client, and vector index."""
+    # RuntimeError: the call ended and its client closed before the warm-up finished.
+    with contextlib.suppress(CommerceError, httpx.HTTPError, RuntimeError):
+        client.get("/v1/policies/search", params={"q": "return policy", "limit": 1})
 
 
 def _recent_orders(client: CommerceClient) -> list[dict[str, Any]] | None:
@@ -261,7 +270,7 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
                 open=False,
                 kwargs={"autocommit": True, "prepare_threshold": 0, "row_factory": dict_row},
             )
-            await pool.open()
+            await pool.open(wait=True, timeout=10)
             saver = AsyncPostgresSaver(pool)  # type: ignore[arg-type]
         state["graph"] = build_voice_graph(saver)
         state["http"] = httpx.AsyncClient(
@@ -341,6 +350,10 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
                     )
 
         try:
+            # Not awaited: a cold policy search can take seconds, and the call shouldn't wait.
+            warm = asyncio.create_task(asyncio.to_thread(_warm_policy_search, client))
+            _background.add(warm)
+            warm.add_done_callback(_background.discard)
             conv, orders, *_ = await asyncio.gather(
                 asyncio.to_thread(_own_or_new, customer, hello.get("conversation_id")),
                 asyncio.to_thread(_recent_orders, client),
@@ -461,11 +474,13 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
 
 
 def main() -> None:
+    import sys
+
     import uvicorn
 
     logging.basicConfig(level=logging.INFO)
     settings = get_settings()
-    uvicorn.run(
+    config = uvicorn.Config(
         "ai_commerce_voice.app:create_app",
         factory=True,
         host=settings.voice_host,
@@ -473,3 +488,9 @@ def main() -> None:
         ws_max_size=2**20,
         log_level="info",
     )
+    server = uvicorn.Server(config)
+    if sys.platform == "win32":
+        # Async psycopg (the checkpoint pool) can't run on Windows' default Proactor loop.
+        asyncio.run(server.serve(), loop_factory=asyncio.SelectorEventLoop)
+    else:
+        server.run()

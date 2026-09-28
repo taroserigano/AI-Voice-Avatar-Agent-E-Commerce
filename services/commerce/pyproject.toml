@@ -5,6 +5,7 @@ description = "Commerce API: sign-in, catalog, cart, orders, search, outbox"
 requires-python = ">=3.12"
 dependencies = [
     "ai-commerce-telemetry",
+    "ai-commerce-retrieval",
     "fastapi==0.141.1",
     "uvicorn[standard]==0.54.0",
     # 2.0.x: the OTel SQLAlchemy instrumentation supports < 2.1.
@@ -34,6 +35,7 @@ commerce-openapi = "commerce.openapi_export:main"
 
 [tool.uv.sources]
 ai-commerce-telemetry = { workspace = true }
+ai-commerce-retrieval = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]

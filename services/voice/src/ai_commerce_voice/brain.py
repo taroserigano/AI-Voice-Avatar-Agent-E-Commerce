@@ -9,8 +9,13 @@ different is tuned for speaking in real time:
   ms on the default tier), streaming; its text goes straight to the speech engine;
 - a tool call is announced the moment its name streams in, not when the call is complete, so
   the "Let me check that order" filler starts ~a second sooner;
-- a snapshot of the customer's recent orders is read when the call starts and given to the
-  model (as untrusted data), so "where's my order?" needs no tool round trip;
+- a snapshot of the customer's recent orders (with delivery status) is read when the call
+  starts and given to the model (as untrusted data), so "where's my order?" needs no tool round
+  trip;
+- a question about returns, refunds, or policy runs the policy search (hybrid: keywords plus
+  LlamaIndex/Qdrant meaning search, ~300 ms) *before* the model, recorded in the conversation as
+  a real ``search_policies`` call. The model answers in one call instead of calling the tool and
+  then answering (each model call is ~1-1.7 s), and its citations are checked as usual;
 - the prompt is short and fixed per session (the dynamic part last) so OpenAI's prompt cache
   hits from the second turn on.
 
@@ -20,7 +25,9 @@ for building a basket (services/planner) and wrong for a phone call.
 
 from __future__ import annotations
 
+import asyncio
 import logging
+import re
 import time
 import uuid
 from collections.abc import AsyncIterator
@@ -38,6 +45,7 @@ from langchain_core.messages import (
     HumanMessage,
     SystemMessage,
     ToolMessage,
+    message_chunk_to_message,
 )
 from langchain_core.runnables import Runnable, RunnableConfig
 from langgraph.checkpoint.base import BaseCheckpointSaver
@@ -49,7 +57,7 @@ from langgraph.types import Command
 
 from ai_commerce_voice.ports import AgentEvent, CardOut, QuoteOut, TextDelta, ToolStarted, TurnEnded
 from assistant.graph import _superseded_proposal, recent_history
-from assistant.tools import ToolContext, _order_for_model, untrusted
+from assistant.tools import ToolContext, _order_for_model, citation_card, untrusted
 from assistant.toolsets import XANA_TOOLS
 from assistant.turns import TOOL_LABELS, message_text, split_citations
 
@@ -58,6 +66,152 @@ log = logging.getLogger(__name__)
 PROMPT_VERSION = "xana.voice.v1"
 PROMPT_DIR = Path(__file__).resolve().parent / "prompts"
 SNAPSHOT_ORDERS = 8
+PREFETCH_TIMEOUT_S = 1.2
+PREFETCH_SECTIONS = 6
+# Words that mean the answer likely rests on a policy (not "where's my order?").
+POLICY_WORDS = re.compile(
+    r"\b(polic(y|ies)|returns?|returned|returning|refunds?|refunded|exchanges?|warrant(y|ies)|"
+    r"opened|damaged|broken|defective|restocking|final sale|cancel\w*|perishables?|spoiled|"
+    r"inspect\w*|labels?|drop.?offs?|eligib\w*|window|price match|gift cards?)\b",
+    re.IGNORECASE,
+)
+
+
+def wants_policy(text: str) -> bool:
+    return bool(POLICY_WORDS.search(text))
+
+
+# Conversational words that match the wrong sections ("What's *your* return *policy*..." ranks
+# "Your privacy" first) and dilute meaning search. Measured on the real policies: dropping them
+# put "Standard items" and "Electronics" in the top six for opened headphones, and the three
+# refund-timing sections in the top three for "how long do refunds take".
+_FILLER = frozenset(
+    [
+        "a",
+        "an",
+        "and",
+        "are",
+        "about",
+        "any",
+        "anything",
+        "as",
+        "at",
+        "be",
+        "been",
+        "but",
+        "by",
+        "can",
+        "could",
+        "did",
+        "do",
+        "does",
+        "doing",
+        "for",
+        "from",
+        "get",
+        "go",
+        "going",
+        "got",
+        "had",
+        "has",
+        "have",
+        "hey",
+        "hi",
+        "hello",
+        "how",
+        "i",
+        "if",
+        "in",
+        "is",
+        "it",
+        "its",
+        "it's",
+        "just",
+        "know",
+        "let",
+        "like",
+        "me",
+        "my",
+        "of",
+        "on",
+        "or",
+        "our",
+        "please",
+        "policy",
+        "policies",
+        "say",
+        "should",
+        "so",
+        "tell",
+        "that",
+        "the",
+        "their",
+        "them",
+        "then",
+        "there",
+        "they",
+        "this",
+        "to",
+        "us",
+        "wanna",
+        "want",
+        "was",
+        "we",
+        "what",
+        "what's",
+        "whats",
+        "when",
+        "where",
+        "which",
+        "who",
+        "why",
+        "will",
+        "with",
+        "would",
+        "xana",
+        "you",
+        "your",
+        "you're",
+        "yours",
+        "ok",
+        "okay",
+        "um",
+        "uh",
+        "also",
+        "again",
+        "still",
+        "really",
+        "thanks",
+        "thank",
+    ]
+)
+_TIMING = re.compile(
+    r"\b(how long|how soon|how many days|when will|when do|when does|when would)\b", re.I
+)
+
+
+def retrieval_query(text: str) -> str:
+    """The customer's words as a search query: timing questions say "timing", filler goes."""
+    words = re.findall(r"[a-z0-9]+(?:'[a-z]+)?", _TIMING.sub(" timing ", text.lower()))
+    kept = [w for w in words if w not in _FILLER]
+    return " ".join(dict.fromkeys(kept)) or text.strip()
+
+
+def policy_tool_output(result: dict[str, Any]) -> tuple[str, list[dict[str, Any]]]:
+    """``search_policies``' own content and citation cards, for a search made outside it."""
+    payload = {
+        "sections": [
+            {
+                "cite": r["cite"],
+                "title": f"{r['doc_title']} §{r['number']} {r['title']}".strip(),
+                "version": r["version"],
+                "text": r["body"],
+            }
+            for r in result["results"]
+        ]
+    }
+    cards = [citation_card(r).model_dump() for r in result["results"]]
+    return untrusted("search_policies", payload), cards
 
 
 @lru_cache
@@ -70,6 +224,7 @@ def orders_snapshot(details: list[dict[str, Any]]) -> list[dict[str, Any]]:
     out = []
     for d in details[:SNAPSHOT_ORDERS]:
         o = _order_for_model(d)
+        delivery = o.get("delivery") or {}
         out.append(
             {
                 "order_id": o["order_id"],
@@ -78,6 +233,16 @@ def orders_snapshot(details: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "placed_on": o["placed_on"],
                 "arriving_by": o["arriving_by"],
                 "delivered_on": o["delivered_on"],
+                "delivery": (
+                    {
+                        "status": delivery.get("status"),
+                        "carrier": delivery.get("carrier"),
+                        "arriving_by": delivery.get("arriving_by"),
+                        "latest_update": delivery.get("latest_update"),
+                    }
+                    if delivery
+                    else None
+                ),
                 "total": o["total"],
                 "items": [f"{i['quantity']} × {i['title']}" for i in o["items"]][:6],
             }
@@ -132,8 +297,27 @@ async def agent(state: VoiceState, config: RunnableConfig) -> dict[str, Any]:
         SystemMessage(content=vc.system),
         *recent_history(state["messages"]),
     ]
-    response = await model.ainvoke(messages, config)
+    started = time.perf_counter()
+    first: float | None = None
+    merged: AIMessageChunk | None = None
+    async for chunk in model.astream(messages, config):
+        if first is None:
+            first = time.perf_counter()
+        merged = chunk if merged is None else merged + chunk
+    response = message_chunk_to_message(merged) if merged is not None else AIMessage(content="")
     calls = len(response.tool_calls) if isinstance(response, AIMessage) else 0
+    usage = getattr(response, "usage_metadata", None) or {}
+    log.info(
+        "voice model call: first chunk %.0f ms, done %.0f ms, %s in (%s cached), %s out "
+        "(%s reasoning), %d tool calls",
+        ((first or started) - started) * 1000,
+        (time.perf_counter() - started) * 1000,
+        usage.get("input_tokens"),
+        (usage.get("input_token_details") or {}).get("cache_read"),
+        usage.get("output_tokens"),
+        (usage.get("output_token_details") or {}).get("reasoning"),
+        calls,
+    )
     return {"messages": [response], "tool_calls_this_turn": used + calls}
 
 
@@ -198,10 +382,67 @@ class XanaBrain:
             "run_name": "xana-voice-turn",
         }
 
-    def turn(self, text: str, message_id: str | None = None) -> AsyncIterator[AgentEvent]:
-        # A fixed id: a turn restarted on a corrected transcript replaces its draft message.
-        message = HumanMessage(content=text, id=message_id or str(uuid.uuid4()))
-        return self._stream({"messages": [message], "agent": "xana", "tool_calls_this_turn": 0})
+    async def turn(self, text: str, message_id: str | None = None) -> AsyncIterator[AgentEvent]:
+        # Fixed ids: a turn restarted on a corrected transcript replaces its draft messages
+        # (the customer's words and any prefetched policy search) instead of adding to them.
+        mid = message_id or str(uuid.uuid4())
+        messages: list[AnyMessage] = [HumanMessage(content=text, id=mid)]
+        citable: dict[str, dict[str, Any]] = {}
+        prefetched = await self._prefetch_policies(text, mid)
+        if prefetched is not None:
+            messages += prefetched
+            for card in prefetched[1].artifact or []:
+                if card.get("kind") == "citation":
+                    citable[card["cite"]] = card
+        graph_input = {
+            "messages": messages,
+            "agent": "xana",
+            "tool_calls_this_turn": 1 if prefetched else 0,
+        }
+        async for ev in self._stream(graph_input, citable):
+            yield ev
+
+    async def _prefetch_policies(self, text: str, mid: str) -> list[Any] | None:
+        """Search the policies with the customer's own words before the model, when the
+        question is about policy, and record it as a ``search_policies`` call with the tool's
+        own output format. It asks for more sections than the tool (a general rule and the
+        item's category rule often both matter: "opened items are fine" plus "electronics are
+        inspected"). None, so the model may call the tool itself, when the question isn't about
+        policy or the search is slow or fails."""
+        if not wants_policy(text):
+            return None
+        question = retrieval_query(text)[:300]
+        started = time.perf_counter()
+        try:
+            result = await asyncio.wait_for(
+                asyncio.to_thread(
+                    self.ctx.client.get,
+                    "/v1/policies/search",
+                    {"q": question, "limit": PREFETCH_SECTIONS},
+                ),
+                PREFETCH_TIMEOUT_S,
+            )
+            content, cards = policy_tool_output(result)
+        except Exception as exc:  # noqa: BLE001 - the model can still call the tool
+            log.warning("policy prefetch skipped: %s", type(exc).__name__)
+            return None
+        log.info("policy prefetch: %.0f ms", (time.perf_counter() - started) * 1000)
+        call = {
+            "name": "search_policies",
+            "args": {"question": question},
+            "id": f"prefetch-{mid}",
+            "type": "tool_call",
+        }
+        return [
+            AIMessage(content="", tool_calls=[call], id=f"{mid}-policy-call"),
+            ToolMessage(
+                content=content,
+                artifact=cards,
+                name="search_policies",
+                tool_call_id=call["id"],
+                id=f"{mid}-policies",
+            ),
+        ]
 
     def resume(
         self, outcome: Literal["confirmed", "declined", "superseded"]
@@ -218,11 +459,13 @@ class XanaBrain:
                 return value
         return None
 
-    async def _stream(self, graph_input: Any) -> AsyncIterator[AgentEvent]:
+    async def _stream(
+        self, graph_input: Any, citable: dict[str, dict[str, Any]] | None = None
+    ) -> AsyncIterator[AgentEvent]:
         started = time.perf_counter()
         first_token_ms: float | None = None
         answer: list[str] = []
-        citable: dict[str, dict[str, Any]] = {}
+        citable = dict(citable or {})
         # Text streamed during the current agent step: its final message repeats it (the
         # Responses API gives the chunks and the final message different ids).
         streamed_this_step = False

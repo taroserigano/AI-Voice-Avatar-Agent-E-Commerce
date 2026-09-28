@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
-const COMMERCE_API_URL = process.env.COMMERCE_API_URL ?? "http://localhost:8000";
-const ASSISTANT_API_URL = process.env.ASSISTANT_API_URL ?? "http://localhost:8001";
+const COMMERCE_API_URL = process.env.COMMERCE_API_URL ?? "http://127.0.0.1:8000";
+const ASSISTANT_API_URL = process.env.ASSISTANT_API_URL ?? "http://127.0.0.1:8001";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,

@@ -63,6 +63,21 @@ class FakeStore:
         self.calls.append(path)
         if path == "/v1/orders":
             return [{"id": ORDER_ID}]
+        if path == "/v1/policies/search":
+            return {
+                "results": [
+                    {
+                        "cite": "returns-and-refunds#rr-4-1",
+                        "doc_title": "Returns and refunds",
+                        "number": "4.1",
+                        "title": "Standard items",
+                        "version": "2026-09",
+                        "url": "/returns-policy#rr-4-1",
+                        "body": "Send items back with everything that came with them. "
+                        "Opened items are fine.",
+                    }
+                ]
+            }
         if path == f"/v1/orders/{ORDER_ID}":
             return order()
         if path == f"/v1/returns/quotes/{QUOTE_ID}":
@@ -243,3 +258,26 @@ def test_a_proposed_return_pauses_on_the_quote_and_only_the_store_says_it_was_co
     tool_results = [m for m in graph_state.values["messages"] if isinstance(m, ToolMessage)]
     assert '"outcome": "declined"' in str(tool_results[-1].content)
     assert asyncio.run(brain.pending_quote()) is None
+
+
+def test_a_policy_question_is_answered_in_one_model_call_from_prefetched_sections() -> None:
+    brain, store, model = brain_with(
+        ["Opened items are fine to return. [[cite:returns-and-refunds#rr-4-1]]"]
+    )
+    events = asyncio.run(collect(brain.turn("Can I return opened headphones?", message_id="m1")))
+
+    assert len(model.seen) == 1  # no tool round trip
+    shown = model.seen[0]
+    assert [m.type for m in shown[-3:]] == ["human", "ai", "tool"]
+    assert "Opened items are fine" in str(shown[-1].content)
+    end = events[-1]
+    assert isinstance(end, TurnEnded)
+    assert [c["cite"] for c in end.citations] == ["returns-and-refunds#rr-4-1"]
+    assert not any(isinstance(e, ToolStarted) for e in events)
+
+
+def test_an_order_question_skips_the_policy_prefetch() -> None:
+    brain, store, model = brain_with(["It arrives Wednesday."])
+    asyncio.run(collect(brain.turn("When does my oat milk arrive?")))
+    assert "/v1/policies/search" not in store.calls
+    assert model.seen[0][-1].type == "human"

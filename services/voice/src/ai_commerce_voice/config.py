@@ -35,7 +35,7 @@ class VoiceSettings(BaseSettings):
 
     # Who the customer is: the commerce API checks the session cookie.
     commerce_api_url: str = Field(
-        default="http://localhost:8000", validation_alias="COMMERCE_API_URL"
+        default="http://127.0.0.1:8000", validation_alias="COMMERCE_API_URL"
     )
     session_cookie_name: str = "ac_session"
 

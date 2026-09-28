@@ -5,7 +5,7 @@ import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 
-const COMMERCE_API_URL = process.env.COMMERCE_API_URL ?? "http://localhost:8000";
+const COMMERCE_API_URL = process.env.COMMERCE_API_URL ?? "http://127.0.0.1:8000";
 export const SESSION_COOKIE = "ac_session";
 
 /**

@@ -1,9 +1,15 @@
-"""Search over approved policy sections: OpenSearch keywords, plus Pinecone meaning when set up.
+"""Search over approved policy sections: OpenSearch keywords, plus meaning search when set up.
 
 Same design as product search. The policy files are the source; both indexes are rebuildable
 projections. The OpenSearch index loads itself on first use and reloads when the files change
 (a content hash is stored in the index), so no manual reindex is needed after editing a policy.
-Pinecone, when configured, is filled by ``pnpm reindex`` into namespace ``policies-<env>``.
+Meaning search is Qdrant (decision 23) through ``ai_commerce_retrieval`` (LlamaIndex nodes,
+OpenAI embeddings) in collection ``aic-policies-<env>``. It syncs itself incrementally (by content
+hash) the first time a process searches, and ``pnpm reindex`` syncs it too. Customers ask in their
+own words ("can I send back opened headphones?") while the policy says "Opened items are fine",
+which keywords alone miss; the two result lists are fused by rank (RRF). If Qdrant or the
+embedding call is slow or down, keywords answer alone within ``policy_semantic_timeout_ms``.
+Pinecone is only used when Qdrant isn't configured (the older setup).
 """
 
 from __future__ import annotations
@@ -11,12 +17,13 @@ from __future__ import annotations
 import hashlib
 import logging
 import threading
+import time
 from collections.abc import Sequence
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeout
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from opensearchpy import OpenSearch, helpers
 from opensearchpy.exceptions import NotFoundError
@@ -28,6 +35,10 @@ from commerce.search.rrf import reciprocal_rank_fusion
 from commerce.search.semantic import TEXT_FIELD, UPSERT_BATCH, get_semantic_index
 
 log = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    from ai_commerce_retrieval.index import VectorIndex
+    from ai_commerce_retrieval.records import Record
 
 _EN = {"type": "text", "analyzer": "shop", "search_analyzer": "shop_search"}
 META_ID = "__meta__"
@@ -226,10 +237,108 @@ def upsert_policies_to_pinecone() -> int | None:
     return len(records)
 
 
+# --- Qdrant (decision 23) -----------------------------------------------------------------------
+
+_QDRANT_RETRY_S = 60.0
+_qdrant_lock = threading.Lock()
+_qdrant: dict[str, Any] = {"index": None, "failed_at": 0.0, "synced": False}
+
+
+def _policy_records() -> list[Record]:
+    from ai_commerce_retrieval.records import Record
+
+    return [
+        Record(
+            id=key,
+            text=_semantic_text(doc, section),
+            metadata={
+                "cite": key,
+                "doc_id": doc.id,
+                "version": str(doc.version),
+                "status": "approved",
+                "effective_from": int(doc.effective_date.strftime("%Y%m%d")),
+            },
+        )
+        for key, (doc, section) in _sections().items()
+    ]
+
+
+def _qdrant_policy_index() -> VectorIndex | None:
+    """The policy collection, or None when meaning search isn't configured. A failure to
+    connect is retried at most once a minute, so a down Qdrant doesn't slow every search."""
+    from ai_commerce_retrieval.config import get_settings as retrieval_settings
+
+    if not retrieval_settings().openai_api_key:
+        return None
+    with _qdrant_lock:
+        if _qdrant["index"] is None:
+            if time.monotonic() - _qdrant["failed_at"] < _QDRANT_RETRY_S:
+                raise RuntimeError("qdrant unavailable (retrying soon)")
+            try:
+                from ai_commerce_retrieval.factory import vector_index
+
+                _qdrant["index"] = vector_index("policies")
+            except Exception:
+                _qdrant["failed_at"] = time.monotonic()
+                raise
+        index: VectorIndex = _qdrant["index"]
+        return index
+
+
+def sync_policies_to_qdrant() -> dict[str, int] | None:
+    """Make the Qdrant collection match the policy files, embedding only what changed."""
+    index = _qdrant_policy_index()
+    if index is None:
+        return None
+    result = index.sync(_policy_records())
+    _qdrant["synced"] = True
+    return {
+        "added": result.added,
+        "updated": result.updated,
+        "deleted": result.deleted,
+        "unchanged": result.unchanged,
+    }
+
+
+def _sync_in_background() -> None:
+    if _qdrant["synced"]:
+        return
+    _qdrant["synced"] = True  # one attempt per process; reindex covers the rest
+
+    def run() -> None:
+        try:
+            log.info("policy meaning index synced: %s", sync_policies_to_qdrant())
+        except Exception as exc:  # noqa: BLE001 - keyword search still answers
+            log.warning("policy meaning index sync failed: %s", type(exc).__name__)
+
+    threading.Thread(target=run, name="policy-qdrant-sync", daemon=True).start()
+
+
 _pool = ThreadPoolExecutor(max_workers=4, thread_name_prefix="policy-semantic")
 
 
+def _qdrant_ids(query: str, top_k: int) -> tuple[list[str], SemanticState] | None:
+    """Qdrant's ranking, or None when it isn't configured (so Pinecone may be tried)."""
+    try:
+        index = _qdrant_policy_index()
+    except Exception as exc:  # noqa: BLE001 - keyword results still answer
+        log.warning("policy meaning search unavailable: %s", type(exc).__name__)
+        return [], "unavailable"
+    if index is None:
+        return None
+    _sync_in_background()
+    try:
+        future = _pool.submit(index.search, query, top_k)
+        hits = future.result(timeout=get_settings().policy_semantic_timeout_ms / 1000)
+    except (FutureTimeout, Exception) as exc:  # noqa: BLE001 - keyword results still answer
+        log.warning("policy meaning search unavailable: %s", type(exc).__name__)
+        return [], "unavailable"
+    return [h.record_id for h in hits], "used"
+
+
 def _semantic_ids(query: str, top_k: int) -> tuple[list[str], SemanticState]:
+    if (qdrant := _qdrant_ids(query, top_k)) is not None:
+        return qdrant
     settings = get_settings()
     if not settings.pinecone_api_key:
         return [], "disabled"

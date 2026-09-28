@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         default="postgresql+psycopg://commerce:commerce@localhost:5432/commerce",
         validation_alias=AliasChoices("ASSISTANT_DATABASE_URL", "COMMERCE_DATABASE_URL"),
     )
-    commerce_api_url: str = "http://localhost:8000"
+    commerce_api_url: str = "http://127.0.0.1:8000"  # not localhost: ~2 s on Windows
     assistant_service_token: str = DEV_ASSISTANT_TOKEN
     session_cookie_name: str = "ac_session"
 

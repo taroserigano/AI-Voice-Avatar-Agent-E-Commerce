@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 // The Python services read the repo-root .env themselves; Next.js only reads apps/web/.env.
 // Pass through just these keys from the root .env (never the whole file: it may hold other
 // projects' secrets). Real environment variables win.
-const PASS_THROUGH = ["APP_ENV", "API_PORT", "WEB_PORT", "ASSISTANT_PORT", "GOOGLE_MAPS_API_KEY"];
+const PASS_THROUGH = ["APP_ENV", "API_PORT", "WEB_PORT", "ASSISTANT_PORT", "VOICE_PORT", "GOOGLE_MAPS_API_KEY"];
 const rootEnv = join(dirname(fileURLToPath(import.meta.url)), "..", ".env");
 if (existsSync(rootEnv)) {
   for (const line of readFileSync(rootEnv, "utf8").split(/\r?\n/)) {
@@ -38,10 +38,16 @@ function collectorListening() {
 const apiPort = process.env.API_PORT ?? "8000";
 const assistantPort = process.env.ASSISTANT_PORT ?? "8001";
 const webPort = process.env.WEB_PORT ?? "3000";
+const voicePort = process.env.VOICE_PORT ?? "8103";
 const env = {
   ...process.env,
-  COMMERCE_API_URL: process.env.COMMERCE_API_URL ?? `http://localhost:${apiPort}`,
-  ASSISTANT_API_URL: process.env.ASSISTANT_API_URL ?? `http://localhost:${assistantPort}`,
+  // 127.0.0.1, not localhost: on Windows a new connection to localhost tries ::1 first and
+  // waits ~2 s for the refusal before falling back (the servers listen on IPv4 only).
+  COMMERCE_API_URL: process.env.COMMERCE_API_URL ?? `http://127.0.0.1:${apiPort}`,
+  ASSISTANT_API_URL: process.env.ASSISTANT_API_URL ?? `http://127.0.0.1:${assistantPort}`,
+  // Xana's voice screen opens its WebSocket straight to the voice agent on this port.
+  VOICE_PORT: voicePort,
+  NEXT_PUBLIC_VOICE_PORT: voicePort,
 };
 if (env.OTEL_EXPORTER_OTLP_ENDPOINT === undefined) {
   if (await collectorListening()) env.OTEL_EXPORTER_OTLP_ENDPOINT = "http://localhost:4318";
@@ -52,6 +58,7 @@ const procs = [
   { name: "api", color: 36, cmd: "pnpm", args: ["dev:api", "--port", apiPort] },
   { name: "assist", color: 32, cmd: "pnpm", args: ["dev:assistant", "--port", assistantPort] },
   { name: "outbox", color: 35, cmd: "pnpm", args: ["dev:outbox"] },
+  { name: "voice", color: 34, cmd: "pnpm", args: ["dev:voice"] },
   { name: "web", color: 33, cmd: "pnpm", args: ["--filter", "@ai-commerce/web", "exec", "next", "dev", "--port", webPort] },
 ];
 

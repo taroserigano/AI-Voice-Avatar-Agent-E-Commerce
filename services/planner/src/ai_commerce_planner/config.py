@@ -44,7 +44,7 @@ class PlannerSettings(BaseSettings):
 
     # The planner's own commerce identity: catalog reads only (PLANNER_ROUTES).
     commerce_api_url: str = Field(
-        default="http://localhost:8000", validation_alias="COMMERCE_API_URL"
+        default="http://127.0.0.1:8000", validation_alias="COMMERCE_API_URL"
     )
     planner_service_token: str = "dev-only-planner-service-token"  # noqa: S105
 

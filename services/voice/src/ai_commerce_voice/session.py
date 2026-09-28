@@ -56,7 +56,7 @@ from ai_commerce_voice.ports import (
     Utterance,
     Words,
 )
-from ai_commerce_voice.speech_text import SpeechChunker
+from ai_commerce_voice.speech_text import SpeechChunker, speakable
 
 log = logging.getLogger(__name__)
 
@@ -148,6 +148,8 @@ class VoiceSession:
     _hearing_task: asyncio.Task[None] | None = None
     # The turn started early on the live transcript: (item_id, text).
     _draft: tuple[str, str] | None = None
+    # The running turn only says a fixed line ("Thanks, confirming your return now.").
+    _turn_is_say: bool = False
     muted: bool = False
 
     # --- lifecycle -----------------------------------------------------------------------
@@ -247,7 +249,8 @@ class VoiceSession:
             return
         self._draft = (ev.item_id, text)
         await self.send_json({"type": "user.final", "text": text})
-        clock = TurnClock(stopped_at=self._stopped_at, final_at=ev.at)
+        # When the words were ready (not when speech stopped): stt_ms is the transcriber's lag.
+        clock = TurnClock(stopped_at=self._stopped_at, final_at=self.clock())
         await self._start_turn(text=text, message_id=ev.item_id, clock=clock)
 
     async def _on_final(self, ev: Final, *, typed: bool = False) -> None:
@@ -315,9 +318,16 @@ class VoiceSession:
         message_id: str | None = None,
     ) -> None:
         if self._turn and not self._turn.done():
-            self._turn.cancel()
-            with contextlib.suppress(asyncio.CancelledError, Exception):
-                await self._turn
+            if self._turn_is_say and resume is not None:
+                # The store answered while Xana is saying "confirming your return now": let her
+                # finish the sentence, then carry on (only talking over her cuts her off).
+                with contextlib.suppress(asyncio.CancelledError, Exception):
+                    await self._turn
+            else:
+                self._turn.cancel()
+                with contextlib.suppress(asyncio.CancelledError, Exception):
+                    await self._turn
+        self._turn_is_say = say is not None
         self._turn = asyncio.create_task(
             self._run_turn(
                 text=text,
@@ -346,10 +356,13 @@ class VoiceSession:
         forward: asyncio.Task[None] | None = None
         answer: Segment | None = None
         chunker = SpeechChunker()
+        # No filler for a fixed line, or right after "confirming your return now" (the outcome
+        # follows it; "let me think" there would sound unsure about a done deal).
+        quiet = say is not None or resume in ("confirmed", "declined")
+        if quiet:
+            self._filler_played = True
         filler_timer = (
-            asyncio.create_task(self._filler_after(self.filler_after_ms, clock))
-            if say is None
-            else None
+            None if quiet else asyncio.create_task(self._filler_after(self.filler_after_ms, clock))
         )
 
         async def speak(chunk: str) -> None:
@@ -445,6 +458,9 @@ class VoiceSession:
         self._next_segment += 1
         seg = Segment(self._next_segment, kind)
         self.segments[seg.number] = seg
+        if kind != "filler":
+            # Real speech is on its way: a filler now would jump in front of it.
+            self._answer_audio_started = True
         # Forget old, finished segments.
         for n in [n for n, s in self.segments.items() if s.complete and n < seg.number - 20]:
             del self.segments[n]
@@ -493,7 +509,9 @@ class VoiceSession:
         await self.send_json({"type": "segment.text", "segment": seg.number, "text": text})
         utterance = self.mouth.utterance()
         forward = asyncio.create_task(self._forward(utterance, seg, clock))
-        await utterance.push(text)
+        # The caption keeps the exact words (a read-back is what gets confirmed); the voice
+        # reads them the way a person would ("1 × Notebook" is "1 Notebook").
+        await utterance.push(speakable(text))
         await utterance.finish()
         await forward
         return seg

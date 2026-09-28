@@ -34,6 +34,7 @@ def spell_order_numbers(text: str) -> str:
 
 def speakable(text: str) -> str:
     text = CITE.sub("", text)
+    text = re.sub(r"(\d)\s*×\s*", r"\1 ", text)  # "1 × Notebook" -> "1 Notebook"
     text = _MARKDOWN.sub("", text)
     text = spell_order_numbers(text)
     return re.sub(r"[ \t]+", " ", text).replace(" .", ".").replace(" ,", ",")
