@@ -23,7 +23,7 @@ export function XanaOrb({
   const spin = state === "speaking" ? "6s" : state === "thinking" ? "3.5s" : "18s";
 
   return (
-    <div aria-hidden className={cn("relative grid size-72 place-items-center sm:size-80", className)}>
+    <div aria-hidden className={cn("relative grid size-[min(18rem,30vh)] place-items-center sm:size-[min(20rem,32vh)]", className)}>
       {/* Rings */}
       <div className="absolute inset-0 rounded-full border border-white/10" />
       <div className="absolute inset-[9%] rounded-full border border-white/[0.07]" />

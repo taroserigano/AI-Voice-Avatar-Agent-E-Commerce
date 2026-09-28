@@ -36,6 +36,7 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstNa
   const [confirming, setConfirming] = useState(false);
   const [confirmError, setConfirmError] = useState<string | null>(null);
   const handled = useRef<string | null>(null);
+  const stage = useRef<HTMLElement>(null);
 
   // A clear spoken yes (checked by the server's rule, never the model) confirms like the button.
   useEffect(() => {
@@ -60,8 +61,17 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstNa
   }
 
   const status = STATUS[state];
+  const captionNow = captionFor(voice.segments);
+
+  // On short screens the newest words can fall below the fold: keep them in view.
+  useEffect(() => {
+    const el = stage.current;
+    if (!el || el.scrollHeight <= el.clientHeight) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollTo({ top: el.scrollHeight, behavior: reduce ? "auto" : "smooth" });
+  }, [captionNow, voice.userText, quote]);
   const hint = state === "thinking" && voice.toolLabel ? voice.toolLabel : status.hint;
-  const caption = captionFor(voice.segments);
+  const caption = captionNow;
   const level = state === "speaking" ? voice.speechLevel : voice.micLevel;
   const live = state !== "off" && state !== "error";
 
@@ -89,7 +99,7 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstNa
       </header>
 
       {/* Stage */}
-      <main id="main" className="flex flex-1 flex-col items-center overflow-y-auto px-4 pb-6 pt-8 text-center sm:pt-12">
+      <main ref={stage} id="main" className="flex flex-1 flex-col items-center overflow-y-auto px-4 pb-6 pt-6 text-center sm:pt-10">
         <p className="text-xs font-bold uppercase tracking-[0.32em] text-brand-200 sm:text-sm">
           Orders &amp; returns, in conversation
         </p>
@@ -101,13 +111,13 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstNa
             if (!live) void voice.start();
             else if (state === "speaking") voice.interrupt();
           }}
-          className="mt-6 rounded-full sm:mt-8"
+          className="mt-4 rounded-full sm:mt-6"
           aria-label={!live ? "Start talking to Xana" : state === "speaking" ? "Interrupt Xana" : "Xana is listening"}
         >
           <XanaOrb state={state} level={level} />
         </button>
 
-        <div aria-live="polite" className="mt-2 min-h-24">
+        <div aria-live="polite" className="mt-1 min-h-20">
           <p className="font-display text-3xl font-bold tracking-tight">
             {status.title}
             {state === "thinking" ? <ThinkingDots /> : null}
