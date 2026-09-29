@@ -33,8 +33,8 @@ SCRIPTED_MODEL_NAME = "scripted"
 GREETINGS = {
     "steph": "Hi! I'm Steph. I can find products, check your orders, answer policy questions, "
     "and find stores. What are you looking for?",
-    "xana": "Hi, I'm Xana. I can help you return something, check on a refund, or answer "
-    "questions about an order. What can I help with?",
+    "xana": "Hi, I'm Xana. I can help with products, orders, returns, and refunds. "
+    "What can I help with?",
 }
 BYPASS_REPLY = (
     "I can't skip our checks or make exceptions to the policy, and I don't follow instructions "
@@ -137,6 +137,12 @@ HANDOFF_WORDS = re.compile(r"\b(human|person|agent|representative|someone real|r
 ADD_WORDS = re.compile(r"\b(add|put)\b.*\b(cart|basket)\b|\badd (it|that|this|the|one|two)\b")
 ORDINALS = {"first": 0, "1st": 0, "second": 1, "2nd": 1, "third": 2, "3rd": 2, "last": -1}
 PRICE = re.compile(r"\b(?:under|less than|below|cheaper than|max(?:imum)?)\s*\$?\s*(\d+(?:\.\d+)?)")
+PRODUCT_DETAIL_WORDS = re.compile(
+    r"\b(ingredients?|allergens?|allerg(?:y|ies|ic)|contains?|calories?|protein|"
+    r"nutrition|specs?|compatible|dimensions?|warranty|price|cost|stock|available)\b"
+    r"|\bwork with\b",
+    re.IGNORECASE,
+)
 
 
 def _norm(text: str) -> str:
@@ -247,6 +253,18 @@ def plan(
             qty = 2 if " two " in t else 1
             if card.get("variant_id"):
                 return [_call("add_to_cart", {"variant_id": card["variant_id"], "quantity": qty})]
+    if (
+        PRODUCT_DETAIL_WORDS.search(t)
+        and not ORDER_WORDS.search(t)
+        and not POLICY_WORDS.search(t)
+        and "get_product_details" in tools
+    ):
+        cards = _last_product_cards(history)
+        if cards:
+            ordinal = next((i for w, i in ORDINALS.items() if f" {w} " in t), None)
+            if len(cards) == 1 or ordinal is not None:
+                card = cards[ordinal or 0]
+                return [_call("get_product_details", {"product_id": card["id"]})]
     # "I want to return my earbuds" goes to Xana; "can I drop off a return at a store?" is a
     # policy question Steph answers herself.
     asks_question = bool(re.match(r"\s*(can|could|do|does|how|what|where|when|is|are|will)\b", t))
@@ -271,7 +289,11 @@ def plan(
         return calls
     if re.fullmatch(r"\s*(hi|hello|hey|thanks|thank you|ok|okay)[ !.]*", text.lower()):
         return []
-    return [_call("search_products", parse_product_request(text, vocabulary))]
+    return (
+        [_call("search_products", parse_product_request(text, vocabulary))]
+        if "search_products" in tools
+        else []
+    )
 
 
 def _describe_search(args: dict[str, Any], vocabulary: dict[str, Any]) -> str:
@@ -282,6 +304,57 @@ def _describe_search(args: dict[str, Any], vocabulary: dict[str, Any]) -> str:
     return " ".join([*words, thing])
 
 
+def _answer_product_detail(data: dict[str, Any], question: str) -> str:
+    """The scripted fallback states only fields returned for this product."""
+    title = str(data.get("title") or "This product")
+    q = question.lower()
+    if "ingredient" in q:
+        ingredients = data.get("ingredients")
+        return (
+            f"{title} lists these ingredients: {ingredients}."
+            if ingredients
+            else f"The listing for {title} doesn't specify ingredients."
+        )
+    if re.search(r"\b(allerg|contain)\w*\b", q):
+        allergens = data.get("allergens")
+        if allergens is None:
+            return f"The listing for {title} doesn't specify allergens. Check the package."
+        listed = ", ".join(allergens) if allergens else "none"
+        return (
+            f"The listed major allergens for {title} are {listed}. "
+            "The listing doesn't confirm whether cross-contact is possible; check the package "
+            "or ask the manufacturer if you have an allergy."
+        )
+    if re.search(r"\b(nutrition|calori|protein)\w*\b", q):
+        n = data.get("nutrition_per_serving")
+        return (
+            f"Per {n['serving_size']}, {title} has {n['calories']} calories, "
+            f"{n['protein_g']:g} g protein, and {n['added_sugars_g']:g} g added sugar."
+            if n
+            else f"The listing for {title} doesn't provide nutrition facts."
+        )
+    if re.search(r"\b(price|cost|stock|available)\b", q):
+        variants = data.get("variants") or []
+        if len(variants) > 1:
+            options = "; ".join(
+                f"{v['name']}: {v['price']}" + (" in stock" if v["in_stock"] else " out of stock")
+                for v in variants[:4]
+            )
+            return f"{title} has these options: {options}."
+        return (
+            f"{title} is {data.get('price')} and is "
+            f"{'in stock' if data.get('in_stock') else 'out of stock'} right now."
+        )
+    specs = data.get("specs") or {}
+    matched = [f"{k}: {v}" for k, v in specs.items() if k.lower() in q]
+    if matched:
+        return f"The listing for {title} says {'; '.join(matched[:3])}."
+    return (
+        f"The listing for {title} doesn't specify that. Check the product card for its "
+        "published details."
+    )
+
+
 def compose(results: list[ToolMessage], vocabulary: dict[str, Any]) -> str:
     parts: list[str] = []
     for m in results:
@@ -290,6 +363,12 @@ def compose(results: list[ToolMessage], vocabulary: dict[str, Any]) -> str:
             parts.append("Sorry, I couldn't get that information just now. Please try again.")
             continue
         if m.name == "search_products":
+            if data.get("unsupported_filters"):
+                parts.append(
+                    "I can't verify that request with the catalog's available filters. "
+                    "Please rephrase the product type or feature."
+                )
+                continue
             desc = _describe_search(data.get("filters_used", {}), vocabulary)
             items = data.get("results", [])
             if not items:
@@ -410,11 +489,35 @@ class ScriptedChatModel(BaseChatModel):
             text = str(messages[last_human].content) if last_human >= 0 else ""
             if agent == "xana":
                 step = next_support_step(text, results, signals)
+                if (
+                    step is None
+                    and results[-1].name == "search_products"
+                    and PRODUCT_DETAIL_WORDS.search(text)
+                ):
+                    found = read_payload(str(results[-1].content)).get("results") or []
+                    if len(found) == 1 and found[0].get("product_id"):
+                        step = [
+                            _call("get_product_details", {"product_id": found[0]["product_id"]})
+                        ]
                 if step and {c["name"] for c in step} <= tools:
                     return ChatResult(
                         generations=[ChatGeneration(message=AIMessage(content="", tool_calls=step))]
                     )
                 answer = compose_support(results, text)
+                latest = read_payload(str(results[-1].content))
+                if (
+                    answer is None
+                    and results[-1].name == "get_product_details"
+                    and "error" not in latest
+                ):
+                    answer = _answer_product_detail(latest, text)
+                if (
+                    answer is None
+                    and results[-1].name == "search_products"
+                    and PRODUCT_DETAIL_WORDS.search(text)
+                    and len(latest.get("results") or []) > 1
+                ):
+                    answer = "I found several possible products. Which one do you mean?"
                 message = AIMessage(
                     content=answer if answer is not None else compose(results, vocabulary)
                 )
@@ -424,6 +527,19 @@ class ScriptedChatModel(BaseChatModel):
             text = str(messages[last_human].content) if last_human >= 0 else ""
             if (signals.get("policy_bypass") or 0) >= 0.7:
                 reply = AIMessage(content=BYPASS_REPLY)
+                return ChatResult(generations=[ChatGeneration(message=reply)])
+            cards = _last_product_cards(messages[:last_human])
+            if (
+                agent == "xana"
+                and PRODUCT_DETAIL_WORDS.search(text)
+                and len(cards) > 1
+                and not any(f" {w} " in _norm(text) for w in ORDINALS)
+                and not ORDER_WORDS.search(_norm(text))
+                and not POLICY_WORDS.search(_norm(text))
+            ):
+                reply = AIMessage(
+                    content="Which product do you mean? Please choose one of the cards."
+                )
                 return ChatResult(generations=[ChatGeneration(message=reply)])
             calls = (plan_support(text, signals) if agent == "xana" else None) or plan(
                 text, messages[:last_human], vocabulary, tools, signals

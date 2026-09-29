@@ -1,13 +1,16 @@
-"""Assistant conversation eval: run the scripted product Q&A through the live assistant.
+"""Assistant conversation eval: run labeled product Q&A through a live assistant.
 
 Run with the stack up (``pnpm dev``), from the repo root:
   uv run --directory services/assistant python ../../evals/assistant_eval.py
   --web http://localhost:3000     the web app (the assistant is reached through /api/assistant)
+  --agent xana                   score Xana's product answers (default: Steph)
   --only qa-001,qa-002            run some scripts
   --record-baseline               save as evals/baselines/assistant-<model>.json
 
 Scored from what the customer sees, not from the model's text alone:
   filters      every product card matches the expected type and tags (and none of the excluded tags)
+  details      shown products meet labeled specification, allergen, title, and option constraints
+  tool use     product searches and detail questions call the corresponding catalog tool
   empty        when a script expects no exact match, no product card is shown
   mentions     required words appear in the answer; forbidden ones don't
   cites        the expected policy documents are among the answer's valid citations
@@ -48,15 +51,21 @@ def turn(client: httpx.Client, conversation: str, text: str) -> dict[str, Any]:
     return {
         "text": "".join(d["delta"] for e, d in events if e == "text"),
         "cards": [d for e, d in events if e == "card"],
+        "tools": [d["tool"] for e, d in events if e == "status"],
         "citations": next((d["valid"] for e, d in events if e == "citations"), []),
         "done": next((d for e, d in events if e == "done"), {}),
     }
 
 
-def score(expect: dict[str, Any], got: dict[str, Any]) -> dict[str, bool]:
+def score(expect: dict[str, Any], got: dict[str, Any], client: httpx.Client) -> dict[str, bool]:
     checks: dict[str, bool] = {}
     products = [c for c in got["cards"] if c["kind"] == "product"]
     search = expect.get("search") or {}
+    tools = got["tools"]
+    if expect.get("action") == "search":
+        checks["uses_catalog"] = "search_products" in tools
+    elif expect.get("action") == "product_details":
+        checks["uses_details"] = "get_product_details" in tools
     if expect.get("expect_empty"):
         checks["empty"] = not products
     elif search and expect.get("all_results_match"):
@@ -75,6 +84,34 @@ def score(expect: dict[str, Any], got: dict[str, Any]) -> dict[str, bool]:
             )
 
         checks["filters"] = bool(products) and all(ok(c) for c in products)
+    constraints = expect.get("result_constraints") or {}
+    if constraints:
+
+        def detail_ok(card: dict[str, Any]) -> bool:
+            detail = client.get(f"/api/v1/products/{card['id']}")
+            detail.raise_for_status()
+            product = detail.json()
+            specs = product.get("specs") or {}
+            allergens = {a.lower() for a in product.get("allergens") or []}
+            return (
+                all(
+                    word.lower() in product["title"].lower()
+                    for word in constraints.get("title_contains", [])
+                )
+                and all(
+                    specs.get(key) == value for key, value in constraints.get("specs", {}).items()
+                )
+                and not (allergens & {a.lower() for a in constraints.get("allergens_none", [])})
+                and (
+                    "variant_code" not in constraints
+                    or any(
+                        variant["sku"].endswith("-" + constraints["variant_code"])
+                        for variant in product.get("variants", [])
+                    )
+                )
+            )
+
+        checks["result_constraints"] = bool(products) and all(detail_ok(c) for c in products)
     text = got["text"].lower()
     if expect.get("mentions"):
         checks["mentions"] = all(m.lower() in text for m in expect["mentions"])
@@ -96,6 +133,7 @@ def score(expect: dict[str, Any], got: dict[str, Any]) -> dict[str, bool]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--web", default="http://localhost:3000")
+    parser.add_argument("--agent", choices=("steph", "xana"), default="steph")
     parser.add_argument("--only")
     parser.add_argument("--record-baseline", action="store_true")
     args = parser.parse_args()
@@ -107,6 +145,13 @@ def main() -> None:
     if args.only:
         wanted = set(args.only.split(","))
         scripts = [s for s in scripts if s["id"] in wanted]
+    elif args.agent == "xana":
+        # Xana answers product questions but deliberately cannot add to the cart.
+        scripts = [
+            script
+            for script in scripts
+            if all(turn["expect"].get("action") != "add_to_cart" for turn in script["turns"])
+        ]
     clients: dict[str, httpx.Client] = {}
     results = []
     model = "?"
@@ -120,12 +165,12 @@ def main() -> None:
             ).raise_for_status()
             clients[user] = c
         client = clients[user]
-        conv = client.post("/api/assistant/conversations", json={"agent": "steph"}).json()["id"]
+        conv = client.post("/api/assistant/conversations", json={"agent": args.agent}).json()["id"]
         turn_results = []
         for t in script["turns"]:
             got = turn(client, conv, t["user"])
             model = got["done"].get("model", model)
-            checks = score(t["expect"], got)
+            checks = score(t["expect"], got, client)
             turn_results.append(
                 {"user": t["user"], "checks": checks, "passed": all(checks.values())}
             )
@@ -151,8 +196,10 @@ def main() -> None:
     for k, vals in sorted(by_check.items()):
         print(f"  {k:<18} {sum(vals)}/{len(vals)}")
     if args.record_baseline:
-        out = ROOT / "evals" / "baselines" / f"assistant-{model}.json"
+        label = f"{args.agent}-" if args.agent != "steph" else ""
+        out = ROOT / "evals" / "baselines" / f"assistant-{label}{model}.json"
         summary = {
+            "agent": args.agent,
             "model": model,
             "passed": ok,
             "total": total,

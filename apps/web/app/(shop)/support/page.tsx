@@ -24,7 +24,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Support",
-  description: "Talk with Xana, Serigan Mart's customer-support assistant, about orders, delivery, returns, and refunds.",
+  description: "Talk with Xana, Serigan Mart's customer-support assistant, about products, orders, delivery, returns, and refunds.",
 };
 
 type Case = components["schemas"]["CaseOut"];
@@ -78,7 +78,7 @@ export default async function SupportPage({
           Help with orders, delivery, and returns
         </h1>
         <p className="mt-3 text-lg leading-relaxed text-ink-soft">
-          Ask Xana by voice or text: where an order is, what went wrong with a delivery, or how to return something.
+          Ask Xana by voice or text about products, where an order is, a delivery problem, or how to return something.
           For a return, she shows your exact refund and starts it only when you confirm.
         </p>
         <Link

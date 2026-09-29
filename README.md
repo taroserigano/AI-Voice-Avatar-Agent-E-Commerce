@@ -37,16 +37,18 @@ batch is planned in [docs/features/](docs/features/README.md).
   perishables, partial returns with cent rounding, final sale, late, not delivered, ...),
   reset to fresh dates on every `pnpm db:seed`.
 - **Ask Steph:** a shopping assistant behind the button at the bottom right of every shop
-  page (`services/assistant`, LangGraph + Claude). It searches the catalog with exact filters
+  page (`services/assistant`, LangGraph with Claude or OpenAI). It searches the catalog with exact filters
   ("non fat organic milk, not regular milk"), shows product, order, store, and cart cards,
   adds to the cart, checks orders, and answers policy questions with numbered citations it
   can only take from sections it actually retrieved. Conversations are saved per customer.
   It calls the commerce API with its own service identity for the signed-in customer (never
   the customer's cookie), and it has no tool that can confirm, pay, or refund. Without a
-  working `ANTHROPIC_API_KEY` a scripted model answers from the same tools and the chat says
-  **Simulated**.
-- **Support with Xana (`/support`):** talk (or type) to Xana about returns and refunds. She
-  finds the order and item, explains eligibility from the store's return options, prices the
+  working `ANTHROPIC_API_KEY` or `OPEN_AI_API`, a scripted model answers from the same tools
+  and the chat says **Simulated**.
+- **Support with Xana (`/support`):** talk (or type) to Xana about products, returns, and refunds. She
+  searches the same live catalog as Steph and opens product details for ingredient, allergen,
+  nutrition, specification, and variant questions. Unknown filters return no recommendation.
+  She finds the order and item, explains eligibility from the store's return options, prices the
   return, and shows a quote card. The customer confirms with the **Confirm return** button, or
   by voice: Xana reads the quote back (built by code, not the model) and only a clear, final
   "yes" after the full read-back counts, checked by the app (a strict rule, plus Jev's vote
@@ -220,7 +222,7 @@ docs/                  build plan and handoff docs
 | PostgreSQL, Redis, OpenSearch, OTel Collector, Grafana | Real (local Docker or Podman) |
 | Pinecone | Real service; code and guards tested, but the semantic path hasn't run end to end yet because the account had no free index slot |
 | Sign-in | Email and password checked by the API (by design, no other layers) |
-| LLM (Claude `claude-sonnet-5`) | Real when `ANTHROPIC_API_KEY` works; otherwise the labeled scripted model (the key in the shared `.env` was rejected on 2026-09-26) |
+| Text assistant LLM | Claude when `ANTHROPIC_API_KEY` works; otherwise OpenAI `gpt-6-sol` when `OPEN_AI_API` works; otherwise the labeled scripted model |
 | Policy search | OpenSearch keyword search over policy sections; Pinecone joins when its index slot is free |
 | Jev (TypeSafe) | Real when `TYPESAFE_API_KEY` is set; otherwise the labeled simulator |
 | Speech-to-text / text-to-speech | Real: Groq Whisper and Cartesia with the keys in `.env` (Deepgram if keyed); the browser's own voice features otherwise. LiveKit (the plan's streaming voice) isn't connected yet |

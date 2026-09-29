@@ -63,7 +63,7 @@ from assistant.turns import TOOL_LABELS, message_text, split_citations
 
 log = logging.getLogger(__name__)
 
-PROMPT_VERSION = "xana.voice.v1"
+PROMPT_VERSION = "xana.voice.v2"
 PROMPT_DIR = Path(__file__).resolve().parent / "prompts"
 SNAPSHOT_ORDERS = 8
 PREFETCH_TIMEOUT_S = 1.2
@@ -250,17 +250,27 @@ def orders_snapshot(details: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return out
 
 
-def system_prompt(first_name: str, today: date, snapshot: list[dict[str, Any]] | None) -> str:
+def system_prompt(
+    first_name: str,
+    today: date,
+    snapshot: list[dict[str, Any]] | None,
+    vocabulary: dict[str, Any] | None = None,
+) -> str:
     # Fixed instructions first (cacheable), then this call's facts.
     orders = (
         untrusted("orders_snapshot", {"orders": snapshot})
         if snapshot is not None
         else "(not loaded: use list_my_orders)"
     )
+    vocab = vocabulary or {}
+    types = ", ".join(str(t["value"]) for t in vocab.get("product_types", []))
+    tags = ", ".join(str(t["value"]) for t in vocab.get("tags", []))
     return (
         f"{_template()}\n\n## This call\n\nYou're talking with {first_name or 'the customer'}, "
         f"who is signed in. Today is {today.strftime('%A, %B %d, %Y')}.\n\n"
-        f"## Your orders right now\n\n{orders}\n"
+        f"## Your orders right now\n\n{orders}\n\n"
+        f"## Catalog filters\n\nUse only these exact values in product search. "
+        f"Product types: {types or '(unavailable)'}. Tags: {tags or '(unavailable)'}.\n"
     )
 
 

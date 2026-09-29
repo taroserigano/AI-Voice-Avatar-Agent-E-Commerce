@@ -21,8 +21,9 @@ const XANA: Persona = {
   role: "AI customer-support assistant",
   avatar: <AssistantAvatar who="xana" />,
   greeting:
-    "Hi, I'm Xana, Serigan Mart's customer-support assistant. I can start a return, check on a refund, or help with an order. Talk to me with the microphone, or type.",
+    "Hi, I'm Xana, Serigan Mart's customer-support assistant. I can answer product questions, help with orders, and handle returns and refunds. Talk to me with the microphone, or type.",
   suggestions: [
+    "Find me sugar free yogurt",
     "I want to return my earbuds",
     "The milk I got went bad",
     "Where's my refund?",

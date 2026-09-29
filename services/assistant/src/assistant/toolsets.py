@@ -18,9 +18,11 @@ from assistant.tools import (
     list_my_orders,
     list_stores,
     search_policies,
+    search_products,
 )
 
 XANA_TOOLS: list[BaseTool] = [
+    search_products,
     list_my_orders,
     get_order_status,
     get_return_options,

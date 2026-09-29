@@ -21,6 +21,11 @@ Sign in as the `user` of each script (development accounts: `alice@example.com`,
 `bob@example.com`). Reseed first (`pnpm db:seed`) so the orders' delivery dates are relative
 to today.
 
+The runner defaults to Steph. To measure Xana's product search against the same labeled
+catalog cases, run `pnpm eval:assistant -- --agent xana`. Use `--only qa-001,qa-002` for a
+smaller smoke test. Record separate baselines with `--record-baseline` only after the stack
+and the intended model are running; the report names the agent and model.
+
 ## Shape
 
 Each line is one conversation:

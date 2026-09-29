@@ -32,11 +32,15 @@ class Settings(BaseSettings):
     assistant_service_token: str = DEV_ASSISTANT_TOKEN
     session_cookie_name: str = "ac_session"
 
-    # The LLM. "auto" uses Claude when ANTHROPIC_API_KEY works and the labeled scripted model
-    # otherwise; "claude" and "scripted" force one.
+    # The LLM. "auto" tries Claude, then OpenAI, then the labeled scripted fallback.
     anthropic_api_key: str | None = None
     assistant_model: str = "claude-sonnet-5"
-    assistant_model_mode: Literal["auto", "claude", "scripted"] = "auto"
+    openai_api_key: str | None = Field(
+        default=None, validation_alias=AliasChoices("OPEN_AI_API", "OPENAI_API_KEY")
+    )
+    assistant_openai_model: str = "gpt-6-sol"
+    assistant_openai_reasoning: Literal["low", "medium", "high"] = "medium"
+    assistant_model_mode: Literal["auto", "claude", "openai", "scripted"] = "auto"
     assistant_max_tokens: int = 1024
 
     # TypeSafe Jev: typed decisions about each turn (intent, return reason, which order line,

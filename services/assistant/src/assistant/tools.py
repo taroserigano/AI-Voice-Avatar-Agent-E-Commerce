@@ -195,6 +195,18 @@ def search_products(
     unknown = [t for t in (product_types or []) if t not in known_types] + [
         t for t in [*(tags or []), *(exclude_tags or [])] if t not in known_tags
     ]
+    if unknown:
+        # An unrecognized required filter must not turn a narrow request into a broad
+        # recommendation. Ask for clarification instead of showing false matches.
+        return untrusted(
+            "search_products",
+            {
+                "total_matches": 0,
+                "results": [],
+                "unsupported_filters": unknown,
+                "note": "No catalog search was run because a required filter is unknown.",
+            },
+        ), []
     params: dict[str, Any] = {"page_size": 24, "sort": sort}
     if query:
         params["q"] = query
@@ -220,8 +232,6 @@ def search_products(
         "filters_used": {k: v for k, v in params.items() if k not in ("page_size",)},
         "results": [_product_for_model(d) for d in details],
     }
-    if unknown:
-        payload["ignored_unknown_filters"] = unknown
     if page.get("search") and page["search"].get("semantic") != "ok":
         payload["note"] = "Meaning-based search is off; results come from keyword search."
     summary = search_summary_card(params, page["total"], len(details), vocab)

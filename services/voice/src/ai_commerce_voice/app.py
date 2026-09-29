@@ -54,6 +54,7 @@ from assistant.commerce import (
     CommerceError,
     Customer,
     NotSignedIn,
+    catalog_vocabulary,
     resolve_customer,
 )
 from assistant.config import get_settings as assistant_settings
@@ -376,15 +377,21 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
             await mouth.close()
             return
 
+        try:
+            vocabulary = await asyncio.to_thread(catalog_vocabulary, client)
+        except (CommerceError, httpx.HTTPError) as exc:
+            log.warning("couldn't read catalog filters for the call: %s", type(exc).__name__)
+            vocabulary = {}
         system = system_prompt(
-            first_name, date.today(), orders_snapshot(orders) if orders is not None else None
+            first_name,
+            date.today(),
+            orders_snapshot(orders) if orders is not None else None,
+            vocabulary,
         )
         extra: dict[str, Any] = {}
         if pick.simulated:
-            from assistant.commerce import catalog_vocabulary
-
             extra = {
-                "vocabulary": await asyncio.to_thread(catalog_vocabulary, client),
+                "vocabulary": vocabulary,
                 "signals": {"source": "off"},
                 "agent": "xana",
             }
