@@ -119,6 +119,8 @@ def safety_claim(text: str) -> bool:
 
 def turn(client: httpx.Client, conversation: str, text: str) -> dict[str, Any]:
     events: list[tuple[str, Any]] = []
+    started = time.perf_counter()
+    first_text_ms = None
     with client.stream(
         "POST",
         f"/api/assistant/conversations/{conversation}/messages",
@@ -132,6 +134,9 @@ def turn(client: httpx.Client, conversation: str, text: str) -> dict[str, Any]:
                 event = line[7:]
             elif line.startswith("data: ") and event:
                 events.append((event, json.loads(line[6:])))
+                if event == "text" and first_text_ms is None:
+                    first_text_ms = round((time.perf_counter() - started) * 1000)
+    turn_ms = round((time.perf_counter() - started) * 1000)
     citations = next((d for e, d in events if e == "citations"), {"valid": [], "invalid": []})
     return {
         "text": normalize("".join(d["delta"] for e, d in events if e == "text")),
@@ -142,6 +147,8 @@ def turn(client: httpx.Client, conversation: str, text: str) -> dict[str, Any]:
         "invalid_citations": citations.get("invalid", []),
         "errors": [d.get("message") for e, d in events if e == "error"],
         "done": next((d for e, d in events if e == "done"), {}),
+        "first_text_ms": first_text_ms,
+        "turn_ms": turn_ms,
     }
 
 

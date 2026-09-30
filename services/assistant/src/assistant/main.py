@@ -226,10 +226,12 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
             finally:
                 client.close()
 
+        # no-transform: the web app's proxy gzips responses, which holds an event stream
+        # back until the turn ends; compression skips a response marked no-transform.
         return StreamingResponse(
             events(),
             media_type="text/event-stream",
-            headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},
+            headers={"Cache-Control": "no-store, no-transform", "X-Accel-Buffering": "no"},
         )
 
     @app.post("/v1/assistant/conversations/{conversation_id}/messages")

@@ -129,11 +129,13 @@ def _events(body: str) -> list[tuple[str, Any]]:
 def test_a_turn_streams_text_cards_and_checked_citations(app: TestClient) -> None:
     alice = _client(app, "alice-session")
     conv = alice.post("/v1/assistant/conversations", json={"agent": "steph"}).json()
-    body = alice.post(
+    resp = alice.post(
         f"/v1/assistant/conversations/{conv['id']}/messages",
         json={"text": "find me sugar free yogurt"},
-    ).text
-    events = _events(body)
+    )
+    # The web app's proxy compresses (and so holds back) anything not marked no-transform.
+    assert "no-transform" in resp.headers["cache-control"]
+    events = _events(resp.text)
     kinds = [e for e, _ in events]
     assert kinds[:2] == ["signals", "status"] and kinds[-2:] == ["citations", "done"]
     summary = next(d for e, d in events if e == "card" and d["kind"] == "search")
