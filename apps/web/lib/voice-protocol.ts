@@ -40,6 +40,8 @@ export type ServerMessage =
       voice: { provider: string; name: string };
       stt: { provider: string; model: string };
       llm: { model: string; simulated: boolean };
+      /** Xana's face (Tavus): offered only when the server has it set up. */
+      avatar?: AvatarOffer;
       notice: string;
     }
   | { type: "state"; state: VoiceStateName }
@@ -61,7 +63,13 @@ export type ServerMessage =
       metrics: { stt_ms?: number; first_audio_ms?: number; llm_first_token_ms?: number; filler?: boolean };
     }
   | { type: "confirm.result"; decision: "yes" | "no" | "unclear"; quote_id: string }
-  | { type: "error"; message: string; fatal?: boolean };
+  | { type: "error"; message: string; fatal?: boolean }
+  /** The private Tavus room for this call, for this customer only. */
+  | { type: "avatar"; provider: "tavus"; conversation_id: string; url: string; token: string | null }
+  | { type: "avatar.unavailable"; reason: "not_configured" | "busy" | "error" }
+  | { type: "avatar.ended" };
+
+export type AvatarOffer = { available: false } | { available: true; provider: "tavus"; notice: string };
 
 export type ClientMessage =
   | { type: "hello"; conversation_id?: string | null; mic_rate: number; speech_rate: number }
@@ -69,7 +77,9 @@ export type ClientMessage =
   | { type: "played"; segment: number; complete: boolean; played_ms: number }
   | { type: "interrupt" }
   | { type: "text"; text: string }
-  | { type: "quote.outcome"; quote_id: string; outcome: "confirmed" | "declined" };
+  | { type: "quote.outcome"; quote_id: string; outcome: "confirmed" | "declined" }
+  | { type: "avatar.start" }
+  | { type: "avatar.stop" };
 
 export function parseServerMessage(raw: string): ServerMessage | null {
   try {

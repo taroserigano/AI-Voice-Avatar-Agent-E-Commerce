@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@ai-commerce/contracts": "workspace:*",
+    "@daily-co/daily-js": "0.92.2",
     "@opentelemetry/api": "1.9.1",
     "@opentelemetry/api-logs": "0.222.0",
     "@opentelemetry/exporter-metrics-otlp-http": "0.222.0",

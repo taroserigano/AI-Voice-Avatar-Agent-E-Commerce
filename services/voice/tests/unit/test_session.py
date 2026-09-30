@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Awaitable, Callable
 
+from ai_commerce_voice.fillers import BY_TOOL
 from ai_commerce_voice.ports import (
     Draft,
     Final,
@@ -139,11 +140,7 @@ def test_a_tool_call_before_any_words_says_what_xana_is_doing() -> None:
             {"type": "tool", "name": "get_order_status", "label": "Checking your order…"}
         ]
         filler_text = h.of("segment.text")[0]["text"]
-        assert filler_text in (
-            "Let me check on that order.",
-            "Let me look that order up.",
-            "One sec, checking that order.",
-        )
+        assert filler_text in BY_TOOL["get_order_status"]
         await h.session.close()
 
     run(t)

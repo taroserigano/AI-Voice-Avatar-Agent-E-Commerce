@@ -34,7 +34,13 @@ export type EchoMessage = {
   message_type: "conversation";
   event_type: "conversation.echo" | "conversation.interrupt";
   conversation_id: string;
-  properties?: { modality: "audio"; audio: string; sample_rate: number; inference_id: string; done: boolean };
+  properties?: {
+    modality: "audio";
+    audio: string;
+    sample_rate: number;
+    inference_id: string;
+    done: boolean;
+  };
 };
 
 export function pcmBase64(pcm: Int16Array): string {
@@ -169,15 +175,22 @@ export class AvatarEcho {
         if (this.current === turn) this.current = null;
       }
     }
-    this.send({ message_type: "conversation", event_type: "conversation.interrupt", conversation_id: this.conversationId });
+    this.send({
+      message_type: "conversation",
+      event_type: "conversation.interrupt",
+      conversation_id: this.conversationId,
+    });
     this.release();
   }
 
   // --- from Tavus ----------------------------------------------------------------------
 
   onTavus(eventType: string, properties?: { role?: string; interrupted?: boolean } | null): void {
-    const role =
-      eventType.startsWith("conversation.pal.") ? "pal" : eventType.startsWith("conversation.replica.") ? "replica" : properties?.role;
+    const role = eventType.startsWith("conversation.pal.")
+      ? "pal"
+      : eventType.startsWith("conversation.replica.")
+        ? "replica"
+        : properties?.role;
     if (role !== "pal") return; // Tavus sends each PAL event twice (pal and legacy replica)
     const t = this.now();
     if (eventType.endsWith("started_speaking")) this.onStarted(t);
@@ -256,7 +269,9 @@ export class AvatarEcho {
 
   /** Nothing waiting to be heard: a good moment to switch audio back to the local player. */
   get idle(): boolean {
-    return this.order.every((s) => s.complete || s.dropped) && this.turns.every((x) => x.finished || x.segments.length === 0);
+    return (
+      this.order.every((s) => s.complete || s.dropped) && this.turns.every((x) => x.finished || x.segments.length === 0)
+    );
   }
 
   // --- internals -----------------------------------------------------------------------
@@ -264,7 +279,15 @@ export class AvatarEcho {
   private attach(seg: Seg): Turn {
     let turn = this.current;
     if (!turn || turn.closed) {
-      turn = { id: this.newId(), segments: [], pending: [], held: [], started: false, closed: false, finished: false };
+      turn = {
+        id: this.newId(),
+        segments: [],
+        pending: [],
+        held: [],
+        started: false,
+        closed: false,
+        finished: false,
+      };
       this.turns.push(turn);
       this.current = turn;
     }
@@ -285,7 +308,13 @@ export class AvatarEcho {
       message_type: "conversation",
       event_type: "conversation.echo",
       conversation_id: this.conversationId,
-      properties: { modality: "audio", audio: pcmBase64(pcm), sample_rate: SPEECH_RATE, inference_id: turn.id, done },
+      properties: {
+        modality: "audio",
+        audio: pcmBase64(pcm),
+        sample_rate: SPEECH_RATE,
+        inference_id: turn.id,
+        done,
+      },
     };
     if (this.blocked(turn)) {
       turn.held.push(msg);
@@ -329,7 +358,10 @@ export class AvatarEcho {
     const end = this.endOf(seg);
     seg.endAt = end === null ? this.now() : Math.min(end, this.now());
     seg.complete = true;
-    this.completed.push({ segment: seg.segment, playedMs: Math.round(durationMs(seg.samples)) });
+    this.completed.push({
+      segment: seg.segment,
+      playedMs: Math.round(durationMs(seg.samples)),
+    });
   }
 
   private startOf(seg: Seg): number | null {
@@ -365,7 +397,6 @@ export class AvatarEcho {
       this.order.shift();
       this.segs.delete(first.segment);
     }
-    return null;
   }
 }
 

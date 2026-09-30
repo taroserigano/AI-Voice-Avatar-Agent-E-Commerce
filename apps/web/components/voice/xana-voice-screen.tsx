@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { MicIcon, SparklesIcon, XIcon } from "@/components/icons";
+import { MicIcon, SparklesIcon, VideoIcon, XIcon } from "@/components/icons";
 import { cn } from "@/lib/cn";
 import { confirmQuote } from "@/lib/returns-confirm";
 import { useVoiceAgent } from "@/lib/use-voice-agent";
 import { captionFor, dollars } from "@/lib/voice-captions";
 import type { QuoteCard } from "@/lib/voice-protocol";
+import { XanaAvatar } from "./xana-avatar";
 import { XanaOrb } from "./xana-orb";
 
 /**
@@ -18,6 +19,9 @@ import { XanaOrb } from "./xana-orb";
  * A return is only ever confirmed by the customer: by the button, or by a clear spoken yes
  * that the server checks with a strict rule after the read-back played in full. The browser
  * then confirms with the store itself (the model never can).
+ *
+ * With Video on (when the server offers it), Xana's face (Tavus) takes the orb's place and
+ * speaks her answers; captions follow her lips. If video fails, the call carries on as voice.
  */
 
 const STATUS = {
@@ -74,6 +78,8 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstNa
   const caption = captionNow;
   const level = state === "speaking" ? voice.speechLevel : voice.micLevel;
   const live = state !== "off" && state !== "error";
+  const face = voice.avatar.status === "live" && voice.avatar.stream ? voice.avatar.stream : null;
+  const videoOffered = live && voice.avatar.offer.available;
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-voice-night text-white focus-inverse">
@@ -114,7 +120,7 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstNa
           className="mt-4 rounded-full sm:mt-6"
           aria-label={!live ? "Start talking to Xana" : state === "speaking" ? "Interrupt Xana" : "Xana is listening"}
         >
-          <XanaOrb state={state} level={level} />
+          {face ? <XanaAvatar stream={face} state={state} /> : <XanaOrb state={state} level={level} />}
         </button>
 
         <div aria-live="polite" className="mt-1 min-h-20">
@@ -123,7 +129,11 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstNa
             {state === "thinking" ? <ThinkingDots /> : null}
           </p>
           <p className="mt-3 text-base text-neutral-300 sm:text-lg">
-            {state === "error" && voice.error ? voice.error : hint}
+            {state === "error" && voice.error
+              ? voice.error
+              : voice.avatar.status === "starting"
+                ? "Starting video…"
+                : hint}
           </p>
         </div>
 
@@ -167,6 +177,8 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstNa
           />
         ) : null}
 
+        {voice.avatar.error ? <p className="mt-4 text-sm text-neutral-300">{voice.avatar.error}</p> : null}
+
         {voice.error && state !== "error" ? (
           <p role="alert" className="mt-4 text-sm text-danger-200">
             {voice.error}
@@ -177,20 +189,39 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstNa
       {/* Controls */}
       <footer className="border-t border-white/10 px-4 pb-4 pt-5 text-center">
         {live ? (
-          <button
-            type="button"
-            onClick={() => voice.setMuted(!voice.muted)}
-            aria-pressed={voice.muted}
-            className={cn(
-              "inline-flex min-w-40 items-center justify-center gap-2 rounded-2xl border px-6 py-3.5 text-lg font-medium transition",
-              voice.muted
-                ? "border-accent-300/60 bg-accent-400/15 text-accent-200"
-                : "border-white/15 bg-white/5 hover:bg-white/10",
-            )}
-          >
-            <MicIcon className="size-6" />
-            {voice.muted ? "Unmute" : "Mute"}
-          </button>
+          <div className="flex flex-wrap justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => voice.setMuted(!voice.muted)}
+              aria-pressed={voice.muted}
+              className={cn(
+                "inline-flex min-w-40 items-center justify-center gap-2 rounded-2xl border px-6 py-3.5 text-lg font-medium transition",
+                voice.muted
+                  ? "border-accent-300/60 bg-accent-400/15 text-accent-200"
+                  : "border-white/15 bg-white/5 hover:bg-white/10",
+              )}
+            >
+              <MicIcon className="size-6" />
+              {voice.muted ? "Unmute" : "Mute"}
+            </button>
+            {videoOffered ? (
+              <button
+                type="button"
+                onClick={() => voice.setVideo(!voice.avatar.wanted)}
+                aria-pressed={voice.avatar.wanted}
+                disabled={voice.avatar.status === "starting"}
+                className={cn(
+                  "inline-flex min-w-40 items-center justify-center gap-2 rounded-2xl border px-6 py-3.5 text-lg font-medium transition disabled:opacity-60",
+                  voice.avatar.wanted
+                    ? "border-brand-300/60 bg-brand-500/20 text-brand-100"
+                    : "border-white/15 bg-white/5 hover:bg-white/10",
+                )}
+              >
+                <VideoIcon className="size-6" />
+                {voice.avatar.wanted ? "Video off" : "Video"}
+              </button>
+            ) : null}
+          </div>
         ) : (
           <button
             type="button"
@@ -204,6 +235,7 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstNa
         <p className="mt-4 text-xs text-neutral-400 sm:text-sm">
           AI can make mistakes. Check important details on your order page.
           {voice.ready?.llm.simulated ? " Simulated answers (no AI model connected)." : ""}
+          {voice.avatar.wanted && voice.avatar.offer.available ? ` ${voice.avatar.offer.notice}` : ""}
         </p>
         {process.env.NODE_ENV === "development" && voice.metrics?.first_audio_ms !== undefined ? (
           <p className="mt-1 font-mono text-[0.6875rem] text-neutral-500">

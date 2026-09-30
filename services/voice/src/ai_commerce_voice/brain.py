@@ -70,7 +70,7 @@ from assistant.turns import TOOL_LABELS, ProductCards, message_text, split_citat
 
 log = logging.getLogger(__name__)
 
-PROMPT_VERSION = "xana.voice.v2"
+PROMPT_VERSION = "xana.voice.v3"
 PROMPT_DIR = Path(__file__).resolve().parent / "prompts"
 SNAPSHOT_ORDERS = 8
 PREFETCH_TIMEOUT_S = 1.2

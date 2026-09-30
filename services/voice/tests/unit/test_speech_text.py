@@ -90,3 +90,9 @@ def test_only_policy_questions_are_searched_before_the_model() -> None:
     assert wants_policy("Can I return opened headphones?")
     assert wants_policy("how long do refunds take")
     assert not wants_policy("Where's my order? When will it arrive?")
+
+
+def test_emoji_are_never_spoken() -> None:
+    assert speakable("Your milk is in stock 🥛, enjoy!") == "Your milk is in stock, enjoy!"
+    assert speakable("Happy puzzling! 🧩✨").strip() == "Happy puzzling!"
+    assert speakable("Thumbs up 👍🏽.") == "Thumbs up."

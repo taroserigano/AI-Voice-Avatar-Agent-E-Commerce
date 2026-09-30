@@ -12,35 +12,37 @@ from __future__ import annotations
 import random
 from dataclasses import dataclass, field
 
+# Upbeat, but safe before bad news too: a filler is picked before the answer is known, so
+# nothing here jokes or celebrates ("Great question!" would jar before "it arrived broken").
 GENERIC = (
-    "Let me think.",
-    "Hmm, let me think.",
-    "One moment.",
-    "Just a sec.",
+    "One moment!",
+    "Sure thing, one sec.",
+    "On it!",
+    "Let me take a look.",
     "Let me see.",
-    "Okay, give me a second.",
-    "Good question, one moment.",
+    "Just a sec!",
+    "Happy to check, one moment.",
 )
 
 # A filler that says what Xana is doing reads as competence, not stalling.
 BY_TOOL: dict[str, tuple[str, ...]] = {
     "list_my_orders": (
+        "Sure, pulling up your orders!",
         "Let me pull up your orders.",
-        "Let me look at your orders.",
-        "Checking your orders now.",
+        "On it, checking your orders.",
     ),
     "get_order_status": (
-        "Let me check on that order.",
+        "Let me check on that order!",
         "Let me look that order up.",
         "One sec, checking that order.",
     ),
-    "get_return_options": ("Let me see what can be returned.", "Let me check the return options."),
+    "get_return_options": ("Let me see what can go back.", "Let me check the return options."),
     "quote_return": ("Let me price that return.", "Working out your refund now."),
     "propose_return": ("Here's what I've got.",),
     "get_refund_status": ("Let me check your refunds.", "Let me look at your refunds."),
     "search_policies": ("Let me check our policy.", "Let me look that up in our policies."),
-    "list_stores": ("Let me find a store for you.",),
-    "get_product_details": ("Let me check that item.",),
+    "list_stores": ("Let me find a store for you!",),
+    "get_product_details": ("Let me check that item!",),
     "handoff_to_person": ("Let me get a person to help.",),
 }
 

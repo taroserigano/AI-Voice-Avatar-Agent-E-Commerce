@@ -89,3 +89,28 @@ One of these calls was an accidental duplicate run (about 40 s billed); it ended
       in full". A read-back only completes on a clean `stopped_speaking` at or after its end;
       other segments fall back to the timeline 3 s after their end.
       `avatar-echo.test.ts`: 13 tests pass.
+
+## Xana's personality: prompt `xana.voice.v3` (2026-09-30)
+
+Taro: "make her upbeat, a few little jokes, a super positive vibe". v3 is v2 plus a "Your
+personality" section: cheerful in fresh words each time (no stock opener twice in a call), a
+tiny kind joke now and then when the moment is light, and **no jokes, only a short, kind
+apology, when something went wrong** (upset customer, damage, spoilage, a missing package, a
+late refund, a charge, a refused return, allergies or safety). Personality changes only how
+she sounds, never what she does. Fillers are a little brighter but safe before bad news. Emoji
+are stripped before speech (`speech_text.speakable`), because the upbeat prompt let one slip
+into 2 of 364 answers.
+
+Face and voice: Tavus takes emotion tags only on text echoes (we send audio), and Cartesia's
+emotion guidance works reliably only on its "Emotive" voices (Skylar isn't one) and needs the
+tone to match the words, so the cheer comes from the words themselves.
+
+Golden sets, voice channel, gpt-6-luna (products /200, returns /198):
+
+| Wording | Products | Returns | Notes |
+|---|---|---|---|
+| v2 baseline | 197 | 187 | |
+| v3, first draft | 197 | 186 | Damaged-item turns turned hesitant (a hand-off instead of a quote). Fixed by "personality never changes what you do". |
+| v3, rules tightened | 198 | 192 | Tone mostly stock openers ("Good news!", "Happy to help!"), almost no jokes. |
+| v3, cheer asked for | 198 | 190 | "Great pick!" 51 times (copied from the example), "Oh no" 32 times, one emoji. |
+| **v3, final** | 195 | 188 | Varied openers; about 1 reply in 5 openly cheerful, plus small jokes ("Great pick for a cozy puzzle night!", "Glad that's settled!"). Same total as v2 (383 vs 384); runs vary by about ±3. |

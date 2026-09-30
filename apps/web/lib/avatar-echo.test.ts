@@ -41,7 +41,12 @@ describe("Xana's audio reaches Tavus", () => {
     const last = s.echoes().at(-1)!.properties!;
     expect(last.done).toBe(true);
     expect(last.sample_rate).toBe(24_000);
-    expect(s.echoes().slice(0, -1).every((m) => m.properties!.done === false)).toBe(true);
+    expect(
+      s
+        .echoes()
+        .slice(0, -1)
+        .every((m) => m.properties!.done === false),
+    ).toBe(true);
   });
 
   it("sends the first audio of a turn at once and coalesces the rest", () => {
@@ -173,10 +178,18 @@ describe("what the customer has heard", () => {
     s.at(600);
     s.echo.onTavus("conversation.replica.started_speaking", null);
     s.at(2000); // after the segment's end, before the lost-event fallback
-    s.echo.onTavus("conversation.replica.stopped_speaking", { interrupted: false });
-    s.echo.onTavus("conversation.stopped_speaking", { role: "replica", interrupted: false });
+    s.echo.onTavus("conversation.replica.stopped_speaking", {
+      interrupted: false,
+    });
+    s.echo.onTavus("conversation.stopped_speaking", {
+      role: "replica",
+      interrupted: false,
+    });
     expect(s.echo.tick()).toEqual([]);
-    s.echo.onTavus("conversation.stopped_speaking", { role: "pal", interrupted: false });
+    s.echo.onTavus("conversation.stopped_speaking", {
+      role: "pal",
+      interrupted: false,
+    });
     expect(s.echo.tick()).toEqual([{ segment: 1, playedMs: 500 }]);
   });
 });

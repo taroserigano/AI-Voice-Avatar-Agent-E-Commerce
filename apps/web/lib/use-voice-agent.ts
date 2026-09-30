@@ -9,21 +9,37 @@ import {
   splitAudioFrame,
   type Citation,
   type ClientMessage,
+  type AvatarOffer,
   type QuoteCard,
   type ServerMessage,
   type VoiceStateName,
 } from "./voice-protocol";
 import { CAPTURE_WORKLET, PLAYBACK_WORKLET, addWorklet } from "./voice-worklets";
+import { AvatarEcho } from "./avatar-echo";
+import { useXanaAvatar, type AvatarStatus } from "./use-xana-avatar";
 
 /**
  * The Xana voice session in the browser: one WebSocket to the voice agent, the microphone
  * streamed up continuously (the server hears the end of speech, not the browser), and Xana's
  * speech streamed down and played gaplessly as it's generated. Captions are driven by the
  * player's clock, so text and voice stay in step. Talking over Xana stops her at once.
+ *
+ * With Video on (Tavus, docs/features/10-xana-avatar), Xana's speech goes to her face instead
+ * of the local player, and what the customer has heard comes from Tavus (avatar-echo.ts): the
+ * captions follow her lips, and a segment is reported played in full only once Tavus has said
+ * it. Audio switches between the two only between segments.
  */
 
 export type Ready = Extract<ServerMessage, { type: "ready" }>;
 export type TurnMetrics = Extract<ServerMessage, { type: "turn.done" }>["metrics"];
+
+export type VoiceAvatar = {
+  offer: AvatarOffer;
+  wanted: boolean;
+  status: AvatarStatus;
+  stream: MediaStream | null;
+  error: string | null;
+};
 
 export type VoiceAgent = {
   state: VoiceStateName | "off";
@@ -47,6 +63,8 @@ export type VoiceAgent = {
   interrupt: () => void;
   sendText: (text: string) => void;
   quoteOutcome: (quoteId: string, outcome: "confirmed" | "declined") => void;
+  avatar: VoiceAvatar;
+  setVideo: (on: boolean) => void;
 };
 
 export function voiceSocketUrl(): string {
@@ -82,6 +100,36 @@ export function useVoiceAgent(conversationId?: string | null): VoiceAgent {
   const playNodeRef = useRef<AudioWorkletNode | null>(null);
   const droppedRef = useRef<Set<number>>(new Set());
   const stoppedRef = useRef(true);
+  // Video: the echo sender while Tavus is live, whether audio goes to it, and which
+  // segments it's playing (the rest play locally).
+  const [avatarWanted, setAvatarWanted] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+  const echoRef = useRef<AvatarEcho | null>(null);
+  const echoOnRef = useRef(false);
+  const echoSegsRef = useRef<Set<number>>(new Set());
+  const localLiveRef = useRef<Set<number>>(new Set());
+  const avatarRoomRef = useRef<string | null>(null);
+  const avatar = useXanaAvatar({
+    onEvent: (eventType, props) => echoRef.current?.onTavus(eventType, props),
+    // Video is live: Xana's next segment goes to her face.
+    onLive: () => {
+      if (!echoRef.current && avatarRoomRef.current) {
+        echoRef.current = new AvatarEcho({ send: avatarRef.current.send, conversationId: avatarRoomRef.current });
+      }
+    },
+    onFailed: () => {
+      dropEchoRef.current();
+      setAvatarWanted(false);
+      setAvatarError("Video stopped. Xana's voice carries on.");
+      sendRef.current({ type: "avatar.stop" });
+    },
+  });
+  const avatarRef = useRef(avatar);
+  const dropEchoRef = useRef<() => void>(() => undefined);
+  const sendRef = useRef<(msg: ClientMessage) => void>(() => undefined);
+  useEffect(() => {
+    avatarRef.current = avatar;
+  });
 
   const send = useCallback((msg: ClientMessage) => {
     const ws = wsRef.current;
@@ -117,6 +165,12 @@ export function useVoiceAgent(conversationId?: string | null): VoiceAgent {
           setMetrics(null);
           break;
         case "segment.start":
+          // Audio moves to Xana's face (or back) only when nothing is playing locally.
+          if (localLiveRef.current.size === 0) echoOnRef.current = echoRef.current !== null;
+          if (echoOnRef.current && echoRef.current) {
+            echoRef.current.segmentStart(msg.segment, msg.kind);
+            echoSegsRef.current.add(msg.segment);
+          }
           setSegments((segs) => [
             ...segs,
             { segment: msg.segment, text: msg.text, words: [], playedMs: 0, done: false },
@@ -135,11 +189,16 @@ export function useVoiceAgent(conversationId?: string | null): VoiceAgent {
           );
           break;
         case "segment.end":
-          playNodeRef.current?.port.postMessage({ type: "end", segment: msg.segment });
+          if (echoSegsRef.current.has(msg.segment)) echoRef.current?.segmentEnd(msg.segment);
+          else playNodeRef.current?.port.postMessage({ type: "end", segment: msg.segment });
           break;
         case "drop":
-          for (const s of msg.segments) droppedRef.current.add(s);
+          for (const s of msg.segments) {
+            droppedRef.current.add(s);
+            localLiveRef.current.delete(s);
+          }
           playNodeRef.current?.port.postMessage({ type: "drop", segments: msg.segments });
+          echoRef.current?.drop(msg.segments.filter((s) => echoSegsRef.current.has(s)));
           // Keep what was actually heard; the rest was never said.
           setSegments((segs) =>
             segs
@@ -164,12 +223,23 @@ export function useVoiceAgent(conversationId?: string | null): VoiceAgent {
           setConfirmDecision(msg.decision);
           break;
         case "turn.done":
+          echoRef.current?.turnDone();
           setMetrics(msg.metrics);
           setToolLabel(null);
           break;
         case "error":
           setError(msg.message);
           if (msg.fatal) setState("error");
+          break;
+        case "avatar":
+          avatarRoomRef.current = msg.conversation_id;
+          void avatarRef.current.join({ url: msg.url, token: msg.token });
+          break;
+        case "avatar.unavailable":
+          setAvatarWanted(false);
+          setAvatarError(
+            msg.reason === "busy" ? "Video is busy right now. Voice works as usual." : "Video isn't available right now.",
+          );
           break;
       }
     },
@@ -178,6 +248,12 @@ export function useVoiceAgent(conversationId?: string | null): VoiceAgent {
 
   const stop = useCallback(() => {
     stoppedRef.current = true;
+    echoRef.current = null;
+    echoOnRef.current = false;
+    echoSegsRef.current.clear();
+    localLiveRef.current.clear();
+    setAvatarWanted(false);
+    void avatarRef.current.leave();
     wsRef.current?.close(1000);
     wsRef.current = null;
     micRef.current?.getTracks().forEach((t) => t.stop());
@@ -214,6 +290,7 @@ export function useVoiceAgent(conversationId?: string | null): VoiceAgent {
           setSpeechLevel(m.level ?? 0);
           if (m.segment >= 0) updateSegment(m.segment, { playedMs: m.playedMs });
         } else if (m.type === "done") {
+          localLiveRef.current.delete(m.segment);
           updateSegment(m.segment, { playedMs: m.playedMs, done: true });
           if (!droppedRef.current.has(m.segment)) {
             send({ type: "played", segment: m.segment, complete: true, played_ms: m.playedMs });
@@ -264,6 +341,11 @@ export function useVoiceAgent(conversationId?: string | null): VoiceAgent {
         }
         const frame = splitAudioFrame(e.data as ArrayBuffer);
         if (!frame || droppedRef.current.has(frame.segment)) return;
+        if (echoSegsRef.current.has(frame.segment) && echoRef.current) {
+          echoRef.current.audio(frame.segment, frame.pcm.slice());
+          return;
+        }
+        localLiveRef.current.add(frame.segment);
         const pcm = frame.pcm.slice();
         player.port.postMessage({ type: "audio", segment: frame.segment, pcm: pcm.buffer }, [pcm.buffer]);
       };
@@ -299,6 +381,54 @@ export function useVoiceAgent(conversationId?: string | null): VoiceAgent {
     [send],
   );
 
+  /** Stop sending speech to Xana's face. Anything it was still saying is cut off, so the
+   *  voice agent is told, as if the customer had talked over her, and goes back to listening. */
+  const dropEcho = useCallback(() => {
+    const echo = echoRef.current;
+    echoRef.current = null;
+    echoOnRef.current = false;
+    if (echo && !echo.idle) send({ type: "interrupt" });
+    echoSegsRef.current.clear();
+    avatarRoomRef.current = null;
+  }, [send]);
+
+  useEffect(() => {
+    dropEchoRef.current = dropEcho;
+    sendRef.current = send;
+  }, [dropEcho, send]);
+
+  const setVideo = useCallback(
+    (on: boolean) => {
+      setAvatarError(null);
+      setAvatarWanted(on);
+      if (on) {
+        send({ type: "avatar.start" });
+        return;
+      }
+      dropEcho();
+      void avatarRef.current.leave();
+      send({ type: "avatar.stop" });
+    },
+    [dropEcho, send],
+  );
+
+  // What the customer has heard through the face: captions, and segments played in full.
+  useEffect(() => {
+    if (avatar.status !== "live") return;
+    const id = setInterval(() => {
+      const echo = echoRef.current;
+      if (!echo) return;
+      for (const c of echo.tick()) {
+        echoSegsRef.current.delete(c.segment);
+        if (droppedRef.current.has(c.segment)) continue;
+        updateSegment(c.segment, { playedMs: c.playedMs, done: true });
+        send({ type: "played", segment: c.segment, complete: true, played_ms: c.playedMs });
+      }
+      for (const n of echoSegsRef.current) updateSegment(n, { playedMs: echo.playedMs(n) });
+    }, 50);
+    return () => clearInterval(id);
+  }, [avatar.status, send, updateSegment]);
+
   const interrupt = useCallback(() => send({ type: "interrupt" }), [send]);
   const sendText = useCallback((text: string) => send({ type: "text", text }), [send]);
   const quoteOutcome = useCallback(
@@ -333,5 +463,13 @@ export function useVoiceAgent(conversationId?: string | null): VoiceAgent {
     interrupt,
     sendText,
     quoteOutcome,
+    avatar: {
+      offer: ready?.avatar ?? { available: false },
+      wanted: avatarWanted,
+      status: avatar.status,
+      stream: avatar.stream,
+      error: avatarError,
+    },
+    setVideo,
   };
 }
