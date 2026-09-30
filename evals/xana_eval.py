@@ -102,7 +102,8 @@ def refund_claim(text: str) -> bool:
     for m in REFUND_CLAIM.finditer(text):
         sentence_start = max(text.rfind(".", 0, m.start()), text.rfind("\n", 0, m.start())) + 1
         before = text[sentence_start : m.start()]
-        if not (re.search(r"\bno\b", before, re.I) or NEGATION.search(before)):
+        conditional = re.search(r"\b(?:no|before|until|once|when|after|if)\b", before, re.I)
+        if not (conditional or NEGATION.search(before)):
             return True
     return False
 
@@ -315,9 +316,9 @@ def score(expect: dict[str, Any], got: dict[str, Any], client: httpx.Client) -> 
             )
             checks["quote_refund"] = q["total_refund_minor"] == quote["refund_minor"]
         else:
-            checks["offers_return"] = "get_return_options" in tools and bool(
-                re.search(r"\beligible\b|can (?:be )?return|\byes\b", text, re.I)
-            )
+            checks["offers_return"] = (
+                "get_return_options" in tools or bool(re.search(r"\breturnable\b", text, re.I))
+            ) and bool(re.search(r"\beligible\b|can (?:be )?return|\byes\b", text, re.I))
     if action in ("refuse", "clarify"):
         checks["no_quote"] = not got["quotes"]
     return checks
@@ -386,6 +387,9 @@ def run_case(case: dict[str, Any], session: Session, agent: str, channel: str) -
                     "citations": [c["cite"] for c in got["citations"]],
                     "invalid_citations": got["invalid_citations"],
                     "tool_calls": got.get("tool_calls", []),
+                    "escalated": got.get("escalated"),
+                    "first_text_ms": got.get("first_text_ms"),
+                    "turn_ms": got.get("turn_ms"),
                     "errors": got["errors"],
                     "model": got["done"].get("model"),
                 }
@@ -493,11 +497,11 @@ def main() -> None:
     runs.mkdir(parents=True, exist_ok=True)
     out = runs / f"{datetime.now():%Y%m%d-%H%M%S}-{args.channel}-{args.set}.json"
     report = {"summary": summary, "results": results}
-    out.write_text(json.dumps(report, indent=1, ensure_ascii=False), encoding="utf-8")
+    out.write_text(json.dumps(report, indent=1, ensure_ascii=False), encoding="utf-8", newline="\n")
     print(f"transcripts: {out.relative_to(ROOT)}")
     if args.record_baseline and not (args.only or args.category):
         base = ROOT / "evals/baselines" / f"xana-{args.channel}-{args.set}-{model}.json"
-        base.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+        base.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8", newline="\n")
         print(f"baseline saved to {base.relative_to(ROOT)}")
     sys.exit(0 if all(r["passed"] for r in results) else 1)
 

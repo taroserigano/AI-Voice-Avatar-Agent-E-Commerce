@@ -114,9 +114,9 @@
       "failed": []
     },
     "returns": {
-      "passed": 200,
+      "passed": 199,
       "total": 200,
-      "accuracy": 1.0,
+      "accuracy": 0.995,
       "categories": {
         "clarify": [
           8,
@@ -139,7 +139,7 @@
           4
         ],
         "policy": [
-          64,
+          63,
           64
         ],
         "refund_status": [
@@ -165,7 +165,7 @@
           80
         ],
         "facts": [
-          146,
+          145,
           146
         ],
         "facts_any": [
@@ -193,8 +193,8 @@
           4
         ],
         "quote": [
-          45,
-          45
+          40,
+          40
         ],
         "quote_lines": [
           50,
@@ -213,7 +213,9 @@
           10
         ]
       },
-      "failed": []
+      "failed": [
+        "xr-094"
+      ]
     }
   }
 }

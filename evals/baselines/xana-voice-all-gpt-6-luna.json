@@ -4,9 +4,9 @@
   "model": "gpt-6-luna",
   "sets": {
     "products": {
-      "passed": 198,
+      "passed": 197,
       "total": 200,
-      "accuracy": 0.99,
+      "accuracy": 0.985,
       "categories": {
         "allergy": [
           11,
@@ -17,7 +17,7 @@
           2
         ],
         "filter_search": [
-          65,
+          64,
           65
         ],
         "ingredients": [
@@ -33,7 +33,7 @@
           6
         ],
         "no_match": [
-          10,
+          9,
           10
         ],
         "product_facts": [
@@ -41,7 +41,7 @@
           38
         ],
         "spec_search": [
-          19,
+          20,
           20
         ],
         "stock": [
@@ -67,11 +67,11 @@
           12
         ],
         "details": [
-          20,
+          21,
           21
         ],
         "empty": [
-          10,
+          9,
           10
         ],
         "facts": [
@@ -79,7 +79,7 @@
           99
         ],
         "filters": [
-          91,
+          90,
           91
         ],
         "no_error": [
@@ -112,14 +112,15 @@
         ]
       },
       "failed": [
-        "xp-070",
+        "xp-041",
+        "xp-090",
         "xp-172"
       ]
     },
     "returns": {
-      "passed": 188,
+      "passed": 187,
       "total": 198,
-      "accuracy": 0.9495,
+      "accuracy": 0.9444,
       "categories": {
         "clarify": [
           7,
@@ -130,11 +131,11 @@
           1
         ],
         "item_policy": [
-          12,
+          10,
           12
         ],
         "not_eligible": [
-          24,
+          25,
           26
         ],
         "not_found": [
@@ -142,7 +143,7 @@
           4
         ],
         "policy": [
-          57,
+          59,
           64
         ],
         "refund_status": [
@@ -150,7 +151,7 @@
           10
         ],
         "return_quote": [
-          50,
+          48,
           50
         ],
         "safety": [
@@ -164,11 +165,11 @@
       },
       "checks": {
         "cites": [
-          75,
+          73,
           80
         ],
         "facts": [
-          137,
+          142,
           144
         ],
         "facts_any": [
@@ -176,11 +177,11 @@
           1
         ],
         "no_error": [
-          205,
+          203,
           205
         ],
         "no_quote": [
-          45,
+          44,
           45
         ],
         "no_refund_claim": [
@@ -192,16 +193,16 @@
           8
         ],
         "offers_return": [
-          3,
-          3
+          1,
+          1
         ],
         "person": [
           4,
           4
         ],
         "quote": [
-          45,
-          45
+          38,
+          40
         ],
         "quote_lines": [
           47,
@@ -221,16 +222,17 @@
         ]
       },
       "failed": [
-        "xr-057",
+        "xr-043",
+        "xr-044",
         "xr-075",
-        "xr-084",
-        "xr-091",
-        "xr-095",
+        "xr-082",
+        "xr-117",
         "xr-119",
         "xr-121",
         "xr-129",
-        "xr-141",
-        "xr-152"
+        "xr-153",
+        "xr-156",
+        "xr-161"
       ]
     }
   }

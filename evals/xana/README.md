@@ -42,13 +42,21 @@ retrieved in the same turn. A case passes only if every check on every turn pass
 When a check fails on a correct answer, fix the check in `build_golden.py` or
 `evals/xana_eval.py` and say why. Don't loosen it to hide a wrong answer.
 
-## Results (2026-09-29)
+## Results (2026-09-30)
 
 | Channel | Model | Products | Returns |
 |---|---|---|---|
-| Chat | gpt-6-sol | 200/200 | 200/200 |
-| Voice | gpt-6-luna | 198/200 | 188/198 (2 typed-"yes" cases are chat-only) |
+| Chat | gpt-6-sol | 200/200 | 199–200/200 |
+| Voice | gpt-6-luna, gpt-6-sol on escalated turns | 195–198/200 | 187–190/198 (2 typed-"yes" cases are chat-only) |
 
-The first runs on the new sets scored chat 188/200 and 174/200, and voice 161/200 and 177/200.
-Most voice misses left are short policy answers without a citation or with a detail left out
-(for example "30 days" without "after delivery").
+Ranges are over the last runs; the models don't answer the same way every time. The
+baselines in `evals/baselines/` are the latest run. The first runs on the new sets scored
+chat 188/200 and 174/200, and voice 161/200 and 177/200.
+
+Most voice misses left are short policy answers: a citation left off, or a detail missing. An
+upstream model error sometimes fails a case (`no_error`).
+
+Escalating every return, refund, or policy turn to gpt-6-sol was measured and left out. It
+scored the same as Luna alone, at the same speed (see
+`services/voice/src/ai_commerce_voice/escalation.py`). Only disputes, "that's wrong", repeated
+questions, and repeated tool failures escalate.

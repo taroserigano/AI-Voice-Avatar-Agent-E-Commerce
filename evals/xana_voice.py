@@ -10,6 +10,7 @@ Conversations are checkpointed in memory, not saved.
 from __future__ import annotations
 
 import asyncio
+import time
 import uuid
 from datetime import date
 from typing import Any
@@ -58,6 +59,8 @@ async def _run(user_web: httpx.Client, texts: list[str]) -> list[dict[str, Any]]
                     vocabulary,
                 ),
                 max_tool_calls=v.voice_max_tool_calls,
+                strong=pick.strong,
+                strong_name=pick.strong_name,
             ),
             model=pick.name,
             simulated=pick.simulated,
@@ -71,8 +74,11 @@ async def _run(user_web: httpx.Client, texts: list[str]) -> list[dict[str, Any]]
             if await brain.pending_quote():
                 async for _ in brain.resume("superseded"):
                     pass
+            started = time.perf_counter()
             async for ev in brain.turn(text):
                 if isinstance(ev, TextDelta):
+                    if not got["text"]:
+                        got["first_text_ms"] = round((time.perf_counter() - started) * 1000)
                     got["text"] += ev.text
                 elif isinstance(ev, ToolStarted):
                     got["tools"].append(ev.name)
@@ -84,6 +90,11 @@ async def _run(user_web: httpx.Client, texts: list[str]) -> list[dict[str, Any]]
                     got["citations"] = ev.citations or []
                     if ev.error:
                         got["errors"].append(ev.error)
+            got["turn_ms"] = round((time.perf_counter() - started) * 1000)
+            state = await brain.graph.aget_state(
+                {"configurable": {"thread_id": brain.conversation_id}}
+            )
+            got["escalated"] = state.values.get("escalated")
             out.append(got)
         # What the model asked each tool, for failure review.
         state = await brain.graph.aget_state({"configurable": {"thread_id": brain.conversation_id}})

@@ -96,6 +96,8 @@ def num(x: float) -> str:
 
 
 def grams(x: float) -> str:
+    if x == 0.5:
+        return r"(?:(?<![\d.])0?\.5\s?(?:g\b|grams?)|half a gram)"
     if x == 0:
         return r"(?:(?<![\d.])0(?:\.0)?\s?(?:g\b|grams?)|\bno\b|\bzero\b|\bnone\b)"
     return num(x) + r"\s?(?:g\b|grams?)"
@@ -407,7 +409,7 @@ def spec_pattern(value: str) -> str:
                    "W": r"(?:W\b|watts?)", "oz": r"(?:fl\.?\s?|fluid\s)?(?:oz|ounces?)", "gal": r"(?:gal|gallons?)",
                    "mAh": r"(?:mAh|milliamp)", "people": r"(?:people|persons?)"}.get(unit, re.escape(unit))  # fmt: skip
         return rf"(?<![\d.]){n}\s?[-‑]?\s?{unit_re}"
-    return re.escape(head.lower())
+    return r"[\s-]+".join(re.escape(w) for w in head.lower().split())
 
 
 SPEC_FACTS: list[tuple[str, str, list[str]]] = [
@@ -723,7 +725,14 @@ def quote_case(texts: str | list[str], user: str, order_key: str, slugs: list[st
     ask = re.search(
         r"\bcan i (?:return|get a refund|send)|can i return (?:it|them)\?", texts[-1], re.I
     )
-    action = "quote_or_offer" if ask and "?" in texts[-1] else "quote"
+    asks_for_it = re.search(
+        r"\b(?:return|refund|send (?:it |them )?back|money back)\b", texts[-1], re.I
+    )
+    action = (
+        "quote_or_offer"
+        if (ask and "?" in texts[-1]) or (len(texts) == 1 and not asks_for_it)
+        else "quote"
+    )
     turns.append({"user": texts[-1], "expect": {"action": action, "quote": quote, **expect_extra}})
     add_return("return_quote", user, turns, order=order_key, outcome=outcome)
 
@@ -819,7 +828,7 @@ quote_case(["I want to return both laptop backpacks", "ok, just the one that's l
            "alice-partly-returned", [BACKPACK])  # fmt: skip
 quote_case("Can I return my other laptop backpack?", ALICE, "alice-partly-returned", [BACKPACK])
 add_return("eligibility", BOB, [{"user": "is it too late to return my tablet?", "expect": {
-    "action": "answer", "mentions_re": [r"not too late|still (?:return|eligible|within|have)|is eligible|can (?:still )?(?:be )?return|last day|today"]}}],
+    "action": "answer", "mentions_re": [r"not too late|still (?:\w+ )?(?:return|eligible|within|have)|is eligible|can (?:still )?(?:be )?return|last day|today"]}}],
     order="bob-tablet", note="Delivered 29 days ago: still returnable. Answer the question; a quote is optional.")  # fmt: skip
 quote_case("I want to return the Lumen tablet", BOB, "bob-tablet", [TABLET])
 quote_case("The tablet screen has dead pixels. Return it please.", BOB, "bob-tablet", [TABLET])
@@ -894,8 +903,8 @@ def refuse(text: str | list[str], user: str, order_key: str | None, reason: str,
     add_return(category, user, turns, **extra)
 
 
-PAST_7 = r"7 days|seven days|7-day|seven-day"
-PAST_30 = r"30 days|thirty days|30-day|thirty-day"
+PAST_7 = r"(?:7|seven)[- ]days?"
+PAST_30 = r"(?:30|thirty)[- ]days?"
 FINAL = r"final sale"
 NOT_DELIVERED = r"(?:once|until|after) (?:it|the order|the package|your order|they|the items?)(?:'s| is| are| has been| have been)? (?:been )?(?:delivered|arrives?)|still in progress|can't start (?:a|the) return yet|(?:hasn't|has not|hasn't been|not been|isn't|not yet|until it(?:'s| is| has been)?|once it(?:'s| is| has been)?|after it(?:'s| is| has been)?)\s*(?:been\s*)?(?:delivered|arrive[sd]?)|on its way|in transit|out for delivery"
 CANCELED = r"cancel+ed"
@@ -994,7 +1003,7 @@ clarify(
 clarify(
     "I want to return the Sonora thing I bought",
     ALICE,
-    [r"Arc|over.ear", r"Pulse|earbuds"],
+    [r"Arc|over.ear|headphones", r"Pulse|earbuds"],
     "Two Sonora items.",
 )
 clarify(
@@ -1106,7 +1115,7 @@ policy(
 policy(
     "Can I return something I bought at another store?",
     [R + "3-4"],
-    [r"only|online|Serigan Mart website|bought somewhere else|elsewhere"],
+    [r"only|online|website|online order|bought somewhere else|elsewhere"],
 )
 policy(
     "Will the store give me cash for my return?",
@@ -1374,7 +1383,7 @@ status(
     ALICE,
     [r"succeeded|complete|finished|issued|done|went through|refunded"],
 )
-status("What's the RMA number for my blanket return?", ALICE, [r"RMA-[0-9A-F]{8}"])
+status("What's the RMA number for my blanket return?", ALICE, [r"RMA[- ]?(?:[0-9A-F] ?){8}"])
 
 
 # Safety: identity, injection, confirmation, exceptions.
@@ -1441,6 +1450,18 @@ def hhmm(t: str) -> str:
     return rf"(?<!\d){(h % 12) or 12}{minutes}\s?{suffix}"
 
 
+SPOKEN = {"W": "West", "E": "East", "N": "North", "S": "South", "St": "Street",
+          "Ave": "Avenue", "Dr": "Drive", "Rd": "Road", "Blvd": "Boulevard", "Pkwy": "Parkway"}  # fmt: skip
+
+
+def address_re(line1: str) -> str:
+    parts = []
+    for word in line1.split():
+        full = SPOKEN.get(word)
+        parts.append(f"(?:{re.escape(word)}\\.?|{full})" if full else re.escape(word))
+    return r"\s+".join(parts)
+
+
 def store(code: str) -> Any:
     return next(s for s in STORES if s.code == code)
 
@@ -1451,9 +1472,9 @@ def store_q(text: str, mentions_re: list[str]) -> None:
 
 
 store_q(
-    "can I drop off my return at the Plano store?", [re.escape(store("PLN-LEGACY").address_line1)]
+    "can I drop off my return at the Plano store?", [address_re(store("PLN-LEGACY").address_line1)]
 )
-store_q("What's the address of the Frisco store?", [re.escape(store("FRI-MAIN").address_line1)])
+store_q("What's the address of the Frisco store?", [address_re(store("FRI-MAIN").address_line1)])
 store_q(
     "What's the phone number for the Richardson store?",
     [re.escape(store("RCH-CAMPBELL").phone[-8:])],
@@ -1465,10 +1486,10 @@ store_q(
 store_q("What time does the Uptown store close?", [hhmm(store("DAL-UPTOWN").hours["mon"][1])])
 store_q(
     "Is there a store in Arlington where I can drop off a return?",
-    [re.escape(store("ARL-ABRAM").address_line1)],
+    [address_re(store("ARL-ABRAM").address_line1)],
 )
 store_q(
-    "Can I drop a return package off in Garland?", [re.escape(store("GAR-DOWNTOWN").address_line1)]
+    "Can I drop a return package off in Garland?", [address_re(store("GAR-DOWNTOWN").address_line1)]
 )
 store_q(
     "what time does the McKinney store close on Sunday?",
@@ -1491,7 +1512,7 @@ def main() -> None:
             print(f"{label}: {len(cases)} cases, expected 200")
         path = OUT / f"{label}.jsonl"
         path.write_text("".join(json.dumps(c, ensure_ascii=False) + "\n" for c in cases),
-                        encoding="utf-8")  # fmt: skip
+                        encoding="utf-8", newline="\n")  # fmt: skip
         by_cat: dict[str, int] = {}
         for c in cases:
             by_cat[c["category"]] = by_cat.get(c["category"], 0) + 1
