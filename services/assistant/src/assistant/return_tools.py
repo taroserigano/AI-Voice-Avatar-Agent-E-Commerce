@@ -20,8 +20,50 @@ from langchain_core.tools import tool
 from langgraph.types import interrupt
 from pydantic import BaseModel, Field
 
-from assistant.commerce import CommerceError
-from assistant.tools import ctx_from, money, untrusted
+from assistant.commerce import CommerceClient, CommerceError
+from assistant.tools import _resolve_order_number, ctx_from, money, untrusted
+
+# The model reads order lines by a short handle (the first 8 characters of the line id, when
+# no other line on the order starts the same way): copying 36-character ids, models splice
+# one line's id onto another's. The tools resolve a handle, or a full id, against the order's
+# own lines.
+LINE_HANDLE = 8
+
+
+def line_handle(order_line_id: str, all_ids: list[str]) -> str:
+    short = str(order_line_id)[:LINE_HANDLE]
+    unique = sum(str(i).startswith(short) for i in all_ids) == 1
+    return short if unique else str(order_line_id)
+
+
+def resolve_order_id(client: CommerceClient, order_id: str) -> str:
+    """A full order id, or the 8-character order number the customer sees."""
+    try:
+        return str(uuid.UUID(order_id))
+    except ValueError:
+        found = _resolve_order_number(client, order_id)
+        if found is None:
+            raise
+        return found
+
+
+def resolve_lines(client: CommerceClient, order_id: str, lines: list[Any]) -> list[dict[str, Any]]:
+    """The requested lines with full ids; ValueError names a line that isn't on the order.
+    Resolved against the same lines the handles were made from (the return options)."""
+    opts = client.get(f"/v1/orders/{order_id}/return-options")
+    ids = [str(ln["order_line_id"]) for ln in opts["lines"]]
+    out = []
+    for ln in lines:
+        given = str(ln["order_line_id"] if isinstance(ln, dict) else ln.order_line_id).strip()
+        qty = ln["quantity"] if isinstance(ln, dict) else ln.quantity
+        match = [i for i in ids if i == given] or [
+            i for i in ids if len(given) >= LINE_HANDLE and i.startswith(given[:LINE_HANDLE])
+        ]
+        if len(match) != 1:
+            raise ValueError(given)
+        out.append({"order_line_id": match[0], "quantity": qty})
+    return out
+
 
 TIMING_WORDS = {
     "instant": "as soon as the carrier or a Serigan Mart store scans your package",
@@ -50,6 +92,13 @@ def _error(source: str, exc: CommerceError) -> tuple[str, list[dict[str, Any]]]:
         payload["problems"] = [
             {"reason": p["reason"], "explanation": p["message"]} for p in exc.problems
         ]
+        if any(p["reason"] == "perishable_reason" for p in exc.problems):
+            payload["next_step"] = (
+                "Fresh and frozen food is refunded only for a quality problem. If the customer "
+                "described one (spoiled, sour, moldy, past its date: spoiled_or_expired; cracked, "
+                "leaking, crushed, melted, warm: damaged), call quote_return again with that "
+                "reason. Otherwise explain the rule; don't quote it."
+            )
     return untrusted(source, payload), []
 
 
@@ -116,7 +165,7 @@ def quote_card(quote: dict[str, Any]) -> dict[str, Any]:
 
 
 class OrderIdArgs(BaseModel):
-    order_id: str = Field(description="An order_id from list_my_orders")
+    order_id: str = Field(description="An order_id from list_my_orders, or its order_number")
 
 
 @tool("get_return_options", args_schema=OrderIdArgs, response_format="content_and_artifact")
@@ -125,12 +174,13 @@ def get_return_options(config: RunnableConfig, order_id: str) -> tuple[str, list
     (with the policy reason), how many units, and the most it would refund. Read-only."""
     ctx = ctx_from(config)
     try:
-        uuid.UUID(order_id)
+        order_id = resolve_order_id(ctx.client, order_id)
         opts = ctx.client.get(f"/v1/orders/{order_id}/return-options")
     except ValueError:
-        return untrusted("get_return_options", {"error": "not an order_id"}), []
+        return untrusted("get_return_options", {"error": "not an order_id or order number"}), []
     except CommerceError as exc:
         return _error("get_return_options", exc)
+    all_ids = [str(ln["order_line_id"]) for ln in opts["lines"]]
     payload = {
         "order_id": opts["order_id"],
         "policy_version": opts["policy_version"],
@@ -138,7 +188,7 @@ def get_return_options(config: RunnableConfig, order_id: str) -> tuple[str, list
         "whole_order_shipping_refund": money(opts["whole_order_shipping_refund_minor"]),
         "lines": [
             {
-                "order_line_id": ln["order_line_id"],
+                "order_line_id": line_handle(ln["order_line_id"], all_ids),
                 "title": ln["product_title"],
                 "variant": ln["variant_name"],
                 "eligible": ln["eligible"],
@@ -173,7 +223,7 @@ def get_return_options(config: RunnableConfig, order_id: str) -> tuple[str, list
 
 
 class QuoteLine(BaseModel):
-    order_line_id: str = Field(description="From get_return_options")
+    order_line_id: str = Field(description="The order_line_id from get_return_options")
     quantity: int = Field(ge=1, le=100)
 
 
@@ -182,8 +232,10 @@ class QuoteReturnArgs(BaseModel):
     lines: list[QuoteLine] = Field(min_length=1, max_length=20)
     reason: REASONS | None = Field(
         default=None,
-        description="Why the customer is returning it, if they said. Leave empty to use the "
-        "reason the decision model read from the conversation.",
+        description="Why the customer is returning it, if they said. Always set it for fresh or "
+        "frozen food: spoiled_or_expired (spoiled, sour, moldy, past its date) or damaged "
+        "(cracked, leaking, crushed, melted). Leave empty otherwise to use the reason the "
+        "decision model read from the conversation.",
     )
 
 
@@ -198,17 +250,20 @@ def quote_return(
     signals = ctx.signals or {}
     jev_reason = signals.get("return_reason") or {}
     chosen = reason or (jev_reason.get("value") if jev_reason.get("act") else None) or "other"
-    body = {
-        "order_id": order_id,
-        "lines": [
+    try:
+        order_id = resolve_order_id(ctx.client, order_id)
+        resolved = resolve_lines(ctx.client, order_id, lines)
+    except ValueError as exc:
+        return untrusted(
+            "quote_return",
             {
-                "order_line_id": ln["order_line_id"] if isinstance(ln, dict) else ln.order_line_id,
-                "quantity": ln["quantity"] if isinstance(ln, dict) else ln.quantity,
-            }
-            for ln in lines
-        ],
-        "reason": chosen,
-    }
+                "error": f"{exc} isn't an order_line_id on this order",
+                "next_step": "Use the order_line_id values from get_return_options for this order.",
+            },
+        ), []
+    except CommerceError as exc:
+        return _error("quote_return", exc)
+    body = {"order_id": order_id, "lines": resolved, "reason": chosen}
     try:
         quote = ctx.client.post("/v1/returns/quote", body)
     except CommerceError as exc:
@@ -307,7 +362,9 @@ def propose_return(config: RunnableConfig, quote_id: str) -> tuple[str, list[dic
             "declined": "The customer didn't confirm. Nothing was returned. Ask if they want to "
             "change anything.",
             "expired": "The quote expired before it was confirmed. Offer to price it again.",
-            "superseded": "The customer moved on without confirming. Nothing was returned.",
+            "superseded": "The customer moved on without confirming, so nothing was returned. "
+            "If their next message still wants this return, or changes it, price it again with "
+            "quote_return and propose_return; don't call it expired.",
         }[status],
     }
     return untrusted("propose_return", payload), [{"kind": "return_status", "outcome": status}]

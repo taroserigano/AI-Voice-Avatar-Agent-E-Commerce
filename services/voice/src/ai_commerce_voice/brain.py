@@ -57,9 +57,15 @@ from langgraph.types import Command
 
 from ai_commerce_voice.ports import AgentEvent, CardOut, QuoteOut, TextDelta, ToolStarted, TurnEnded
 from assistant.graph import _superseded_proposal, recent_history
-from assistant.tools import ToolContext, _order_for_model, citation_card, untrusted
+from assistant.tools import (
+    ToolContext,
+    _order_for_model,
+    citation_card,
+    policy_search,
+    untrusted,
+)
 from assistant.toolsets import XANA_TOOLS
-from assistant.turns import TOOL_LABELS, message_text, split_citations
+from assistant.turns import TOOL_LABELS, ProductCards, message_text, split_citations
 
 log = logging.getLogger(__name__)
 
@@ -77,8 +83,15 @@ POLICY_WORDS = re.compile(
 )
 
 
+# "What does keto friendly mean?": label meanings are in the product labels policy.
+LABEL_QUESTION = re.compile(
+    r"\b(?:mean|means|meaning|difference between|same as|counts? as|definition of|defined)\b",
+    re.IGNORECASE,
+)
+
+
 def wants_policy(text: str) -> bool:
-    return bool(POLICY_WORDS.search(text))
+    return bool(POLICY_WORDS.search(text) or LABEL_QUESTION.search(text))
 
 
 # Conversational words that match the wrong sections ("What's *your* return *policy*..." ranks
@@ -224,6 +237,12 @@ def orders_snapshot(details: list[dict[str, Any]]) -> list[dict[str, Any]]:
     out = []
     for d in details[:SNAPSHOT_ORDERS]:
         o = _order_for_model(d)
+        returnable = {
+            str(ln["order_line_id"]): (
+                " (returnable now)" if ln["eligible"] else f" (not returnable: {ln['reason']})"
+            )
+            for ln in (d.get("return_options") or {}).get("lines", [])
+        }
         delivery = o.get("delivery") or {}
         out.append(
             {
@@ -244,7 +263,13 @@ def orders_snapshot(details: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     else None
                 ),
                 "total": o["total"],
-                "items": [f"{i['quantity']} × {i['title']}" for i in o["items"]][:6],
+                "items": [
+                    f"{i['quantity']} × "
+                    + (f"{i['brand']} " if i.get("brand") else "")
+                    + i["title"]
+                    + returnable.get(i["line_id"], "")
+                    for i in o["items"]
+                ][:6],
             }
         )
     return out
@@ -264,7 +289,7 @@ def system_prompt(
     )
     vocab = vocabulary or {}
     types = ", ".join(str(t["value"]) for t in vocab.get("product_types", []))
-    tags = ", ".join(str(t["value"]) for t in vocab.get("tags", []))
+    tags = ", ".join(f"{t['value']} ({t['label']})" for t in vocab.get("tags", []))
     return (
         f"{_template()}\n\n## This call\n\nYou're talking with {first_name or 'the customer'}, "
         f"who is signed in. Today is {today.strftime('%A, %B %d, %Y')}.\n\n"
@@ -425,11 +450,7 @@ class XanaBrain:
         started = time.perf_counter()
         try:
             result = await asyncio.wait_for(
-                asyncio.to_thread(
-                    self.ctx.client.get,
-                    "/v1/policies/search",
-                    {"q": question, "limit": PREFETCH_SECTIONS},
-                ),
+                asyncio.to_thread(policy_search, self.ctx.client, question, PREFETCH_SECTIONS),
                 PREFETCH_TIMEOUT_S,
             )
             content, cards = policy_tool_output(result)
@@ -482,6 +503,7 @@ class XanaBrain:
         announced: set[str] = set()
         # Calls already announced from their streamed name, not yet seen complete.
         early: list[str] = []
+        products = ProductCards()
         try:
             stream = self.graph.astream(
                 graph_input, self._config(), stream_mode=["messages", "updates"]
@@ -528,11 +550,14 @@ class XanaBrain:
                                 yield TextDelta(text)
                             streamed_this_step = False
                         elif isinstance(message, ToolMessage):
+                            cards = []
                             for card in message.artifact or []:
                                 if card.get("kind") == "citation":
                                     citable[card["cite"]] = card
                                 else:
-                                    yield CardOut(card)
+                                    cards.append(card)
+                            for card in products.take(message.name, cards):
+                                yield CardOut(card)
         except Exception:
             log.exception("voice turn failed")
             yield TurnEnded(
@@ -540,6 +565,8 @@ class XanaBrain:
                 error="Sorry, something went wrong on our side. Please try again.",
             )
             return
+        for card in products.final():
+            yield CardOut(card)
         valid, invalid = split_citations("".join(answer), citable)
         if invalid:
             log.warning("voice answer cited sections it didn't retrieve: %s", invalid)

@@ -17,6 +17,7 @@ import uuid
 from dataclasses import dataclass
 from typing import Any, Literal
 
+import httpx
 from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import BaseTool, tool
 from pydantic import BaseModel, Field
@@ -35,6 +36,24 @@ from assistant.schemas import (
 
 MAX_PRODUCTS = 6
 MAX_ORDERS = 12
+# "Which has the most protein?": rank this many matching products by the nutrient, not the
+# first page of a relevance search.
+RANK_LIMIT = 120
+NUTRIENT_SORTS = {
+    "protein": "protein_g",
+    "fiber": "fiber_g",
+    "calories": "calories",
+    "sugar": "total_sugars_g",
+    "added_sugar": "added_sugars_g",
+    "sodium": "sodium_mg",
+    "fat": "total_fat_g",
+}
+SortOption = Literal[
+    "relevance", "price_asc", "price_desc",
+    "protein_desc", "protein_asc", "fiber_desc", "fiber_asc", "calories_desc", "calories_asc",
+    "sugar_desc", "sugar_asc", "added_sugar_desc", "added_sugar_asc", "sodium_desc",
+    "sodium_asc", "fat_desc", "fat_asc",
+]  # fmt: skip
 
 
 @dataclass
@@ -94,21 +113,136 @@ def _facts(detail: dict[str, Any]) -> list[str]:
     return facts
 
 
-def product_card(detail: dict[str, Any], highlight: list[str] | None = None) -> ProductCard:
-    """A product card; tags the customer asked for (``highlight``) come first."""
+def has_words(needle: str, text: str) -> bool:
+    """``needle`` appears in ``text`` as whole words, ignoring case ("vanilla" is in
+    "Unsweetened Vanilla"; "oat" isn't in "goat")."""
+
+    def norm(s: str) -> str:
+        return " ".join(re.sub(r"[-\u2010\u2011]", " ", s.casefold()).split())
+
+    return bool(re.search(rf"(?<!\w){re.escape(norm(needle))}(?!\w)", norm(text)))
+
+
+QUERY_STOPWORDS = frozenset(
+    [
+        "a",
+        "an",
+        "the",
+        "for",
+        "with",
+        "and",
+        "or",
+        "of",
+        "in",
+        "on",
+        "to",
+        "my",
+        "me",
+        "some",
+        "any",
+        "that",
+        "this",
+        "these",
+        "those",
+        "please",
+        "i",
+        "want",
+        "need",
+        "find",
+        "show",
+        "get",
+        "looking",
+        "like",
+        "one",
+        "ones",
+        "do",
+        "you",
+        "have",
+        "is",
+        "it",
+        "are",
+        "there",
+        "what",
+        "which",
+    ]
+)
+
+
+def query_words(query: str | None) -> list[str]:
+    """The words of a free-text search that a matching product should say."""
+    words = re.findall(r"[a-z0-9%/.+'-]+", (query or "").casefold())
+    return [
+        w.strip(".'-")
+        for w in words
+        if w not in QUERY_STOPWORDS and (len(w) >= 3 or any(c.isdigit() for c in w))
+    ]
+
+
+def names_all(detail: dict[str, Any], words: list[str]) -> bool:
+    """The product's brand, title, tags, or specs say every one of ``words`` (a plural or
+    singular form counts: "beans" matches "Black Bean Soup")."""
+    hay = " ".join(
+        [
+            detail.get("brand", ""),
+            detail["title"],
+            *(f"{t['value']} {t['label']}" for t in detail.get("tags", [])),
+            *(str(v) for v in (detail.get("specs") or {}).values()),
+        ]
+    )
+
+    def says(w: str) -> bool:
+        forms = {w, w[:-1] if w.endswith("s") else w + "s", w[:-2] if w.endswith("es") else w}
+        return any(f and has_words(f, hay) for f in forms)
+
+    return all(says(w) for w in words)
+
+
+def _variant_text(v: dict[str, Any]) -> str:
+    attrs = " ".join(str(x) for x in (v.get("attributes") or {}).values())
+    return f"{v['name']} {attrs}"
+
+
+def _selected_variant(
+    detail: dict[str, Any],
+    max_price_minor: int | None = None,
+    in_stock_only: bool = False,
+    variant_terms: list[str] | None = None,
+) -> dict[str, Any] | None:
     variants = detail.get("variants") or []
+    eligible = [
+        v
+        for v in variants
+        if (max_price_minor is None or v["price_minor"] <= max_price_minor)
+        and (not in_stock_only or v.get("in_stock"))
+        and all(has_words(t, _variant_text(v)) for t in variant_terms or [])
+    ]
+    return min(
+        eligible,
+        key=lambda v: (not v.get("in_stock"), v["price_minor"], v["name"]),
+        default=None,
+    )
+
+
+def product_card(
+    detail: dict[str, Any],
+    highlight: list[str] | None = None,
+    max_price_minor: int | None = None,
+    in_stock_only: bool = False,
+    variant_terms: list[str] | None = None,
+) -> ProductCard:
+    """A product card; tags the customer asked for (``highlight``) come first."""
     wanted = highlight or []
     tags = sorted(detail.get("tags", []), key=lambda t: t["value"] not in wanted)
-    pick = next((v for v in variants if v.get("in_stock")), variants[0] if variants else None)
+    pick = _selected_variant(detail, max_price_minor, in_stock_only, variant_terms)
     return ProductCard(
         id=str(detail["id"]),
         title=detail["title"],
         brand=detail["brand"],
         product_type=detail["product_type"],
-        price_minor=detail["price_minor"],
+        price_minor=pick["price_minor"] if pick else detail["price_minor"],
         currency=detail.get("currency", "USD"),
         image_path=detail["image_path"],
-        in_stock=detail["in_stock"],
+        in_stock=bool(pick and pick.get("in_stock")),
         tags=[Tag(value=t["value"], label=t["label"]) for t in tags],
         url=f"/products/{detail['id']}",
         variant_id=str(pick["id"]) if pick else None,
@@ -117,14 +251,20 @@ def product_card(detail: dict[str, Any], highlight: list[str] | None = None) -> 
     )
 
 
-def _product_for_model(detail: dict[str, Any]) -> dict[str, Any]:
+def _product_for_model(
+    detail: dict[str, Any],
+    max_price_minor: int | None = None,
+    in_stock_only: bool = False,
+    variant_terms: list[str] | None = None,
+) -> dict[str, Any]:
+    pick = _selected_variant(detail, max_price_minor, in_stock_only, variant_terms)
     out = {
         "product_id": str(detail["id"]),
         "title": detail["title"],
         "brand": detail["brand"],
         "type": detail["product_type"],
-        "price": money(detail["price_minor"]),
-        "in_stock": detail["in_stock"],
+        "price": money(pick["price_minor"] if pick else detail["price_minor"]),
+        "in_stock": bool(pick and pick.get("in_stock")),
         "tags": [t["value"] for t in detail.get("tags", [])],
     }
     if detail.get("nutrition"):
@@ -134,6 +274,7 @@ def _product_for_model(detail: dict[str, Any]) -> dict[str, Any]:
     if detail.get("specs"):
         out["specs"] = detail["specs"]
     if detail.get("variants"):
+        out["selected_variant"] = pick["name"] if pick else None
         out["variants"] = [
             {
                 "variant_id": str(v["id"]),
@@ -169,9 +310,46 @@ class SearchProductsArgs(BaseModel):
         description='Tags no result may have (e.g. ["whole-milk"]).',
         max_length=8,
     )
+    required_specs: dict[str, str] = Field(
+        default_factory=dict,
+        description=(
+            'Listing specifications every result must have, such as {"Flavor": "Chocolate"}, '
+            '{"Style": "Greek"}, or {"Roast": "Dark"}. A value matches as whole words ("Vanilla" '
+            'matches "Unsweetened Vanilla"); exact matches are preferred. Verified before showing '
+            "a card."
+        ),
+    )
+    variant_terms: list[str] = Field(
+        default_factory=list,
+        description=(
+            'The size, count, or color the customer wants, such as "half gallon", "18", or '
+            '"Sand". Only products offering such a variant are shown, with that variant\'s price.'
+        ),
+        max_length=3,
+    )
+    required_title_terms: list[str] = Field(
+        default_factory=list,
+        description=(
+            'Words or phrases required in the product title, such as "Senior" or "SPF 50".'
+        ),
+        max_length=5,
+    )
+    exclude_allergens: list[str] = Field(
+        default_factory=list,
+        description=(
+            'Listed major allergens to exclude, such as "tree nuts". '
+            "This does not establish cross-contact safety."
+        ),
+        max_length=9,
+    )
     max_price_dollars: float | None = Field(default=None, ge=0, le=100000)
     in_stock_only: bool = False
-    sort: Literal["relevance", "price_asc", "price_desc"] = "relevance"
+    sort: SortOption = Field(
+        default="relevance",
+        description="price_asc or price_desc for the cheapest or priciest; a nutrient sort "
+        '(e.g. "protein_desc", "sodium_asc") ranks every matching product by that nutrient per '
+        'serving, for "which has the most or least" questions.',
+    )
 
 
 @tool("search_products", args_schema=SearchProductsArgs, response_format="content_and_artifact")
@@ -181,6 +359,10 @@ def search_products(
     product_types: list[str] | None = None,
     tags: list[str] | None = None,
     exclude_tags: list[str] | None = None,
+    required_specs: dict[str, str] | None = None,
+    variant_terms: list[str] | None = None,
+    required_title_terms: list[str] | None = None,
+    exclude_allergens: list[str] | None = None,
     max_price_dollars: float | None = None,
     in_stock_only: bool = False,
     sort: str = "relevance",
@@ -189,7 +371,10 @@ def search_products(
     price) and optional free text. Returns the best matches with price, stock, tags, and, for
     food, nutrition facts and allergens."""
     ctx = ctx_from(config)
-    vocab = catalog_vocabulary(ctx.client)
+    try:
+        vocab = catalog_vocabulary(ctx.client)
+    except CommerceError as exc:
+        return _error("search_products", exc)
     known_types = {t["value"] for t in vocab["product_types"]}
     known_tags = {t["value"] for t in vocab["tags"]}
     unknown = [t for t in (product_types or []) if t not in known_types] + [
@@ -197,17 +382,27 @@ def search_products(
     ]
     if unknown:
         # An unrecognized required filter must not turn a narrow request into a broad
-        # recommendation. Ask for clarification instead of showing false matches.
+        # recommendation: say so, with the catalog's closest values to search with instead.
         return untrusted(
             "search_products",
             {
                 "total_matches": 0,
                 "results": [],
                 "unsupported_filters": unknown,
-                "note": "No catalog search was run because a required filter is unknown.",
+                "closest_catalog_values": {u: closest_values(u, vocab) for u in unknown},
+                "note": "No catalog search was run because a required filter is unknown. "
+                "Search again with the closest catalog value that means what the customer "
+                "asked for (for example no-salt-added for unsalted).",
             },
         ), []
-    params: dict[str, Any] = {"page_size": 24, "sort": sort}
+    nutrient: tuple[str, bool] | None = None
+    if sort not in ("relevance", "price_asc", "price_desc"):
+        name, direction = sort.rsplit("_", 1)
+        nutrient = (NUTRIENT_SORTS[name], direction == "desc")
+    params: dict[str, Any] = {
+        "page_size": 60 if nutrient else 24,
+        "sort": "relevance" if nutrient else sort,
+    }
     if query:
         params["q"] = query
     if product_types:
@@ -216,29 +411,186 @@ def search_products(
         params["tag"] = [t for t in tags if t in known_tags]
     if exclude_tags:
         params["exclude_tag"] = [t for t in exclude_tags if t in known_tags]
-    if max_price_dollars is not None:
-        params["max_price"] = round(max_price_dollars * 100)
+    max_price_minor = round(max_price_dollars * 100) if max_price_dollars is not None else None
+    if max_price_minor is not None:
+        params["max_price"] = max_price_minor
     if in_stock_only:
         params["in_stock"] = True
+    extra_checks = bool(
+        required_specs or variant_terms or required_title_terms or exclude_allergens
+    )
     try:
         page = ctx.client.get("/v1/products", params=params)
-        details = [
-            ctx.client.get(f"/v1/products/{item['id']}") for item in page["items"][:MAX_PRODUCTS]
-        ]
+        items = list(page["items"])
+        while nutrient and len(items) < min(page["total"], RANK_LIMIT):
+            more = ctx.client.get(
+                "/v1/products", params={**params, "page": len(items) // params["page_size"] + 1}
+            )
+            if not more["items"]:
+                break
+            items += more["items"]
+        words = query_words(query)
+        limit = RANK_LIMIT if nutrient else 24 if (extra_checks or words) else MAX_PRODUCTS
+        candidates = [ctx.client.get(f"/v1/products/{item['id']}") for item in items[:limit]]
     except CommerceError as exc:
         return _error("search_products", exc)
+
+    def terms_for(detail: dict[str, Any]) -> list[str]:
+        """The variant terms for this product: the customer's, plus any required "spec" that is
+        really a variant (a size or color isn't in the spec table). A term the product's own
+        name already says ("32 oz" in "Insulated Water Bottle, 32 oz") needs no variant."""
+        specs = {k.casefold() for k in detail.get("specs") or {}}
+        named = f"{detail['brand']} {detail['title']}"
+        wanted = [
+            *(variant_terms or []),
+            *(
+                v
+                for k, v in (required_specs or {}).items()
+                if k.casefold() not in specs and k.casefold() != "brand"
+            ),
+        ]
+        return [t for t in wanted if not has_words(t, named)]
+
+    def verified(detail: dict[str, Any], exact: bool) -> bool:
+        actual_tags = {t["value"] for t in detail.get("tags", [])}
+        actual_allergens = {a.casefold() for a in detail.get("allergens") or []}
+        specs = {
+            key.casefold(): str(value).casefold()
+            for key, value in (detail.get("specs") or {}).items()
+        }
+
+        def spec_ok(key: str, value: str) -> bool:
+            actual = specs.get(key.casefold())
+            if actual is None:
+                if key.casefold() == "brand":
+                    return has_words(value, detail["brand"])
+                return True  # checked against the name and variants instead (terms_for)
+            return actual == value.casefold() or (not exact and has_words(value, actual))
+
+        return (
+            (not product_types or detail["product_type"] in product_types)
+            and set(tags or []) <= actual_tags
+            and not (set(exclude_tags or []) & actual_tags)
+            and all(spec_ok(k, v) for k, v in (required_specs or {}).items())
+            and all(
+                t.casefold() in f"{detail['brand']} {detail['title']}".casefold()
+                for t in required_title_terms or []
+            )
+            and not (actual_allergens & {a.casefold() for a in exclude_allergens or []})
+            and _selected_variant(detail, max_price_minor, in_stock_only, terms_for(detail))
+            is not None
+        )
+
+    # Exact spec values first ("Dark" roast); whole-word matches ("Unsweetened Vanilla" for
+    # "Vanilla") only when nothing matches exactly.
+    details = [d for d in candidates if verified(d, exact=True)] or [
+        d for d in candidates if verified(d, exact=False)
+    ]
+    note_type: str | None = None
+    if words and not nutrient:
+        # "green tea": the products that say every word come first, and near misses (a
+        # chamomile tea) stay off the screen when any product says them all.
+        named = [d for d in details if names_all(d, words)]
+        if named:
+            details = named
+        elif product_types:
+            # A named product searched under the wrong type ("Trailmark Nut & Seed Bar" as a
+            # fruit-and-nut bar): look again without the type, and keep only products whose
+            # brand the customer said.
+            try:
+                untyped = {k: v for k, v in params.items() if k != "product_type"}
+                again = ctx.client.get("/v1/products", params=untyped)
+                others = [ctx.client.get(f"/v1/products/{i['id']}") for i in again["items"][:12]]
+            except CommerceError:
+                others = []
+            named = [
+                d
+                for d in others
+                if names_all(d, words) and has_words(d["brand"], query or "")
+                and _selected_variant(d, max_price_minor, in_stock_only, terms_for(d))
+            ]  # fmt: skip
+            if named:
+                details = named
+                note_type = named[0]["product_type"]
+    if nutrient:
+        field, highest_first = nutrient
+        details = sorted(
+            (d for d in details if d.get("nutrition")),
+            key=lambda d: d["nutrition"][field],
+            reverse=highest_first,
+        )
+    counted = extra_checks or nutrient or words
     payload: dict[str, Any] = {
-        "total_matches": page["total"],
+        "total_matches": len(details) if counted else page["total"],
         "filters_used": {k: v for k, v in params.items() if k not in ("page_size",)},
-        "results": [_product_for_model(d) for d in details],
+        "results": [
+            _product_for_model(d, max_price_minor, in_stock_only, terms_for(d))
+            for d in details[:MAX_PRODUCTS]
+        ],
     }
+    if query:
+        # "Nonna Lucia's Marinara Sauce" is that product, not also its low-sodium sibling.
+        wanted = " ".join(query_words(query))
+        exact = [
+            str(d["id"])
+            for d in details[:MAX_PRODUCTS]
+            if " ".join(query_words(f"{d['brand']} {d['title']}")) == wanted
+            or " ".join(query_words(d["title"])) == wanted
+        ]
+        if len(exact) == 1:
+            payload["exact_name_match"] = exact[0]
+    if note_type:
+        payload["note_on_type"] = (
+            f"The product named isn't a {', '.join(product_types or [])}; it's listed as "
+            f"{note_type}, so it was found without that type filter."
+        )
+    if nutrient:
+        payload["ranked_by"] = (
+            f"{nutrient[0]} per serving, {'highest' if nutrient[1] else 'lowest'} first"
+        )
+        payload["ranked_among"] = len(candidates)
+        payload["verification_limited"] = page["total"] > len(candidates)
+    if extra_checks:
+        payload["verified_constraints"] = {
+            "specs": required_specs or {},
+            "variant": variant_terms or [],
+            "title_terms": required_title_terms or [],
+            "excluded_listed_allergens": exclude_allergens or [],
+        }
+        payload["candidate_matches"] = page["total"]
+        payload["verification_limited"] = page["total"] > len(candidates)
     if page.get("search") and page["search"].get("semantic") != "ok":
         payload["note"] = "Meaning-based search is off; results come from keyword search."
-    summary = search_summary_card(params, page["total"], len(details), vocab)
+    summary = search_summary_card(
+        params,
+        len(details) if counted else page["total"],
+        min(len(details), MAX_PRODUCTS),
+        vocab,
+    )
     return untrusted("search_products", payload), [
         summary,
-        *(product_card(d, tags).model_dump() for d in details),
+        *(
+            product_card(d, tags, max_price_minor, in_stock_only, terms_for(d)).model_dump()
+            for d in details[:MAX_PRODUCTS]
+        ),
     ]
+
+
+def closest_values(unknown: str, vocab: dict[str, Any]) -> list[str]:
+    """Catalog types and tags whose value or label shares a word stem with ``unknown``
+    ("unsalted" -> "no-salt-added"; "puppy-food" -> "dog-food")."""
+    import difflib
+
+    entries = [*vocab.get("product_types", []), *vocab.get("tags", [])]
+    stems = {w[:4] for w in re.findall(r"[a-z]+", unknown.casefold()) if len(w) >= 4}
+    stems |= {w[2:6] for w in re.findall(r"[a-z]+", unknown.casefold()) if w.startswith("un")}
+    close = [
+        e["value"]
+        for e in entries
+        if stems & {w[:4] for w in re.findall(r"[a-z]+", f"{e['value']} {e['label']}".casefold())}
+    ]
+    close += difflib.get_close_matches(unknown, [e["value"] for e in entries], n=3, cutoff=0.6)
+    return list(dict.fromkeys(close))[:6]
 
 
 def search_summary_card(
@@ -453,6 +805,29 @@ def order_card(detail: dict[str, Any]) -> OrderCard:
     )
 
 
+_BRANDS: dict[str, str] = {}  # product_id -> brand (a product's brand doesn't change)
+
+
+def with_brands(client: CommerceClient, details: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Add each order line's product brand ("brand"), so "the Sonora earbuds" or "my Quillmark
+    order" finds the right line: order lines keep only the product title."""
+    wanted = {
+        str(ln["product_id"])
+        for d in details
+        for ln in d.get("lines", [])
+        if ln.get("product_id") and str(ln["product_id"]) not in _BRANDS
+    }
+    for pid in wanted:
+        with contextlib.suppress(CommerceError, httpx.HTTPError):
+            _BRANDS[pid] = client.get(f"/v1/products/{pid}")["brand"]
+    for d in details:
+        for ln in d.get("lines", []):
+            brand = _BRANDS.get(str(ln.get("product_id")))
+            if brand:
+                ln["brand"] = brand
+    return details
+
+
 def _order_for_model(detail: dict[str, Any]) -> dict[str, Any]:
     """What the model may read about an order: a whitelist. No address and no payment card."""
     return {
@@ -469,6 +844,7 @@ def _order_for_model(detail: dict[str, Any]) -> dict[str, Any]:
             {
                 "line_id": str(ln["id"]),
                 "title": ln["product_title"],
+                "brand": ln.get("brand"),
                 "variant": ln["variant_name"],
                 "quantity": ln["quantity"],
                 "paid_per_unit": money(ln["unit_price_minor"]),
@@ -481,7 +857,8 @@ def _order_for_model(detail: dict[str, Any]) -> dict[str, Any]:
 class ListOrdersArgs(BaseModel):
     contains: str | None = Field(
         default=None,
-        description='Only orders with an item whose title contains these words, e.g. "otter"',
+        description="Only orders with an item whose brand and title contain these words, e.g. "
+        '"otter" or "Sonora". Leave empty to see every recent order.',
         max_length=80,
     )
 
@@ -495,15 +872,19 @@ def list_my_orders(
     ctx = ctx_from(config)
     try:
         summaries = ctx.client.get("/v1/orders")[:MAX_ORDERS]
-        details = [ctx.client.get(f"/v1/orders/{o['id']}") for o in summaries]
+        details = with_brands(
+            ctx.client, [ctx.client.get(f"/v1/orders/{o['id']}") for o in summaries]
+        )
     except CommerceError as exc:
         return _error("list_my_orders", exc)
     if contains:
         words = contains.lower().split()
+
+        def named(ln: dict[str, Any]) -> str:
+            return f"{ln.get('brand') or ''} {ln['product_title']}".lower()
+
         details = [
-            d
-            for d in details
-            if any(all(w in ln["product_title"].lower() for w in words) for ln in d["lines"])
+            d for d in details if any(all(w in named(ln) for w in words) for ln in d["lines"])
         ]
     payload = {"orders": [_order_for_model(d) for d in details], "count": len(details)}
     return untrusted("list_my_orders", payload), [order_card(d).model_dump() for d in details[:5]]
@@ -553,7 +934,7 @@ def get_order_status(
         if not order_id:
             return untrusted("get_order_status", {"error": "give an order_id or order_number"}), []
         uuid.UUID(order_id)
-        detail = ctx.client.get(f"/v1/orders/{order_id}")
+        detail = with_brands(ctx.client, [ctx.client.get(f"/v1/orders/{order_id}")])[0]
     except ValueError:
         return untrusted("get_order_status", {"error": "not an order_id"}), []
     except CommerceError as exc:
@@ -638,6 +1019,27 @@ def citation_card(r: dict[str, Any]) -> CitationCard:
     )
 
 
+# "Can I return a TV?": the answer needs the item's group (section 1.4) as well as the
+# sections the words match, and word matching alone often leaves it out.
+ITEM_RETURN_QUESTION = re.compile(
+    r"\b(?:return(?:able|ing)?|send (?:it |them )?back|return policy)\b", re.IGNORECASE
+)
+ITEM_TYPES_QUERY = "item types groups standard inspected perishable final sale departments"
+
+
+def policy_search(client: CommerceClient, question: str, limit: int = 4) -> dict[str, Any]:
+    """The approved policy sections for a question (``/v1/policies/search``), plus the item
+    types section when the question is about returning some kind of item."""
+    result: dict[str, Any] = client.get(
+        "/v1/policies/search", params={"q": question, "limit": limit}
+    )
+    if ITEM_RETURN_QUESTION.search(question):
+        extra = client.get("/v1/policies/search", params={"q": ITEM_TYPES_QUERY, "limit": 1})
+        have = {r["cite"] for r in result["results"]}
+        result["results"] += [r for r in extra["results"] if r["cite"] not in have]
+    return result
+
+
 class PolicyArgs(BaseModel):
     question: str = Field(description="The policy question in plain words", max_length=300)
 
@@ -648,7 +1050,7 @@ def search_policies(config: RunnableConfig, question: str) -> tuple[str, list[di
     returns are handled). Answer policy questions only from these sections and cite them."""
     ctx = ctx_from(config)
     try:
-        result = ctx.client.get("/v1/policies/search", params={"q": question, "limit": 4})
+        result = policy_search(ctx.client, question)
     except CommerceError as exc:
         return _error("search_policies", exc)
     payload = {

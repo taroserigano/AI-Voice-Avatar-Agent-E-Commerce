@@ -9,7 +9,7 @@ from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
 import assistant.commerce as commerce_mod
 from assistant.scripted import ScriptedChatModel
-from assistant.tools import ToolContext, search_products, untrusted
+from assistant.tools import ToolContext, product_card, search_products, untrusted
 from assistant.toolsets import XANA_TOOLS
 
 PRODUCT_ID = "33333333-3333-4333-8333-333333333333"
@@ -85,6 +85,49 @@ def test_xana_search_reads_current_product_details(monkeypatch: pytest.MonkeyPat
         "/v1/products",
         f"/v1/products/{PRODUCT_ID}",
     ]
+
+
+def test_search_verifies_specs_and_allergens_before_showing_cards(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(commerce_mod, "_vocabulary", None)
+    client = Catalog()
+    config = {"configurable": {"ctx": ToolContext(client=client, agent="xana")}}
+    result = search_products.invoke(
+        {"product_types": ["yogurt"], "required_specs": {"Flavor": "Chocolate"}},
+        config=config,  # type: ignore[arg-type]
+    )
+    assert "Plain Greek Yogurt" not in str(result)
+    assert "verified_constraints" in str(result)
+    assert '"total_matches": 0' in str(result)
+
+    result = search_products.invoke(
+        {"product_types": ["yogurt"], "exclude_allergens": ["milk"]},
+        config=config,  # type: ignore[arg-type]
+    )
+    assert "Plain Greek Yogurt" not in str(result)
+
+
+def test_product_card_price_is_for_its_selected_variant() -> None:
+    detail = Catalog().get(f"/v1/products/{PRODUCT_ID}")
+    detail["price_minor"] = 499
+    detail["variants"] = [
+        {"id": PRODUCT_ID, "name": "16 oz", "price_minor": 499, "in_stock": False},
+        {
+            "id": "44444444-4444-4444-8444-444444444444",
+            "name": "32 oz",
+            "price_minor": 799,
+            "in_stock": True,
+        },
+    ]
+    card = product_card(detail)
+    assert card.variant_name == "32 oz"
+    assert card.price_minor == 799
+    assert card.in_stock is True
+    affordable = product_card(detail, max_price_minor=500)
+    assert affordable.variant_name == "16 oz"
+    assert affordable.price_minor == 499
+    assert affordable.in_stock is False
 
 
 def test_xana_looks_up_one_product_before_answering_an_allergen_question() -> None:

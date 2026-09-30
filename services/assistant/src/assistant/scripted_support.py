@@ -224,7 +224,15 @@ def next_support_step(
         opts = _payload(last)
         orders = _latest(results, "list_my_orders") or {}
         wanted = {ln["line_id"] for ln in matching_lines(orders, words)}
-        line = next((ln for ln in opts.get("lines", []) if ln["order_line_id"] in wanted), None)
+        # get_return_options names lines by a handle: the start of the line id.
+        line = next(
+            (
+                ln
+                for ln in opts.get("lines", [])
+                if any(w.startswith(ln["order_line_id"]) for w in wanted)
+            ),
+            None,
+        )
         if line and line["eligible"]:
             qty = quantity(text, int(line["returnable_quantity"]))
             return [
@@ -267,7 +275,15 @@ def compose_support(results: Sequence[ToolMessage], text: str) -> str | None:
     if last.name == "get_return_options":
         orders = _latest(results, "list_my_orders") or {}
         wanted = {ln["line_id"] for ln in matching_lines(orders, words)}
-        line = next((ln for ln in data.get("lines", []) if ln["order_line_id"] in wanted), None)
+        # get_return_options names lines by a handle: the start of the line id.
+        line = next(
+            (
+                ln
+                for ln in data.get("lines", [])
+                if any(w.startswith(ln["order_line_id"]) for w in wanted)
+            ),
+            None,
+        )
         if line and not line["eligible"]:
             return f"I'm sorry, the {line['title']} can't be returned. {line['explanation']}"
     if last.name == "quote_return" and "error" in data:

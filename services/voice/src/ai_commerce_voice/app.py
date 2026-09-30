@@ -59,7 +59,7 @@ from assistant.commerce import (
 )
 from assistant.config import get_settings as assistant_settings
 from assistant.db import Conversation, get_sessionmaker, utcnow
-from assistant.tools import ToolContext
+from assistant.tools import ToolContext, with_brands
 
 log = logging.getLogger(__name__)
 
@@ -213,7 +213,17 @@ def _warm_policy_search(client: CommerceClient) -> None:
 def _recent_orders(client: CommerceClient) -> list[dict[str, Any]] | None:
     try:
         summaries = client.get("/v1/orders")[:8]
-        return list(_pool.map(lambda o: client.get(f"/v1/orders/{o['id']}"), summaries))
+        details = list(_pool.map(lambda o: client.get(f"/v1/orders/{o['id']}"), summaries))
+        delivered = [d for d in details if d.get("status") == "delivered"]
+        # Whether each item can be returned right now, from the returns engine: the model
+        # must never work that out from the delivery date itself.
+        for d, opts in zip(
+            delivered,
+            _pool.map(lambda d: client.get(f"/v1/orders/{d['id']}/return-options"), delivered),
+            strict=True,
+        ):
+            d["return_options"] = opts
+        return with_brands(client, details)
     except (CommerceError, httpx.HTTPError) as exc:
         log.warning("couldn't read recent orders for the call: %s", exc)
         return None

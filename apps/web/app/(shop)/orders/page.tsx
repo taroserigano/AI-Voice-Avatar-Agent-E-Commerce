@@ -49,16 +49,26 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
                 }.`}
           </p>
         </div>
-        {orders.length > 0 ? (
+        <div className="flex flex-wrap items-center gap-x-4">
           <Link
-            href="/activity"
+            href="/help/returns"
             className="group -mr-2 inline-flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold text-brand-700 transition-colors hover:text-brand-900"
           >
-            <ClockIcon className="size-4" />
-            Your activity
+            <ReturnIcon className="size-4" />
+            How returns work
             <ArrowRightIcon className="size-4 transition-transform duration-200 ease-snappy group-hover:translate-x-0.5" />
           </Link>
-        ) : null}
+          {orders.length > 0 ? (
+            <Link
+              href="/activity"
+              className="group -mr-2 inline-flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold text-brand-700 transition-colors hover:text-brand-900"
+            >
+              <ClockIcon className="size-4" />
+              Your activity
+              <ArrowRightIcon className="size-4 transition-transform duration-200 ease-snappy group-hover:translate-x-0.5" />
+            </Link>
+          ) : null}
+        </div>
       </div>
 
       {orders.length === 0 ? (

@@ -44,6 +44,8 @@ from assistant.tools import ToolContext
 log = logging.getLogger(__name__)
 
 CITE = re.compile(r"\[\[cite:([a-z0-9-]+(?:#[a-z]{2}(?:-\d+)+)?)\]\]")
+# A whole-document citation sometimes comes back as "doc#doc": it means the document.
+DOC_AS_SECTION = re.compile(r"\[\[cite:([a-z0-9-]+)#\1\]\]")
 TOOL_LABELS = {
     "search_products": "Searching the catalog…",
     "get_product_details": "Reading the product details…",
@@ -80,12 +82,43 @@ def split_citations(
 ) -> tuple[list[dict[str, Any]], list[str]]:
     valid: dict[str, dict[str, Any]] = {}
     invalid: list[str] = []
+    text = DOC_AS_SECTION.sub(r"[[cite:\1]]", text)
     for cite in CITE.findall(text):
         if cite in citable:
             valid.setdefault(cite, citable[cite])
         elif cite not in invalid:
             invalid.append(cite)
     return list(valid.values()), invalid
+
+
+class ProductCards:
+    """Which product cards a turn shows: every product read in detail, then the results of the
+    turn's last catalog search. Earlier searches that the assistant refined away (a broad
+    keyword search before the verified one) were near misses and stay off the screen."""
+
+    def __init__(self) -> None:
+        self.search: list[dict[str, Any]] = []
+        self.details: list[dict[str, Any]] = []
+
+    def take(self, tool: str | None, cards: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Keep this tool's product cards for the end of the turn; return the others now."""
+        if tool == "search_products":
+            self.search = list(cards)
+            return []
+        if tool == "get_product_details":
+            self.details += cards
+            return []
+        return cards
+
+    def final(self) -> list[dict[str, Any]]:
+        summary = [c for c in self.search if c.get("kind") != "product"]
+        out: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        for card in [*self.details, *self.search]:
+            if card.get("kind") == "product" and card.get("id") not in seen:
+                seen.add(card["id"])
+                out.append(card)
+        return summary + out
 
 
 def run_turn(
@@ -105,10 +138,13 @@ def run_turn(
         "metadata": {"agent": agent, "prompt_version": prompt_version(agent), "model": choice.name},
         "run_name": f"{agent}-turn",
     }
-    streamed_ids: set[str] = set()
     answer: list[str] = []
     citable: dict[str, dict[str, Any]] = {}
+    products = ProductCards()
     current_id: str | None = None
+    # Text streamed during the current agent step: its final message repeats it, and the
+    # Responses API gives the chunks and the final message different ids.
+    streamed_this_step = False
 
     def emit_text(message_id: str | None, delta: str) -> Iterator[str]:
         nonlocal current_id
@@ -133,8 +169,8 @@ def run_turn(
                 message, meta = chunk
                 if meta.get("langgraph_node") == "agent" and isinstance(message, AIMessageChunk):
                     delta = message_text(message)
-                    if delta and message.id:
-                        streamed_ids.add(message.id)
+                    if delta:
+                        streamed_this_step = True
                     yield from emit_text(message.id, delta)
                 continue
             for node, update in (chunk or {}).items():
@@ -149,14 +185,18 @@ def run_turn(
                         for call in message.tool_calls:
                             label = TOOL_LABELS.get(call["name"], "Working on it…")
                             yield sse("status", {"tool": call["name"], "label": label})
-                        if message.id not in streamed_ids:
+                        if not streamed_this_step:
                             yield from emit_text(message.id, message_text(message))
+                        streamed_this_step = False
                     elif isinstance(message, ToolMessage):
+                        cards = []
                         for card in message.artifact or []:
                             if card.get("kind") == "citation":
                                 citable[card["cite"]] = card
                             else:
-                                yield sse("card", card)
+                                cards.append(card)
+                        for card in products.take(message.name, cards):
+                            yield sse("card", card)
     except Exception:
         log.exception("assistant turn failed")
         yield sse(
@@ -164,6 +204,8 @@ def run_turn(
         )
         return
 
+    for card in products.final():
+        yield sse("card", card)
     valid, invalid = split_citations("".join(answer), citable)
     if invalid:
         log.warning("answer cited sections it didn't retrieve: %s", invalid)
@@ -204,7 +246,7 @@ def history(messages: list[BaseMessage]) -> list[MessageOut]:
                 id=turn["id"],
                 role="assistant",
                 text=text,
-                cards=turn["cards"],
+                cards=turn["cards"] + turn["products"].final(),
                 citations=[CitationCard(**c) for c in valid],
             )
         )
@@ -216,14 +258,22 @@ def history(messages: list[BaseMessage]) -> list[MessageOut]:
             out.append(MessageOut(id=m.id or f"u{i}", role="user", text=message_text(m)))
             continue
         if turn is None:
-            turn = {"id": m.id or f"a{i}", "texts": [], "cards": [], "citable": {}}
+            turn = {
+                "id": m.id or f"a{i}",
+                "texts": [],
+                "cards": [],
+                "citable": {},
+                "products": ProductCards(),
+            }
         if isinstance(m, AIMessage):
             turn["texts"].append(message_text(m))
         elif isinstance(m, ToolMessage):
+            cards = []
             for card in m.artifact or []:
                 if card.get("kind") == "citation":
                     turn["citable"][card["cite"]] = card
                 else:
-                    turn["cards"].append(card)
+                    cards.append(card)
+            turn["cards"] += turn["products"].take(m.name, cards)
     close()
     return out
