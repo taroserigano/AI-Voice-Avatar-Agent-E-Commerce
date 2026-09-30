@@ -1257,7 +1257,7 @@ policy(
     "What statuses can a return have?", [R + "11-5"], [r"in transit", r"received|inspected|closed"]
 )
 policy("What does 'In review' mean on my return?", [R + "11-5"], [r"person"])
-policy("What happens if my refund fails at the bank?", [R + "11-5"], [r"retry|try again"])
+policy("What happens if my refund fails at the bank?", [R + "11-5"], [r"retr(?:y|ies|ied)|try again"])
 policy(
     "Can I return just some of the units I bought?", [R + "1-2", R + "3-3"], [r"some|units|part"]
 )

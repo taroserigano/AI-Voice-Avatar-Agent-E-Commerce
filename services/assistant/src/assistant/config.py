@@ -40,6 +40,11 @@ class Settings(BaseSettings):
     )
     assistant_openai_model: str = "gpt-6-sol"
     assistant_openai_reasoning: Literal["low", "medium", "high"] = "medium"
+    # "priority" answers sooner and costs more per token.
+    assistant_openai_service_tier: Literal["default", "priority", "flex"] = "default"
+    # Search the policies before the model when a Xana message is about policy (one model
+    # round fewer); off makes the model call search_policies itself.
+    assistant_policy_prefetch: bool = True
     assistant_model_mode: Literal["auto", "claude", "openai", "scripted"] = "auto"
     assistant_max_tokens: int = 1024
 

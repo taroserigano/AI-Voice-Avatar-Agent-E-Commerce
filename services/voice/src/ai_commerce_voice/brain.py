@@ -27,7 +27,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import re
 import time
 import uuid
 from collections.abc import AsyncIterator
@@ -58,13 +57,14 @@ from langgraph.types import Command
 from ai_commerce_voice.escalation import TOOL_ERRORS, escalation_reason, tool_errors_this_turn
 from ai_commerce_voice.ports import AgentEvent, CardOut, QuoteOut, TextDelta, ToolStarted, TurnEnded
 from assistant.graph import _superseded_proposal, recent_history
-from assistant.tools import (
-    ToolContext,
-    _order_for_model,
-    citation_card,
-    policy_search,
-    untrusted,
+from assistant.policy_prefetch import (
+    PREFETCH_SECTIONS,
+    PREFETCH_TIMEOUT_S,
+    prefetched_messages,
+    retrieval_query,
+    wants_policy,
 )
+from assistant.tools import ToolContext, _order_for_model, policy_search, untrusted
 from assistant.toolsets import XANA_TOOLS
 from assistant.turns import TOOL_LABELS, ProductCards, message_text, split_citations
 
@@ -73,159 +73,6 @@ log = logging.getLogger(__name__)
 PROMPT_VERSION = "xana.voice.v2"
 PROMPT_DIR = Path(__file__).resolve().parent / "prompts"
 SNAPSHOT_ORDERS = 8
-PREFETCH_TIMEOUT_S = 1.2
-PREFETCH_SECTIONS = 6
-# Words that mean the answer likely rests on a policy (not "where's my order?").
-POLICY_WORDS = re.compile(
-    r"\b(polic(y|ies)|returns?|returned|returning|refunds?|refunded|exchanges?|warrant(y|ies)|"
-    r"opened|damaged|broken|defective|restocking|final sale|cancel\w*|perishables?|spoiled|"
-    r"inspect\w*|labels?|drop.?offs?|eligib\w*|window|price match|gift cards?)\b",
-    re.IGNORECASE,
-)
-
-
-# "What does keto friendly mean?": label meanings are in the product labels policy.
-LABEL_QUESTION = re.compile(
-    r"\b(?:mean|means|meaning|difference between|same as|counts? as|definition of|defined)\b",
-    re.IGNORECASE,
-)
-
-
-def wants_policy(text: str) -> bool:
-    return bool(POLICY_WORDS.search(text) or LABEL_QUESTION.search(text))
-
-
-# Conversational words that match the wrong sections ("What's *your* return *policy*..." ranks
-# "Your privacy" first) and dilute meaning search. Measured on the real policies: dropping them
-# put "Standard items" and "Electronics" in the top six for opened headphones, and the three
-# refund-timing sections in the top three for "how long do refunds take".
-_FILLER = frozenset(
-    [
-        "a",
-        "an",
-        "and",
-        "are",
-        "about",
-        "any",
-        "anything",
-        "as",
-        "at",
-        "be",
-        "been",
-        "but",
-        "by",
-        "can",
-        "could",
-        "did",
-        "do",
-        "does",
-        "doing",
-        "for",
-        "from",
-        "get",
-        "go",
-        "going",
-        "got",
-        "had",
-        "has",
-        "have",
-        "hey",
-        "hi",
-        "hello",
-        "how",
-        "i",
-        "if",
-        "in",
-        "is",
-        "it",
-        "its",
-        "it's",
-        "just",
-        "know",
-        "let",
-        "like",
-        "me",
-        "my",
-        "of",
-        "on",
-        "or",
-        "our",
-        "please",
-        "policy",
-        "policies",
-        "say",
-        "should",
-        "so",
-        "tell",
-        "that",
-        "the",
-        "their",
-        "them",
-        "then",
-        "there",
-        "they",
-        "this",
-        "to",
-        "us",
-        "wanna",
-        "want",
-        "was",
-        "we",
-        "what",
-        "what's",
-        "whats",
-        "when",
-        "where",
-        "which",
-        "who",
-        "why",
-        "will",
-        "with",
-        "would",
-        "xana",
-        "you",
-        "your",
-        "you're",
-        "yours",
-        "ok",
-        "okay",
-        "um",
-        "uh",
-        "also",
-        "again",
-        "still",
-        "really",
-        "thanks",
-        "thank",
-    ]
-)
-_TIMING = re.compile(
-    r"\b(how long|how soon|how many days|when will|when do|when does|when would)\b", re.I
-)
-
-
-def retrieval_query(text: str) -> str:
-    """The customer's words as a search query: timing questions say "timing", filler goes."""
-    words = re.findall(r"[a-z0-9]+(?:'[a-z]+)?", _TIMING.sub(" timing ", text.lower()))
-    kept = [w for w in words if w not in _FILLER]
-    return " ".join(dict.fromkeys(kept)) or text.strip()
-
-
-def policy_tool_output(result: dict[str, Any]) -> tuple[str, list[dict[str, Any]]]:
-    """``search_policies``' own content and citation cards, for a search made outside it."""
-    payload = {
-        "sections": [
-            {
-                "cite": r["cite"],
-                "title": f"{r['doc_title']} §{r['number']} {r['title']}".strip(),
-                "version": r["version"],
-                "text": r["body"],
-            }
-            for r in result["results"]
-        ]
-    }
-    cards = [citation_card(r).model_dump() for r in result["results"]]
-    return untrusted("search_policies", payload), cards
 
 
 @lru_cache
@@ -462,7 +309,9 @@ class XanaBrain:
         graph_input = {
             "messages": messages,
             "agent": "xana",
-            "tool_calls_this_turn": 1 if prefetched else 0,
+            # The prefetch isn't the model's call: it doesn't use up the model's tool budget
+            # (a return that needs six calls of its own would stop before the quote).
+            "tool_calls_this_turn": 0,
             "escalated": escalated if self.voice.strong is not None else None,
         }
         async for ev in self._stream(graph_input, citable):
@@ -484,27 +333,12 @@ class XanaBrain:
                 asyncio.to_thread(policy_search, self.ctx.client, question, PREFETCH_SECTIONS),
                 PREFETCH_TIMEOUT_S,
             )
-            content, cards = policy_tool_output(result)
+            messages = prefetched_messages(question, result, mid)
         except Exception as exc:  # noqa: BLE001 - the model can still call the tool
             log.warning("policy prefetch skipped: %s", type(exc).__name__)
             return None
         log.info("policy prefetch: %.0f ms", (time.perf_counter() - started) * 1000)
-        call = {
-            "name": "search_policies",
-            "args": {"question": question},
-            "id": f"prefetch-{mid}",
-            "type": "tool_call",
-        }
-        return [
-            AIMessage(content="", tool_calls=[call], id=f"{mid}-policy-call"),
-            ToolMessage(
-                content=content,
-                artifact=cards,
-                name="search_policies",
-                tool_call_id=call["id"],
-                id=f"{mid}-policies",
-            ),
-        ]
+        return messages
 
     def resume(
         self, outcome: Literal["confirmed", "declined", "superseded"]

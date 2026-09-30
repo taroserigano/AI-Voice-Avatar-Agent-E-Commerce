@@ -100,6 +100,7 @@ def choose_model() -> ModelChoice:
                 streaming=True,
                 timeout=60,
                 max_retries=2,
+                model_kwargs={"service_tier": settings.assistant_openai_service_tier},
             )
             return ModelChoice(openai, settings.assistant_openai_model, simulated=False)
     log.warning("using the scripted assistant model: %s", reason)

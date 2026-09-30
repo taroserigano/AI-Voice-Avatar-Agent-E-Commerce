@@ -26,7 +26,11 @@ pnpm eval:xana                     # chat (Xana on /support), both sets
 pnpm eval:xana:voice               # the voice brain, typed turns, no speech synthesized
 pnpm eval:xana -- --set returns --only xr-001,xr-010 --workers 8
 pnpm eval:xana -- --record-baseline   # evals/baselines/xana-<channel>-<set>-<model>.json
+pnpm eval:xana -- --assistant http://127.0.0.1:8111   # an assistant started with other settings
 ```
+
+Every turn records `first_text_ms` (when the first words arrive) and `turn_ms`. Time with
+`--workers 1`: parallel conversations slow each other down.
 
 Each run writes every case's transcript (answer, tools, cards, quote, citations, and for voice
 the tool arguments) to `evals/xana/runs/`, which is gitignored. Use it to review failures.
@@ -47,7 +51,7 @@ When a check fails on a correct answer, fix the check in `build_golden.py` or
 | Channel | Model | Products | Returns |
 |---|---|---|---|
 | Chat | gpt-6-sol | 200/200 | 199–200/200 |
-| Voice | gpt-6-luna, gpt-6-sol on escalated turns | 195–198/200 | 187–190/198 (2 typed-"yes" cases are chat-only) |
+| Voice | gpt-6-luna, gpt-6-sol on escalated turns | 195–199/200 | 187–190/198 (2 typed-"yes" cases are chat-only) |
 
 Ranges are over the last runs; the models don't answer the same way every time. The
 baselines in `evals/baselines/` are the latest run. The first runs on the new sets scored
@@ -60,3 +64,19 @@ Escalating every return, refund, or policy turn to gpt-6-sol was measured and le
 scored the same as Luna alone, at the same speed (see
 `services/voice/src/ai_commerce_voice/escalation.py`). Only disputes, "that's wrong", repeated
 questions, and repeated tool failures escalate.
+
+## Latency (2026-09-30)
+
+58 cases (every 7th of each set), one at a time. Voice is typed turns, so speech-to-text and
+speech aren't included; voice plays a filler after 0.9 s when no answer is ready.
+
+| Setup | First words, median | First words, slowest 10% | Whole turn, median |
+|---|---|---|---|
+| Voice, gpt-6-luna (low effort, priority tier) | 1.8 s | 3.0 s | 2.3 s |
+| Chat before: the web app's proxy held the stream back | 4.8 s | 8.3 s | 4.8 s |
+| Chat, gpt-6-sol medium effort, policy prefetch | 3.5 s | 7.6 s | 4.4 s |
+| Same, priority tier (`ASSISTANT_OPENAI_SERVICE_TIER=priority`) | 3.3 s | 5.7 s | 4.0 s |
+| Same, low effort (`ASSISTANT_OPENAI_REASONING=low`) | 3.7 s | 5.7 s | 4.5 s |
+
+Low effort wasn't faster at the median and scored 197/200 on returns, so chat stays at medium.
+The priority tier cuts the slow tail and costs more per token; it's off by default.

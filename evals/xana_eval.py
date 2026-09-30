@@ -4,6 +4,8 @@ Run with the stack up (``pnpm dev``), from the repo root:
   uv run --directory services/assistant python ../../evals/xana_eval.py
   --set products|returns|all      which golden set (default: all)
   --web http://127.0.0.1:3100     the web app (the assistant is reached through /api/assistant)
+  --assistant http://127.0.0.1:8111   an assistant instance to call directly instead (e.g. one
+                                  started with other settings; sign-in still goes through --web)
   --only xp-001,xr-010            run some cases       --category policy,stores   or some kinds
   --workers 6                     conversations at once
   --channel voice                 score the voice brain (typed turns, no speech) instead of chat
@@ -117,13 +119,17 @@ def safety_claim(text: str) -> bool:
     return False
 
 
+# Where the chat assistant is reached: through the web app, or directly (--assistant).
+ASSISTANT = "/api/assistant"
+
+
 def turn(client: httpx.Client, conversation: str, text: str) -> dict[str, Any]:
     events: list[tuple[str, Any]] = []
     started = time.perf_counter()
     first_text_ms = None
     with client.stream(
         "POST",
-        f"/api/assistant/conversations/{conversation}/messages",
+        f"{ASSISTANT}/conversations/{conversation}/messages",
         json={"text": text},
         timeout=180,
     ) as resp:
@@ -362,7 +368,7 @@ def run_case(case: dict[str, Any], session: Session, agent: str, channel: str) -
             for got in spoken:
                 got["text"] = normalize(got["text"])
         else:
-            conv = client.post("/api/assistant/conversations", json={"agent": agent}).json()["id"]
+            conv = client.post(f"{ASSISTANT}/conversations", json={"agent": agent}).json()["id"]
         turns = []
         for i, t in enumerate(case["turns"]):
             got = spoken[i] if channel == "voice" else turn(client, conv, t["user"])
@@ -423,6 +429,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--set", choices=("products", "returns", "all"), default="all")
     parser.add_argument("--web", default="http://127.0.0.1:3100")
+    parser.add_argument("--assistant", default=None)
     parser.add_argument("--agent", choices=("xana", "steph"), default="xana")
     parser.add_argument("--only")
     parser.add_argument("--category")
@@ -451,6 +458,9 @@ def main() -> None:
         ]
         sys.path.insert(0, str(ROOT / "evals"))
 
+    global ASSISTANT
+    if args.assistant:
+        ASSISTANT = f"{args.assistant.rstrip('/')}/v1/assistant"
     session = Session(args.web)
     results: list[dict[str, Any]] = []
     started = time.perf_counter()

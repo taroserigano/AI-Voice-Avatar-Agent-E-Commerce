@@ -16,6 +16,7 @@ def test_auto_uses_openai_after_claude_key_is_rejected(monkeypatch: pytest.Monke
         openai_api_key="working-openai-key",
         assistant_openai_model="gpt-6-sol",
         assistant_openai_reasoning="medium",
+        assistant_openai_service_tier="default",
         assistant_max_tokens=1024,
     )
     monkeypatch.setattr(models, "get_settings", lambda: settings)

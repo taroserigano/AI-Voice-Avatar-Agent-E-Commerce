@@ -1,7 +1,10 @@
 """The assistant graph: route → agent ⇄ tools, checkpointed in PostgreSQL per conversation.
 
 ``route`` asks Jev about the customer's turn (intent, return reason, which order line, whether
-they want a person) and resets the per-turn counters. ``agent`` is the chat model with the
+they want a person) and resets the per-turn counters. For Xana, a message about policy also
+gets its policy search here, alongside Jev and before the model, recorded as a
+``search_policies`` call (assistant.policy_prefetch): the model answers in one call instead of
+calling the tool and then answering. ``agent`` is the chat model with the
 tools allowed for this assistant, plus Jev's confident signals as hints. ``tools`` runs the
 requested tool calls against the commerce API. The server-side ToolContext (who the
 customer is) travels in the run config, not in the checkpointed state.
@@ -9,6 +12,7 @@ customer is) travels in the run config, not in the checkpointed state.
 
 from __future__ import annotations
 
+import logging
 from datetime import date
 from typing import Annotated, Any, TypedDict
 
@@ -31,9 +35,16 @@ from assistant.config import get_settings
 from assistant.jev.decisions import TurnSignals
 from assistant.jev.signals import turn_signals
 from assistant.models import choose_model
+from assistant.policy_prefetch import (
+    PREFETCH_TIMEOUT_S,
+    prefetched_messages,
+    start_policy_search,
+)
 from assistant.prompts import render_prompt
 from assistant.tools import ctx_from
 from assistant.toolsets import ALL_TOOLS, tools_for
+
+log = logging.getLogger(__name__)
 
 HISTORY_MESSAGES = 40
 
@@ -59,10 +70,31 @@ def recent_history(messages: list[AnyMessage], limit: int = HISTORY_MESSAGES) ->
 
 
 def route(state: AssistantState, config: RunnableConfig) -> dict[str, Any]:
+    ctx = ctx_from(config)
+    search = None
+    last = state["messages"][-1] if state["messages"] else None
+    if (
+        get_settings().assistant_policy_prefetch
+        and isinstance(last, HumanMessage)
+        and isinstance(last.content, str)
+        and state.get("agent") == "xana"
+    ):
+        search = start_policy_search(ctx.client, last.content)
     signals = turn_signals(list(state["messages"]))
     # Tools read the signals from the server-side context (e.g. the return reason for a quote).
-    ctx_from(config).signals = signals.model_dump()
-    return {"tool_calls_this_turn": 0, "signals": signals.model_dump()}
+    ctx.signals = signals.model_dump()
+    update: dict[str, Any] = {"tool_calls_this_turn": 0, "signals": signals.model_dump()}
+    # A turn trying to talk its way past the rules is declined without tools.
+    if search is not None and not signals.bypass_attempt:
+        question, pending = search
+        try:
+            result = pending.result(timeout=PREFETCH_TIMEOUT_S)
+        except Exception as exc:  # noqa: BLE001 - the model can still call the tool
+            log.warning("policy prefetch skipped: %s", type(exc).__name__)
+        else:
+            # Not counted in tool_calls_this_turn: the model's own budget is for its own calls.
+            update["messages"] = prefetched_messages(question, result)
+    return update
 
 
 def _superseded_proposal(messages: list[AnyMessage]) -> bool:
