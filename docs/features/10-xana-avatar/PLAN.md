@@ -24,7 +24,7 @@ confirmation rule.
 | 31 | **Tavus renders Xana's face in echo mode.** Tavus only animates the face. It does not run its own speech-to-text, LLM, voice, or perception. Our pipeline still decides every word. This lifts "avatar" out of decision 30; phone and cloud deploy stay out of scope. |
 | 32 | **The browser joins the Tavus room and feeds it Xana's audio**, on today's WebSocket stack. The server creates the Tavus conversation; the key never reaches the browser. When LiveKit (plan 09, V1) lands, the worker can use `tavus.AvatarSession` instead, but only where Tavus can reach the LiveKit server (LiveKit Cloud, which decision 30 leaves out for now). Locally, a Tavus avatar can't join a `livekit-server --dev` on this laptop, so the browser bridge is the path that works here. |
 | 33 | **Only Xana's voice goes to Tavus, never the customer's.** The customer's microphone and camera are never published to the Tavus room. Recording, transcription and captions are off on Tavus's side. |
-| 34 | Face: **Anna – Casual** (`rc9cff32ceba`), a stock Phoenix-4.5 face (Tavus recommends these for real time). Taro asked for "a beautiful white female model". Setting `TAVUS_FACE_ID`. |
+| 34 | Face: **Rose – Business** (`rf1bd7e252de`), a stock Phoenix-4.5 face (Tavus recommends these for real time): black blazer, white blouse. Taro asked for "a beautiful white female model" in customer-support clothes; it replaced Anna – Casual. No stock face wears a headset. Setting `TAVUS_FACE_ID`. |
 | 35 | Feed: **audio echo messages** (`conversation.echo`). Microphone echo was silent in the spike. |
 
 ## How it works

@@ -13,8 +13,9 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 
 # Cartesia's "Skylar - Friendly Guide": approachable American English, made for support.
 SKYLAR = "db6b0ed5-d5d3-463d-ae85-518a07d3c2b4"
-# Tavus stock face "Anna - Casual" (Phoenix-4.5), Taro's pick for Xana's face (2026-09-30).
-ANNA = "rc9cff32ceba"
+# Tavus stock face "Rose - Business" (Phoenix-4.5): Taro asked for a customer-support look
+# (2026-09-30; it replaced "Anna - Casual", rc9cff32ceba).
+ROSE = "rf1bd7e252de"
 
 
 class VoiceSettings(BaseSettings):
@@ -76,7 +77,7 @@ class VoiceSettings(BaseSettings):
     )
     # The echo PAL made by `pnpm tavus:setup`.
     tavus_pal_id: str | None = None
-    tavus_face_id: str = ANNA
+    tavus_face_id: str = ROSE
     # Avatars at once across this process (the Tavus account's limits; each one bills).
     tavus_max_live: int = 2
     # Tavus doesn't join or bill test-mode conversations (tests only).

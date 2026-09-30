@@ -36,6 +36,24 @@ billed in all. Every conversation was ended by the script.
   `started_speaking`, plus ~150 ms.
 - **Barge-in:** drop our queued audio and send `conversation.interrupt`; silence in ~0.5 s.
 
+### Follow-up spike: segments back to back (two short calls, plus one stray re-run of mine)
+
+| Case | Result |
+|---|---|
+| Filler (id A, `done`) then answer (id B) sent right after | **One** 2.4 s utterance: the answer was **dropped**. A new id while Tavus is speaking is lost. |
+| Filler + answer under **one** id, then a 20 ms silent chunk with `done: true` | Both played: 4.3 s, not interrupted. |
+| A segment, then a 20 ms silent chunk with `done: true` | Clean finish (`interrupted: false`). |
+| 100 ms chunks at real-time pace | Tavus split one segment into two utterances at a short gap. |
+
+So the browser sends everything Xana says in one turn under one `inference_id`, ends it with
+a silent `done` chunk at `turn.done`, and holds the next turn's audio until Tavus has finished
+the previous one. Whether a segment was heard in full is worked out on a playback timeline
+(each segment starts when it's sent plus Tavus's delay, or when the one before it ends) and
+confirmed by a `stopped_speaking` with `interrupted: false` at or after the segment's end.
+Stop events alone can't be trusted, because Tavus splits utterances at gaps.
+
+One of these calls was an accidental duplicate run (about 40 s billed); it ended itself.
+
 ## A1 Server (2026-09-30)
 
 - [x] Settings in `services/voice/config.py`: `VOICE_AVATAR` (off by default), `TAVUS_APIKEY`
@@ -58,5 +76,16 @@ billed in all. Every conversation was ended by the script.
       the live limit incl. parallel starts, failures mean no video, a server without video
       says so). `tests/live/test_live_tavus.py` (`TAVUS_LIVE=1`): a real test-mode
       conversation is created with a meeting token and ends. Both pass.
-- Screenshots of Anna talking, from a 40 s call on the real PAL: kept in the session scratchpad,
-  not committed.
+- Face changed to **Rose – Business** (`rf1bd7e252de`): Taro asked for customer-support
+      clothes (Anna – Casual wore a leather jacket). `pnpm tavus:setup` made PAL
+      `p47f6df86787`; the Anna PAL is deleted. Screenshots of Rose idle and talking, from a
+      40 s call: [screenshots/rose-sheet.png](screenshots/rose-sheet.png).
+
+## A2 Browser (in progress)
+
+- [x] `apps/web/lib/avatar-echo.ts`: `AvatarEcho` turns the agent's audio into echo messages
+      (one id per turn, the next turn held until Tavus finishes, silent `done` chunk at
+      `turn.done`, ~100 ms coalescing) and keeps the playback timeline for captions and "heard
+      in full". A read-back only completes on a clean `stopped_speaking` at or after its end;
+      other segments fall back to the timeline 3 s after their end.
+      `avatar-echo.test.ts`: 13 tests pass.
