@@ -13,6 +13,8 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 
 # Cartesia's "Skylar - Friendly Guide": approachable American English, made for support.
 SKYLAR = "db6b0ed5-d5d3-463d-ae85-518a07d3c2b4"
+# Tavus stock face "Anna - Casual" (Phoenix-4.5), Taro's pick for Xana's face (2026-09-30).
+ANNA = "rc9cff32ceba"
 
 
 class VoiceSettings(BaseSettings):
@@ -66,6 +68,20 @@ class VoiceSettings(BaseSettings):
     voice_escalation_model: str = "gpt-6-sol"
     voice_escalation_reasoning: Literal["none", "low", "medium"] = "low"
 
+    # Xana's face: a Tavus avatar in echo mode (docs/features/10-xana-avatar). Off unless
+    # VOICE_AVATAR=tavus and a key and PAL are set; the customer still turns it on per call.
+    voice_avatar: Literal["off", "tavus"] = "off"
+    tavus_api_key: str | None = Field(
+        default=None, validation_alias=AliasChoices("TAVUS_APIKEY", "TAVUS_API_KEY")
+    )
+    # The echo PAL made by `pnpm tavus:setup`.
+    tavus_pal_id: str | None = None
+    tavus_face_id: str = ANNA
+    # Avatars at once across this process (the Tavus account's limits; each one bills).
+    tavus_max_live: int = 2
+    # Tavus doesn't join or bill test-mode conversations (tests only).
+    tavus_test_mode: bool = False
+
     # Turn-taking. Silence that ends the customer's turn (server VAD), and how long Xana waits
     # for answer audio before saying a filler.
     voice_end_silence_ms: int = 450
@@ -73,6 +89,10 @@ class VoiceSettings(BaseSettings):
     voice_max_turn_s: float = 45.0
     voice_max_tool_calls: int = 6
     voice_max_session_s: int = 20 * 60
+
+    @property
+    def avatar_ready(self) -> bool:
+        return self.voice_avatar == "tavus" and bool(self.tavus_api_key and self.tavus_pal_id)
 
     @property
     def is_dev(self) -> bool:

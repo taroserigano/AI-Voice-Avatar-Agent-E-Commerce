@@ -35,3 +35,28 @@ billed in all. Every conversation was ended by the script.
 - **Captions:** shift the player's clock by the time from the first chunk sent to
   `started_speaking`, plus ~150 ms.
 - **Barge-in:** drop our queued audio and send `conversation.interrupt`; silence in ~0.5 s.
+
+## A1 Server (2026-09-30)
+
+- [x] Settings in `services/voice/config.py`: `VOICE_AVATAR` (off by default), `TAVUS_APIKEY`
+      (or `TAVUS_API_KEY`), `TAVUS_PAL_ID`, `TAVUS_FACE_ID` (default Anna – Casual),
+      `TAVUS_MAX_LIVE` (2), `TAVUS_TEST_MODE`. Listed in `.env.example`.
+- [x] `face_tavus.py`: `TavusFace` creates a private conversation (`require_auth`, name
+      `xana-<conversation id>`, recording and captions off, `max_call_duration` = the voice
+      session limit) and ends it (two tries; 400/404 means already ended). A process-wide
+      limit on live avatars, reserved before the request so parallel starts can't overshoot.
+      `AvatarLink` handles `avatar.start` / `avatar.stop` per call and ends the avatar in the
+      call's `finally`. Any Tavus failure is `avatar.unavailable`, never a failed call.
+- [x] `app.py`: `ready.avatar` says whether video is available (and the Tavus notice);
+      `avatar.*` messages go to the link, everything else to the session.
+- [x] `pnpm tavus:setup` (`ai_commerce_voice/tavus_setup.py`): finds or creates the echo PAL
+      "Xana ai commerce echo" (Tavus strips punctuation from names, so names are compared
+      normalized). Created `p544a255f656` with Anna – Casual. The spike PALs and one duplicate
+      are deleted.
+- [x] Tests: `tests/unit/test_face_tavus.py` (12: no personal data in the request, key never
+      sent to the browser, ends exactly once on hang-up or Video off, retry on a failed end,
+      the live limit incl. parallel starts, failures mean no video, a server without video
+      says so). `tests/live/test_live_tavus.py` (`TAVUS_LIVE=1`): a real test-mode
+      conversation is created with a meeting token and ends. Both pass.
+- Screenshots of Anna talking, from a 40 s call on the real PAL: kept in the session scratchpad,
+  not committed.

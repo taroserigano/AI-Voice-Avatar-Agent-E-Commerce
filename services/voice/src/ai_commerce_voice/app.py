@@ -44,6 +44,7 @@ from ai_commerce_voice.brain import (
 )
 from ai_commerce_voice.config import VoiceSettings, get_settings
 from ai_commerce_voice.ears_openai import OpenAILiveEars
+from ai_commerce_voice.face_tavus import AvatarLink, TavusFace
 from ai_commerce_voice.fillers import all_phrases
 from ai_commerce_voice.mouth_cartesia import CartesiaMouth
 from ai_commerce_voice.ports import AgentEvent, TurnEnded
@@ -185,6 +186,22 @@ async def load_fillers(settings: VoiceSettings, clips: dict[str, FillerClip]) ->
     log.info("voice fillers ready: %d of %d", len(clips), len(all_phrases()))
 
 
+def make_face(settings: VoiceSettings, http: httpx.AsyncClient) -> TavusFace | None:
+    """Xana's avatar, when it's turned on for this server and configured."""
+    if not settings.avatar_ready:
+        return None
+    assert settings.tavus_api_key and settings.tavus_pal_id
+    return TavusFace(
+        settings.tavus_api_key,
+        pal_id=settings.tavus_pal_id,
+        face_id=settings.tavus_face_id,
+        http=http,
+        max_live=settings.tavus_max_live,
+        max_call_s=settings.voice_max_session_s,
+        test_mode=settings.tavus_test_mode,
+    )
+
+
 # --- per-call helpers -------------------------------------------------------------------------
 
 
@@ -304,6 +321,7 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
             limits=httpx.Limits(max_keepalive_connections=20),
         )
         state["fillers_task"] = asyncio.create_task(load_fillers(settings, state["fillers"]))
+        state["face"] = make_face(settings, state["http"])
         yield
         await state["http"].aclose()
         if pool is not None:
@@ -463,6 +481,7 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
             max_turn_s=settings.voice_max_turn_s,
         )
         session_ref["s"] = session
+        avatar = AvatarLink(state.get("face"), str(conv.id), send_json)
         await send_json(
             {
                 "type": "ready",
@@ -471,6 +490,7 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
                 "voice": {"provider": "cartesia", "name": settings.cartesia_voice_name},
                 "stt": {"provider": "openai", "model": settings.voice_stt_model},
                 "llm": {"model": pick.name, "simulated": pick.simulated},
+                "avatar": avatar.describe(),
                 "notice": NOTICE,
             }
         )
@@ -491,11 +511,16 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
                     elif (text := msg.get("text")) is not None:
                         with contextlib.suppress(json.JSONDecodeError):
                             parsed = json.loads(text)
-                            if isinstance(parsed, dict):
+                            if not isinstance(parsed, dict):
+                                continue
+                            if str(parsed.get("type", "")).startswith("avatar."):
+                                await avatar.on_message(parsed)
+                            else:
                                 await session.on_message(parsed)
         except (WebSocketDisconnect, TimeoutError):
             pass
         finally:
+            await avatar.close()
             await session.close()
             await ears.close()
             await mouth.close()
