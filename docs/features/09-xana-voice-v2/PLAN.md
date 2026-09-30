@@ -145,7 +145,7 @@ both ways, products 198 vs 197 of 200), at the same speed (median first words 2.
 
 ## Later (designed for, not built)
 
-- **Avatar**: a LiveKit avatar plugin joins the room as a video participant. Audio passes through untouched, so speech never waits on video.
+- **Avatar**: a LiveKit avatar plugin joins the room as a video participant. Audio passes through untouched, so speech never waits on video. Now planned with Tavus on today's stack: [plan 10](../10-xana-avatar/PLAN.md).
 - **Phone**: LiveKit SIP plus a carrier trunk. It needs a caller-verification step before any order tool, and a server-side confirmation path, because there is no browser.
 - **Cloud**: the API, workers and web on ECS/Fargate; media on LiveKit Cloud or EC2, because Fargate handles UDP port ranges badly.
 
