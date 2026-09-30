@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import time
 from pathlib import Path
@@ -68,6 +69,15 @@ def score(expect: dict[str, Any], got: dict[str, Any], client: httpx.Client) -> 
         checks["uses_details"] = "get_product_details" in tools
     if expect.get("expect_empty"):
         checks["empty"] = not products
+        if expect.get("must_not_claim_match"):
+            checks["acknowledges_no_match"] = bool(
+                re.search(
+                    r"\b(?:no exact match|no matching|none (?:of the .+ )?matched|"
+                    r"couldn['’]?t find|didn['’]?t find|cannot find|can['’]?t find)\b",
+                    got["text"],
+                    re.IGNORECASE,
+                )
+            )
     elif search and expect.get("all_results_match"):
 
         def ok(card: dict[str, Any]) -> bool:
@@ -85,7 +95,7 @@ def score(expect: dict[str, Any], got: dict[str, Any], client: httpx.Client) -> 
 
         checks["filters"] = bool(products) and all(ok(c) for c in products)
     constraints = expect.get("result_constraints") or {}
-    if constraints:
+    if constraints and not expect.get("expect_empty"):
 
         def detail_ok(card: dict[str, Any]) -> bool:
             detail = client.get(f"/api/v1/products/{card['id']}")

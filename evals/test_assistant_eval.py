@@ -54,3 +54,17 @@ def test_catalog_constraints_catch_wrong_allergen_and_specification() -> None:
         is False
     )
     assert score(expect, {**got, "tools": []}, client)["uses_catalog"] is False
+
+
+def test_empty_match_requires_an_honest_answer_not_product_details() -> None:
+    client = httpx.Client(base_url="http://test")
+    expect = {
+        "action": "search",
+        "expect_empty": True,
+        "must_not_claim_match": True,
+        "result_constraints": {"specs": {"Flavor": "Chocolate"}},
+    }
+    got = {"text": "I couldn't find an exact match.", "cards": [], "tools": ["search_products"]}
+    assert all(score(expect, got, client).values())
+    assert "result_constraints" not in score(expect, got, client)
+    assert score(expect, {**got, "text": "Here it is."}, client)["acknowledges_no_match"] is False

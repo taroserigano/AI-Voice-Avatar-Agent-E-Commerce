@@ -1,0 +1,54 @@
+# Xana golden sets
+
+Two sets of 200 questions each, scored against the live assistant:
+
+| File | What it covers |
+|---|---|
+| `products.jsonl` | Filtered searches (type, tags, exclusions, price), spec and size searches, honest "no match", facts about one named product (nutrition, specs, variant price, stock, options, ingredients), allergy questions, label meanings, "which has the most" and comparisons, multi-turn refinement. |
+| `returns.jsonl` | Return quotes with the exact refund in cents, ineligible returns (window, perishables, final sale, not delivered, canceled, already returned), items not on the account, clarifying questions, return and shipping policy with citations, return rules for kinds of items, refund status, safety (another customer's order, prompt injection, typed "yes", card numbers, exceptions), stores and drop-offs. |
+
+The questions are written by hand in `build_golden.py`. Every expected fact is read from the
+seed data (catalog, orders, stores, policy sections), so a golden answer can't be a typo.
+`services/commerce/tests/unit/test_xana_golden.py` checks the written files against the seed
+data on every test run. Rebuild after changing the seed data or the questions:
+
+```
+pnpm eval:xana:build
+```
+
+## Running
+
+Reseed first (`pnpm db:seed`) so order dates are relative to today, start the stack
+(`pnpm dev`), then:
+
+```
+pnpm eval:xana                     # chat (Xana on /support), both sets
+pnpm eval:xana:voice               # the voice brain, typed turns, no speech synthesized
+pnpm eval:xana -- --set returns --only xr-001,xr-010 --workers 8
+pnpm eval:xana -- --record-baseline   # evals/baselines/xana-<channel>-<set>-<model>.json
+```
+
+Each run writes every case's transcript (answer, tools, cards, quote, citations, and for voice
+the tool arguments) to `evals/xana/runs/`, which is gitignored. Use it to review failures.
+
+## How a case is scored
+
+From what the customer sees, not from the model's words alone. A quote must be the server's own
+quote for exactly the expected units and refund. Product cards must match the filters and the
+listing facts, read back from the product API. Facts are regular expressions that accept
+natural phrasings ("one-year" for "1-year", "1,000" for "1000"). A citation must be a section
+retrieved in the same turn. A case passes only if every check on every turn passes.
+
+When a check fails on a correct answer, fix the check in `build_golden.py` or
+`evals/xana_eval.py` and say why. Don't loosen it to hide a wrong answer.
+
+## Results (2026-09-29)
+
+| Channel | Model | Products | Returns |
+|---|---|---|---|
+| Chat | gpt-6-sol | 200/200 | 200/200 |
+| Voice | gpt-6-luna | 198/200 | 188/198 (2 typed-"yes" cases are chat-only) |
+
+The first runs on the new sets scored chat 188/200 and 174/200, and voice 161/200 and 177/200.
+Most voice misses left are short policy answers without a citation or with a detail left out
+(for example "30 days" without "after delivery").

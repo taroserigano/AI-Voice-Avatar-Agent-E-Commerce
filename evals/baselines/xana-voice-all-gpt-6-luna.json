@@ -1,0 +1,237 @@
+{
+  "agent": "xana",
+  "channel": "voice",
+  "model": "gpt-6-luna",
+  "sets": {
+    "products": {
+      "passed": 198,
+      "total": 200,
+      "accuracy": 0.99,
+      "categories": {
+        "allergy": [
+          11,
+          12
+        ],
+        "comparison": [
+          2,
+          2
+        ],
+        "filter_search": [
+          65,
+          65
+        ],
+        "ingredients": [
+          8,
+          8
+        ],
+        "labels": [
+          12,
+          12
+        ],
+        "multi_turn": [
+          6,
+          6
+        ],
+        "no_match": [
+          10,
+          10
+        ],
+        "product_facts": [
+          38,
+          38
+        ],
+        "spec_search": [
+          19,
+          20
+        ],
+        "stock": [
+          8,
+          8
+        ],
+        "superlative": [
+          8,
+          8
+        ],
+        "variant_price": [
+          7,
+          7
+        ],
+        "variants": [
+          4,
+          4
+        ]
+      },
+      "checks": {
+        "cites": [
+          12,
+          12
+        ],
+        "details": [
+          20,
+          21
+        ],
+        "empty": [
+          10,
+          10
+        ],
+        "facts": [
+          98,
+          99
+        ],
+        "filters": [
+          91,
+          91
+        ],
+        "no_error": [
+          208,
+          208
+        ],
+        "no_safety_claim": [
+          12,
+          12
+        ],
+        "nothing_wrong": [
+          3,
+          3
+        ],
+        "right_product": [
+          77,
+          77
+        ],
+        "right_winner": [
+          10,
+          10
+        ],
+        "says_no_match": [
+          10,
+          10
+        ],
+        "uses_catalog": [
+          188,
+          188
+        ]
+      },
+      "failed": [
+        "xp-070",
+        "xp-172"
+      ]
+    },
+    "returns": {
+      "passed": 188,
+      "total": 198,
+      "accuracy": 0.9495,
+      "categories": {
+        "clarify": [
+          7,
+          8
+        ],
+        "eligibility": [
+          1,
+          1
+        ],
+        "item_policy": [
+          12,
+          12
+        ],
+        "not_eligible": [
+          24,
+          26
+        ],
+        "not_found": [
+          4,
+          4
+        ],
+        "policy": [
+          57,
+          64
+        ],
+        "refund_status": [
+          10,
+          10
+        ],
+        "return_quote": [
+          50,
+          50
+        ],
+        "safety": [
+          13,
+          13
+        ],
+        "stores": [
+          10,
+          10
+        ]
+      },
+      "checks": {
+        "cites": [
+          75,
+          80
+        ],
+        "facts": [
+          137,
+          144
+        ],
+        "facts_any": [
+          1,
+          1
+        ],
+        "no_error": [
+          205,
+          205
+        ],
+        "no_quote": [
+          45,
+          45
+        ],
+        "no_refund_claim": [
+          5,
+          5
+        ],
+        "nothing_wrong": [
+          8,
+          8
+        ],
+        "offers_return": [
+          3,
+          3
+        ],
+        "person": [
+          4,
+          4
+        ],
+        "quote": [
+          45,
+          45
+        ],
+        "quote_lines": [
+          47,
+          47
+        ],
+        "quote_refund": [
+          47,
+          47
+        ],
+        "uses_get_refund_status": [
+          10,
+          10
+        ],
+        "uses_list_stores": [
+          10,
+          10
+        ]
+      },
+      "failed": [
+        "xr-057",
+        "xr-075",
+        "xr-084",
+        "xr-091",
+        "xr-095",
+        "xr-119",
+        "xr-121",
+        "xr-129",
+        "xr-141",
+        "xr-152"
+      ]
+    }
+  }
+}

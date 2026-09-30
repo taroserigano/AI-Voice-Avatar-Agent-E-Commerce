@@ -37,6 +37,9 @@
     "eval:search": "uv run --directory services/commerce python ../../evals/search_eval.py",
     "eval:planner": "uv run --directory services/planner python ../../evals/planner_eval.py",
     "eval:jev": "uv run --directory services/assistant python ../../evals/jev_eval.py",
-    "eval:assistant": "uv run --directory services/assistant python ../../evals/assistant_eval.py"
+    "eval:assistant": "uv run --directory services/assistant python ../../evals/assistant_eval.py",
+    "eval:xana": "uv run --directory services/assistant python ../../evals/xana_eval.py",
+    "eval:xana:voice": "uv run --directory services/voice python ../../evals/xana_eval.py --channel voice",
+    "eval:xana:build": "uv run --directory services/commerce python ../../evals/xana/build_golden.py"
   }
 }
