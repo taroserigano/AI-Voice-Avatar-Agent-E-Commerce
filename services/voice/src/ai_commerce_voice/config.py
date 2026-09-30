@@ -61,6 +61,10 @@ class VoiceSettings(BaseSettings):
     voice_llm_service_tier: Literal["default", "priority", "flex"] = "priority"
     # "auto": the real model when a key is set, the labeled scripted one otherwise.
     voice_llm_mode: Literal["auto", "openai", "scripted"] = "auto"
+    # The stronger model for the turns code escalates (decision 26, ai_commerce_voice.escalation).
+    # Empty: Luna answers every turn.
+    voice_escalation_model: str = "gpt-6-sol"
+    voice_escalation_reasoning: Literal["none", "low", "medium"] = "low"
 
     # Turn-taking. Silence that ends the customer's turn (server VAD), and how long Xana waits
     # for answer audio before saying a filler.

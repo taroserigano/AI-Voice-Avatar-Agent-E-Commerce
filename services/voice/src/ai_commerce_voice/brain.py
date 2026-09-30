@@ -55,6 +55,7 @@ from langgraph.graph.state import CompiledStateGraph
 from langgraph.prebuilt import ToolNode
 from langgraph.types import Command
 
+from ai_commerce_voice.escalation import TOOL_ERRORS, escalation_reason, tool_errors_this_turn
 from ai_commerce_voice.ports import AgentEvent, CardOut, QuoteOut, TextDelta, ToolStarted, TurnEnded
 from assistant.graph import _superseded_proposal, recent_history
 from assistant.tools import (
@@ -307,12 +308,18 @@ class VoiceContext:
     model: Runnable[Any, Any]
     bound: Runnable[Any, Any]
     max_tool_calls: int
+    # The stronger model for turns the escalation rules move up (decision 26), if any.
+    strong: Runnable[Any, Any] | None = None
+    strong_bound: Runnable[Any, Any] | None = None
+    strong_name: str | None = None
 
 
 class VoiceState(TypedDict, total=False):
     messages: Annotated[list[AnyMessage], add_messages]
     agent: str
     tool_calls_this_turn: int
+    # Why this turn is answered by the stronger model (ai_commerce_voice.escalation), or None.
+    escalated: str | None
 
 
 def _voice(config: RunnableConfig) -> VoiceContext:
@@ -327,7 +334,14 @@ async def agent(state: VoiceState, config: RunnableConfig) -> dict[str, Any]:
         return {}
     vc = _voice(config)
     used = state.get("tool_calls_this_turn", 0)
-    model = vc.bound if used < vc.max_tool_calls else vc.model
+    escalated = state.get("escalated")
+    if not escalated and tool_errors_this_turn(state["messages"]) >= TOOL_ERRORS:
+        escalated = "tool_errors"
+    model: Runnable[Any, Any] = vc.bound if used < vc.max_tool_calls else vc.model
+    strong = False
+    if escalated and vc.strong is not None and vc.strong_bound is not None:
+        strong = True
+        model = vc.strong_bound if used < vc.max_tool_calls else vc.strong
     messages: list[AnyMessage] = [
         SystemMessage(content=vc.system),
         *recent_history(state["messages"]),
@@ -343,8 +357,9 @@ async def agent(state: VoiceState, config: RunnableConfig) -> dict[str, Any]:
     calls = len(response.tool_calls) if isinstance(response, AIMessage) else 0
     usage = getattr(response, "usage_metadata", None) or {}
     log.info(
-        "voice model call: first chunk %.0f ms, done %.0f ms, %s in (%s cached), %s out "
+        "voice model call (%s): first chunk %.0f ms, done %.0f ms, %s in (%s cached), %s out "
         "(%s reasoning), %d tool calls",
+        f"{vc.strong_name}, {escalated}" if strong else "default",
         ((first or started) - started) * 1000,
         (time.perf_counter() - started) * 1000,
         usage.get("input_tokens"),
@@ -353,7 +368,7 @@ async def agent(state: VoiceState, config: RunnableConfig) -> dict[str, Any]:
         (usage.get("output_token_details") or {}).get("reasoning"),
         calls,
     )
-    return {"messages": [response], "tool_calls_this_turn": used + calls}
+    return {"messages": [response], "tool_calls_this_turn": used + calls, "escalated": escalated}
 
 
 def after_agent(state: VoiceState) -> str:
@@ -377,9 +392,19 @@ def make_context(
     system: str,
     max_tool_calls: int,
     bind_extra: dict[str, Any] | None = None,
+    strong: BaseChatModel | None = None,
+    strong_name: str | None = None,
 ) -> VoiceContext:
     bound = model.bind_tools(XANA_TOOLS, **(bind_extra or {}))
-    return VoiceContext(system=system, model=model, bound=bound, max_tool_calls=max_tool_calls)
+    return VoiceContext(
+        system=system,
+        model=model,
+        bound=bound,
+        max_tool_calls=max_tool_calls,
+        strong=strong,
+        strong_bound=strong.bind_tools(XANA_TOOLS, **(bind_extra or {})) if strong else None,
+        strong_name=strong_name,
+    )
 
 
 class XanaBrain:
@@ -423,6 +448,11 @@ class XanaBrain:
         mid = message_id or str(uuid.uuid4())
         messages: list[AnyMessage] = [HumanMessage(content=text, id=mid)]
         citable: dict[str, dict[str, Any]] = {}
+        history: list[AnyMessage] = []
+        if self.voice.strong is not None:
+            snapshot = await self.graph.aget_state(self._config())
+            history = [m for m in snapshot.values.get("messages", []) if m.id != mid]
+        escalated = escalation_reason(text, history)
         prefetched = await self._prefetch_policies(text, mid)
         if prefetched is not None:
             messages += prefetched
@@ -433,6 +463,7 @@ class XanaBrain:
             "messages": messages,
             "agent": "xana",
             "tool_calls_this_turn": 1 if prefetched else 0,
+            "escalated": escalated if self.voice.strong is not None else None,
         }
         async for ev in self._stream(graph_input, citable):
             yield ev

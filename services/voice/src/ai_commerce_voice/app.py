@@ -92,6 +92,9 @@ class ModelPick:
     model: BaseChatModel
     name: str
     simulated: bool
+    # The stronger model for escalated turns (decision 26), if configured.
+    strong: BaseChatModel | None = None
+    strong_name: str | None = None
 
 
 def pick_model(settings: VoiceSettings, http: httpx.AsyncClient) -> ModelPick:
@@ -103,22 +106,33 @@ def pick_model(settings: VoiceSettings, http: httpx.AsyncClient) -> ModelPick:
         return ModelPick(ScriptedChatModel(), SCRIPTED_MODEL_NAME, True)
     from langchain_openai import ChatOpenAI
 
-    model = ChatOpenAI(
-        model=settings.voice_llm_model,
-        api_key=settings.openai_api_key,
-        use_responses_api=True,
-        reasoning={"effort": settings.voice_llm_reasoning},
-        streaming=True,
-        max_retries=1,
-        timeout=20,
-        max_tokens=400,
-        http_async_client=http,
-        model_kwargs={
-            "prompt_cache_key": "xana-voice-v1",
-            "service_tier": settings.voice_llm_service_tier,
-        },
+    def chat_model(name: str, effort: str) -> BaseChatModel:
+        return ChatOpenAI(
+            model=name,
+            api_key=settings.openai_api_key,
+            use_responses_api=True,
+            reasoning={"effort": effort},
+            streaming=True,
+            max_retries=1,
+            timeout=20,
+            max_tokens=400 if effort in ("none", "low") else 1200,
+            http_async_client=http,
+            model_kwargs={
+                "prompt_cache_key": f"xana-voice-v1-{name}",
+                "service_tier": settings.voice_llm_service_tier,
+            },
+        )
+
+    strong_name = settings.voice_escalation_model or None
+    return ModelPick(
+        chat_model(settings.voice_llm_model, settings.voice_llm_reasoning),
+        settings.voice_llm_model,
+        False,
+        strong=chat_model(strong_name, settings.voice_escalation_reasoning)
+        if strong_name
+        else None,
+        strong_name=strong_name,
     )
-    return ModelPick(model, settings.voice_llm_model, False)
 
 
 # --- fillers ----------------------------------------------------------------------------------
@@ -418,6 +432,8 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
             ctx=ctx,
             voice=make_context(
                 pick.model,
+                strong=pick.strong,
+                strong_name=pick.strong_name,
                 system=system,
                 max_tool_calls=settings.voice_max_tool_calls,
                 bind_extra=extra,

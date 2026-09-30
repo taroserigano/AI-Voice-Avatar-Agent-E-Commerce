@@ -102,6 +102,17 @@ Limits: one Sol call per turn, at most three per call. A filler always plays fir
 not started speaking within 4 s, Luna's answer is used. Evals (V5) decide whether these rules
 earn their place.
 
+**Built early, on the current voice agent (2026-09-30):** `services/voice/src/ai_commerce_voice/escalation.py`.
+The dispute, "that's wrong" or repeated question, and two-failed-tools rules are in. The
+more-than-two-items rule isn't: the item count isn't known until the model has quoted. The
+limits above aren't built yet. An escalated turn uses Sol for all its model calls, and there's
+no 4 s fallback: measured, Sol started speaking no later than Luna on the same turns.
+
+Also measured, on the golden sets (`evals/xana`), and left out: escalating every return, refund,
+or policy question. That was 185 of 413 turns. It scored the same as Luna alone (returns 188/198
+both ways, products 198 vs 197 of 200), at the same speed (median first words 2.29 s vs
+2.32 s), and Sol costs more. Sol fixed some of Luna's misses and made others.
+
 ## Other layers
 
 | Layer | Plan |
