@@ -9,6 +9,7 @@ import { useVoiceAgent } from "@/lib/use-voice-agent";
 import { captionFor, dollars } from "@/lib/voice-captions";
 import type { QuoteCard } from "@/lib/voice-protocol";
 import { XanaAvatar } from "./xana-avatar";
+import { XanaLookPicker } from "./xana-look-picker";
 import { XanaOrb } from "./xana-orb";
 
 /**
@@ -120,7 +121,16 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstNa
           className="mt-4 rounded-full sm:mt-6"
           aria-label={!live ? "Start talking to Xana" : state === "speaking" ? "Interrupt Xana" : "Xana is listening"}
         >
-          {face ? <XanaAvatar stream={face} state={state} /> : <XanaOrb state={state} level={level} />}
+          {face ? (
+            <XanaAvatar
+              stream={face}
+              state={state}
+              greenscreen={voice.avatar.greenscreen}
+              background={voice.avatar.background}
+            />
+          ) : (
+            <XanaOrb state={state} level={level} />
+          )}
         </button>
 
         <div aria-live="polite" className="mt-1 min-h-20">
@@ -174,6 +184,17 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstNa
             unclear={confirmDecision === "unclear"}
             onConfirm={() => void onConfirm(quote)}
             onDecline={() => quoteOutcome(quote.quote_id, "declined")}
+          />
+        ) : null}
+
+        {live && voice.avatar.wanted ? (
+          <XanaLookPicker
+            looks={voice.avatar.looks}
+            look={voice.avatar.look}
+            background={voice.avatar.background.key}
+            busy={voice.avatar.status === "starting"}
+            onLook={voice.chooseLook}
+            onBackground={voice.chooseBackground}
           />
         ) : null}
 

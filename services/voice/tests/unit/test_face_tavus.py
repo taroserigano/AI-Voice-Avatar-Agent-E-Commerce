@@ -10,6 +10,7 @@ from typing import Any
 import httpx
 import pytest
 
+from ai_commerce_voice.config import LOOKS, Look
 from ai_commerce_voice.face_tavus import AvatarLink, AvatarUnavailable, TavusFace
 
 KEY = "tavus-secret-key"
@@ -106,6 +107,8 @@ def test_the_key_never_reaches_the_browser() -> None:
         "conversation_id": "c1",
         "url": "https://tavus.daily.co/c1",
         "token": "token-c1",
+        "look": None,
+        "greenscreen": False,
     }
     assert KEY not in json.dumps(browser.sent)
 
@@ -236,3 +239,68 @@ def test_a_server_without_video_says_so() -> None:
     link = run(go())
     assert link.describe() == {"available": False}
     assert browser.sent == [{"type": "avatar.unavailable", "reason": "not_configured"}]
+
+
+ROSE = Look("rose", "Rose", "face-rose")
+MARGO = Look("margo", "Margo", "face-margo")
+
+
+def looked(fake: FakeTavus, browser: Browser) -> AvatarLink:
+    return AvatarLink(face(fake), "conv-1", browser, looks=(ROSE, MARGO), default_look="rose")
+
+
+def test_a_look_picks_its_face_and_the_green_screen() -> None:
+    fake = FakeTavus()
+    browser = Browser()
+
+    async def go() -> None:
+        await looked(fake, browser).on_message({"type": "avatar.start", "look": "margo"})
+
+    run(go())
+    (body,) = fake.bodies()
+    assert body["face_id"] == "face-margo"
+    assert body["properties"]["apply_greenscreen"] is True
+    assert browser.sent[0]["look"] == "margo" and browser.sent[0]["greenscreen"] is True
+
+
+def test_the_browser_cant_ask_for_an_arbitrary_face() -> None:
+    fake = FakeTavus()
+    browser = Browser()
+
+    async def go() -> None:
+        link = looked(fake, browser)
+        await link.on_message({"type": "avatar.start", "look": "r-someone-elses-face"})
+        await link.on_message({"type": "avatar.start", "face_id": "r-someone-elses-face"})
+
+    run(go())
+    assert [b["face_id"] for b in fake.bodies()] == ["face-rose"]  # the default, once
+
+
+def test_switching_looks_ends_the_old_room_first() -> None:
+    fake = FakeTavus()
+    browser = Browser()
+
+    async def go() -> None:
+        link = looked(fake, browser)
+        await link.on_message({"type": "avatar.start", "look": "rose"})
+        await link.on_message({"type": "avatar.start", "look": "margo"})
+        await link.close()
+
+    run(go())
+    assert [b["face_id"] for b in fake.bodies()] == ["face-rose", "face-margo"]
+    assert fake.ends() == ["/v2/conversations/c1/end", "/v2/conversations/c2/end"]
+    assert [m["look"] for m in browser.sent if m["type"] == "avatar"] == ["rose", "margo"]
+
+
+def test_the_ready_message_lists_the_looks() -> None:
+    link = looked(FakeTavus(), Browser())
+    offer = link.describe()
+    assert offer["looks"] == [{"key": "rose", "label": "Rose"}, {"key": "margo", "label": "Margo"}]
+    assert offer["default_look"] == "rose"
+    assert "face-rose" not in str(offer) and "face-margo" not in str(offer)  # ids stay server-side
+
+
+def test_every_look_can_take_a_background() -> None:
+    # Tavus's green screen doesn't work on Phoenix-4.5 faces; every listed look must allow it.
+    assert LOOKS and all(look.greenscreen for look in LOOKS)
+    assert len({look.key for look in LOOKS}) == len(LOOKS)

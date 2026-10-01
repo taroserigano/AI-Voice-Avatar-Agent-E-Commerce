@@ -9,6 +9,7 @@ import {
   splitAudioFrame,
   type Citation,
   type ClientMessage,
+  type AvatarLook,
   type AvatarOffer,
   type QuoteCard,
   type ServerMessage,
@@ -17,6 +18,7 @@ import {
 import { CAPTURE_WORKLET, PLAYBACK_WORKLET, addWorklet } from "./voice-worklets";
 import { AvatarEcho } from "./avatar-echo";
 import { useXanaAvatar, type AvatarStatus } from "./use-xana-avatar";
+import { DEFAULT_BACKGROUND, backgroundFor, loadPrefs, savePrefs, type Background } from "./xana-looks";
 
 /**
  * The Xana voice session in the browser: one WebSocket to the voice agent, the microphone
@@ -39,6 +41,10 @@ export type VoiceAvatar = {
   status: AvatarStatus;
   stream: MediaStream | null;
   error: string | null;
+  looks: AvatarLook[];
+  look: string | null;
+  background: Background;
+  greenscreen: boolean;
 };
 
 export type VoiceAgent = {
@@ -65,6 +71,8 @@ export type VoiceAgent = {
   quoteOutcome: (quoteId: string, outcome: "confirmed" | "declined") => void;
   avatar: VoiceAvatar;
   setVideo: (on: boolean) => void;
+  chooseLook: (key: string) => void;
+  chooseBackground: (key: string) => void;
 };
 
 export function voiceSocketUrl(): string {
@@ -104,6 +112,11 @@ export function useVoiceAgent(conversationId?: string | null): VoiceAgent {
   // segments it's playing (the rest play locally).
   const [avatarWanted, setAvatarWanted] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
+  // The customer's picks (remembered in this browser) and whether the room is on a green
+  // screen (then the background is drawn behind her).
+  const [look, setLook] = useState<string | null>(null);
+  const [backgroundKey, setBackgroundKey] = useState(DEFAULT_BACKGROUND);
+  const [greenscreen, setGreenscreen] = useState(false);
   const echoRef = useRef<AvatarEcho | null>(null);
   const echoOnRef = useRef(false);
   const echoSegsRef = useRef<Set<number>>(new Set());
@@ -233,6 +246,8 @@ export function useVoiceAgent(conversationId?: string | null): VoiceAgent {
           break;
         case "avatar":
           avatarRoomRef.current = msg.conversation_id;
+          setLook(msg.look);
+          setGreenscreen(msg.greenscreen);
           void avatarRef.current.join({ url: msg.url, token: msg.token });
           break;
         case "avatar.unavailable":
@@ -402,15 +417,39 @@ export function useVoiceAgent(conversationId?: string | null): VoiceAgent {
       setAvatarError(null);
       setAvatarWanted(on);
       if (on) {
-        send({ type: "avatar.start" });
+        const prefs = loadPrefs();
+        const offered = ready?.avatar?.available ? (ready.avatar.looks ?? []) : [];
+        const pick = offered.some((l) => l.key === prefs.look) ? prefs.look : undefined;
+        if (prefs.background) setBackgroundKey(backgroundFor(prefs.background).key);
+        send({ type: "avatar.start", look: pick });
         return;
       }
       dropEcho();
       void avatarRef.current.leave();
       send({ type: "avatar.stop" });
     },
-    [dropEcho, send],
+    [dropEcho, send, ready],
   );
+
+  /** A new face: a new video room (a few seconds). Whatever she was saying is cut off. */
+  const chooseLook = useCallback(
+    (key: string) => {
+      setLook(key);
+      savePrefs({ ...loadPrefs(), look: key });
+      if (!avatarWanted) return;
+      dropEcho();
+      void avatarRef.current.leave();
+      send({ type: "avatar.start", look: key });
+    },
+    [avatarWanted, dropEcho, send],
+  );
+
+  /** A new background: drawn in the browser, so it changes at once. */
+  const chooseBackground = useCallback((key: string) => {
+    const bg = backgroundFor(key);
+    setBackgroundKey(bg.key);
+    savePrefs({ ...loadPrefs(), background: bg.key });
+  }, []);
 
   // What the customer has heard through the face: captions, and segments played in full.
   useEffect(() => {
@@ -469,7 +508,13 @@ export function useVoiceAgent(conversationId?: string | null): VoiceAgent {
       status: avatar.status,
       stream: avatar.stream,
       error: avatarError,
+      looks: ready?.avatar?.available ? (ready.avatar.looks ?? []) : [],
+      look,
+      background: backgroundFor(backgroundKey),
+      greenscreen,
     },
     setVideo,
+    chooseLook,
+    chooseBackground,
   };
 }

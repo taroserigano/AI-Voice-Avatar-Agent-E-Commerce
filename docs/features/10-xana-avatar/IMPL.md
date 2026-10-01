@@ -114,3 +114,30 @@ Golden sets, voice channel, gpt-6-luna (products /200, returns /198):
 | v3, rules tightened | 198 | 192 | Tone mostly stock openers ("Good news!", "Happy to help!"), almost no jokes. |
 | v3, cheer asked for | 198 | 190 | "Great pick!" 51 times (copied from the example), "Oh no" 32 times, one emoji. |
 | **v3, final** | 195 | 188 | Varied openers; about 1 reply in 5 openly cheerful, plus small jokes ("Great pick for a cozy puzzle night!", "Glad that's settled!"). Same total as v2 (383 vs 384); runs vary by about ±3. |
+
+## Looks and backgrounds (2026-09-30)
+
+Taro: a lighter, more casual background, and tabs to choose the background and the model.
+
+- Tavus can't change a background on Phoenix-4.5 faces, so every look is a **Phoenix-4** face
+  with `apply_greenscreen`: Rose (`r6c7a6cb6d9b`, default), Margo, Julia, Helen, Miranda
+  (`config.LOOKS`). The browser sends a look key; the server maps it to a face (an unknown key
+  gets the default), so a face id never comes from the browser. A new look ends the old room
+  before opening the next.
+- The browser keys out the green on the GPU (`lib/green-screen.ts`: soft key + despill, tuned
+  on a real frame) and draws the chosen background: Sunlit room (default), Café, Mint,
+  Lavender, Night. They're generated, soft-focus images (`scripts/xana_backgrounds.py`,
+  8-17 KB each). Without WebGL the plain video shows.
+- `XanaLookPicker`: two radio rows under the video. A background changes instantly; a look
+  takes about 3 s (new room). Picks are remembered in the browser (`lib/xana-looks.ts`).
+- Tests: 5 more server tests (look → face and green screen, no arbitrary faces, switching ends
+  the old room, the ready message lists looks without face ids, every look allows a
+  background), 4 web tests (background fallback, remembered picks, no storage, junk). Voice 67,
+  web 185 pass.
+- **First live end-to-end run of Video** (this branch's web on :3200 and voice on :8203
+  against the integration stack, headless Chromium with a fake microphone saying "Hi Xana,
+  what time does the uptown store close today?"): video offered, Rose live on Sunlit room,
+  the question heard, Xana answered through the avatar ("One moment! The Uptown store closes
+  at 11 PM today. Plenty of time for a snack run!"), the call returned to listening on Tavus's
+  playback reports, Café applied at once, Margo came up in a new room, then Mint.
+  [screenshots/looks-and-backgrounds.png](screenshots/looks-and-backgrounds.png)

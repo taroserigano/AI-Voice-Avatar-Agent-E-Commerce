@@ -42,7 +42,7 @@ from ai_commerce_voice.brain import (
     orders_snapshot,
     system_prompt,
 )
-from ai_commerce_voice.config import VoiceSettings, get_settings
+from ai_commerce_voice.config import LOOKS, VoiceSettings, get_settings
 from ai_commerce_voice.ears_openai import OpenAILiveEars
 from ai_commerce_voice.face_tavus import AvatarLink, TavusFace
 from ai_commerce_voice.fillers import all_phrases
@@ -481,7 +481,13 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
             max_turn_s=settings.voice_max_turn_s,
         )
         session_ref["s"] = session
-        avatar = AvatarLink(state.get("face"), str(conv.id), send_json)
+        avatar = AvatarLink(
+            state.get("face"),
+            str(conv.id),
+            send_json,
+            looks=LOOKS,
+            default_look=settings.tavus_default_look,
+        )
         await send_json(
             {
                 "type": "ready",

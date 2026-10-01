@@ -28,6 +28,8 @@ from typing import Any, Literal
 
 import httpx
 
+from ai_commerce_voice.config import Look
+
 log = logging.getLogger(__name__)
 
 TAVUS_API = "https://tavusapi.com"
@@ -48,10 +50,17 @@ class AvatarRoom:
     url: str
     token: str | None
     opened_at: float
+    look: Look | None = None
 
 
 def conversation_request(
-    *, pal_id: str, face_id: str, conversation_id: str, max_call_s: int, test_mode: bool
+    *,
+    pal_id: str,
+    face_id: str,
+    conversation_id: str,
+    max_call_s: int,
+    test_mode: bool,
+    greenscreen: bool = False,
 ) -> dict[str, Any]:
     """The create-conversation body. Nothing about the customer goes in it."""
     body: dict[str, Any] = {
@@ -68,6 +77,9 @@ def conversation_request(
             "enable_closed_captions": False,
         },
     }
+    if greenscreen:
+        # Solid green behind her; the browser swaps in the background the customer picked.
+        body["properties"]["apply_greenscreen"] = True
     if test_mode:
         body["test_mode"] = True
     return body
@@ -108,7 +120,7 @@ class TavusFace:
     def live(self) -> int:
         return len(self._live) + self._reserved
 
-    async def open(self, conversation_id: str) -> AvatarRoom:
+    async def open(self, conversation_id: str, look: Look | None = None) -> AvatarRoom:
         async with self._lock:
             if self.live >= self._max_live:
                 raise AvatarUnavailable("busy")
@@ -119,10 +131,11 @@ class TavusFace:
                 headers=self._headers,
                 json=conversation_request(
                     pal_id=self._pal_id,
-                    face_id=self.face_id,
+                    face_id=look.face_id if look else self.face_id,
                     conversation_id=conversation_id,
                     max_call_s=self._max_call_s,
                     test_mode=self._test_mode,
+                    greenscreen=bool(look and look.greenscreen),
                 ),
                 timeout=httpx.Timeout(10, connect=5),
             )
@@ -133,6 +146,7 @@ class TavusFace:
                 url=str(data["conversation_url"]),
                 token=data.get("meeting_token"),
                 opened_at=self._clock(),
+                look=look,
             )
         except (httpx.HTTPError, KeyError, ValueError) as exc:
             log.warning("tavus: couldn't start the avatar: %s", _describe(exc))
@@ -183,12 +197,25 @@ SendJson = Callable[[dict[str, Any]], Awaitable[None]]
 
 
 class AvatarLink:
-    """One call's avatar: handles ``avatar.start`` / ``avatar.stop`` from the browser."""
+    """One call's avatar: handles ``avatar.start`` / ``avatar.stop`` from the browser.
 
-    def __init__(self, face: TavusFace | None, conversation_id: str, send_json: SendJson) -> None:
+    ``avatar.start`` may name a look; only looks on the server's list are used (an unknown
+    one gets the default), so the browser can't ask for an arbitrary face. Starting with a
+    different look while a room is open ends that room and opens a new one."""
+
+    def __init__(
+        self,
+        face: TavusFace | None,
+        conversation_id: str,
+        send_json: SendJson,
+        looks: tuple[Look, ...] = (),
+        default_look: str | None = None,
+    ) -> None:
         self._face = face
         self._conversation_id = conversation_id
         self._send = send_json
+        self._looks = {look.key: look for look in looks}
+        self._default = self._looks.get(default_look or "") or (looks[0] if looks else None)
         self._room: AvatarRoom | None = None
         self._lock = asyncio.Lock()
 
@@ -200,23 +227,33 @@ class AvatarLink:
         """What the ``ready`` message says about video."""
         if self._face is None:
             return {"available": False}
-        return {"available": True, "provider": self._face.name, "notice": NOTICE}
+        return {
+            "available": True,
+            "provider": self._face.name,
+            "notice": NOTICE,
+            "looks": [{"key": look.key, "label": look.label} for look in self._looks.values()],
+            "default_look": self._default.key if self._default else None,
+        }
 
     async def on_message(self, msg: dict[str, Any]) -> None:
         kind = msg.get("type")
         if kind == "avatar.start":
-            await self._start()
+            await self._start(self._looks.get(str(msg.get("look") or "")) or self._default)
         elif kind == "avatar.stop":
             await self._stop(tell=True)
 
-    async def _start(self) -> None:
+    async def _start(self, look: Look | None) -> None:
         async with self._lock:
             if self._face is None:
                 await self._send({"type": "avatar.unavailable", "reason": "not_configured"})
                 return
+            if self._room is not None and self._room.look != look:
+                # A new look: end this room (billing stops) before opening the next.
+                await self._face.close(self._room)
+                self._room = None
             if self._room is None:
                 try:
-                    self._room = await self._face.open(self._conversation_id)
+                    self._room = await self._face.open(self._conversation_id, look)
                 except AvatarUnavailable as exc:
                     await self._send({"type": "avatar.unavailable", "reason": exc.reason})
                     return
@@ -227,6 +264,8 @@ class AvatarLink:
                     "conversation_id": self._room.conversation_id,
                     "url": self._room.url,
                     "token": self._room.token,
+                    "look": look.key if look else None,
+                    "greenscreen": bool(look and look.greenscreen),
                 }
             )
 

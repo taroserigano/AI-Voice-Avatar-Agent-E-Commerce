@@ -65,11 +65,25 @@ export type ServerMessage =
   | { type: "confirm.result"; decision: "yes" | "no" | "unclear"; quote_id: string }
   | { type: "error"; message: string; fatal?: boolean }
   /** The private Tavus room for this call, for this customer only. */
-  | { type: "avatar"; provider: "tavus"; conversation_id: string; url: string; token: string | null }
+  | {
+      type: "avatar";
+      provider: "tavus";
+      conversation_id: string;
+      url: string;
+      token: string | null;
+      /** Which look this room shows, and whether it's on a green screen (the browser then
+       *  puts the chosen background behind her). */
+      look: string | null;
+      greenscreen: boolean;
+    }
   | { type: "avatar.unavailable"; reason: "not_configured" | "busy" | "error" }
   | { type: "avatar.ended" };
 
-export type AvatarOffer = { available: false } | { available: true; provider: "tavus"; notice: string };
+export type AvatarLook = { key: string; label: string };
+
+export type AvatarOffer =
+  | { available: false }
+  | { available: true; provider: "tavus"; notice: string; looks?: AvatarLook[]; default_look?: string | null };
 
 export type ClientMessage =
   | { type: "hello"; conversation_id?: string | null; mic_rate: number; speech_rate: number }
@@ -78,7 +92,7 @@ export type ClientMessage =
   | { type: "interrupt" }
   | { type: "text"; text: string }
   | { type: "quote.outcome"; quote_id: string; outcome: "confirmed" | "declined" }
-  | { type: "avatar.start" }
+  | { type: "avatar.start"; look?: string }
   | { type: "avatar.stop" };
 
 export function parseServerMessage(raw: string): ServerMessage | null {

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from typing import Literal
@@ -16,6 +17,27 @@ SKYLAR = "db6b0ed5-d5d3-463d-ae85-518a07d3c2b4"
 # Tavus stock face "Rose - Business" (Phoenix-4.5): Taro asked for a customer-support look
 # (2026-09-30; it replaced "Anna - Casual", rc9cff32ceba).
 ROSE = "rf1bd7e252de"
+
+
+@dataclass(frozen=True)
+class Look:
+    """A face the customer can pick for Xana. Phoenix-4 faces, because Tavus's green screen
+    (which lets the browser put a light background behind her) doesn't work on Phoenix-4.5."""
+
+    key: str
+    label: str
+    face_id: str
+    greenscreen: bool = True
+
+
+# Taro (2026-09-30): pick the look and the background from tabs on the screen.
+LOOKS: tuple[Look, ...] = (
+    Look("rose", "Rose", "r6c7a6cb6d9b"),
+    Look("margo", "Margo", "r78c9b897fbc"),
+    Look("julia", "Julia", "rd27826c12a6"),
+    Look("helen", "Helen", "r12d3eb75ec2"),
+    Look("miranda", "Miranda", "r3cb75621574"),
+)
 
 
 class VoiceSettings(BaseSettings):
@@ -80,6 +102,8 @@ class VoiceSettings(BaseSettings):
     tavus_face_id: str = ROSE
     # Avatars at once across this process (the Tavus account's limits; each one bills).
     tavus_max_live: int = 2
+    # The look a call starts with (a key of LOOKS); the customer can switch on screen.
+    tavus_default_look: str = "rose"
     # Tavus doesn't join or bill test-mode conversations (tests only).
     tavus_test_mode: bool = False
 
