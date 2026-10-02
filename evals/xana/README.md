@@ -1,4 +1,4 @@
-# Xana golden sets
+# Xena golden sets
 
 Two sets of 200 questions each, scored against the live assistant:
 
@@ -22,7 +22,7 @@ Reseed first (`pnpm db:seed`) so order dates are relative to today, start the st
 (`pnpm dev`), then:
 
 ```
-pnpm eval:xana                     # chat (Xana on /support), both sets
+pnpm eval:xana                     # chat (Xena on /support), both sets
 pnpm eval:xana:voice               # the voice brain, typed turns, no speech synthesized
 pnpm eval:xana -- --set returns --only xr-001,xr-010 --workers 8
 pnpm eval:xana -- --record-baseline   # evals/baselines/xana-<channel>-<set>-<model>.json

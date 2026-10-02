@@ -136,7 +136,7 @@ class SearchCard(BaseModel):
 
 
 class XanaCard(BaseModel):
-    """A pointer to Xana, the support assistant, for returns and refunds."""
+    """A pointer to Xena, the support assistant, for returns and refunds."""
 
     kind: Literal["xana"] = "xana"
     about: str

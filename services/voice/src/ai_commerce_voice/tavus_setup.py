@@ -1,4 +1,4 @@
-"""``pnpm tavus:setup``: make (or find) Xana's echo PAL on Tavus and print its id.
+"""``pnpm tavus:setup``: make (or find) Xena's echo PAL on Tavus and print its id.
 
 Nothing creates Tavus resources at runtime; this is the one explicit step. The PAL is echo
 mode (Tavus renders the face; our pipeline supplies every word), with the microphone off
@@ -51,12 +51,12 @@ def main() -> int:
                 and pal.get("pipeline_mode") == "echo"
             ):
                 pal_id = pal["pal_id"]
-                print(f"Found Xana's PAL for face {s.tavus_face_id}.")
+                print(f"Found Xena's PAL for face {s.tavus_face_id}.")
                 break
         else:
             made = http.post("/v2/pals", json=pal_request(s.tavus_face_id)).raise_for_status()
             pal_id = made.json()["pal_id"]
-            print(f"Created Xana's PAL for face {s.tavus_face_id}.")
+            print(f"Created Xena's PAL for face {s.tavus_face_id}.")
     print(f"TAVUS_PAL_ID={pal_id}")
     if s.tavus_pal_id != pal_id or s.voice_avatar != "tavus":
         print("Add these to .env:\n  VOICE_AVATAR=tavus\n  TAVUS_PAL_ID=" + pal_id)

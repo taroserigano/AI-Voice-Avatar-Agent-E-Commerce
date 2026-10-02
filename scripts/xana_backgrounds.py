@@ -1,4 +1,4 @@
-"""Make the backgrounds the customer can put behind Xana's face (docs/features/10-xana-avatar).
+"""Make the backgrounds the customer can put behind Xena's face (docs/features/10-xana-avatar).
 
 Soft, defocused "rooms" and washes, like a camera's background blur, so they read as light and
 casual without looking like a photo someone has to license. Run:
@@ -37,7 +37,7 @@ def sunlit(d: ImageDraw.ImageDraw) -> None:
 def cafe(d: ImageDraw.ImageDraw) -> None:
     """Warm café lights."""
     d.rectangle([0, 0, W, H], fill=(245, 232, 218))
-    r = random.Random(4)
+    r = random.Random(4)  # noqa: S311 - a fixed seed for a repeatable picture, not security
     for _ in range(26):
         x, y, s = r.randint(0, W), r.randint(0, H), r.randint(40, 140)
         tone = r.choice([(255, 226, 180), (255, 244, 226), (236, 200, 160), (250, 214, 196)])
@@ -78,7 +78,8 @@ def main() -> None:
     for key, (draw, blur) in BACKGROUNDS.items():
         im = Image.new("RGB", (W, H))
         draw(ImageDraw.Draw(im))
-        im.filter(ImageFilter.GaussianBlur(blur)).save(OUT / f"{key}.jpg", quality=86, optimize=True)
+        out = im.filter(ImageFilter.GaussianBlur(blur))
+        out.save(OUT / f"{key}.jpg", quality=86, optimize=True)
         print(key, (OUT / f"{key}.jpg").stat().st_size // 1024, "KB")
 
 

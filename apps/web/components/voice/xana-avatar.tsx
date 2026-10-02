@@ -7,7 +7,7 @@ import type { Background } from "@/lib/xana-looks";
 import type { VoiceStateName } from "@/lib/voice-protocol";
 
 /**
- * Xana's face (Tavus) where the orb was: her live video and voice, on the same dark stage,
+ * Xena's face (Tavus) where the orb was: her live video and voice, on the same dark stage,
  * with a soft glow that follows the call's state like the orb's rings did. When Tavus renders
  * her on a green screen, the chosen background is drawn behind her (lib/green-screen.ts).
  * The state is announced in text beside it, so the video itself is decorative for screen
@@ -85,7 +85,7 @@ export function XanaAvatar({
       )}
     >
       {/* Plays her voice; hidden under the keyed canvas when there is one. */}
-      <video ref={video} autoPlay playsInline aria-label="Xana avatar"
+      <video ref={video} autoPlay playsInline aria-label="Xena avatar"
         onPlaying={() => { setBlocked(false); onPlaying(); }}
         onPause={onStopped} onError={onStopped}
         className="absolute inset-0 size-full object-cover" />

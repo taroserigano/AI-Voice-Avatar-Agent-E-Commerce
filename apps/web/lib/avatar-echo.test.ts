@@ -26,7 +26,7 @@ function setup() {
   };
 }
 
-describe("Xana's audio reaches Tavus", () => {
+describe("Xena's audio reaches Tavus", () => {
   it("sends a turn under one id and closes it with a silent done chunk", () => {
     const s = setup();
     s.echo.segmentStart(1, "filler");
@@ -194,7 +194,7 @@ describe("what the customer has heard", () => {
   });
 });
 
-describe("talking over Xana", () => {
+describe("talking over Xena", () => {
   it("interrupts Tavus, stops sending, and lets the next turn go at once", () => {
     const s = setup();
     s.echo.segmentStart(1, "answer");

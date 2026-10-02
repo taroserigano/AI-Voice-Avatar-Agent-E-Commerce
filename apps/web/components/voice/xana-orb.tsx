@@ -4,7 +4,7 @@ import { cn } from "@/lib/cn";
 import type { VoiceStateName } from "@/lib/voice-protocol";
 
 /**
- * Xana's orb: a glassy rounded square inside two faint rings, with three orbiting motes.
+ * Xena's orb: a glassy rounded square inside two faint rings, with three orbiting motes.
  * It swells with the customer's voice while she listens and with her own voice while she
  * speaks, and pulses slowly while she thinks. Decorative: the state is announced in text.
  */

@@ -1,7 +1,7 @@
 [project]
 name = "ai-commerce-voice"
 version = "0.1.0"
-description = "Xana's real-time voice agent: streaming speech-to-text, a LangGraph support agent, and Cartesia speech over one WebSocket"
+description = "Xena's real-time voice agent: streaming speech-to-text, a LangGraph support agent, and Cartesia speech over one WebSocket"
 requires-python = ">=3.12"
 dependencies = [
     "pydantic==2.13.5",

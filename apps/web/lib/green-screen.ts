@@ -1,5 +1,5 @@
 /**
- * Puts a background behind Xana's face: Tavus renders her on a solid green screen
+ * Puts a background behind Xena's face: Tavus renders her on a solid green screen
  * (`apply_greenscreen`, roughly rgb(0, 255, 155)), and this keys the green out on the GPU and
  * draws the chosen background in its place, every video frame.
  *

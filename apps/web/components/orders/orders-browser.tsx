@@ -34,7 +34,7 @@ const EMPTY: Record<OrderFilter, string> = {
   all: "No orders yet.",
   in_progress: "Nothing on the way right now. Everything you've ordered has arrived.",
   delivered: "No delivered orders yet.",
-  returns: "No returns yet. Start one from an order's page, or ask Xana on the Support page.",
+  returns: "No returns yet. Start one from an order's page, or ask Xena on the Support page.",
 };
 
 /** Keep a list setting in the URL so it survives a refresh and can be linked to. */
@@ -279,7 +279,7 @@ function ReturnSummaryCard({ ret }: { ret: ReturnOut }) {
             {refund.detail ? <p className="mt-0.5 text-xs text-muted">{refund.detail}</p> : null}
             <ButtonLink href={`/support?order=${ret.order_id}`} variant="ghost" size="sm" className="mt-2 -mr-2 text-brand-700">
               <ChatIcon className="size-4" />
-              Ask Xana about it<span className="sr-only"> (return {ret.rma_number})</span>
+              Ask Xena about it<span className="sr-only"> (return {ret.rma_number})</span>
             </ButtonLink>
           </div>
         </div>

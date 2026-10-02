@@ -186,10 +186,10 @@ const FAQS: { id: string; q: string; a: ReactNode }[] = [
   { id: "faq-store-pickup", q: "Can I pick up an online order at a store?", a: "Not yet. Online orders are always delivered." },
   {
     id: "faq-assistants",
-    q: "Who are Steph and Xana?",
+    q: "Who are Steph and Xena?",
     a: (
       <>
-        Steph is our shopping assistant: she finds products, checks your orders, and answers policy questions. Xana
+        Steph is our shopping assistant: she finds products, checks your orders, and answers policy questions. Xena
         helps with orders, delivery, returns, and refunds by voice or text on the{" "}
         <Link href="/support" className={inlineLink}>
           Support page
@@ -278,7 +278,7 @@ export default function HelpCenterPage() {
           How can we help?
         </h1>
         <p className="mt-4 max-w-2xl text-lg text-ink-soft">
-          Find answers about returns, delivery, orders, and stores, or ask Steph and Xana. They&apos;re here any
+          Find answers about returns, delivery, orders, and stores, or ask Steph and Xena. They&apos;re here any
           time.
         </p>
         <HelpSearch entries={helpEntries()} className="mt-6">
@@ -286,7 +286,7 @@ export default function HelpCenterPage() {
             <OpenStephButton>Ask Steph</OpenStephButton>
             <ButtonLink href="/support" variant="outline">
               <MicIcon className="size-4.5" />
-              Talk to Xana
+              Talk to Xena
             </ButtonLink>
           </div>
         </HelpSearch>
@@ -381,7 +381,7 @@ export default function HelpCenterPage() {
             </ol>
             <p className="mt-3 text-sm text-muted">
               If the carrier reports a problem, the order shows{" "}
-              <strong className="font-semibold text-ink">{shipmentStatusLabel("exception")}</strong>. Xana can look into
+              <strong className="font-semibold text-ink">{shipmentStatusLabel("exception")}</strong>. Xena can look into
               it for you.
             </p>
           </Card>
@@ -459,7 +459,7 @@ export default function HelpCenterPage() {
         <div className="mt-8 grid gap-8 lg:grid-cols-2">
           <div>
             <h3 className="font-semibold text-white">Ask an assistant, any time</h3>
-            <p className="mt-1">Steph helps you shop. Xana helps with orders, delivery, and returns by voice or text.</p>
+            <p className="mt-1">Steph helps you shop. Xena helps with orders, delivery, and returns by voice or text.</p>
             <div className="mt-5 flex flex-wrap gap-3">
               <OpenStephButton variant="inverse">Ask Steph</OpenStephButton>
               <ButtonLink
@@ -468,7 +468,7 @@ export default function HelpCenterPage() {
                 className="text-white ring-1 ring-inset ring-white/25 hover:bg-white/10 active:bg-white/15"
               >
                 <MicIcon className="size-4.5" />
-                Talk to Xana
+                Talk to Xena
               </ButtonLink>
             </div>
           </div>
@@ -480,7 +480,7 @@ export default function HelpCenterPage() {
               </span>
             </h3>
             <p className="mt-1 text-sm">
-              Sample contact info for this demo store. Nobody answers these, so use Steph or Xana instead.
+              Sample contact info for this demo store. Nobody answers these, so use Steph or Xena instead.
             </p>
             <dl className="mt-4 space-y-2.5 text-sm">
               <ContactRow icon={HeadsetIcon} term="Phone">

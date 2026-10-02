@@ -116,7 +116,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                   <ProductTile src={item.src} className="w-full" />
                 </div>
               ))}
-              {/* assistant chip: the kind of thing Xana handles by voice or text */}
+              {/* assistant chip: the kind of thing Xena handles by voice or text */}
               <div className="absolute -bottom-3 left-[24%] z-20 flex animate-fade-up items-center gap-2.5 rounded-full border border-white/15 bg-brand-950/70 py-2 pl-2 pr-4 text-sm text-white whitespace-nowrap shadow-xl backdrop-blur-md animation-delay-400">
                 <span className="grid size-7 place-items-center rounded-full bg-accent-400 text-ink">
                   <ChatIcon className="size-4" />
@@ -133,7 +133,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             </p>
             <p className="mt-4 hidden max-w-md text-base leading-relaxed text-brand-200 sm:block lg:text-lg">
               Groceries, household basics, and everything in between, with honest ratings from other shoppers.
-              Steph helps you shop, and Xana handles returns by voice or text. Sign in or create an account to
+              Steph helps you shop, and Xena handles returns by voice or text. Sign in or create an account to
               start shopping.
             </p>
           </div>

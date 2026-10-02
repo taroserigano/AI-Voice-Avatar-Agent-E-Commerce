@@ -3,21 +3,21 @@ id: returns-regulations
 title: How we handle returns and refunds
 version: sandbox-2026-09
 effective_date: 2026-09-26
-applies_to: every return and refund, in every channel (website, Steph, Xana, staff)
+applies_to: every return and refund, in every channel (website, Steph, Xena, staff)
 status: sandbox
 section_prefix: rg
 summary:
-  - The same rules apply everywhere, whether you use the website, Steph, Xana, or talk to a person.
+  - The same rules apply everywhere, whether you use the website, Steph, Xena, or talk to a person.
   - Eligibility and refund amounts are calculated by our policy engine from your order records, never by an AI model.
   - Nothing is returned or refunded until you confirm a quote yourself, on screen or with a clear spoken yes.
-  - Steph and Xana say they're AI assistants, and you can ask for a person at any time.
+  - Steph and Xena say they're AI assistants, and you can ask for a person at any time.
   - Refunds go only to the original payment method, and never twice for the same item.
 ---
 
 # How we handle returns and refunds
 
 These are the binding rules Serigan Mart follows for every return and refund, in every channel: the
-**Orders & returns** pages, **Steph** (our shopping assistant), **Xana** (our customer-support
+**Orders & returns** pages, **Steph** (our shopping assistant), **Xena** (our customer-support
 assistant, by text or voice), and our support team. They sit alongside the
 [return and refund policy](/returns-policy#rr-1), which says what you're entitled to; this
 document says how we make sure you get exactly that.
@@ -35,7 +35,7 @@ Each rule is marked **System** when our software enforces it (it can't be skippe
 
 | Rule | Enforced by |
 |---|---|
-| The website, Steph, Xana, and staff tools all call the same policy engine and get the same eligibility, amount, and timing for the same request. | System |
+| The website, Steph, Xena, and staff tools all call the same policy engine and get the same eligibility, amount, and timing for the same request. | System |
 | No channel can offer terms the policy doesn't allow: no extra refunds, window extensions, store credit, or payments to a different card. | System |
 | Exceptions (recalls, lost packages, disputes over an inspection) are handled only through a support case reviewed by a person. | Procedure |
 
@@ -63,7 +63,7 @@ amounts saved on the order at purchase time. **System**
 
 ### 3.2 AI models never decide
 
-Steph and Xana use AI models to understand what you're asking and to explain the answer. The
+Steph and Xena use AI models to understand what you're asking and to explain the answer. The
 models can't set or change an amount, approve an ineligible item, or override a rule. Any amount
 an assistant says aloud or in text comes from the engine's quote, and the quote card on screen is
 the authoritative figure. **System**
@@ -98,21 +98,21 @@ anything changes, a new quote is needed. **System**
 The customer gets the return label (unless nothing is sent back), and the return appears in
 **Orders & returns** with its status. **System**
 
-## 5. Voice conversations with Xana
+## 5. Voice conversations with Xena
 
 ### 5.1 Before the microphone turns on
 
-Xana's page says that Xana is an AI assistant, that speech is sent to our speech-recognition and
+Xena's page says that Xena is an AI assistant, that speech is sent to our speech-recognition and
 speech-synthesis providers to be converted, that audio isn't stored, and that a text transcript
 is saved with the conversation. The microphone starts only after the customer chooses to start.
 **System**
 
 ### 5.2 Spoken confirmation
 
-A spoken answer counts as confirming a return only if **all** of these are true. Otherwise Xana
+A spoken answer counts as confirming a return only if **all** of these are true. Otherwise Xena
 asks again or shows the Confirm button. **System**
 
-1. Xana has read the quote back in full: the item, the quantity, the refund amount, and that it
+1. Xena has read the quote back in full: the item, the quantity, the refund amount, and that it
    goes to the original card. Interrupting the read-back cancels it.
 2. The customer's answer is a complete, final turn (not a partial transcript).
 3. The answer is a clear yes, such as "yes", "yes, confirm", or "confirm the return". Fillers and
@@ -129,7 +129,7 @@ with the on-screen button. **System**
 
 ## 6. What our AI assistants may and may not do
 
-| Steph and Xana may | Steph and Xana may not |
+| Steph and Xena may | Steph and Xena may not |
 |---|---|
 | Look up the signed-in customer's orders, returns, and refund status | Look up any other customer's information |
 | Explain the policy and cite its sections | State a policy that isn't in the approved documents; if unsure, they say so or offer a person |
@@ -197,7 +197,7 @@ in Texas that ships nationwide.
 | Texas Deceptive Trade Practices Act (Tex. Bus. & Com. Code §17.41 and following) | No false or misleading statements about refunds, warranties, or rights | One approved policy text; assistants may only state what it says and must cite it |
 | State sales-tax rules | Tax collected on a refunded sale is returned with the refund | Each unit's tax share is refunded ([rr-7.1](/returns-policy#rr-7-1)) |
 | Consumer Product Safety Act (CPSC recalls) | Cooperate with recalls and their remedies | Recall refunds aren't limited by the return window ([rr-12.1](/returns-policy#rr-12-1)) |
-| Bot disclosure (for example California Business and Professions Code §17940–17943) | Disclose when an automated bot communicates with a customer to encourage a sale | Steph and Xana introduce themselves as AI assistants ([section 6](#rg-6)) |
+| Bot disclosure (for example California Business and Professions Code §17940–17943) | Disclose when an automated bot communicates with a customer to encourage a sale | Steph and Xena introduce themselves as AI assistants ([section 6](#rg-6)) |
 | Call-recording and eavesdropping laws (federal one-party consent; all-party consent states such as California Penal Code §632) | Consent before recording a conversation | Notice and an explicit start before the microphone turns on; audio isn't stored ([section 5.1](#rg-5-1)) |
 | Americans with Disabilities Act and WCAG 2.2 AA | Accessible service | Every voice feature has a text path; pages target WCAG 2.2 AA ([section 5.3](#rg-5-3)) |
 | Card network rules | Refunds go to the card that was charged | Original payment method only ([section 8](#rg-8)) |

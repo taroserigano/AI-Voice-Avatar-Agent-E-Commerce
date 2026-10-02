@@ -1,19 +1,19 @@
-# Feature batch: policy, Steph, Jev, Xana, maturity (requested 2026-09-26)
+# Feature batch: policy, Steph, Jev, Xena, maturity (requested 2026-09-26)
 
 Taro's request, numbered as he gave it:
 
 | # | Feature | Status | Plan | Implementation log |
 |---|---|---|---|---|
-| 11 | Switch Xana between Tavus and HeyGen using provider tabs and routes | Implemented; connected HeyGen sandbox verified | [PLAN](11-xana-heygen/PLAN.md) | [IMPL](11-xana-heygen/IMPL.md) |
+| 11 | Switch Xena between Tavus and HeyGen using provider tabs and routes | Implemented; connected HeyGen sandbox verified | [PLAN](11-xana-heygen/PLAN.md) | [IMPL](11-xana-heygen/IMPL.md) |
 | 7 | Detailed return and refund policy plus "regulations", on a dedicated page | Done | [PLAN](07-returns-policy/PLAN.md) | [IMPL](07-returns-policy/IMPL.md) |
 | 5 | "Ask Steph": a chat assistant behind a lower-right button (voice later) | Done | [PLAN](05-ask-steph/PLAN.md) | [IMPL](05-ask-steph/IMPL.md) |
 | 3.3 | Jev (TypeSafe) in the assistant, especially for returns and refunds | Done (simulator until a key is set) | [PLAN](03.3-jev/PLAN.md) | [IMPL](03.3-jev/IMPL.md) |
-| 6 | A Support tab where customers talk by voice with Xana about returns and refunds | Done (turn-based voice) | [PLAN](06-xana-voice-support/PLAN.md) | [IMPL](06-xana-voice-support/IMPL.md) |
+| 6 | A Support tab where customers talk by voice with Xena about returns and refunds | Done (turn-based voice) | [PLAN](06-xana-voice-support/PLAN.md) | [IMPL](06-xana-voice-support/IMPL.md) |
 | 4 | A more mature, in-depth site: critique, investigator, and eval agents, then improve | Done (3.55 → 4.38) | [PLAN](04-site-maturity/PLAN.md) | [IMPL](04-site-maturity/IMPL.md) |
 
 ## Build order: 7 → 5 → 3.3 → 6 → 4
 
-- **7 first.** Steph, Jev's return triage, and Xana all cite the policy; its section IDs are the
+- **7 first.** Steph, Jev's return triage, and Xena all cite the policy; its section IDs are the
   citation targets. It touches only `content/policies/` and one new public page.
 - **5 next.** It creates `services/assistant` (LangGraph + Claude), the chat UI, the tool
   boundary, and policy search. Item 6 reuses all of it.
@@ -39,7 +39,7 @@ Taro's request, numbered as he gave it:
 
 | Key | State |
 |---|---|
-| `ANTHROPIC_API_KEY` | **Invalid** (401). Steph and Xana run on the labeled scripted model until a valid key is set. |
+| `ANTHROPIC_API_KEY` | **Invalid** (401). Steph and Xena run on the labeled scripted model until a valid key is set. |
 | `CARTESIA_SONIC_API_KEY` | Works. |
 | `GROQ_API_KEY` | Works (`whisper-large-v3-turbo`). |
 | `TYPESAFE_API_KEY` | Not set. Jev runs as the labeled simulator. |

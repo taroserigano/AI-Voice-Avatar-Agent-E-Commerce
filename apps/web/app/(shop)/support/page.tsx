@@ -24,7 +24,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Support",
-  description: "Talk with Xana, Serigan Mart's customer-support assistant, about products, orders, delivery, returns, and refunds.",
+  description: "Talk with Xena, Serigan Mart's customer-support assistant, about products, orders, delivery, returns, and refunds.",
 };
 
 type Case = components["schemas"]["CaseOut"];
@@ -66,7 +66,7 @@ export default async function SupportPage({
   const params = await searchParams;
   const uuid = /^[0-9a-f-]{36}$/i;
   const cases = await loadCases();
-  // "Continue with Xana" on a request: pick the conversation up where it stopped. Only a request
+  // "Continue with Xena" on a request: pick the conversation up where it stopped. Only a request
   // from this customer's own list is used, and the message is built here, never from the URL.
   const followUp = cases?.find((c) => c.reference === params.case && c.status !== "resolved");
 
@@ -78,7 +78,7 @@ export default async function SupportPage({
           Help with orders, delivery, and returns
         </h1>
         <p className="mt-3 text-lg leading-relaxed text-ink-soft">
-          Ask Xana by voice or text about products, where an order is, a delivery problem, or how to return something.
+          Ask Xena by voice or text about products, where an order is, a delivery problem, or how to return something.
           For a return, she shows your exact refund and starts it only when you confirm.
         </p>
         <Link
@@ -86,7 +86,7 @@ export default async function SupportPage({
           className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-brand-950 px-5 py-2.5 font-semibold text-white shadow-sm transition hover:bg-brand-900 focus-inverse"
         >
           <MicIcon className="size-5" />
-          Talk to Xana by voice
+          Talk to Xena by voice
           <span className="text-sm font-normal text-brand-200">real-time, full screen</span>
         </Link>
       </header>
@@ -104,7 +104,7 @@ export default async function SupportPage({
             Your requests
           </h2>
           <p className="mt-1 text-sm text-muted">
-            When Xana hands something to our team, it&apos;s tracked here.
+            When Xena hands something to our team, it&apos;s tracked here.
           </p>
           {cases === null ? (
             <p className="mt-4 rounded-2xl border border-line bg-raised px-4 py-3 text-sm text-muted">
@@ -114,7 +114,7 @@ export default async function SupportPage({
             <div className="mt-4 flex items-start gap-3 rounded-3xl border border-dashed border-line-strong px-5 py-6">
               <HeadsetIcon className="mt-0.5 size-5 shrink-0 text-muted" />
               <p className="text-sm text-muted">
-                <span className="font-semibold text-ink">No requests yet.</span> If Xana can&apos;t sort something out,
+                <span className="font-semibold text-ink">No requests yet.</span> If Xena can&apos;t sort something out,
                 she can pass it to a person, and you&apos;ll see it here with its status.
               </p>
             </div>
@@ -160,7 +160,7 @@ export default async function SupportPage({
   );
 }
 
-/** What the customer says to Xana when they continue a request. */
+/** What the customer says to Xena when they continue a request. */
 function followUpMessage(item: Case): string {
   const order = item.order_id ? ` about order ${orderNumber(item.order_id)}` : "";
   return `I'm following up on my request ${item.reference} ("${item.subject}")${order}.`;
@@ -218,7 +218,7 @@ function CaseCard({ item }: { item: Case }) {
         {item.status === "waiting_on_customer" ? (
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl bg-warning-50 px-4 py-3">
             <p className="min-w-0 flex-1 basis-60 text-sm text-ink-soft">
-              Reply to keep this request moving. Xana picks it up with the details.
+              Reply to keep this request moving. Xena picks it up with the details.
             </p>
             {/* A plain link (not client navigation) so the page starts at the top, on the conversation. */}
             <a
@@ -227,7 +227,7 @@ function CaseCard({ item }: { item: Case }) {
               className={buttonClasses("primary", "sm")}
             >
               <ChatIcon className="size-4" />
-              Continue with Xana
+              Continue with Xena
             </a>
           </div>
         ) : null}

@@ -1,7 +1,7 @@
 [project]
 name = "assistant"
 version = "0.1.0"
-description = "Assistant API: Steph (shopping) and Xana (support), one LangGraph over narrow commerce tools"
+description = "Assistant API: Steph (shopping) and Xena (support), one LangGraph over narrow commerce tools"
 requires-python = ">=3.12"
 dependencies = [
     "ai-commerce-telemetry",

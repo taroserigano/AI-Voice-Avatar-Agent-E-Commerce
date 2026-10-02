@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
 import { ALICE, signInFromScratch } from "./helpers";
 
-// Explicit opt-in: a real sandbox avatar and a short real Xana/Cartesia response.
+// Explicit opt-in: a real sandbox avatar and a short real Xena/Cartesia response.
 test.use({ trace: "off", video: "off", viewport: { width: 1280, height: 1000 } });
-test("HeyGen sandbox receives video and speaks Xana's audio", async ({ page }, testInfo) => {
+test("HeyGen sandbox receives video and speaks Xena's audio", async ({ page }, testInfo) => {
   test.skip(process.env.HEYGEN_E2E_LIVE !== "1", "set HEYGEN_E2E_LIVE=1");
   test.setTimeout(90_000);
   const clientTypes: string[] = [], providerTypes: string[] = [];

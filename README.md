@@ -10,7 +10,7 @@ current status and every decision made so far.
 
 **Status:** Milestone 1 (sign-in and shopping foundation) is built, plus the redesign,
 reviews, order tracking, the return and refund policy, **Ask Steph** (the shopping
-assistant), **Xana** (voice and text returns and refunds on `/support`), return quotes and
+assistant), **Xena** (voice and text returns and refunds on `/support`), return quotes and
 confirmation, and **Jev** decision signals. Stripe checkout and Temporal workflows come next. The current feature
 batch is planned in [docs/features/](docs/features/README.md).
 
@@ -45,19 +45,19 @@ batch is planned in [docs/features/](docs/features/README.md).
   the customer's cookie), and it has no tool that can confirm, pay, or refund. Without a
   working `ANTHROPIC_API_KEY` or `OPEN_AI_API`, a scripted model answers from the same tools
   and the chat says **Simulated**.
-- **Support with Xana (`/support`):** talk (or type) to Xana about products, returns, and refunds. She
+- **Support with Xena (`/support`):** talk (or type) to Xena about products, returns, and refunds. She
   searches the same live catalog as Steph and opens product details for ingredient, allergen,
   nutrition, specification, and variant questions. Unknown filters return no recommendation.
   She finds the order and item, explains eligibility from the store's return options, prices the
   return, and shows a quote card. The customer confirms with the **Confirm return** button, or
-  by voice: Xana reads the quote back (built by code, not the model) and only a clear, final
+  by voice: Xena reads the quote back (built by code, not the model) and only a clear, final
   "yes" after the full read-back counts, checked by the app (a strict rule, plus Jev's vote
   when enabled). The browser then confirms directly with the store using a single-use token the
   assistant never sees; the conversation resumes and re-checks the outcome with the store.
   Voice is turn-based over HTTP: Groq Whisper (or Deepgram, or the browser) for speech-to-text
-  and Cartesia `sonic-3.6-2026-08-27` (or the browser) for speech; talking over Xana stops her.
+  and Cartesia `sonic-3.6-2026-08-27` (or the browser) for speech; talking over Xena stops her.
   In development a "simulated speech" box drives the same path without a microphone. Order pages'
-  **Start a return** opens Xana on that item.
+  **Start a return** opens Xena on that item.
 - **Return quotes and confirmation (commerce API):** `POST /v1/returns/quote` prices a return
   from the order's saved amounts (every seeded scenario matches the eval oracle to the cent);
   `POST /v1/returns/quotes/{id}/confirmation` and `POST /v1/returns/confirm` (with an
@@ -70,7 +70,7 @@ batch is planned in [docs/features/](docs/features/README.md).
   veto (never cause) a spoken confirmation. A labeled simulator answers until `TYPESAFE_API_KEY`
   is set; `pnpm eval:jev` compares the two.
 - **Return and refund policy:** a detailed, versioned policy plus the rules every channel
-  (site, Steph, Xana, staff) follows, public at `/returns-policy` with citable section anchors.
+  (site, Steph, Xena, staff) follows, public at `/returns-policy` with citable section anchors.
   Its numbers are machine-readable and tested against the code.
 - **Assistant scripts:** scripted product Q&A and return conversations with known-right
   answers in `evals/assistant/`, and the policy text they cite in `content/policies/`.
@@ -204,7 +204,7 @@ themselves.
 apps/web/              Next.js storefront (App Router, Tailwind, TanStack Query)
   proxy.ts             sign-in wall (convenience only; the API enforces 401)
 services/commerce/     FastAPI: auth, catalog, cart, orders, returns, policies, search, outbox, seed
-services/assistant/    FastAPI + LangGraph: Steph (and Xana), tools, scripted model, prompts
+services/assistant/    FastAPI + LangGraph: Steph (and Xena), tools, scripted model, prompts
 packages/telemetry/    shared Python OpenTelemetry setup and redaction
 packages/contracts/    OpenAPI schema and generated TypeScript client
 infra/                 Docker Compose, OTel Collector config, Grafana dashboards

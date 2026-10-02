@@ -1,6 +1,6 @@
 """The call-start orders snapshot says, per delivered item, what the returns engine allows.
 
-Found by Xana's golden-set eval: from the delivery date alone, the voice model counted the days
+Found by Xena's golden-set eval: from the delivery date alone, the voice model counted the days
 itself and told a customer on day 29 of 30 that their tablet could no longer be returned.
 """
 

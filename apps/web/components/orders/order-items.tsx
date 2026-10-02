@@ -18,7 +18,7 @@ import type { LineReturnOption, OrderDetail, ReturnOptions } from "@ai-commerce/
 import Link from "next/link";
 import { AddToCartButton } from "@/components/account/add-to-cart-button";
 
-const HELPER = "Xana, our support assistant, shows your exact refund. Nothing is returned until you confirm.";
+const HELPER = "Xena, our support assistant, shows your exact refund. Nothing is returned until you confirm.";
 
 /**
  * Every line of the order with what the server says about returning it. Nothing here decides

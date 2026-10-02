@@ -24,7 +24,7 @@ const ACCOUNT_LINKS = [
 
 const HELP_LINKS = [
   { href: "/help", label: "Help center" },
-  { href: "/support", label: "Support (Xana)" },
+  { href: "/support", label: "Support (Xena)" },
   { href: "/stores", label: "Stores" },
   { href: "/help/returns", label: "How returns work" },
   { href: "/help#shipping", label: "Shipping and delivery" },

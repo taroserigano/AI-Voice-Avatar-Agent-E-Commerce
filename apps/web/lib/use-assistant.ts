@@ -38,7 +38,7 @@ const localId = (prefix: string) => `${prefix}-${Date.now()}-${++seq}`;
 export type AnswerDone = { text: string; quote: ReturnQuoteCard | null };
 
 /**
- * One assistant conversation (Steph or Xana): loads the last one on first use, streams answers,
+ * One assistant conversation (Steph or Xena): loads the last one on first use, streams answers,
  * pauses on a return quote until the customer decides, and keeps the header's cart in step.
  */
 export function useAssistant(agent: AgentName, options: { onAnswer?: (done: AnswerDone) => void } = {}) {

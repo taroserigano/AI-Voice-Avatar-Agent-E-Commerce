@@ -5,7 +5,7 @@ import type { Word } from "./voice-protocol";
  *
  * The server sends each spoken segment's text and word timings (from the speech engine); the
  * player reports how many milliseconds of each segment have played. `visibleText` is what the
- * customer has heard so far, so the words on screen never run ahead of (or lag behind) Xana.
+ * customer has heard so far, so the words on screen never run ahead of (or lag behind) Xena.
  * Without timings (an engine that gives none) the whole text shows as soon as audio starts.
  */
 

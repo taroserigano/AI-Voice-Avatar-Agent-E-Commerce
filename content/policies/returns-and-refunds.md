@@ -37,7 +37,7 @@ rules:
 This policy explains what you can return, how to return it, and how much you get back and when.
 It applies to every order placed on the Serigan Mart website and shipped to you. It's the same
 policy whether you return an item from **Orders & returns**, with Steph (our shopping
-assistant), with Xana (our customer-support assistant), or with a member of our team.
+assistant), with Xena (our customer-support assistant), or with a member of our team.
 
 > **Sandbox notice.** Serigan Mart is a demonstration store. This is a sandbox policy used to build
 > and test the site. No real orders, payments, or refunds take place, and nothing here is legal
@@ -152,9 +152,9 @@ label is free, and a wrong or damaged item is never counted as abuse
 
 - **Orders & returns:** open the order, choose **Start a return**, and choose the item.
 - **Steph:** open **Ask Steph** at the bottom of any page and say which order and item.
-- **Xana:** open **Support** and talk (or type) to Xana, our customer-support assistant.
+- **Xena:** open **Support** and talk (or type) to Xena, our customer-support assistant.
 
-All three use the same rules and show you the same quote. Steph and Xana are AI assistants; they
+All three use the same rules and show you the same quote. Steph and Xena are AI assistants; they
 look up your order and ask the policy engine what you're owed. They never decide eligibility or
 amounts themselves ([returns regulations, section 3](/returns-policy#rg-3)).
 
@@ -170,9 +170,9 @@ must be a quality problem.
 We show the quote, and nothing is returned until **you** confirm it:
 
 - On screen, with the **Confirm return** button.
-- By voice with Xana, only after she has read the whole quote back to you and you clearly say yes
+- By voice with Xena, only after she has read the whole quote back to you and you clearly say yes
   (for example "yes, confirm the return"). A hesitant or unclear answer ("mm-hmm", "I guess",
-  "yes but…") isn't a confirmation; Xana will ask again or show you the button.
+  "yes but…") isn't a confirmation; Xena will ask again or show you the button.
 
 Once you confirm, we send your return label (unless nothing has to be sent back) and the return
 appears in **Orders & returns**.
@@ -322,7 +322,7 @@ as a credit from Serigan Mart on your card statement.
 
 ### 11.5 Refund status
 
-You can see each return's status in **Orders & returns** or by asking Steph or Xana:
+You can see each return's status in **Orders & returns** or by asking Steph or Xena:
 **Requested → Authorized → In transit → Received → Inspected → Closed**, with **Refund:
 pending → succeeded**. A return can also be **In review** (a person is checking it),
 **Rejected**, or **Canceled**. If a refund fails at the bank we retry, and if it still fails a
@@ -365,7 +365,7 @@ defective, or wrong items is never counted against you.
 
 ### 16.1 Ask for a person
 
-At any point you can ask Steph or Xana for a person. We'll open a support case with your
+At any point you can ask Steph or Xena for a person. We'll open a support case with your
 conversation attached, so you don't have to repeat yourself, and reply within 1 business day.
 
 ### 16.2 Disagreeing with a decision

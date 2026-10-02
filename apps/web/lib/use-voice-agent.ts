@@ -24,12 +24,12 @@ import { HeygenPlayback } from "./heygen-playback";
 import { DEFAULT_BACKGROUND, backgroundFor, loadPrefs, savePrefs, type Background } from "./xana-looks";
 
 /**
- * The Xana voice session in the browser: one WebSocket to the voice agent, the microphone
- * streamed up continuously (the server hears the end of speech, not the browser), and Xana's
+ * The Xena voice session in the browser: one WebSocket to the voice agent, the microphone
+ * streamed up continuously (the server hears the end of speech, not the browser), and Xena's
  * speech streamed down and played gaplessly as it's generated. Captions are driven by the
- * player's clock, so text and voice stay in step. Talking over Xana stops her at once.
+ * player's clock, so text and voice stay in step. Talking over Xena stops her at once.
  *
- * With Video on (Tavus, docs/features/10-xana-avatar), Xana's speech goes to her face instead
+ * With Video on (Tavus, docs/features/10-xana-avatar), Xena's speech goes to her face instead
  * of the local player, and what the customer has heard comes from Tavus (avatar-echo.ts): the
  * captions follow her lips, and a segment is reported played in full only once Tavus has said
  * it. Audio switches between the two only between segments.
@@ -145,7 +145,7 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
     dropEchoRef.current();
     wantedRef.current = false;
     setAvatarWanted(false);
-    setAvatarError("Video stopped. Xana's voice carries on.");
+    setAvatarError("Video stopped. Xena's voice carries on.");
     selectRef.current(null);
   };
   const avatar = useAvatarTransport({
@@ -154,7 +154,7 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
       if (playback instanceof AvatarEcho) playback.onTavus(eventType, props);
       else if (playback instanceof HeygenPlayback && props) playback.onEvent(props);
     },
-    // Video is live: Xana's next segment goes to her face.
+    // Video is live: Xena's next segment goes to her face.
     onLive: () => {
       const room = avatarRoomRef.current;
       if (!echoRef.current && room && room.request_id === requestRef.current && wantedRef.current) {
@@ -218,7 +218,7 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
             droppedRef.current.add(msg.segment);
             break;
           }
-          // Audio moves to Xana's face (or back) only when nothing is playing locally.
+          // Audio moves to Xena's face (or back) only when nothing is playing locally.
           if (localLiveRef.current.size === 0) echoOnRef.current = echoRef.current !== null;
           if (echoOnRef.current && echoRef.current) {
             echoRef.current.segmentStart(msg.segment, msg.kind);
@@ -434,18 +434,18 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
         if (stoppedRef.current) return;
         setError(
           e.code === 4401
-            ? "Your session has ended. Sign in again to talk to Xana."
-            : "The connection to Xana dropped. Tap the orb to reconnect.",
+            ? "Your session has ended. Sign in again to talk to Xena."
+            : "The connection to Xena dropped. Tap the orb to reconnect.",
         );
         stop();
       };
-      ws.onerror = () => setError("Couldn't reach Xana's voice service.");
+      ws.onerror = () => setError("Couldn't reach Xena's voice service.");
       await playCtx.resume();
     } catch (err) {
       const denied = err instanceof DOMException && (err.name === "NotAllowedError" || err.name === "SecurityError");
       setError(
         denied
-          ? "Xana needs your microphone. Allow it in your browser's site settings, then try again."
+          ? "Xena needs your microphone. Allow it in your browser's site settings, then try again."
           : "Couldn't start voice on this device.",
       );
       stop();
@@ -463,7 +463,7 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
     [send],
   );
 
-  /** Stop sending speech to Xana's face. Anything it was still saying is cut off, so the
+  /** Stop sending speech to Xena's face. Anything it was still saying is cut off, so the
    *  voice agent is told, as if the customer had talked over her, and goes back to listening. */
   const dropEcho = useCallback(() => {
     const echo = echoRef.current;
@@ -482,7 +482,7 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
     if (next !== null) switchTimerRef.current = setTimeout(() => {
       wantedRef.current = false;
       setAvatarWanted(false);
-      setAvatarError("Video took too long to connect. Xana's voice carries on.");
+      setAvatarError("Video took too long to connect. Xena's voice carries on.");
       selectRef.current(null);
     }, 45_000);
     setReadbackInterrupted(true);

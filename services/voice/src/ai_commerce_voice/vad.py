@@ -7,7 +7,7 @@ depends on what was said so far. A turn that ends in "?" or a full stop ends soo
 (``quick_end_ms``) than one trailing off mid-sentence ("my order from, um…"), which waits for
 ``end_ms``. That's cheap semantic endpointing: fast on complete questions, patient otherwise.
 
-While Xana is talking the start threshold rises (``talking=True``): what's left of her own
+While Xena is talking the start threshold rises (``talking=True``): what's left of her own
 voice after echo cancellation shouldn't count as the customer.
 """
 

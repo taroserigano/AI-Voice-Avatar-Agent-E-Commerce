@@ -46,7 +46,7 @@ const env = {
   // waits ~2 s for the refusal before falling back (the servers listen on IPv4 only).
   COMMERCE_API_URL: process.env.COMMERCE_API_URL ?? `http://127.0.0.1:${apiPort}`,
   ASSISTANT_API_URL: process.env.ASSISTANT_API_URL ?? `http://127.0.0.1:${assistantPort}`,
-  // Xana's voice screen opens its WebSocket straight to the voice agent on this port.
+  // Xena's voice screen opens its WebSocket straight to the voice agent on this port.
   VOICE_PORT: voicePort,
   NEXT_PUBLIC_VOICE_PORT: voicePort,
 };

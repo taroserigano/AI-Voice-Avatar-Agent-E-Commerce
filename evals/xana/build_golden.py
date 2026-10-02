@@ -1,4 +1,4 @@
-"""Build Xana's golden sets from the seed data: 200 product questions, 200 return and refund
+"""Build Xena's golden sets from the seed data: 200 product questions, 200 return and refund
 questions.
 
   uv run --directory services/commerce python ../../evals/xana/build_golden.py
@@ -1226,7 +1226,7 @@ policy(
     [r"pause|twice|dispute"],
 )
 policy(
-    "Do you keep recordings of my voice when I talk to Xana?",
+    "Do you keep recordings of my voice when I talk to Xena?",
     [R + "14", G + "9-2", G + "9-1", G + "5-1"],
     [r"not stored|aren't stored|isn't stored|don't store|transcript|not kept|don't keep"],
 )
@@ -1268,7 +1268,7 @@ policy(
 )
 policy("How do I confirm a return by voice?", [R + "5-3", G + "5-2"], [r"yes|read"])
 policy(
-    "Does Xana decide whether my return is eligible?",
+    "Does Xena decide whether my return is eligible?",
     [R + "5-1", G + "3-1", G + "3-2", G + "6"],
     [r"policy engine|never decide|doesn't decide|don't decide|do not decide|the store's|rules"],
 )

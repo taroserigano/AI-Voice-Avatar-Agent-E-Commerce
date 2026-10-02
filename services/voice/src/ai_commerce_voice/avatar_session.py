@@ -53,9 +53,9 @@ class AvatarSession:
                 offers[provider].update(
                     {
                         "provider": provider,
-                        "notice": "With video on, Xana's replies are sent to "
+                        "notice": "With video on, Xena's replies are sent to "
                         + ("Tavus" if provider == "tavus" else "HeyGen LiveAvatar")
-                        + " to animate her face. Your microphone stays with Xana's voice service.",
+                        + " to animate her face. Your microphone stays with Xena's voice service.",
                     }
                 )
         if "tavus" in self._faces:

@@ -15,13 +15,13 @@ async function openSupport(page: Page, query = "") {
   await resetReturns(page);
   if (query) await page.goto(`/support${query}`);
   else await page.getByRole("link", { name: "Support", exact: true }).first().click();
-  await expect(page.getByRole("heading", { name: "Xana", level: 2, exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Xena", level: 2, exact: true })).toBeVisible();
   await page.getByRole("button", { name: "New conversation" }).click();
 }
 
-test("Xana prices a return and it's confirmed only by the customer's button", async ({ page }) => {
+test("Xena prices a return and it's confirmed only by the customer's button", async ({ page }) => {
   await openSupport(page);
-  await page.getByLabel("Message Xana").fill("I want to return my gel pens");
+  await page.getByLabel("Message Xena").fill("I want to return my gel pens");
   await page.keyboard.press("Enter");
 
   const quote = page.getByRole("region", { name: "Return quote" });
@@ -30,7 +30,7 @@ test("Xana prices a return and it's confirmed only by the customer's button", as
   await expect(quote.getByRole("button", { name: "Confirm return" })).toBeEnabled();
 
   // A typed "yes" is not a confirmation.
-  await page.getByLabel("Message Xana").fill("yes");
+  await page.getByLabel("Message Xena").fill("yes");
   await page.keyboard.press("Enter");
   await expect(page.getByText(/tap Confirm return on the quote/).first()).toBeVisible();
 
@@ -60,7 +60,7 @@ test("a spoken yes confirms only when it's clear (simulated speech)", async ({ p
   await expect(page.getByText(/Return R-[0-9A-F]{8} is confirmed/).first()).toBeVisible({ timeout: 30_000 });
 });
 
-test("the order page's Start a return opens Xana on that item", async ({ page }) => {
+test("the order page's Start a return opens Xena on that item", async ({ page }) => {
   await signInFromScratch(page, ALICE);
   await resetReturns(page);
   // An order with something returnable right now.

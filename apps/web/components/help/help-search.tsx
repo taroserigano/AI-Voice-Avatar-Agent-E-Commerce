@@ -12,7 +12,7 @@ const MAX_RESULTS = 8;
 
 /**
  * Filters the help center's own topics and answers as you type (nothing leaves the browser).
- * With no match, it points to Steph and Xana instead of a dead end; `children` (the page's usual
+ * With no match, it points to Steph and Xena instead of a dead end; `children` (the page's usual
  * assistant buttons) step aside then, so the same two buttons don't show twice.
  */
 export function HelpSearch({
@@ -90,7 +90,7 @@ export function HelpSearch({
         <div className="mt-4 max-w-3xl rounded-2xl border border-dashed border-line-strong bg-raised/80 p-5">
           <p className="font-semibold text-ink">Nothing here matches “{query.trim()}”.</p>
           <p className="mt-1 text-sm text-muted">
-            Try another word, or ask an assistant: Steph for products and policies, Xana for orders, delivery, and
+            Try another word, or ask an assistant: Steph for products and policies, Xena for orders, delivery, and
             returns.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -99,7 +99,7 @@ export function HelpSearch({
             </OpenStephButton>
             <ButtonLink href="/support" variant="outline" size="sm">
               <MicIcon className="size-4" />
-              Talk to Xana
+              Talk to Xena
             </ButtonLink>
           </div>
         </div>

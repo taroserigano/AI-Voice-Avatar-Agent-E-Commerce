@@ -5,9 +5,9 @@ Everything is streamed and overlapped, which is where the speed comes from:
 - the microphone streams to speech-to-text the whole time, and the server's voice activity
   detection hears the end of the customer's turn (no clip upload, no browser-side guessing);
 - the model's answer streams into the speech engine clause by clause, and the audio streams
-  to the browser as it's generated, so Xana starts talking while she's still "writing";
+  to the browser as it's generated, so Xena starts talking while she's still "writing";
 - if no answer audio is ready ``filler_after_ms`` after the customer stops, or a tool call
-  starts before Xana has said anything, she says a short pre-recorded filler ("Let me
+  starts before Xena has said anything, she says a short pre-recorded filler ("Let me
   check that order.") so there's never dead air;
 - if the customer talks over her, she stops at once (the browser drops queued audio) and
   listens.
@@ -64,7 +64,7 @@ SendJson = Callable[[dict[str, Any]], Awaitable[None]]
 SendBytes = Callable[[bytes], Awaitable[None]]
 
 FRAME_BYTES = 4800  # 100 ms of PCM16 at 24 kHz per WebSocket frame for pre-rendered audio
-BARGE_IN_MS = 250  # speech this long while Xana talks stops her; shorter is a cough or a blip
+BARGE_IN_MS = 250  # speech this long while Xena talks stops her; shorter is a cough or a blip
 MIN_WORDS_TO_MOVE_ON = 5  # an "unclear" reply this long to a quote is a new request instead
 
 CONFIRM_SAY = {
@@ -373,7 +373,7 @@ class VoiceSession:
     ) -> None:
         if self._turn and not self._turn.done():
             if self._turn_is_say and resume is not None:
-                # The store answered while Xana is saying "confirming your return now": let her
+                # The store answered while Xena is saying "confirming your return now": let her
                 # finish the sentence, then carry on (only talking over her cuts her off).
                 with contextlib.suppress(asyncio.CancelledError, Exception):
                     await self._turn

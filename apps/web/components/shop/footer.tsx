@@ -11,7 +11,7 @@ type FooterLink = { href: string; label: string };
 
 const SERVICE_LINKS: FooterLink[] = [
   { href: "/help", label: "Help center" },
-  { href: "/support", label: "Support (Xana)" },
+  { href: "/support", label: "Support (Xena)" },
   { href: "/stores", label: "Stores" },
   { href: "/returns-policy", label: "Returns & refunds" },
   { href: "/help/returns", label: "How returns work" },

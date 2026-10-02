@@ -1,5 +1,5 @@
 /**
- * What the customer can pick for Xana's face: the look (which face, offered by the server)
+ * What the customer can pick for Xena's face: the look (which face, offered by the server)
  * and the background behind her (drawn in the browser over Tavus's green screen). The choice
  * is remembered in this browser only; nothing breaks if storage is unavailable.
  */

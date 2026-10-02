@@ -27,6 +27,7 @@ confirmation rule.
 | 34 | Face: **Rose – Business** (`rf1bd7e252de`), a stock Phoenix-4.5 face (Tavus recommends these for real time): black blazer, white blouse. Taro asked for "a beautiful white female model" in customer-support clothes; it replaced Anna – Casual. No stock face wears a headset. Setting `TAVUS_FACE_ID`. |
 | 35 | Feed: **audio echo messages** (`conversation.echo`). Microphone echo was silent in the spike. |
 | 36 | The customer picks the **look** (face) and the **background** from tabs under the video (Taro, 2026-09-30: "background more casual or light", "choose background and models by option tabs"). Looks are a server allowlist of **Phoenix-4** faces, because Tavus's green screen doesn't work on Phoenix-4.5; backgrounds are drawn in the browser over the green screen. |
+| 37 | Taro (2026-10-01): **Video stays off by default**; the customer turns it on per call. The "TAVUS" watermark is fine. **The assistant is renamed Xena** everywhere a customer reads or hears it (UI, prompts, policies, spoken lines). Code names (`xana-*` files, `XanaBrain`, routes, `eval:xana`), the Tavus PAL name, and older plan docs keep "Xana". **The chat gets the same upbeat personality** as voice (prompts `xana.v3` and `xana.voice.v4`). |
 
 ## How it works
 

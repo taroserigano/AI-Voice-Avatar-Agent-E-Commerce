@@ -21,7 +21,7 @@ ROSE = "rf1bd7e252de"
 
 @dataclass(frozen=True)
 class Look:
-    """A face the customer can pick for Xana. Phoenix-4 faces, because Tavus's green screen
+    """A face the customer can pick for Xena. Phoenix-4 faces, because Tavus's green screen
     (which lets the browser put a light background behind her) doesn't work on Phoenix-4.5."""
 
     key: str
@@ -91,7 +91,7 @@ class VoiceSettings(BaseSettings):
     voice_escalation_model: str = "gpt-6-sol"
     voice_escalation_reasoning: Literal["none", "low", "medium"] = "low"
 
-    # Xana's face: a Tavus avatar in echo mode (docs/features/10-xana-avatar). Off unless
+    # Xena's face: a Tavus avatar in echo mode (docs/features/10-xana-avatar). Off unless
     # VOICE_AVATAR=tavus and a key and PAL are set; the customer still turns it on per call.
     voice_avatar: Literal["off", "tavus", "heygen", "both"] = "off"
     tavus_api_key: str | None = Field(
@@ -119,7 +119,7 @@ class VoiceSettings(BaseSettings):
     heygen_max_live: int = Field(default=2, ge=1, le=20)
     heygen_max_session_s: int = Field(default=60, ge=30, le=1200)
 
-    # Turn-taking. Silence that ends the customer's turn (server VAD), and how long Xana waits
+    # Turn-taking. Silence that ends the customer's turn (server VAD), and how long Xena waits
     # for answer audio before saying a filler.
     voice_end_silence_ms: int = 450
     voice_filler_after_ms: int = 900

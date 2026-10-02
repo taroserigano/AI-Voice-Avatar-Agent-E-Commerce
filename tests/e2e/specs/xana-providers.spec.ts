@@ -87,5 +87,5 @@ test("provider routes preserve a muted call and pending return; keyboard tabs ac
   await expect.poll(() => messages.filter((m) => m.type === "hello").length).toBe(2);
   expect(messages.filter((m) => m.type === "hello").at(-1)?.conversation_id).toBe("preserved-call");
   await page.goto("/support/voice/unknown-provider");
-  await expect(page.getByRole("heading", { name: "Meet Xana" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Meet Xena" })).toHaveCount(0);
 });

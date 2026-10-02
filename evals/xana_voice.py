@@ -1,7 +1,7 @@
-"""Xana's voice brain, driven with typed turns for the golden-set eval (``--channel voice``).
+"""Xena's voice brain, driven with typed turns for the golden-set eval (``--channel voice``).
 
 The same brain as a voice call (services/voice): the voice prompt with the call-start orders
-snapshot, gpt-6-luna at the voice settings, the policy prefetch, and Xana's real tools against
+snapshot, gpt-6-luna at the voice settings, the policy prefetch, and Xena's real tools against
 the running commerce API for the signed-in customer. Only the ears and mouth are left out: the
 customer's words go in as text and the answer comes out as text, so no speech is synthesized.
 Conversations are checkpointed in memory, not saved.

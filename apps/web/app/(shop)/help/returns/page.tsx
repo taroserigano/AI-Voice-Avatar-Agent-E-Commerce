@@ -64,7 +64,7 @@ const steps: { art: ReactNode; title: string; body: ReactNode }[] = [
         </Link>{" "}
         and choose Start a return. Or just tell{" "}
         <Link href="/support" className={inlineLink}>
-          Xana
+          Xena
         </Link>
         .
       </>
@@ -78,7 +78,7 @@ const steps: { art: ReactNode; title: string; body: ReactNode }[] = [
   {
     art: <StepConfirmArt />,
     title: "Confirm it yourself",
-    body: "Tap Confirm return, or say a clear “yes” to Xana. Nothing happens until you do.",
+    body: "Tap Confirm return, or say a clear “yes” to Xena. Nothing happens until you do.",
   },
   {
     art: <StepShipArt />,
@@ -125,7 +125,7 @@ export default function HowReturnsWorkPage() {
           </ButtonLink>
           <ButtonLink href="/support" variant="outline">
             <MicIcon className="size-4.5" />
-            Return with Xana
+            Return with Xena
           </ButtonLink>
         </div>
         <p className="mt-4 text-center text-sm text-muted">
@@ -351,7 +351,7 @@ export default function HowReturnsWorkPage() {
             <p className="mt-1 text-muted">
               Tell{" "}
               <Link href="/support" className={inlineLink}>
-                Xana on the Support page
+                Xena on the Support page
               </Link>{" "}
               in your own words, by voice or text. If more than one item matches, she shows you cards to pick from.
             </p>
@@ -370,7 +370,7 @@ export default function HowReturnsWorkPage() {
         <div className="mt-5 flex items-start gap-3 rounded-2xl bg-brand-50 p-4 text-brand-900 ring-1 ring-inset ring-brand-100">
           <ShieldCheckIcon className="mt-0.5 text-brand-600" />
           <p>
-            <strong className="font-semibold">You&apos;re always in charge.</strong> Xana can find your item and
+            <strong className="font-semibold">You&apos;re always in charge.</strong> Xena can find your item and
             get a quote, but only you can confirm. Background noise or an unclear answer never counts as
             a “yes.”
           </p>
@@ -386,7 +386,7 @@ export default function HowReturnsWorkPage() {
           <Faq q="What if I tap Confirm twice?">
             You still get exactly one return and one refund. We never refund twice.
           </Faq>
-          <Faq q="Can Xana return something without asking me?">
+          <Faq q="Can Xena return something without asking me?">
             No. It can help, but a return is only created after you tap Confirm or say a clear “yes.”
           </Faq>
           <Faq q="My situation is unusual. Who can help?">
@@ -426,7 +426,7 @@ export default function HowReturnsWorkPage() {
             className="text-white ring-1 ring-inset ring-white/25 hover:bg-white/10 active:bg-white/15"
           >
             <MicIcon className="size-4.5" />
-            Talk to Xana
+            Talk to Xena
           </ButtonLink>
         </div>
         <p className="text-sm text-brand-200">

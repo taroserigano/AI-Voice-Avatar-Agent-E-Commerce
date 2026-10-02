@@ -1,8 +1,8 @@
-"""Xana's golden sets (evals/xana/*.jsonl) must agree with the seed data and the policies.
+"""Xena's golden sets (evals/xana/*.jsonl) must agree with the seed data and the policies.
 
 The builder (evals/xana/build_golden.py) reads every expected fact from the seed data; this
 test reads the written files back and checks them again, so a catalog, order, store, or policy
-change that makes a golden answer wrong fails here instead of silently scoring Xana against it.
+change that makes a golden answer wrong fails here instead of silently scoring Xena against it.
 """
 
 from __future__ import annotations
