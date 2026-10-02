@@ -30,7 +30,7 @@ from assistant.commerce import catalog_vocabulary
 from assistant.config import get_settings
 from assistant.jev.decisions import TurnSignals
 from assistant.jev.signals import turn_signals
-from assistant.models import choose_model
+from assistant.models import current_model
 from assistant.prompts import render_prompt
 from assistant.tools import ctx_from
 from assistant.toolsets import ALL_TOOLS, tools_for
@@ -80,7 +80,7 @@ def agent(state: AssistantState, config: RunnableConfig) -> dict[str, Any]:
         return {}
     ctx = ctx_from(config)
     settings = get_settings()
-    choice = choose_model()
+    choice = current_model()
     name = state.get("agent", "steph")
     vocabulary = catalog_vocabulary(ctx.client)
     system = render_prompt(

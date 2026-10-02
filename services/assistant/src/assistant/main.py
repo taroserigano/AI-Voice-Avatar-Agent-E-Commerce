@@ -29,7 +29,7 @@ from assistant.config import get_settings
 from assistant.db import Conversation, get_sessionmaker, utcnow
 from assistant.graph import build_graph
 from assistant.jev.signals import decision_model
-from assistant.models import choose_model
+from assistant.models import current_model
 from assistant.prompts import PROMPT_VERSIONS
 from assistant.schemas import (
     AgentName,
@@ -129,7 +129,7 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
 
     @app.get("/v1/assistant/status", response_model=AssistantStatus)
     def assistant_status(customer: CustomerDep) -> AssistantStatus:
-        choice = choose_model()
+        choice = current_model()
         return AssistantStatus(
             model=choice.name,
             simulated=choice.simulated,
@@ -203,8 +203,8 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
                     yield sse(
                         "done",
                         {
-                            "model": choose_model().name,
-                            "simulated": choose_model().simulated,
+                            "model": current_model().name,
+                            "simulated": current_model().simulated,
                             "prompt_version": PROMPT_VERSIONS[conv.agent],
                         },
                     )
