@@ -16,8 +16,13 @@ export const BACKGROUNDS: Background[] = [
 
 export const DEFAULT_BACKGROUND = "sunlit";
 
+/** A look's poster (first frame) and its 3-second looping clip (scripts/xana_look_previews.py). */
 export function lookThumb(key: string): string {
   return `/xana/looks/${key}.jpg`;
+}
+
+export function lookClip(key: string): string {
+  return `/xana/looks/${key}.mp4`;
 }
 
 export function backgroundFor(key: string | null | undefined): Background {

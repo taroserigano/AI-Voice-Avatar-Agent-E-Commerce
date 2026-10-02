@@ -121,6 +121,30 @@ def test_a_fast_answer_gets_no_filler() -> None:
     run(t)
 
 
+def test_with_her_face_on_the_filler_comes_sooner() -> None:
+    # Plan 12, L1: the face adds ~1 s before anything is heard, so the filler covers it.
+    async def kinds(face: bool) -> list[str]:
+        h = harness(
+            FakeBrain(scripts=[[Step(TextDelta("It arrives Friday."), delay_s=0.2)]]),
+            filler_after_ms=900,
+        )
+        h.session.face_filler_after_ms = 60
+        await h.session.start()
+        if face:
+            await h.session.switch_output("tavus", 1)
+            await h.session.output_ready(1)
+        h.ears.hear(Final("When does it arrive?", at=1.0))
+        await settle(h, 0.4)
+        await h.session.close()
+        return [s["kind"] for s in h.of("segment.start")]
+
+    async def t() -> None:
+        assert await kinds(face=True) == ["filler", "answer"]
+        assert await kinds(face=False) == ["answer"]
+
+    run(t)
+
+
 def test_a_tool_call_before_any_words_says_what_xana_is_doing() -> None:
     async def t() -> None:
         brain = FakeBrain(

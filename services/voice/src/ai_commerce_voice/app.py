@@ -100,6 +100,14 @@ class ModelPick:
     strong_name: str | None = None
 
 
+def after_tool_settings(settings: VoiceSettings, simulated: bool) -> dict[str, Any] | None:
+    """Request settings for the model call right after a tool result (plan 12, L3)."""
+    effort = settings.voice_llm_after_tool_reasoning
+    if simulated or effort == "same":
+        return None
+    return {"reasoning": {"effort": effort}}
+
+
 def pick_model(settings: VoiceSettings, http: httpx.AsyncClient) -> ModelPick:
     if settings.voice_llm_mode == "scripted" or (
         settings.voice_llm_mode == "auto" and not settings.openai_api_key
@@ -116,8 +124,10 @@ def pick_model(settings: VoiceSettings, http: httpx.AsyncClient) -> ModelPick:
             use_responses_api=True,
             reasoning={"effort": effort},
             streaming=True,
-            max_retries=1,
-            timeout=20,
+            # A dropped connection is retried at once: a 20 s connect wait left a caller in
+            # silence for ~40 s (2026-10-02). Reading the answer may still take up to 20 s.
+            max_retries=2,
+            timeout=httpx.Timeout(20, connect=4),
             max_tokens=400 if effort in ("none", "low") else 1200,
             http_async_client=http,
             model_kwargs={
@@ -487,6 +497,7 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
                 system=system,
                 max_tool_calls=settings.voice_max_tool_calls,
                 bind_extra=extra,
+                after_tool=after_tool_settings(settings, pick.simulated),
             ),
             model=pick.name,
             simulated=pick.simulated,
@@ -510,6 +521,7 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
             confirm=confirm_rule,
             fillers=state["fillers"],
             filler_after_ms=settings.voice_filler_after_ms,
+            face_filler_after_ms=settings.voice_face_filler_after_ms,
             max_turn_s=settings.voice_max_turn_s,
         )
         session_ref["s"] = session

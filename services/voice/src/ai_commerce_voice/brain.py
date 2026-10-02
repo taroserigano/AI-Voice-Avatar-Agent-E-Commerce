@@ -58,6 +58,7 @@ from langgraph.types import Command
 from ai_commerce_voice.escalation import TOOL_ERRORS, escalation_reason, tool_errors_this_turn
 from ai_commerce_voice.ports import AgentEvent, CardOut, QuoteOut, TextDelta, ToolStarted, TurnEnded
 from assistant.graph import _superseded_proposal, recent_history
+from assistant.prompts import catalog_size
 from assistant.tools import (
     ToolContext,
     _order_for_model,
@@ -297,6 +298,7 @@ def system_prompt(
         f"## Your orders right now\n\n{orders}\n\n"
         f"## Catalog filters\n\nUse only these exact values in product search. "
         f"Product types: {types or '(unavailable)'}. Tags: {tags or '(unavailable)'}.\n"
+        f"{catalog_size(vocab)}\n"
     )
 
 
@@ -312,6 +314,9 @@ class VoiceContext:
     strong: Runnable[Any, Any] | None = None
     strong_bound: Runnable[Any, Any] | None = None
     strong_name: str | None = None
+    # Extra request settings for the call right after a tool result, when the model mostly
+    # puts the result into words (plan 12, L3: reasoning effort "none" there).
+    after_tool: dict[str, Any] | None = None
 
 
 class VoiceState(TypedDict, total=False):
@@ -342,6 +347,14 @@ async def agent(state: VoiceState, config: RunnableConfig) -> dict[str, Any]:
     if escalated and vc.strong is not None and vc.strong_bound is not None:
         strong = True
         model = vc.strong_bound if used < vc.max_tool_calls else vc.strong
+    last = state["messages"][-1]
+    # After the model's own tool call, not the policy prefetch: a policy answer still has to
+    # weigh the rules, which is what the first call's reasoning is for.
+    after_tool = isinstance(last, ToolMessage) and not str(last.tool_call_id).startswith(
+        "prefetch-"
+    )
+    if after_tool and not strong and vc.after_tool:
+        model = model.bind(**vc.after_tool)
     messages: list[AnyMessage] = [
         SystemMessage(content=vc.system),
         *recent_history(state["messages"]),
@@ -359,7 +372,9 @@ async def agent(state: VoiceState, config: RunnableConfig) -> dict[str, Any]:
     log.info(
         "voice model call (%s): first chunk %.0f ms, done %.0f ms, %s in (%s cached), %s out "
         "(%s reasoning), %d tool calls",
-        f"{vc.strong_name}, {escalated}" if strong else "default",
+        f"{vc.strong_name}, {escalated}"
+        if strong
+        else ("after tool" if after_tool and vc.after_tool else "default"),
         ((first or started) - started) * 1000,
         (time.perf_counter() - started) * 1000,
         usage.get("input_tokens"),
@@ -394,6 +409,7 @@ def make_context(
     bind_extra: dict[str, Any] | None = None,
     strong: BaseChatModel | None = None,
     strong_name: str | None = None,
+    after_tool: dict[str, Any] | None = None,
 ) -> VoiceContext:
     bound = model.bind_tools(XANA_TOOLS, **(bind_extra or {}))
     return VoiceContext(
@@ -404,6 +420,7 @@ def make_context(
         strong=strong,
         strong_bound=strong.bind_tools(XANA_TOOLS, **(bind_extra or {})) if strong else None,
         strong_name=strong_name,
+        after_tool=after_tool,
     )
 
 
@@ -591,9 +608,13 @@ class XanaBrain:
                                 yield CardOut(card)
         except Exception:
             log.exception("voice turn failed")
+            # She already answered (a later step failed, e.g. a network timeout): end the turn
+            # there rather than put an error under an answer the customer just heard.
             yield TurnEnded(
                 first_token_ms=first_token_ms,
-                error="Sorry, something went wrong on our side. Please try again.",
+                error=None
+                if answer
+                else "Sorry, something went wrong on our side. Please try again.",
             )
             return
         for card in products.final():
