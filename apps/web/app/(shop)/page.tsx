@@ -94,8 +94,8 @@ const TRUST_ITEMS: { icon: Icon; title: string; body: string; href: string }[] =
   },
   {
     icon: ChatIcon,
-    title: "Help from Steph and Xana, any time",
-    body: "Steph helps you shop. Xana handles returns by voice or text.",
+    title: "Help from Steph and Xena, any time",
+    body: "Steph helps you shop. Xena handles returns by voice or text.",
     href: "/help",
   },
   {
@@ -622,9 +622,9 @@ function PromoRow() {
         </div>
         <div className="max-w-sm">
           <p className="text-xs font-semibold uppercase tracking-eyebrow text-accent-300">Help by text or voice</p>
-          <h2 className="mt-3 font-display text-2xl font-semibold text-white sm:text-3xl">Ask Steph. Talk to Xana.</h2>
+          <h2 className="mt-3 font-display text-2xl font-semibold text-white sm:text-3xl">Ask Steph. Talk to Xena.</h2>
           <p className="mt-2 text-base text-brand-200">
-            Steph finds products down to the diet label, checks your orders, and answers policy questions. Xana
+            Steph finds products down to the diet label, checks your orders, and answers policy questions. Xena
             handles returns and refunds by voice or text, and starts a return only when you confirm.
           </p>
         </div>
@@ -638,7 +638,7 @@ function PromoRow() {
             className="text-white ring-1 ring-inset ring-white/25 hover:bg-white/10 active:bg-white/15 max-sm:w-full"
           >
             <MicIcon className="size-4.5" />
-            Talk to Xana
+            Talk to Xena
           </ButtonLink>
         </div>
       </div>

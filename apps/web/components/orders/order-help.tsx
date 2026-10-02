@@ -3,7 +3,7 @@ import { buttonClasses } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import Link from "next/link";
 
-/** "Need help with this order?": Xana already knows which order, plus the help topics. */
+/** "Need help with this order?": Xena already knows which order, plus the help topics. */
 export function OrderHelpCard({ orderId, orderNumber }: { orderId: string; orderNumber: string }) {
   return (
     <aside aria-labelledby="order-help-heading" className="rounded-3xl border border-line bg-raised p-5 shadow-xs sm:p-6">
@@ -16,14 +16,14 @@ export function OrderHelpCard({ orderId, orderNumber }: { orderId: string; order
             Need help with this order?
           </h2>
           <p className="mt-1 text-sm text-muted">
-            Xana, our support assistant, can check delivery, start a return, or hand you to a person.
+            Xena, our support assistant, can check delivery, start a return, or hand you to a person.
           </p>
         </div>
       </div>
       <div className="mt-4 flex flex-col gap-2">
         <Link href={`/support?order=${orderId}`} className={cn(buttonClasses("secondary", "md"), "w-full")}>
           <ChatIcon className="size-4.5" />
-          Ask Xana about this order
+          Ask Xena about this order
           <span className="sr-only"> (#{orderNumber})</span>
         </Link>
         <Link

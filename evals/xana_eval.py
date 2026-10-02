@@ -1,4 +1,4 @@
-"""Xana golden-set eval: 200 product questions and 200 return/refund questions, live.
+"""Xena golden-set eval: 200 product questions and 200 return/refund questions, live.
 
 Run with the stack up (``pnpm dev``), from the repo root:
   uv run --directory services/assistant python ../../evals/xana_eval.py

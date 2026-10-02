@@ -19,7 +19,7 @@ function StephMark() {
   );
 }
 
-/** Xana's mark: a voice wave. */
+/** Xena's mark: a voice wave. */
 function XanaMark() {
   return (
     <svg viewBox="0 0 24 24" className="size-[58%]" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">

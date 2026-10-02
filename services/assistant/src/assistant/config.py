@@ -57,7 +57,7 @@ class Settings(BaseSettings):
     jev_model: str = "jev-latest"
     jev_timeout_s: float = 1.5
 
-    # Voice (Xana). Speech-to-text: Deepgram, else Groq Whisper, else the browser's.
+    # Voice (Xena). Speech-to-text: Deepgram, else Groq Whisper, else the browser's.
     # Text-to-speech: Cartesia, else the browser's. Audio is never stored.
     deepgram_api_key: str | None = None
     groq_api_key: str | None = None

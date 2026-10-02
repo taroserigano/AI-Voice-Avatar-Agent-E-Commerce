@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
   // is first-party and never exposed to scripts (HttpOnly).
   async rewrites() {
     return [
-      // Steph and Xana (services/assistant). Listed first: rewrites match in order.
+      // Steph and Xena (services/assistant). Listed first: rewrites match in order.
       { source: "/api/assistant/:path*", destination: `${ASSISTANT_API_URL}/v1/assistant/:path*` },
       { source: "/api/:path*", destination: `${COMMERCE_API_URL}/:path*` },
     ];

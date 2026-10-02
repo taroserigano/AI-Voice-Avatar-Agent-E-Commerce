@@ -1,4 +1,4 @@
-"""Xana's product answers use the same catalog tools as Steph and stay within their facts."""
+"""Xena's product answers use the same catalog tools as Steph and stay within their facts."""
 
 from __future__ import annotations
 

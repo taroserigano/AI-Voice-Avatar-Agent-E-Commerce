@@ -107,7 +107,7 @@ export default async function ReturnsPolicyPage() {
             <StartCard icon={<ChatIcon className="size-5" />} title="Ask Steph">
               Our shopping assistant, at the bottom right of every page, answers policy questions and checks orders.
             </StartCard>
-            <StartCard icon={<InfoIcon className="size-5" />} title="Talk to Xana">
+            <StartCard icon={<InfoIcon className="size-5" />} title="Talk to Xena">
               Our customer-support assistant handles returns and refunds by voice or text.
             </StartCard>
           </div>
@@ -123,7 +123,7 @@ export default async function ReturnsPolicyPage() {
             <PolicyDocument key={doc.id} doc={doc} />
           ))}
           <p className="border-t border-line pt-6 text-sm text-muted">
-            Questions this page doesn&apos;t answer? Ask Steph or Xana for a person, and we&apos;ll open a support case.
+            Questions this page doesn&apos;t answer? Ask Steph or Xena for a person, and we&apos;ll open a support case.
             See also{" "}
             <Link className={linkClass} href="/help/returns">
               how returns work

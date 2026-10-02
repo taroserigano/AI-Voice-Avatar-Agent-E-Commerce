@@ -1,4 +1,4 @@
-"""Return and refund tools (Xana): eligibility, a priced quote, and a paused proposal.
+"""Return and refund tools (Xena): eligibility, a priced quote, and a paused proposal.
 
 The model can look up what's returnable and ask the commerce API to price a return. It can
 then *propose* the quote: ``propose_return`` pauses the conversation (LangGraph ``interrupt``)

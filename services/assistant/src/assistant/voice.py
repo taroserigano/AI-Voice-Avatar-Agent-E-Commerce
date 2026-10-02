@@ -1,4 +1,4 @@
-"""Voice for Xana without LiveKit (yet): speech-to-text, text-to-speech, and the app-controlled
+"""Voice for Xena without LiveKit (yet): speech-to-text, text-to-speech, and the app-controlled
 spoken confirmation.
 
 Turn-based: the browser detects the end of the customer's speech, uploads that clip, and plays

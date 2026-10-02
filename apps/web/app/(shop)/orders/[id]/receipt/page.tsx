@@ -198,7 +198,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
             </p>
           ) : null}
           <p>Returns within 30 days of delivery, refunded to your original payment method. Some items are final sale.</p>
-          <p>Questions about this order? See Help, or ask Xana on the Support page.</p>
+          <p>Questions about this order? See Help, or ask Xena on the Support page.</p>
         </div>
       </article>
     </div>

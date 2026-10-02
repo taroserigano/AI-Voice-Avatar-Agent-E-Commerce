@@ -1,4 +1,4 @@
-"""Xana's voice: Cartesia Sonic ("Skylar"), streamed over one WebSocket per session.
+"""Xena's voice: Cartesia Sonic ("Skylar"), streamed over one WebSocket per session.
 
 Measured (2026-09-26): first audio ~125-165 ms after text is sent on an open socket, versus
 ~365-454 ms on a fresh connection, so the socket is opened when the session starts and kept

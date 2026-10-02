@@ -1,4 +1,4 @@
-"""Xana's ears: OpenAI streaming transcription (``gpt-live-transcribe``) with our own VAD.
+"""Xena's ears: OpenAI streaming transcription (``gpt-live-transcribe``) with our own VAD.
 
 ``gpt-live-transcribe`` at ``delay: minimal`` streams words while the customer is still
 talking (about 150-400 ms behind the audio, measured), so captions are live and the text is
@@ -59,9 +59,9 @@ class _Utterance:
 RATE = 24_000
 FRAME_BYTES = RATE * 2 * FRAME_MS // 1000
 
-# Words customers say to Xana that a general model may not expect.
+# Words customers say to Xena that a general model may not expect.
 KEYWORDS = [
-    "Xana",
+    "Xena",
     "Serigan Mart",
     "RMA",
     "refund",
@@ -88,7 +88,7 @@ class OpenAILiveEars:
         self._key = api_key
         self._vad = vad or Vad()
         self._keywords = keywords or KEYWORDS
-        # A callable telling us whether Xana is speaking right now (raises the VAD threshold).
+        # A callable telling us whether Xena is speaking right now (raises the VAD threshold).
         self._talking = talking or (lambda: False)
         self._ws: websockets.ClientConnection | None = None
         self._events: asyncio.Queue[HearingEvent | None] = asyncio.Queue()

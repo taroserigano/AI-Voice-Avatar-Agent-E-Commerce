@@ -1,7 +1,7 @@
-"""Xana's brain for voice: a LangGraph agent ⇄ tools loop over Xana's own support tools.
+"""Xena's brain for voice: a LangGraph agent ⇄ tools loop over Xena's own support tools.
 
-The same narrow tools, server-side identity, and PostgreSQL checkpoint as Xana in the chat
-(services/assistant), so a voice call is saved as a normal Xana conversation. What's
+The same narrow tools, server-side identity, and PostgreSQL checkpoint as Xena in the chat
+(services/assistant), so a voice call is saved as a normal Xena conversation. What's
 different is tuned for speaking in real time:
 
 - the model is ``gpt-6-luna`` on the Responses API at low reasoning effort with priority
@@ -70,7 +70,7 @@ from assistant.turns import TOOL_LABELS, ProductCards, message_text, split_citat
 
 log = logging.getLogger(__name__)
 
-PROMPT_VERSION = "xana.voice.v3"
+PROMPT_VERSION = "xana.voice.v4"
 PROMPT_DIR = Path(__file__).resolve().parent / "prompts"
 SNAPSHOT_ORDERS = 8
 

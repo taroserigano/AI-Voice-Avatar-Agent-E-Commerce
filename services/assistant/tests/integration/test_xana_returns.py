@@ -1,4 +1,4 @@
-"""Xana's return flow: find the item, price it, pause for the customer, resume with the outcome.
+"""Xena's return flow: find the item, price it, pause for the customer, resume with the outcome.
 
 The commerce API is a fake that behaves like the real one for these routes (the real routes are
 tested in services/commerce). What's tested here is the assistant's side: the graph pauses on
@@ -346,7 +346,7 @@ def test_voice_confirmation_is_checked_by_the_app(alice: TestClient) -> None:
 def test_a_case_follow_up_answers_about_the_named_order(
     alice: TestClient, saver: InMemorySaver
 ) -> None:
-    """The Support page's "Continue with Xana" message names the order; Xana answers about its
+    """The Support page's "Continue with Xena" message names the order; Xena answers about its
     delivery (from the store's shipment data), not with a list of recent orders."""
     FakeStore.in_transit = True
     conv = alice.post("/v1/assistant/conversations", json={"agent": "xana"}).json()

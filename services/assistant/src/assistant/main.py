@@ -1,4 +1,4 @@
-"""Assistant API: conversations with Steph (shopping) and Xana (support).
+"""Assistant API: conversations with Steph (shopping) and Xena (support).
 
 Every route but ``/healthz`` needs the customer's session: the browser reaches this service
 through the web app's ``/api/assistant/*`` rewrite with its HttpOnly cookie, and each request
@@ -253,7 +253,7 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
         db.commit()
         return _stream(conv, customer, body.voice, text=text)
 
-    # --- Voice (Xana) ------------------------------------------------------------------------
+    # --- Voice (Xena) ------------------------------------------------------------------------
 
     @app.get("/v1/assistant/voice/config", response_model=VoiceConfig)
     def voice_config(customer: CustomerDep) -> VoiceConfig:
@@ -262,7 +262,7 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
             tts=voice.tts_provider(settings),
             max_seconds=settings.voice_max_seconds,
             decision_model=_decision_model_name(),
-            notice="Xana is an AI assistant. Your speech is sent to our speech providers to be "
+            notice="Xena is an AI assistant. Your speech is sent to our speech providers to be "
             "turned into text and isn't stored; the text is saved with this conversation.",
         )
 

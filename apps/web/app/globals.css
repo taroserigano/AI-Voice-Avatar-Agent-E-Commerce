@@ -384,7 +384,7 @@
     radial-gradient(50% 70% at 0% 100%, rgb(255 239 207 / 0.9) 0%, transparent 60%);
 }
 
-/* Xana's voice screen: a deep night-blue stage with a soft violet glow behind the orb. White
+/* Xena's voice screen: a deep night-blue stage with a soft violet glow behind the orb. White
    text on the base is 17:1; the muted captions (neutral-300) are 11:1. */
 @utility bg-voice-night {
   background-color: #0b1024;

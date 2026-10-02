@@ -65,7 +65,7 @@ class ToolContext:
     first_name: str = ""
     # Jev's signals for this turn (set by the graph's route node).
     signals: dict[str, Any] | None = None
-    # The customer is speaking (Xana's voice mode): short spoken answers.
+    # The customer is speaking (Xena's voice mode): short spoken answers.
     voice: bool = False
     conversation_id: str | None = None
 
@@ -1115,13 +1115,13 @@ class SuggestXanaArgs(BaseModel):
 
 @tool("suggest_xana", args_schema=SuggestXanaArgs, response_format="content_and_artifact")
 def suggest_xana(config: RunnableConfig, about: str) -> tuple[str, list[dict[str, Any]]]:
-    """Point the customer to Xana, the customer-support assistant on the Support page, for
+    """Point the customer to Xena, the customer-support assistant on the Support page, for
     starting a return, reporting a problem with an order, or a refund. Steph can't start returns."""
     ctx_from(config)
     card = {
         "kind": "xana",
         "about": about,
-        "message": "Xana handles returns and refunds, by voice or text. She finds the order, shows "
+        "message": "Xena handles returns and refunds, by voice or text. She finds the order, shows "
         "your exact refund, and starts the return when you confirm.",
         "url": "/support",
     }

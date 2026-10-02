@@ -1,4 +1,4 @@
-"""The scripted model's support flow (Xana), used when no working LLM key is configured.
+"""The scripted model's support flow (Xena), used when no working LLM key is configured.
 
 A return takes several tool calls in one turn, as a real model would make them:
 ``list_my_orders`` (find the item) → ``get_return_options`` (is it eligible?) → ``quote_return``

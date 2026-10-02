@@ -1,4 +1,4 @@
-// Scratch (not committed): screenshot the Xana flow. node xana-shot.mjs <outdir> [width]
+// Scratch (not committed): screenshot the Xena flow. node xana-shot.mjs <outdir> [width]
 import { chromium } from "@playwright/test";
 
 const [out, w = "1280"] = process.argv.slice(2);

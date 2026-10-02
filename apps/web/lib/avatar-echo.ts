@@ -1,13 +1,13 @@
 import { SPEECH_RATE } from "./voice-protocol";
 
 /**
- * Xana's face (Tavus, echo mode): turns the speech the voice agent streams into Tavus echo
+ * Xena's face (Tavus, echo mode): turns the speech the voice agent streams into Tavus echo
  * messages, and works out what the customer has actually heard. See
  * docs/features/10-xana-avatar.
  *
  * What the spike showed (2026-09-30), and what this does about it:
  * - Tavus drops audio sent under a new `inference_id` while it's still speaking. So everything
- *   Xana says in one turn goes under one id, closed by a short silent chunk with `done: true`
+ *   Xena says in one turn goes under one id, closed by a short silent chunk with `done: true`
  *   at `turn.done`, and the next turn's audio waits until Tavus has finished the previous one.
  * - Tavus plays our audio ~0.8 s after we send it. Its `started_speaking` event comes ~150 ms
  *   before the audio is heard, and `stopped_speaking` says whether it was `interrupted`.
@@ -19,7 +19,7 @@ import { SPEECH_RATE } from "./voice-protocol";
  * Safety: a confirm segment (the return read-back) is reported complete only on that clean
  * stop. If Tavus never reports one, it stays incomplete, so a spoken yes is "unclear" and the
  * customer can still tap Confirm. Other segments fall back to the timeline after a while, so a
- * lost event can't leave Xana "speaking" forever.
+ * lost event can't leave Xena "speaking" forever.
  */
 
 export const DEFAULT_DELAY_MS = 800;

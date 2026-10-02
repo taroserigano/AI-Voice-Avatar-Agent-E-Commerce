@@ -1,4 +1,4 @@
-"""Fixes found by Xana's golden-set eval (evals/xana_eval.py): what the customer sees in a turn."""
+"""Fixes found by Xena's golden-set eval (evals/xana_eval.py): what the customer sees in a turn."""
 
 from __future__ import annotations
 

@@ -1,5 +1,5 @@
 /**
- * The wire protocol between the Xana voice screen and the voice agent (services/voice).
+ * The wire protocol between the Xena voice screen and the voice agent (services/voice).
  *
  * One WebSocket per session:
  * - browser → server, binary: microphone audio, PCM16 mono at MIC_RATE, ~20 ms per frame;
@@ -41,7 +41,7 @@ export type ServerMessage =
       voice: { provider: string; name: string };
       stt: { provider: string; model: string };
       llm: { model: string; simulated: boolean };
-      /** Xana's face (Tavus): offered only when the server has it set up. */
+      /** Xena's face (Tavus): offered only when the server has it set up. */
       avatar?: AvatarOffer;
       avatars?: Record<AvatarProvider, AvatarOffer>;
       notice: string;

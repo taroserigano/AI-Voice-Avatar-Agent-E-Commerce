@@ -155,10 +155,10 @@ function SearchSummaryChatCard({ card }: { card: SearchCard }) {
 
 function XanaChatCard({ card }: { card: XanaCard }) {
   return (
-    <article className={`${cardBox} flex gap-3`} aria-label="Returns and refunds with Xana">
+    <article className={`${cardBox} flex gap-3`} aria-label="Returns and refunds with Xena">
       <AssistantAvatar who="xana" size="lg" />
       <div>
-        <p className="text-sm font-semibold text-ink">Returns and refunds with Xana</p>
+        <p className="text-sm font-semibold text-ink">Returns and refunds with Xena</p>
         <p className="mt-0.5 text-sm text-ink-soft">{card.message}</p>
         <Link href={card.url} className={`${smallLink} mt-1.5`}>
           Open Support <ArrowRightIcon className="size-3.5" />

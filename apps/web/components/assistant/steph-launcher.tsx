@@ -33,7 +33,7 @@ export function StephLauncher() {
   const launcherRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { load } = chat;
-  // Xana has the Support page; Steph stays out of her way there.
+  // Xena has the Support page; Steph stays out of her way there.
   const onSupport = usePathname()?.startsWith("/support") ?? false;
 
   const close = useCallback(() => {

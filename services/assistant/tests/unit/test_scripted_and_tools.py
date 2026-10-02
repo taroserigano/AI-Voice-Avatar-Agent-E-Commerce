@@ -80,7 +80,7 @@ def test_the_model_can_never_confirm_pay_or_refund() -> None:
     names = {t.name for t in ALL_TOOLS}
     assert names == REVIEWED_TOOLS
     assert not {n for n in names if n.startswith(("confirm", "issue", "cancel", "pay", "checkout"))}
-    # Steph can't even price a return; that's Xana's job, and still only a proposal.
+    # Steph can't even price a return; that's Xena's job, and still only a proposal.
     assert {t.name for t in tools_for("steph")} & {"quote_return", "propose_return"} == set()
     # The customer's identity is never a tool argument.
     for t in ALL_TOOLS:

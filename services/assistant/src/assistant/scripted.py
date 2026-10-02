@@ -33,7 +33,7 @@ SCRIPTED_MODEL_NAME = "scripted"
 GREETINGS = {
     "steph": "Hi! I'm Steph. I can find products, check your orders, answer policy questions, "
     "and find stores. What are you looking for?",
-    "xana": "Hi, I'm Xana. I can help with products, orders, returns, and refunds. "
+    "xana": "Hi, I'm Xena. I can help with products, orders, returns, and refunds. "
     "What can I help with?",
 }
 BYPASS_REPLY = (
@@ -265,7 +265,7 @@ def plan(
             if len(cards) == 1 or ordinal is not None:
                 card = cards[ordinal or 0]
                 return [_call("get_product_details", {"product_id": card["id"]})]
-    # "I want to return my earbuds" goes to Xana; "can I drop off a return at a store?" is a
+    # "I want to return my earbuds" goes to Xena; "can I drop off a return at a store?" is a
     # policy question Steph answers herself.
     asks_question = bool(re.match(r"\s*(can|could|do|does|how|what|where|when|is|are|will)\b", t))
     if "suggest_xana" in tools and not asks_question and wants_return(text, signals or {}):
@@ -447,13 +447,13 @@ def compose(results: list[ToolMessage], vocabulary: dict[str, Any]) -> str:
             parts.append(" ".join(sentences[:2]) + f" [[cite:{top['cite']}]]")
         elif m.name == "suggest_xana":
             parts.append(
-                "I can't start returns myself, but Xana, our customer-support assistant, can: "
+                "I can't start returns myself, but Xena, our customer-support assistant, can: "
                 "she'll find the order, show your exact refund, and start the return when you "
                 "confirm."
             )
         elif m.name == "handoff_to_person":
             parts.append(
-                "I can hand this to a person. Open Support to talk with Xana or ask for a member "
+                "I can hand this to a person. Open Support to talk with Xena or ask for a member "
                 "of our team; your conversation comes with you."
             )
     return "\n\n".join(parts) or "How can I help?"

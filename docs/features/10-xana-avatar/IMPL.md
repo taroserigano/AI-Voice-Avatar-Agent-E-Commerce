@@ -81,7 +81,7 @@ One of these calls was an accidental duplicate run (about 40 s billed); it ended
       `p47f6df86787`; the Anna PAL is deleted. Screenshots of Rose idle and talking, from a
       40 s call: [screenshots/rose-sheet.png](screenshots/rose-sheet.png).
 
-## A2 Browser (in progress)
+## A2 Browser (2026-09-30)
 
 - [x] `apps/web/lib/avatar-echo.ts`: `AvatarEcho` turns the agent's audio into echo messages
       (one id per turn, the next turn held until Tavus finishes, silent `done` chunk at
@@ -141,3 +141,65 @@ Taro: a lighter, more casual background, and tabs to choose the background and t
   at 11 PM today. Plenty of time for a snack run!"), the call returned to listening on Tavus's
   playback reports, Café applied at once, Margo came up in a new room, then Mint.
   [screenshots/looks-and-backgrounds.png](screenshots/looks-and-backgrounds.png)
+
+## Renamed to Xena; chat gets the personality (2026-10-01)
+
+Decision 37. Every customer-facing name says Xena (252 places: pages, prompts, policies,
+spoken lines, the speech-to-text hints); code names and older docs keep "xana". New prompt
+versions so runs stay comparable: chat `xana.v3` (v2 plus the voice personality, same rules)
+and voice `xana.voice.v4` (v3 with the new name).
+
+Golden sets, this branch's stack (:3200), reseeded first:
+
+| Channel | Model | Products | Returns | Before |
+|---|---|---|---|---|
+| Chat, `xana.v3` | gpt-6-sol | 199/200 | 199/200 | 200 + 199 (baseline, `xana.v2`) |
+| Voice, `xana.voice.v4` | gpt-6-luna | 197/200 | 186/198 | 195 + 188 (`xana.voice.v3`) |
+
+Neither chat miss is about tone (a water-resistance answer missing a listed fact; a late-order
+question answered with the order instead of the cited policy, which voice misses too). Tone in
+chat: 68 of 417 answers openly cheerful, no "Oh no", no emoji.
+
+## A3 Safety with video (2026-10-01)
+
+`tests/e2e/specs/xana-avatar-live.spec.ts`, opt-in with `TAVUS_E2E_LIVE=1` (real Tavus
+minutes, about 1.5 a run, plus OpenAI and Cartesia). Turns are typed into the call's socket,
+which goes through the same read-back rule as speech. The store's confirmation endpoint is
+stubbed, so a yes never creates a return. The same steps run with video on and off:
+
+1. Two questions (the A4 timings below).
+2. "Return the Arc over-ear headphones", then **"yes" while the read-back is playing:
+   unclear**, no confirmation request.
+3. A new quote, then **"yes" after the read-back was heard in full: yes**, and the browser
+   asks the store to confirm. With video on, "heard in full" came from Tavus finishing it
+   (17 s after our server finished sending it), not from our server.
+4. A long answer, then an interrupt mid-sentence: the segment is dropped and she goes quiet.
+
+Both pass (video on: 4 runs, video off: 2).
+
+**Bug found and fixed** (not avatar-specific): a yes that arrived while the read-back's voice
+was still being made started the next turn, which cancelled the read-back without dropping
+it. The segment never ended, so the call never went back to listening. A cancelled turn now
+drops the speech it hadn't finished making (`VoiceSession._drop_unmade`); a unit test covers it.
+
+## A4 Measure (2026-10-01)
+
+From the live spec. "Heard" is when the face's audio goes loud in the browser (a Web Audio
+level meter on the video's stream); "first audio" is when our first audio frame reached the
+browser. Typed turns, so no speech-to-text time.
+
+| | First audio | Heard | Face adds |
+|---|---|---|---|
+| Video off | 0.90 s | about the same (local player) | — |
+| Video on, Phoenix-4.5 (Rose – Business, no background) | 0.88 s | 1.72 s | **0.83 s** (0.833, 0.837) |
+| Video on, Phoenix-4 looks (green screen + background) | 0.91 s | 2.03 s | **1.12 s** (1.85 first call, 1.10, 1.14, 1.11) |
+
+- The first audio is the pre-recorded filler at ~0.9 s; the answer itself follows.
+- The backgrounds cost about **0.3 s** more per reply: Tavus's green-screen render on
+  Phoenix-4 is slower than Phoenix-4.5. The first reply of a call can take ~0.7 s more.
+- Barge-in with video: the interrupt reaches the server and the segment is dropped in
+  6-14 ms; her face goes quiet **0.62-0.68 s** after the interrupt (Tavus's own stop). Real
+  speech adds the 250 ms barge-in threshold before that.
+- Avatar minutes: about 1.5 per test run. A call bills from Video on to Video off or hang-up;
+  the room is ended on both, and the live check after the runs showed no active conversations.
+- Taro (2026-10-01): video stays **off by default**.

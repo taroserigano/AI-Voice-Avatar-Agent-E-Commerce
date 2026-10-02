@@ -14,23 +14,23 @@ import { XanaLookPicker } from "./xana-look-picker";
 import { XanaOrb } from "./xana-orb";
 
 /**
- * The Xana voice screen: a full-screen, voice-first conversation for orders, returns, and
- * refunds. Separate from the chat. Everything Xana says is streamed as audio with captions
+ * The Xena voice screen: a full-screen, voice-first conversation for orders, returns, and
+ * refunds. Separate from the chat. Everything Xena says is streamed as audio with captions
  * that follow her voice word by word; the customer's words appear live as they speak.
  *
  * A return is only ever confirmed by the customer: by the button, or by a clear spoken yes
  * that the server checks with a strict rule after the read-back played in full. The browser
  * then confirms with the store itself (the model never can).
  *
- * With Video on (when the server offers it), Xana's face (Tavus) takes the orb's place and
+ * With Video on (when the server offers it), Xena's face (Tavus) takes the orb's place and
  * speaks her answers; captions follow her lips. If video fails, the call carries on as voice.
  */
 
 const STATUS = {
   off: { title: "Tap to talk", hint: "Ask about an order, a return, or a refund." },
-  connecting: { title: "Connecting", hint: "Getting Xana on the line…" },
-  listening: { title: "Listening", hint: "Speak naturally. Xana answers when you pause." },
-  hearing: { title: "Listening", hint: "Go on, Xana's listening." },
+  connecting: { title: "Connecting", hint: "Getting Xena on the line…" },
+  listening: { title: "Listening", hint: "Speak naturally. Xena answers when you pause." },
+  hearing: { title: "Listening", hint: "Go on, Xena's listening." },
   thinking: { title: "Thinking", hint: "One moment…" },
   speaking: { title: "Speaking", hint: "Talk anytime to interrupt." },
   error: { title: "Voice is off", hint: "Something went wrong." },
@@ -59,7 +59,7 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
     setConfirming(true);
     setConfirmError(null);
     try {
-      // The browser confirms with the store itself; Xana only hears the outcome, then checks it.
+      // The browser confirms with the store itself; Xena only hears the outcome, then checks it.
       const result = await confirmQuote(q.quote_id);
       if (result.ok) quoteOutcome(q.quote_id, "confirmed");
       else setConfirmError(result.message);
@@ -113,7 +113,7 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
         <p className="text-xs font-bold uppercase tracking-[0.32em] text-brand-200 sm:text-sm">
           Orders &amp; returns, in conversation
         </p>
-        <h1 className="mt-3 font-display text-5xl font-extrabold tracking-[-0.04em] sm:text-7xl">Meet Xana</h1>
+        <h1 className="mt-3 font-display text-5xl font-extrabold tracking-[-0.04em] sm:text-7xl">Meet Xena</h1>
         <XanaProviderTabs provider={provider} disabled={confirming} />
         <section role="tabpanel" id="avatar-provider-panel" aria-labelledby={`avatar-tab-${provider}`} className="mt-4">
         {face ? (
@@ -134,13 +134,13 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
             else if (state === "speaking") voice.interrupt();
           }}
           className="mt-4 rounded-full sm:mt-6"
-          aria-label={!live ? "Start talking to Xana" : state === "speaking" ? "Interrupt Xana" : "Xana is listening"}
+          aria-label={!live ? "Start talking to Xena" : state === "speaking" ? "Interrupt Xena" : "Xena is listening"}
         >
           <XanaOrb state={state} level={level} />
         </button>
         )}
         {live && voice.ready && !voice.avatar.offer.available ? (
-          <p className="mt-3 text-sm text-neutral-300">{provider === "heygen" ? "HeyGen" : "Tavus"} video is not set up yet. You can still talk to Xana.</p>
+          <p className="mt-3 text-sm text-neutral-300">{provider === "heygen" ? "HeyGen" : "Tavus"} video is not set up yet. You can still talk to Xena.</p>
         ) : null}
         </section>
 
@@ -158,7 +158,7 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
           </p>
         </div>
 
-        {/* Live transcript: the customer's words as they speak, then Xana's as she says them. */}
+        {/* Live transcript: the customer's words as they speak, then Xena's as she says them. */}
         <div className="mt-4 w-full max-w-2xl space-y-3 text-lg leading-relaxed sm:text-xl">
           {voice.userText ? (
             <p className={cn("text-neutral-300", !voice.userFinal && "italic")}>
@@ -169,7 +169,7 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
           ) : null}
           {caption ? (
             <p className="font-medium text-white" aria-live="off">
-              <span className="sr-only">Xana: </span>
+              <span className="sr-only">Xena: </span>
               {caption}
             </p>
           ) : null}

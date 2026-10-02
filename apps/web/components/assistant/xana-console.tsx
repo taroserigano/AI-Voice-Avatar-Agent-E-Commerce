@@ -17,11 +17,11 @@ import { AssistantAvatar } from "./assistant-avatar";
 import { ChatThread, type Persona } from "./chat-thread";
 
 const XANA: Persona = {
-  name: "Xana",
+  name: "Xena",
   role: "AI customer-support assistant",
   avatar: <AssistantAvatar who="xana" />,
   greeting:
-    "Hi, I'm Xana, Serigan Mart's customer-support assistant. I can answer product questions, help with orders, and handle returns and refunds. Talk to me with the microphone, or type.",
+    "Hi, I'm Xena, Serigan Mart's customer-support assistant, and I'm happy you're here! I can answer product questions, help with orders, and handle returns and refunds. Talk to me with the microphone, or type.",
   suggestions: [
     "Find me sugar free yogurt",
     "I want to return my earbuds",
@@ -30,7 +30,7 @@ const XANA: Persona = {
     "How long do I have to return something?",
     "I'd like to talk to a person",
   ],
-  placeholder: "Type a message to Xana…",
+  placeholder: "Type a message to Xena…",
 };
 
 const STATE_LABEL: Record<string, string> = {
@@ -151,7 +151,7 @@ export function XanaConsole({
   }, [load]);
 
   // Arriving from an order's "Start a return": ask about that item. Or, from a support request's
-  // "Continue with Xana": say that you're following up on it.
+  // "Continue with Xena": say that you're following up on it.
   const startedRef = useRef(false);
   useEffect(() => {
     if (!chat.loaded || startedRef.current || (!initialOrder && !initialMessage)) return;
@@ -181,7 +181,7 @@ export function XanaConsole({
     setVoiceOn(false);
     voice.stop();
   };
-  // The big button: start talking; while Xana speaks, interrupt her; otherwise listen again.
+  // The big button: start talking; while Xena speaks, interrupt her; otherwise listen again.
   const mainAction = () => {
     if (!voiceOn) return startVoice();
     if (voice.state === "speaking") {
@@ -202,9 +202,9 @@ export function XanaConsole({
   const busy = state === "transcribing" || state === "waiting" || state === "requesting";
   const ring = state === "hearing" ? 1 + voice.level * 0.35 : state === "speaking" ? 1.12 : 1;
   const mainLabel = !voiceOn
-    ? "Talk with Xana"
+    ? "Talk with Xena"
     : state === "speaking"
-      ? "Interrupt Xana"
+      ? "Interrupt Xena"
       : listening
         ? "Listening"
         : busy
@@ -217,7 +217,7 @@ export function XanaConsole({
       type="button"
       onClick={voiceOn ? endVoice : startVoice}
       aria-pressed={voiceOn}
-      aria-label={voiceOn ? "End voice conversation" : "Talk with Xana by voice"}
+      aria-label={voiceOn ? "End voice conversation" : "Talk with Xena by voice"}
       title={voiceOn ? "End voice" : "Talk by voice"}
       className={cn(
         "inline-flex size-10 items-center justify-center rounded-full transition-colors",
@@ -251,7 +251,7 @@ export function XanaConsole({
           <AssistantAvatar who="xana" size="xl" className="relative ring-4 ring-white/20" />
         </div>
         <h2 id="xana-title" className="mt-4 font-display text-3xl font-semibold">
-          Xana
+          Xena
         </h2>
         <p className="text-sm text-brand-200">Customer support · AI assistant</p>
 
@@ -319,7 +319,7 @@ export function XanaConsole({
                   c.who === "you" ? "ml-8 bg-brand-600/60 text-white" : "mr-8 bg-white/10 text-brand-50",
                 )}
               >
-                <span className="sr-only">{c.who === "you" ? "You said: " : "Xana said: "}</span>
+                <span className="sr-only">{c.who === "you" ? "You said: " : "Xena said: "}</span>
                 {c.text}
               </p>
             ))}
@@ -372,8 +372,8 @@ export function XanaConsole({
           </summary>
           <p className="mt-2 leading-relaxed">
             {config?.notice ??
-              "Xana is an AI assistant. Speech is turned into text by our speech provider and isn't stored."}{" "}
-            A return is only created after you confirm it, by button or a clear “yes” after Xana reads the
+              "Xena is an AI assistant. Speech is turned into text by our speech provider and isn't stored."}{" "}
+            A return is only created after you confirm it, by button or a clear “yes” after Xena reads the
             quote back.
           </p>
           {config && debugView ? (
@@ -395,13 +395,13 @@ export function XanaConsole({
           <AssistantAvatar who="xana" />
           <div className="min-w-0 flex-1">
             <h2 id="conversation-title" className="font-semibold text-ink">
-              Conversation with Xana
+              Conversation with Xena
             </h2>
             <p className="flex flex-wrap items-center gap-1.5 text-xs text-muted">
               {/* Phones keep the header to two lines; the page intro already says this. */}
               <span className="max-sm:hidden">Returns, refunds, and orders</span>
               {chat.status?.simulated ? (
-                <span title="Xana's AI model is offline in this demo, so answers come from simple rules and live store data.">
+                <span title="Xena's AI model is offline in this demo, so answers come from simple rules and live store data.">
                   <Badge tone="accent">Simulated</Badge>
                 </span>
               ) : null}

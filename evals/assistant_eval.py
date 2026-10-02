@@ -3,7 +3,7 @@
 Run with the stack up (``pnpm dev``), from the repo root:
   uv run --directory services/assistant python ../../evals/assistant_eval.py
   --web http://localhost:3000     the web app (the assistant is reached through /api/assistant)
-  --agent xana                   score Xana's product answers (default: Steph)
+  --agent xana                   score Xena's product answers (default: Steph)
   --only qa-001,qa-002            run some scripts
   --record-baseline               save as evals/baselines/assistant-<model>.json
 
@@ -156,7 +156,7 @@ def main() -> None:
         wanted = set(args.only.split(","))
         scripts = [s for s in scripts if s["id"] in wanted]
     elif args.agent == "xana":
-        # Xana answers product questions but deliberately cannot add to the cart.
+        # Xena answers product questions but deliberately cannot add to the cart.
         scripts = [
             script
             for script in scripts

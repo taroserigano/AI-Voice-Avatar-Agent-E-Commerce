@@ -27,6 +27,7 @@ confirmation rule.
 | 34 | Face: **Rose – Business** (`rf1bd7e252de`), a stock Phoenix-4.5 face (Tavus recommends these for real time): black blazer, white blouse. Taro asked for "a beautiful white female model" in customer-support clothes; it replaced Anna – Casual. No stock face wears a headset. Setting `TAVUS_FACE_ID`. |
 | 35 | Feed: **audio echo messages** (`conversation.echo`). Microphone echo was silent in the spike. |
 | 36 | The customer picks the **look** (face) and the **background** from tabs under the video (Taro, 2026-09-30: "background more casual or light", "choose background and models by option tabs"). Looks are a server allowlist of **Phoenix-4** faces, because Tavus's green screen doesn't work on Phoenix-4.5; backgrounds are drawn in the browser over the green screen. |
+| 37 | Taro (2026-10-01): **Video stays off by default**; the customer turns it on per call. The "TAVUS" watermark is fine. **The assistant is renamed Xena** everywhere a customer reads or hears it (UI, prompts, policies, spoken lines). Code names (`xana-*` files, `XanaBrain`, routes, `eval:xana`), the Tavus PAL name, and older plan docs keep "Xana". **The chat gets the same upbeat personality** as voice (prompts `xana.v3` and `xana.voice.v4`). |
 
 ## How it works
 
@@ -115,8 +116,8 @@ video, the customer hears it later, after Tavus renders it. So:
 | **A0 Spike** ✅ | Echo PAL in both feed modes, real Skylar clips, three short calls. | Done: numbers in `IMPL.md`, echo messages chosen, ~0.8 s added |
 | **A1 Server** | Settings, `face_tavus.py`, `avatar.*` messages, end on close, the limit on concurrent avatars, `pnpm tavus:setup`. | Unit tests (below) pass; live create and end with `test_mode` passes when the key is set |
 | **A2 Browser** | `daily-js`, `use-xana-avatar`, `xana-avatar.tsx`, toggle, audio routing, fallback to the orb, caption delay. | With video on, a real call answers a question on screen; with the key removed, the page shows the orb and says video isn't available |
-| **A3 Safety with video** | Read-back gating on Tavus events, `conversation.interrupt` on barge-in. | Confirmation and barge-in tests (below) pass, with video on and off |
-| **A4 Measure** | The live e2e (`VOICE_E2E_LIVE=1`) with video: first words, barge-in, avatar minutes per call. The golden evals don't change (they're text). | Numbers written down; Taro decides whether Video starts on or off |
+| **A3 Safety with video** ✅ | Read-back gating on Tavus events, `conversation.interrupt` on barge-in. | Done: the live spec passes with video on and off (`IMPL.md`) |
+| **A4 Measure** ✅ | The live e2e (`VOICE_E2E_LIVE=1`) with video: first words, barge-in, avatar minutes per call. The golden evals don't change (they're text). | Numbers written down; Taro decides whether Video starts on or off |
 
 ## Tests that matter
 

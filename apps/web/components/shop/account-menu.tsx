@@ -24,7 +24,7 @@ const ACCOUNT_ITEMS = [
 
 const HELP_ITEMS = [
   { href: "/help", label: "Help center", Icon: InfoIcon },
-  { href: "/support", label: "Support (Xana)", Icon: HeadsetIcon },
+  { href: "/support", label: "Support (Xena)", Icon: HeadsetIcon },
   { href: "/help/returns", label: "How returns work", Icon: ReturnIcon },
   { href: "/stores", label: "Stores", Icon: MapIcon },
   { href: "/sitemap", label: "Site map", Icon: SitemapIcon },

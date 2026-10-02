@@ -1,10 +1,10 @@
 """Short spoken fillers ("Let me think…") for when an answer needs a moment.
 
 A filler plays when no answer audio is ready ``filler_after_ms`` after the customer stops
-talking, or when Xana starts a tool call before saying anything (looking up an order takes a
+talking, or when Xena starts a tool call before saying anything (looking up an order takes a
 round trip). Each is pre-synthesized when the service starts, so it plays with no speech-engine
 delay. The choice is random, never the same line twice in a row, and at most one per turn so
-Xana doesn't stall with filler after filler.
+Xena doesn't stall with filler after filler.
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ GENERIC = (
     "Happy to check, one moment.",
 )
 
-# A filler that says what Xana is doing reads as competence, not stalling.
+# A filler that says what Xena is doing reads as competence, not stalling.
 BY_TOOL: dict[str, tuple[str, ...]] = {
     "list_my_orders": (
         "Sure, pulling up your orders!",

@@ -7,7 +7,7 @@ import { BACKGROUNDS, lookThumb } from "@/lib/xana-looks";
 import type { AvatarLook } from "@/lib/voice-protocol";
 
 /**
- * Two rows of options under Xana's video: which face she has ("Look") and what's behind her
+ * Two rows of options under Xena's video: which face she has ("Look") and what's behind her
  * ("Background"). A new look takes a few seconds (a new video room); a new background is
  * instant (drawn in the browser).
  */

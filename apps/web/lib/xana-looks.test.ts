@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { BACKGROUNDS, DEFAULT_BACKGROUND, backgroundFor, loadPrefs, savePrefs } from "./xana-looks";
 
-describe("Xana's backgrounds and remembered picks", () => {
+describe("Xena's backgrounds and remembered picks", () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it("falls back to the default background for an unknown or missing choice", () => {

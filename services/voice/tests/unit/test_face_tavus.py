@@ -1,4 +1,4 @@
-"""Xana's avatar (Tavus): private rooms, no personal data, billing stops, video never breaks
+"""Xena's avatar (Tavus): private rooms, no personal data, billing stops, video never breaks
 a call."""
 
 from __future__ import annotations

@@ -11,7 +11,7 @@ export function XanaProviderTabs({ provider, disabled = false }: { provider: Ava
   const router = useRouter();
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   return (
-    <div role="tablist" aria-label="Xana avatar provider" className="mt-5 flex gap-1 rounded-2xl border border-white/15 bg-white/5 p-1">
+    <div role="tablist" aria-label="Xena avatar provider" className="mt-5 flex gap-1 rounded-2xl border border-white/15 bg-white/5 p-1">
       {providers.map((value, index) => (
         <button
           key={value}

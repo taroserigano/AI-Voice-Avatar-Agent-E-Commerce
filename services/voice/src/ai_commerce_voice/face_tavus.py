@@ -1,4 +1,4 @@
-"""Xana's face: a Tavus video avatar in echo mode (docs/features/10-xana-avatar).
+"""Xena's face: a Tavus video avatar in echo mode (docs/features/10-xana-avatar).
 
 Tavus only animates the face. Our pipeline still decides every word and makes the audio; the
 browser forwards that audio to the Tavus room as ``conversation.echo`` messages and shows the
@@ -33,7 +33,7 @@ from ai_commerce_voice.config import Look
 log = logging.getLogger(__name__)
 
 TAVUS_API = "https://tavusapi.com"
-NOTICE = "With video on, Xana's replies (not your voice) are sent to Tavus to animate her face."
+NOTICE = "With video on, Xena's replies (not your voice) are sent to Tavus to animate her face."
 
 Reason = Literal["not_configured", "busy", "error", "cleanup_pending"]
 

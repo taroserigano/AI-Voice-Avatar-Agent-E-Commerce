@@ -20,7 +20,7 @@ export type Persona = {
   placeholder: string;
 };
 
-/** The message list and composer, shared by the Steph panel and the Xana page. */
+/** The message list and composer, shared by the Steph panel and the Xena page. */
 export function ChatThread({
   persona,
   chat,
@@ -31,7 +31,7 @@ export function ChatThread({
   persona: Persona;
   chat: AssistantController;
   inputRef?: React.RefObject<HTMLTextAreaElement | null>;
-  /** Voice controls (Xana); Steph shows a disabled mic until voice arrives. */
+  /** Voice controls (Xena); Steph shows a disabled mic until voice arrives. */
   voiceSlot?: ReactNode;
   className?: string;
 }) {
@@ -117,8 +117,8 @@ export function ChatThread({
           {voiceSlot ?? (
             <Link
               href="/support"
-              title="Talk by voice with Xana, our support assistant"
-              aria-label="Talk by voice with Xana"
+              title="Talk by voice with Xena, our support assistant"
+              aria-label="Talk by voice with Xena"
               className="inline-flex size-10 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-neutral-100 hover:text-brand-700"
             >
               <MicIcon className="size-5" />

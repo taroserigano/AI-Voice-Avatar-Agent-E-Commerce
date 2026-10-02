@@ -1,4 +1,4 @@
-"""Xana's voice brain over her real support tools, with a scripted model and a fake store."""
+"""Xena's voice brain over her real support tools, with a scripted model and a fake store."""
 
 from __future__ import annotations
 

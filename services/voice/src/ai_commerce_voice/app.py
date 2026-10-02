@@ -7,7 +7,7 @@ Security, same rules as the rest of the store:
 - the socket only opens from the store's own pages (``Origin`` allowlist), so another site
   can't ride the customer's cookie (cross-site WebSocket hijacking);
 - a conversation id from the browser is used only if that customer owns it;
-- the model gets Xana's narrow support tools, never a confirm tool; a spoken yes is judged by
+- the model gets Xena's narrow support tools, never a confirm tool; a spoken yes is judged by
   the app's strict rule (plus Jev's veto when on), and the browser confirms with the store.
 
 Speed: the speech-to-text and speech sockets are opened, the customer's recent orders are
@@ -68,7 +68,7 @@ log = logging.getLogger(__name__)
 
 CACHE = Path(__file__).resolve().parents[2] / ".cache" / "fillers"
 NOTICE = (
-    "Xana is an AI assistant. Your voice is streamed to our speech providers to be turned into "
+    "Xena is an AI assistant. Your voice is streamed to our speech providers to be turned into "
     "text and isn't stored; the transcript is saved with this conversation."
 )
 _pool = ThreadPoolExecutor(max_workers=16, thread_name_prefix="voice-io")
@@ -189,7 +189,7 @@ async def load_fillers(settings: VoiceSettings, clips: dict[str, FillerClip]) ->
 
 
 def make_face(settings: VoiceSettings, http: httpx.AsyncClient) -> TavusFace | None:
-    """Xana's avatar, when it's turned on for this server and configured."""
+    """Xena's avatar, when it's turned on for this server and configured."""
     if not settings.avatar_ready:
         return None
     assert settings.tavus_api_key and settings.tavus_pal_id
@@ -214,7 +214,7 @@ def _own_or_new(customer: Customer, conversation_id: str | None) -> Conversation
                 found: Conversation | None = db.get(Conversation, uuid.UUID(conversation_id))
                 if found is not None and found.user_id == customer.id and found.agent == "xana":
                     return found
-        conv = Conversation(user_id=customer.id, agent="xana", title="Voice call with Xana")
+        conv = Conversation(user_id=customer.id, agent="xana", title="Voice call with Xena")
         db.add(conv)
         db.commit()
         db.refresh(conv)
@@ -263,7 +263,7 @@ def _recent_orders(client: CommerceClient) -> list[dict[str, Any]] | None:
 
 
 class CountingBrain:
-    """Xana's brain with the conversation's turn limit applied."""
+    """Xena's brain with the conversation's turn limit applied."""
 
     def __init__(self, brain: XanaBrain, conversation_id: uuid.UUID, limit: int) -> None:
         self.inner = brain
@@ -360,7 +360,7 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
                 await pool.close()
 
     app = FastAPI(
-        title="Xana voice agent", version="0.1.0", docs_url=None, redoc_url=None, lifespan=lifespan
+        title="Xena voice agent", version="0.1.0", docs_url=None, redoc_url=None, lifespan=lifespan
     )
 
     @app.get("/healthz")
@@ -387,7 +387,7 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
                 {
                     "type": "error",
                     "fatal": True,
-                    "message": "Xana's voice isn't set up on this server.",
+                    "message": "Xena's voice isn't set up on this server.",
                 }
             )
             await ws.close()
@@ -442,7 +442,7 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
                 {
                     "type": "error",
                     "fatal": True,
-                    "message": "Couldn't connect Xana's voice. Try again in a moment.",
+                    "message": "Couldn't connect Xena's voice. Try again in a moment.",
                 }
             )
             await ws.close()
