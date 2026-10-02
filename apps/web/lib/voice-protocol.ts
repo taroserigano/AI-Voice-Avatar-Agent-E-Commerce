@@ -10,6 +10,7 @@
 
 export const MIC_RATE = 24_000;
 export const SPEECH_RATE = 24_000;
+export type AvatarProvider = "tavus" | "heygen";
 
 export type VoiceStateName = "connecting" | "listening" | "hearing" | "thinking" | "speaking" | "error";
 
@@ -40,12 +41,15 @@ export type ServerMessage =
       voice: { provider: string; name: string };
       stt: { provider: string; model: string };
       llm: { model: string; simulated: boolean };
+      /** Xana's face (Tavus): offered only when the server has it set up. */
+      avatar?: AvatarOffer;
+      avatars?: Record<AvatarProvider, AvatarOffer>;
       notice: string;
     }
   | { type: "state"; state: VoiceStateName }
   | { type: "user.partial"; text: string }
   | { type: "user.final"; text: string }
-  | { type: "segment.start"; segment: number; kind: "filler" | "answer" | "confirm"; text: string }
+  | { type: "segment.start"; segment: number; kind: "filler" | "answer" | "confirm"; text: string; generation?: number }
   /** More text for a segment (appended; an answer arrives clause by clause). */
   | { type: "segment.text"; segment: number; text: string }
   /** Word timings for a segment, from its start (appended). */
@@ -60,16 +64,42 @@ export type ServerMessage =
       type: "turn.done";
       metrics: { stt_ms?: number; first_audio_ms?: number; llm_first_token_ms?: number; filler?: boolean };
     }
-  | { type: "confirm.result"; decision: "yes" | "no" | "unclear"; quote_id: string }
-  | { type: "error"; message: string; fatal?: boolean };
+  | { type: "confirm.result"; decision: "yes" | "no" | "unclear"; quote_id: string; generation?: number }
+  | { type: "error"; message: string; fatal?: boolean }
+  /** The private Tavus room for this call, for this customer only. */
+  | {
+      type: "avatar";
+      provider: AvatarProvider;
+      request_id: number;
+      ws_url?: string | null;
+      conversation_id: string;
+      url: string;
+      token: string | null;
+      /** Which look this room shows, and whether it's on a green screen (the browser then
+       *  puts the chosen background behind her). */
+      look: string | null;
+      greenscreen: boolean;
+    }
+  | { type: "avatar.unavailable"; request_id: number; reason: "not_configured" | "busy" | "error" | "cleanup_pending" }
+  | { type: "avatar.ended"; request_id: number };
+
+export type AvatarLook = { key: string; label: string };
+
+export type AvatarOffer =
+  | { available: false }
+  | { available: true; provider: AvatarProvider; notice: string; looks?: AvatarLook[]; default_look?: string | null };
 
 export type ClientMessage =
   | { type: "hello"; conversation_id?: string | null; mic_rate: number; speech_rate: number }
   | { type: "mute"; muted: boolean }
-  | { type: "played"; segment: number; complete: boolean; played_ms: number }
+  | { type: "played"; segment: number; complete: boolean; played_ms: number; generation?: number }
   | { type: "interrupt" }
   | { type: "text"; text: string }
-  | { type: "quote.outcome"; quote_id: string; outcome: "confirmed" | "declined" };
+  | { type: "quote.outcome"; quote_id: string; outcome: "confirmed" | "declined" }
+  | { type: "avatar.start"; look?: string }
+  | { type: "avatar.stop" }
+  | { type: "avatar.playing"; request_id: number }
+  | { type: "avatar.select"; provider: AvatarProvider | null; request_id: number; look?: string };
 
 export function parseServerMessage(raw: string): ServerMessage | null {
   try {

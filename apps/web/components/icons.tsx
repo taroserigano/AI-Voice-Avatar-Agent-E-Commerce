@@ -245,6 +245,13 @@ export const MicIcon = createIcon(
     <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M9 21h6" />
   </>,
 );
+export const VideoIcon = createIcon(
+  "VideoIcon",
+  <>
+    <rect x="3" y="6" width="12.5" height="12" rx="2.5" />
+    <path d="m15.5 10.5 5-3v9l-5-3" />
+  </>,
+);
 export const ChatIcon = createIcon(
   "ChatIcon",
   <path d="M20 11.5a8 8 0 0 1-11.6 7.2L4 20l1.3-4.1A8 8 0 1 1 20 11.5Z" />,

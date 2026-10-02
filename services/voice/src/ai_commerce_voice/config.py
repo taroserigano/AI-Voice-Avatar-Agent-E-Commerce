@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from typing import Literal
@@ -13,6 +14,30 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 
 # Cartesia's "Skylar - Friendly Guide": approachable American English, made for support.
 SKYLAR = "db6b0ed5-d5d3-463d-ae85-518a07d3c2b4"
+# Tavus stock face "Rose - Business" (Phoenix-4.5): Taro asked for a customer-support look
+# (2026-09-30; it replaced "Anna - Casual", rc9cff32ceba).
+ROSE = "rf1bd7e252de"
+
+
+@dataclass(frozen=True)
+class Look:
+    """A face the customer can pick for Xana. Phoenix-4 faces, because Tavus's green screen
+    (which lets the browser put a light background behind her) doesn't work on Phoenix-4.5."""
+
+    key: str
+    label: str
+    face_id: str
+    greenscreen: bool = True
+
+
+# Taro (2026-09-30): pick the look and the background from tabs on the screen.
+LOOKS: tuple[Look, ...] = (
+    Look("rose", "Rose", "r6c7a6cb6d9b"),
+    Look("margo", "Margo", "r78c9b897fbc"),
+    Look("julia", "Julia", "rd27826c12a6"),
+    Look("helen", "Helen", "r12d3eb75ec2"),
+    Look("miranda", "Miranda", "r3cb75621574"),
+)
 
 
 class VoiceSettings(BaseSettings):
@@ -66,6 +91,34 @@ class VoiceSettings(BaseSettings):
     voice_escalation_model: str = "gpt-6-sol"
     voice_escalation_reasoning: Literal["none", "low", "medium"] = "low"
 
+    # Xana's face: a Tavus avatar in echo mode (docs/features/10-xana-avatar). Off unless
+    # VOICE_AVATAR=tavus and a key and PAL are set; the customer still turns it on per call.
+    voice_avatar: Literal["off", "tavus", "heygen", "both"] = "off"
+    tavus_api_key: str | None = Field(
+        default=None, validation_alias=AliasChoices("TAVUS_APIKEY", "TAVUS_API_KEY")
+    )
+    # The echo PAL made by `pnpm tavus:setup`.
+    tavus_pal_id: str | None = None
+    tavus_face_id: str = ROSE
+    # Avatars at once across this process (the Tavus account's limits; each one bills).
+    tavus_max_live: int = 2
+    # The look a call starts with (a key of LOOKS); the customer can switch on screen.
+    tavus_default_look: str = "rose"
+    # Tavus doesn't join or bill test-mode conversations (tests only).
+    tavus_test_mode: bool = False
+
+    # LiveAvatar uses its own developer key; a HeyGen video API key is not compatible.
+    liveavatar_api_key: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices(
+            "LIVEAVATAR_API_KEY", "HEYGEN_LIVE_APIKEY", "HEYGEN_LIVE_API_KEY"
+        ),
+    )
+    heygen_avatar_id: str | None = None
+    heygen_sandbox: bool = True
+    heygen_max_live: int = Field(default=2, ge=1, le=20)
+    heygen_max_session_s: int = Field(default=60, ge=30, le=1200)
+
     # Turn-taking. Silence that ends the customer's turn (server VAD), and how long Xana waits
     # for answer audio before saying a filler.
     voice_end_silence_ms: int = 450
@@ -73,6 +126,18 @@ class VoiceSettings(BaseSettings):
     voice_max_turn_s: float = 45.0
     voice_max_tool_calls: int = 6
     voice_max_session_s: int = 20 * 60
+
+    @property
+    def avatar_ready(self) -> bool:
+        return self.voice_avatar in ("tavus", "both") and bool(
+            self.tavus_api_key and self.tavus_pal_id
+        )
+
+    @property
+    def heygen_ready(self) -> bool:
+        return self.voice_avatar in ("heygen", "both") and bool(
+            self.liveavatar_api_key and (self.heygen_sandbox or self.heygen_avatar_id)
+        )
 
     @property
     def is_dev(self) -> bool:

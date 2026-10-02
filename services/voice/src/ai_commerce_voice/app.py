@@ -29,12 +29,13 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import httpx
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from langchain_core.language_models import BaseChatModel
 
+from ai_commerce_voice.avatar_session import AvatarSession, Face
 from ai_commerce_voice.brain import (
     XanaBrain,
     build_voice_graph,
@@ -42,8 +43,10 @@ from ai_commerce_voice.brain import (
     orders_snapshot,
     system_prompt,
 )
-from ai_commerce_voice.config import VoiceSettings, get_settings
+from ai_commerce_voice.config import LOOKS, VoiceSettings, get_settings
 from ai_commerce_voice.ears_openai import OpenAILiveEars
+from ai_commerce_voice.face_heygen import SANDBOX_AVATAR, HeygenFace
+from ai_commerce_voice.face_tavus import TavusFace
 from ai_commerce_voice.fillers import all_phrases
 from ai_commerce_voice.mouth_cartesia import CartesiaMouth
 from ai_commerce_voice.ports import AgentEvent, TurnEnded
@@ -185,6 +188,22 @@ async def load_fillers(settings: VoiceSettings, clips: dict[str, FillerClip]) ->
     log.info("voice fillers ready: %d of %d", len(clips), len(all_phrases()))
 
 
+def make_face(settings: VoiceSettings, http: httpx.AsyncClient) -> TavusFace | None:
+    """Xana's avatar, when it's turned on for this server and configured."""
+    if not settings.avatar_ready:
+        return None
+    assert settings.tavus_api_key and settings.tavus_pal_id
+    return TavusFace(
+        settings.tavus_api_key,
+        pal_id=settings.tavus_pal_id,
+        face_id=settings.tavus_face_id,
+        http=http,
+        max_live=settings.tavus_max_live,
+        max_call_s=settings.voice_max_session_s,
+        test_mode=settings.tavus_test_mode,
+    )
+
+
 # --- per-call helpers -------------------------------------------------------------------------
 
 
@@ -237,7 +256,7 @@ def _recent_orders(client: CommerceClient) -> list[dict[str, Any]] | None:
             strict=True,
         ):
             d["return_options"] = opts
-        return with_brands(client, details)
+        return cast(list[dict[str, Any]], with_brands(client, details))
     except (CommerceError, httpx.HTTPError) as exc:
         log.warning("couldn't read recent orders for the call: %s", exc)
         return None
@@ -304,10 +323,41 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
             limits=httpx.Limits(max_keepalive_connections=20),
         )
         state["fillers_task"] = asyncio.create_task(load_fillers(settings, state["fillers"]))
-        yield
-        await state["http"].aclose()
-        if pool is not None:
-            await pool.close()
+        state["face"] = make_face(settings, state["http"])
+        faces: dict[str, Face] = {}
+        if state["face"] is not None:
+            faces["tavus"] = state["face"]
+        if settings.heygen_ready:
+            faces["heygen"] = HeygenFace(
+                settings.liveavatar_api_key or "",
+                avatar_id=SANDBOX_AVATAR
+                if settings.heygen_sandbox
+                else settings.heygen_avatar_id or "",
+                http=state["http"],
+                sandbox=settings.heygen_sandbox,
+                max_live=settings.heygen_max_live,
+                max_call_s=settings.heygen_max_session_s,
+            )
+        state["faces"] = faces
+
+        async def retry_avatar_cleanup() -> None:
+            while True:
+                await asyncio.sleep(5)
+                for face in faces.values():
+                    await face.retry_cleanup()
+
+        cleanup_task = asyncio.create_task(retry_avatar_cleanup())
+        try:
+            yield
+        finally:
+            cleanup_task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await cleanup_task
+            for face in faces.values():
+                await face.close_all()
+            await state["http"].aclose()
+            if pool is not None:
+                await pool.close()
 
     app = FastAPI(
         title="Xana voice agent", version="0.1.0", docs_url=None, redoc_url=None, lifespan=lifespan
@@ -463,6 +513,15 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
             max_turn_s=settings.voice_max_turn_s,
         )
         session_ref["s"] = session
+        avatar = AvatarSession(
+            state.get("faces", {}),
+            str(conv.id),
+            send_json,
+            session.switch_output,
+            output_ready=session.output_ready,
+            looks=LOOKS,
+            default_look=settings.tavus_default_look,
+        )
         await send_json(
             {
                 "type": "ready",
@@ -471,6 +530,8 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
                 "voice": {"provider": "cartesia", "name": settings.cartesia_voice_name},
                 "stt": {"provider": "openai", "model": settings.voice_stt_model},
                 "llm": {"model": pick.name, "simulated": pick.simulated},
+                "avatar": avatar.describe()["tavus"],
+                "avatars": avatar.describe(),
                 "notice": NOTICE,
             }
         )
@@ -491,11 +552,16 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
                     elif (text := msg.get("text")) is not None:
                         with contextlib.suppress(json.JSONDecodeError):
                             parsed = json.loads(text)
-                            if isinstance(parsed, dict):
+                            if not isinstance(parsed, dict):
+                                continue
+                            if str(parsed.get("type", "")).startswith("avatar."):
+                                await avatar.on_message(parsed)
+                            else:
                                 await session.on_message(parsed)
         except (WebSocketDisconnect, TimeoutError):
             pass
         finally:
+            await avatar.close()
             await session.close()
             await ears.close()
             await mouth.close()

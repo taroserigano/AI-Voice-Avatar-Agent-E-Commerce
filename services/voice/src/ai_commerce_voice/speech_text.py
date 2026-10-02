@@ -6,8 +6,9 @@ chunk after that at a sentence end. The engine keeps prosody across chunks (one 
 answer), so early cuts don't sound choppy.
 
 Accuracy: citation markers (``[[cite:...]]``) are shown on screen, never read aloud; markdown
-isn't spoken; order numbers are spelled out character by character so "E2EA6BC6" isn't read
-as a word.
+isn't spoken; emoji are dropped (the prompt forbids them, but an upbeat model slips one in
+now and then, and the speech engine would read it out); order numbers are spelled out
+character by character so "E2EA6BC6" isn't read as a word.
 """
 
 from __future__ import annotations
@@ -22,6 +23,8 @@ _MARKDOWN = re.compile(r"(\*\*|__|`|^#+\s*|^\s*[-*]\s+)", re.MULTILINE)
 _ORDER_NUMBER = re.compile(r"\b(?=[A-Z0-9]{8}\b)(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])[A-Z0-9]{8}\b")
 _SENTENCE_END = re.compile(r"[.!?…](?:[\"'’”)\]]*)\s")
 _CLAUSE_END = re.compile(r"[,;:—–](?:\s)")
+# Pictographs, symbols, flags, and the joiners and variation selectors that build emoji.
+_EMOJI = re.compile("[🀀-🫿☀-➿⬀-⯿️‍]")
 
 FIRST_CHUNK_MIN_WORDS = 4
 MAX_CHUNK_CHARS = 220
@@ -36,6 +39,7 @@ def speakable(text: str) -> str:
     text = CITE.sub("", text)
     text = re.sub(r"(\d)\s*×\s*", r"\1 ", text)  # "1 × Notebook" -> "1 Notebook"
     text = _MARKDOWN.sub("", text)
+    text = _EMOJI.sub("", text)
     text = spell_order_numbers(text)
     return re.sub(r"[ \t]+", " ", text).replace(" .", ".").replace(" ,", ",")
 

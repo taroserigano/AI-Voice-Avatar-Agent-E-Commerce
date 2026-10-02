@@ -4,6 +4,7 @@ Taro's request, numbered as he gave it:
 
 | # | Feature | Status | Plan | Implementation log |
 |---|---|---|---|---|
+| 11 | Switch Xana between Tavus and HeyGen using provider tabs and routes | Implemented; connected HeyGen sandbox verified | [PLAN](11-xana-heygen/PLAN.md) | [IMPL](11-xana-heygen/IMPL.md) |
 | 7 | Detailed return and refund policy plus "regulations", on a dedicated page | Done | [PLAN](07-returns-policy/PLAN.md) | [IMPL](07-returns-policy/IMPL.md) |
 | 5 | "Ask Steph": a chat assistant behind a lower-right button (voice later) | Done | [PLAN](05-ask-steph/PLAN.md) | [IMPL](05-ask-steph/IMPL.md) |
 | 3.3 | Jev (TypeSafe) in the assistant, especially for returns and refunds | Done (simulator until a key is set) | [PLAN](03.3-jev/PLAN.md) | [IMPL](03.3-jev/IMPL.md) |

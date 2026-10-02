@@ -70,7 +70,7 @@ from assistant.turns import TOOL_LABELS, ProductCards, message_text, split_citat
 
 log = logging.getLogger(__name__)
 
-PROMPT_VERSION = "xana.voice.v2"
+PROMPT_VERSION = "xana.voice.v3"
 PROMPT_DIR = Path(__file__).resolve().parent / "prompts"
 SNAPSHOT_ORDERS = 8
 
@@ -333,7 +333,7 @@ class XanaBrain:
                 asyncio.to_thread(policy_search, self.ctx.client, question, PREFETCH_SECTIONS),
                 PREFETCH_TIMEOUT_S,
             )
-            messages = prefetched_messages(question, result, mid)
+            messages: list[Any] = prefetched_messages(question, result, mid)
         except Exception as exc:  # noqa: BLE001 - the model can still call the tool
             log.warning("policy prefetch skipped: %s", type(exc).__name__)
             return None

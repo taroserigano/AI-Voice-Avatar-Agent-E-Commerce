@@ -3,13 +3,14 @@
 import { spawn } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { connect } from "node:net";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { readEnvFile, voiceEnvironment, withoutAvatarSecrets } from "./voice-env.mjs";
 
 // The Python services read the repo-root .env themselves; Next.js only reads apps/web/.env.
 // Pass through just these keys from the root .env (never the whole file: it may hold other
 // projects' secrets). Real environment variables win.
-const PASS_THROUGH = ["APP_ENV", "API_PORT", "WEB_PORT", "ASSISTANT_PORT", "VOICE_PORT", "GOOGLE_MAPS_API_KEY"];
+const PASS_THROUGH = ["APP_ENV", "API_PORT", "WEB_PORT", "ASSISTANT_PORT", "VOICE_PORT", "GOOGLE_MAPS_API_KEY", "VOICE_SHARED_SECRETS_FILE"];
 const rootEnv = join(dirname(fileURLToPath(import.meta.url)), "..", ".env");
 if (existsSync(rootEnv)) {
   for (const line of readFileSync(rootEnv, "utf8").split(/\r?\n/)) {
@@ -62,8 +63,12 @@ const procs = [
   { name: "web", color: 33, cmd: "pnpm", args: ["--filter", "@ai-commerce/web", "exec", "next", "dev", "--port", webPort] },
 ];
 
+const sharedFile = process.env.VOICE_SHARED_SECRETS_FILE;
+const voiceEnv = voiceEnvironment(env, readEnvFile(rootEnv),
+  readEnvFile(sharedFile ? resolve(dirname(rootEnv), sharedFile) : undefined));
+const publicEnv = withoutAvatarSecrets(env);
 const children = procs.map(({ name, color, cmd, args }) => {
-  const child = spawn(cmd, args, { env, shell: process.platform === "win32", stdio: ["ignore", "pipe", "pipe"] });
+  const child = spawn(cmd, args, { env: name === "voice" ? voiceEnv : publicEnv, shell: process.platform === "win32", stdio: ["ignore", "pipe", "pipe"] });
   const prefix = `\x1b[${color}m${name.padEnd(6)}|\x1b[0m `;
   const pipe = (stream, out) => {
     let buffer = "";
