@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- small local previews, no optimization needed */
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import { BACKGROUNDS, backgroundFor, lookClip, lookThumb } from "@/lib/xana-looks";
 import type { AvatarLook } from "@/lib/voice-protocol";
@@ -34,6 +34,14 @@ export function XanaLookPicker({
   const [still] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const current = looks.find((l) => l.key === look) ?? looks[0];
   const bg = backgroundFor(background);
+
+  // Opened below the fold on short screens: bring the whole panel into view.
+  const panelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    panelRef.current?.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -68,6 +76,7 @@ export function XanaLookPicker({
       {open ? (
         <div
           id={panel}
+          ref={panelRef}
           className="mt-3 rounded-3xl border border-white/10 bg-white/4 p-4 text-left shadow-[0_24px_60px_-24px_rgb(0_0_0/0.6)] sm:p-5"
         >
           {looks.length > 1 ? (
