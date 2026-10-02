@@ -23,7 +23,7 @@ import contextlib
 import logging
 import time
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Literal
 
 import httpx
@@ -35,22 +35,24 @@ log = logging.getLogger(__name__)
 TAVUS_API = "https://tavusapi.com"
 NOTICE = "With video on, Xana's replies (not your voice) are sent to Tavus to animate her face."
 
-Reason = Literal["not_configured", "busy", "error"]
+Reason = Literal["not_configured", "busy", "error", "cleanup_pending"]
 
 
 class AvatarUnavailable(Exception):
-    def __init__(self, reason: Reason) -> None:
+    def __init__(self, reason: Reason, room: AvatarRoom | None = None) -> None:
         super().__init__(reason)
         self.reason: Reason = reason
+        self.room = room
 
 
 @dataclass(frozen=True)
 class AvatarRoom:
     conversation_id: str
     url: str
-    token: str | None
+    token: str | None = field(repr=False)
     opened_at: float
     look: Look | None = None
+    ws_url: str | None = field(default=None, repr=False)
 
 
 def conversation_request(
@@ -112,9 +114,10 @@ class TavusFace:
         self._test_mode = test_mode
         self._base = base_url.rstrip("/")
         self._clock = clock
-        self._live: set[str] = set()
+        self._live: dict[str, AvatarRoom] = {}
         self._reserved = 0
         self._lock = asyncio.Lock()
+        self._closing: dict[str, AvatarRoom] = {}
 
     @property
     def live(self) -> int:
@@ -122,6 +125,11 @@ class TavusFace:
 
     async def open(self, conversation_id: str, look: Look | None = None) -> AvatarRoom:
         async with self._lock:
+            self._live = {
+                k: r
+                for k, r in self._live.items()
+                if self._clock() - r.opened_at < self._max_call_s + 30
+            }
             if self.live >= self._max_live:
                 raise AvatarUnavailable("busy")
             self._reserved += 1
@@ -155,16 +163,19 @@ class TavusFace:
             raise AvatarUnavailable("error") from exc
         async with self._lock:
             self._reserved -= 1
-            self._live.add(room.conversation_id)
+            self._live[room.conversation_id] = room
         log.info("tavus: avatar %s started", room.conversation_id)
         return room
 
     async def close(self, room: AvatarRoom) -> None:
-        """End the conversation (billing stops). Tried twice; the slot is freed either way,
-        and Tavus's own timeouts end a conversation we couldn't."""
+        """Release capacity only after a confirmed stop or the provider duration limit."""
         if room.conversation_id not in self._live:
+            self._closing.pop(room.conversation_id, None)
             return
-        self._live.discard(room.conversation_id)
+        if self._clock() - room.opened_at >= self._max_call_s + 30:
+            self._live.pop(room.conversation_id, None)
+            self._closing.pop(room.conversation_id, None)
+            return
         minutes = (self._clock() - room.opened_at) / 60
         for attempt in (1, 2):
             try:
@@ -174,8 +185,10 @@ class TavusFace:
                     timeout=httpx.Timeout(8, connect=5),
                 )
                 # Already ended (Tavus timed it out): nothing left to stop.
-                if resp.status_code not in (400, 404):
+                if resp.status_code != 404:
                     resp.raise_for_status()
+                self._live.pop(room.conversation_id, None)
+                self._closing.pop(room.conversation_id, None)
                 log.info("tavus: avatar %s ended after %.1f min", room.conversation_id, minutes)
                 return
             except httpx.HTTPError as exc:
@@ -185,6 +198,18 @@ class TavusFace:
                     attempt,
                     _describe(exc),
                 )
+        self._closing[room.conversation_id] = room
+        raise AvatarUnavailable("cleanup_pending", room)
+
+    async def retry_cleanup(self) -> None:
+        for room in list(self._closing.values()):
+            with contextlib.suppress(AvatarUnavailable):
+                await self.close(room)
+
+    async def close_all(self) -> None:
+        for room in list(self._live.values()):
+            with contextlib.suppress(AvatarUnavailable):
+                await self.close(room)
 
 
 def _describe(exc: BaseException) -> str:

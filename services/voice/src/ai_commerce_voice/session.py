@@ -97,6 +97,10 @@ class Segment:
     text: str = ""
     sent_audio: bool = False
     complete: bool = False
+    heard_complete: bool = False
+    dropped: bool = False
+    generation: int = 0
+    synthesized: bool = False
 
 
 @dataclass
@@ -151,6 +155,9 @@ class VoiceSession:
     # The running turn only says a fixed line ("Thanks, confirming your return now.").
     _turn_is_say: bool = False
     muted: bool = False
+    output_generation: int = 0
+    spoken_confirmation: bool = True
+    output_switching: bool = False
 
     # --- lifecycle -----------------------------------------------------------------------
 
@@ -168,15 +175,23 @@ class VoiceSession:
     # --- from the browser ----------------------------------------------------------------
 
     async def on_audio(self, pcm16: bytes) -> None:
-        if not self.muted:
+        if not self.muted and not self.output_switching:
             await self.ears.send_audio(pcm16)
 
     async def on_message(self, msg: dict[str, Any]) -> None:
         kind = msg.get("type")
         if kind == "played":
             seg = self.segments.get(int(msg.get("segment", -1)))
-            if seg and msg.get("complete"):
+            if (
+                seg
+                and not seg.dropped
+                and seg.synthesized
+                and msg.get("complete")
+                and seg.generation == self.output_generation
+                and msg.get("generation", 0) == seg.generation
+            ):
                 seg.complete = True
+                seg.heard_complete = self.spoken_confirmation
                 await self._maybe_idle()
         elif kind == "interrupt":
             await self._barge_in()
@@ -198,6 +213,22 @@ class VoiceSession:
                 await self._start_turn(resume="confirmed" if outcome == "confirmed" else "declined")
 
     # --- hearing -------------------------------------------------------------------------
+
+    async def switch_output(self, provider: str, generation: int) -> None:
+        self.output_switching = True
+        await self._barge_in()
+        self.output_generation = generation
+        self.output_switching = provider != "local"
+        # LiveAvatar playout timing needs a connected acceptance test. Its return flow
+        # deliberately uses the existing explicit confirmation button in the meantime.
+        self.spoken_confirmation = provider != "heygen"
+        self._readback_segment = None
+        self._draft = None
+
+    async def output_ready(self, generation: int) -> None:
+        if generation == self.output_generation:
+            self.output_switching = False
+            await self._maybe_idle()
 
     async def _hear(self) -> None:
         async for ev in self.ears.events():
@@ -238,12 +269,16 @@ class VoiceSession:
         if live:
             for n in live:
                 self.segments[n].complete = True
+                self.segments[n].dropped = True
+                self.segments[n].heard_complete = False
             await self.send_json({"type": "drop", "segments": live})
         await self._set_state("hearing")
 
     async def _on_draft(self, ev: Draft) -> None:
         """Start thinking on the live transcript while the final one is on its way. A reply
         to a quote waits for the final transcript: a confirmation is judged on final words."""
+        if self.output_switching:
+            return
         text = ev.text.strip()
         if self.quote is not None or not text or _NOISE.match(text):
             return
@@ -254,6 +289,8 @@ class VoiceSession:
         await self._start_turn(text=text, message_id=ev.item_id, clock=clock)
 
     async def _on_final(self, ev: Final, *, typed: bool = False) -> None:
+        if self.output_switching:
+            return
         text = ev.text.strip()
         draft, self._draft = self._draft, None
         if draft is not None and ev.item_id == draft[0]:
@@ -283,14 +320,23 @@ class VoiceSession:
         )
 
         if self.quote is not None:
+            generation = self.output_generation
+            quote_id = self.quote["quote_id"]
             readback_done = (
                 self._readback_segment is not None
-                and self.segments.get(self._readback_segment, Segment(0, "confirm")).complete
+                and self.spoken_confirmation
+                and self.segments.get(self._readback_segment, Segment(0, "confirm")).heard_complete
             )
             # The app's rule (and Jev's veto, a network call) off the event loop.
             decision = await asyncio.to_thread(
                 self.confirm, text, final=True, readback_complete=readback_done, speech_ms=speech_ms
             )
+            if (
+                generation != self.output_generation
+                or self.quote is None
+                or self.quote["quote_id"] != quote_id
+            ):
+                return
             if decision == "unclear" and len(text.split()) >= MIN_WORDS_TO_MOVE_ON:
                 # They've moved on: close the quote quietly, then answer the new request.
                 self.quote = None
@@ -298,9 +344,17 @@ class VoiceSession:
                 await self._start_turn(resume="superseded", then=text, clock=clock)
                 return
             await self.send_json(
-                {"type": "confirm.result", "decision": decision, "quote_id": self.quote["quote_id"]}
+                {
+                    "type": "confirm.result",
+                    "decision": decision,
+                    "quote_id": self.quote["quote_id"],
+                    **({"generation": generation} if generation else {}),
+                }
             )
-            await self._start_turn(say=CONFIRM_SAY[decision], clock=clock)
+            line = CONFIRM_SAY[decision]
+            if decision == "unclear" and not readback_done:
+                line = "Please review the return details on screen and tap Confirm return."
+            await self._start_turn(say=line, clock=clock)
             return
 
         await self._start_turn(text=text, clock=clock)
@@ -456,7 +510,7 @@ class VoiceSession:
 
     async def _new_segment(self, kind: Literal["filler", "answer", "confirm"]) -> Segment:
         self._next_segment += 1
-        seg = Segment(self._next_segment, kind)
+        seg = Segment(self._next_segment, kind, generation=self.output_generation)
         self.segments[seg.number] = seg
         if kind != "filler":
             # Real speech is on its way: a filler now would jump in front of it.
@@ -465,7 +519,13 @@ class VoiceSession:
         for n in [n for n, s in self.segments.items() if s.complete and n < seg.number - 20]:
             del self.segments[n]
         await self.send_json(
-            {"type": "segment.start", "segment": seg.number, "kind": kind, "text": ""}
+            {
+                "type": "segment.start",
+                "segment": seg.number,
+                "kind": kind,
+                "text": "",
+                "generation": seg.generation,
+            }
         )
         return seg
 
@@ -492,9 +552,13 @@ class VoiceSession:
                     {"type": "segment.words", "segment": seg.number, "words": ev.words}
                 )
             elif isinstance(ev, SpeechDone):
+                seg.synthesized = True
                 break
             elif isinstance(ev, SpeechFailed):
+                seg.complete = True
+                seg.dropped = True
                 log.warning("speech failed: %s", ev.message)
+                await self.send_json({"type": "drop", "segments": [seg.number]})
                 await self.send_json(
                     {"type": "error", "message": "My voice cut out. The answer is on screen."}
                 )
@@ -511,9 +575,18 @@ class VoiceSession:
         forward = asyncio.create_task(self._forward(utterance, seg, clock))
         # The caption keeps the exact words (a read-back is what gets confirmed); the voice
         # reads them the way a person would ("1 × Notebook" is "1 Notebook").
-        await utterance.push(speakable(text))
-        await utterance.finish()
-        await forward
+        try:
+            await utterance.push(speakable(text))
+            await utterance.finish()
+            await forward
+        finally:
+            if not forward.done():
+                forward.cancel()
+                with contextlib.suppress(asyncio.CancelledError, Exception):
+                    await forward
+            if not seg.synthesized:
+                with contextlib.suppress(Exception):
+                    await utterance.cancel()
         return seg
 
     async def _filler_after(self, ms: int, clock: TurnClock) -> None:
@@ -539,6 +612,7 @@ class VoiceSession:
             )
             for i in range(0, len(clip.pcm16), FRAME_BYTES):
                 await self._send_audio(seg, clip.pcm16[i : i + FRAME_BYTES], clock)
+            seg.synthesized = True
             await self.send_json({"type": "segment.end", "segment": seg.number})
 
     # --- state -------------------------------------------------------------------------------

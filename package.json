@@ -32,7 +32,7 @@
     "test:stream": "uv run --directory packages/assistant-stream pytest -q",
     "test:voice": "uv run --directory services/voice pytest tests/unit -q",
     "dev:planner": "uv run --directory services/planner planner-a2a",
-    "dev:voice": "uv run --directory services/voice xana-voice",
+    "dev:voice": "node scripts/voice-dev.mjs",
     "tavus:setup": "uv run --directory services/voice python -m ai_commerce_voice.tavus_setup",
     "test:e2e": "pnpm --filter @ai-commerce/e2e test",
     "eval:search": "uv run --directory services/commerce python ../../evals/search_eval.py",

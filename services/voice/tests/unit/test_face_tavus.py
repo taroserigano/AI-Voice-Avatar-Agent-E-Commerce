@@ -170,6 +170,25 @@ def test_an_already_ended_conversation_isnt_retried() -> None:
     assert len(fake.ends()) == 1
 
 
+def test_uncertain_stop_retains_capacity_until_cleanup_succeeds() -> None:
+    fake = FakeTavus()
+    fake.fail_end = [503, 503]
+
+    async def go() -> None:
+        f = face(fake, max_live=1)
+        room = await f.open("first")
+        with pytest.raises(AvatarUnavailable, match="cleanup_pending"):
+            await f.close(room)
+        assert f.live == 1
+        with pytest.raises(AvatarUnavailable, match="busy"):
+            await f.open("second")
+        await f.retry_cleanup()
+        assert f.live == 0
+        await f.open("second")
+
+    run(go())
+
+
 def test_only_so_many_avatars_at_once() -> None:
     fake = FakeTavus()
 

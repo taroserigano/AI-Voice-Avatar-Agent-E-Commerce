@@ -29,12 +29,13 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import httpx
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from langchain_core.language_models import BaseChatModel
 
+from ai_commerce_voice.avatar_session import AvatarSession, Face
 from ai_commerce_voice.brain import (
     XanaBrain,
     build_voice_graph,
@@ -44,7 +45,8 @@ from ai_commerce_voice.brain import (
 )
 from ai_commerce_voice.config import LOOKS, VoiceSettings, get_settings
 from ai_commerce_voice.ears_openai import OpenAILiveEars
-from ai_commerce_voice.face_tavus import AvatarLink, TavusFace
+from ai_commerce_voice.face_heygen import SANDBOX_AVATAR, HeygenFace
+from ai_commerce_voice.face_tavus import TavusFace
 from ai_commerce_voice.fillers import all_phrases
 from ai_commerce_voice.mouth_cartesia import CartesiaMouth
 from ai_commerce_voice.ports import AgentEvent, TurnEnded
@@ -254,7 +256,7 @@ def _recent_orders(client: CommerceClient) -> list[dict[str, Any]] | None:
             strict=True,
         ):
             d["return_options"] = opts
-        return with_brands(client, details)
+        return cast(list[dict[str, Any]], with_brands(client, details))
     except (CommerceError, httpx.HTTPError) as exc:
         log.warning("couldn't read recent orders for the call: %s", exc)
         return None
@@ -322,10 +324,40 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
         )
         state["fillers_task"] = asyncio.create_task(load_fillers(settings, state["fillers"]))
         state["face"] = make_face(settings, state["http"])
-        yield
-        await state["http"].aclose()
-        if pool is not None:
-            await pool.close()
+        faces: dict[str, Face] = {}
+        if state["face"] is not None:
+            faces["tavus"] = state["face"]
+        if settings.heygen_ready:
+            faces["heygen"] = HeygenFace(
+                settings.liveavatar_api_key or "",
+                avatar_id=SANDBOX_AVATAR
+                if settings.heygen_sandbox
+                else settings.heygen_avatar_id or "",
+                http=state["http"],
+                sandbox=settings.heygen_sandbox,
+                max_live=settings.heygen_max_live,
+                max_call_s=settings.heygen_max_session_s,
+            )
+        state["faces"] = faces
+
+        async def retry_avatar_cleanup() -> None:
+            while True:
+                await asyncio.sleep(5)
+                for face in faces.values():
+                    await face.retry_cleanup()
+
+        cleanup_task = asyncio.create_task(retry_avatar_cleanup())
+        try:
+            yield
+        finally:
+            cleanup_task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await cleanup_task
+            for face in faces.values():
+                await face.close_all()
+            await state["http"].aclose()
+            if pool is not None:
+                await pool.close()
 
     app = FastAPI(
         title="Xana voice agent", version="0.1.0", docs_url=None, redoc_url=None, lifespan=lifespan
@@ -481,10 +513,12 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
             max_turn_s=settings.voice_max_turn_s,
         )
         session_ref["s"] = session
-        avatar = AvatarLink(
-            state.get("face"),
+        avatar = AvatarSession(
+            state.get("faces", {}),
             str(conv.id),
             send_json,
+            session.switch_output,
+            output_ready=session.output_ready,
             looks=LOOKS,
             default_look=settings.tavus_default_look,
         )
@@ -496,7 +530,8 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
                 "voice": {"provider": "cartesia", "name": settings.cartesia_voice_name},
                 "stt": {"provider": "openai", "model": settings.voice_stt_model},
                 "llm": {"model": pick.name, "simulated": pick.simulated},
-                "avatar": avatar.describe(),
+                "avatar": avatar.describe()["tavus"],
+                "avatars": avatar.describe(),
                 "notice": NOTICE,
             }
         )

@@ -7,7 +7,8 @@ import { cn } from "@/lib/cn";
 import { confirmQuote } from "@/lib/returns-confirm";
 import { useVoiceAgent } from "@/lib/use-voice-agent";
 import { captionFor, dollars } from "@/lib/voice-captions";
-import type { QuoteCard } from "@/lib/voice-protocol";
+import type { AvatarProvider, QuoteCard } from "@/lib/voice-protocol";
+import { XanaProviderTabs } from "./xana-provider-tabs";
 import { XanaAvatar } from "./xana-avatar";
 import { XanaLookPicker } from "./xana-look-picker";
 import { XanaOrb } from "./xana-orb";
@@ -35,8 +36,10 @@ const STATUS = {
   error: { title: "Voice is off", hint: "Something went wrong." },
 } satisfies Record<string, { title: string; hint: string }>;
 
-export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstName: string; closeHref?: string }) {
-  const voice = useVoiceAgent();
+export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = "tavus" }: {
+  firstName: string; closeHref?: string; provider?: AvatarProvider;
+}) {
+  const voice = useVoiceAgent(undefined, provider);
   const { state, quote, confirmDecision, quoteOutcome } = voice;
   const [confirming, setConfirming] = useState(false);
   const [confirmError, setConfirmError] = useState<string | null>(null);
@@ -111,6 +114,18 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstNa
           Orders &amp; returns, in conversation
         </p>
         <h1 className="mt-3 font-display text-5xl font-extrabold tracking-[-0.04em] sm:text-7xl">Meet Xana</h1>
+        <XanaProviderTabs provider={provider} disabled={confirming} />
+        <section role="tabpanel" id="avatar-provider-panel" aria-labelledby={`avatar-tab-${provider}`} className="mt-4">
+        {face ? (
+          <XanaAvatar
+            stream={face}
+            state={state}
+            greenscreen={voice.avatar.greenscreen}
+            background={voice.avatar.background}
+            onPlaying={voice.avatar.playbackStarted}
+            onStopped={voice.avatar.playbackStopped}
+          />
+        ) : (
 
         <button
           type="button"
@@ -121,17 +136,13 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstNa
           className="mt-4 rounded-full sm:mt-6"
           aria-label={!live ? "Start talking to Xana" : state === "speaking" ? "Interrupt Xana" : "Xana is listening"}
         >
-          {face ? (
-            <XanaAvatar
-              stream={face}
-              state={state}
-              greenscreen={voice.avatar.greenscreen}
-              background={voice.avatar.background}
-            />
-          ) : (
-            <XanaOrb state={state} level={level} />
-          )}
+          <XanaOrb state={state} level={level} />
         </button>
+        )}
+        {live && voice.ready && !voice.avatar.offer.available ? (
+          <p className="mt-3 text-sm text-neutral-300">{provider === "heygen" ? "HeyGen" : "Tavus"} video is not set up yet. You can still talk to Xana.</p>
+        ) : null}
+        </section>
 
         <div aria-live="polite" className="mt-1 min-h-20">
           <p className="font-display text-3xl font-bold tracking-tight">
@@ -141,8 +152,8 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstNa
           <p className="mt-3 text-base text-neutral-300 sm:text-lg">
             {state === "error" && voice.error
               ? voice.error
-              : voice.avatar.status === "starting"
-                ? "Starting video…"
+              : voice.avatar.switching
+                ? `Connecting ${provider === "heygen" ? "HeyGen" : "Tavus"} video. Microphone paused briefly…`
                 : hint}
           </p>
         </div>
@@ -182,12 +193,13 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstNa
             error={confirmError}
             busy={confirming}
             unclear={confirmDecision === "unclear"}
+            buttonOnly={voice.quoteButtonOnly}
             onConfirm={() => void onConfirm(quote)}
             onDecline={() => quoteOutcome(quote.quote_id, "declined")}
           />
         ) : null}
 
-        {live && voice.avatar.wanted ? (
+        {live && voice.avatar.wanted && provider === "tavus" ? (
           <XanaLookPicker
             looks={voice.avatar.looks}
             look={voice.avatar.look}
@@ -230,7 +242,6 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support" }: { firstNa
                 type="button"
                 onClick={() => voice.setVideo(!voice.avatar.wanted)}
                 aria-pressed={voice.avatar.wanted}
-                disabled={voice.avatar.status === "starting"}
                 className={cn(
                   "inline-flex min-w-40 items-center justify-center gap-2 rounded-2xl border px-6 py-3.5 text-lg font-medium transition disabled:opacity-60",
                   voice.avatar.wanted
@@ -293,6 +304,7 @@ function QuotePanel({
   error,
   busy,
   unclear,
+  buttonOnly,
   onConfirm,
   onDecline,
 }: {
@@ -300,6 +312,7 @@ function QuotePanel({
   error: string | null;
   busy: boolean;
   unclear: boolean;
+  buttonOnly: boolean;
   onConfirm: () => void;
   onDecline: () => void;
 }) {
@@ -327,6 +340,8 @@ function QuotePanel({
         <p role="alert" className="mt-3 text-sm text-danger-200">
           {error}
         </p>
+      ) : buttonOnly ? (
+        <p className="mt-3 text-sm text-neutral-300">Review these details and tap Confirm return to continue.</p>
       ) : unclear ? (
         <p className="mt-3 text-sm text-accent-200">I need a clear yes. Say “yes, confirm”, or tap Confirm.</p>
       ) : (

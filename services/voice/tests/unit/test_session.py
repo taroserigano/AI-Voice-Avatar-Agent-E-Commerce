@@ -218,6 +218,93 @@ async def _quoted(h: Harness) -> None:
     await settle(h)
 
 
+def test_interrupted_readback_and_late_played_event_cannot_confirm() -> None:
+    async def t() -> None:
+        h = harness(FakeBrain(scripts=[[Step(QuoteOut(QUOTE))]]))
+        await _quoted(h)
+        await h.session.on_message({"type": "interrupt"})
+        await play_all(h)  # a late worklet/provider callback after interruption
+        h.ears.hear(Final("Yes, confirm.", at=5.0))
+        await settle(h)
+        assert h.of("confirm.result")[-1]["decision"] == "unclear"
+        assert all(not s.heard_complete for s in h.session.segments.values() if s.dropped)
+        await h.session.close()
+
+    run(t)
+
+
+def test_provider_switch_keeps_quote_and_mute_but_invalidates_readback() -> None:
+    async def t() -> None:
+        h = harness(FakeBrain(scripts=[[Step(QuoteOut(QUOTE))]]))
+        await _quoted(h)
+        await play_all(h)
+        await h.session.on_message({"type": "mute", "muted": True})
+        await h.session.switch_output("heygen", 1)
+        await h.session.output_ready(1)
+        assert h.session.quote == QUOTE and h.session.muted
+        assert h.session._readback_segment is None
+        await play_all(h)
+        h.ears.hear(Final("Yes, confirm.", at=5.0))
+        await settle(h)
+        assert h.of("confirm.result")[-1]["decision"] == "unclear"
+        await h.session.on_message(
+            {"type": "quote.outcome", "quote_id": "q-1", "outcome": "confirmed"}
+        )
+        await settle(h)
+        assert h.brain.resumed == ["confirmed"]
+        await h.session.close()
+
+    run(t)
+
+
+def test_heygen_readback_never_enables_spoken_confirmation_even_after_end() -> None:
+    async def t() -> None:
+        h = harness(FakeBrain(scripts=[[Step(QuoteOut(QUOTE))]]))
+        await h.session.switch_output("heygen", 1)
+        await h.session.output_ready(1)
+        await _quoted(h)
+        for msg in h.of("segment.end"):
+            await h.session.on_message(
+                {"type": "played", "segment": msg["segment"], "complete": True, "generation": 0}
+            )
+            assert not h.session.segments[msg["segment"]].complete
+            await h.session.on_message(
+                {"type": "played", "segment": msg["segment"], "complete": True, "generation": 1}
+            )
+            assert h.session.segments[msg["segment"]].complete
+            assert not h.session.segments[msg["segment"]].heard_complete
+        h.ears.hear(Final("Yes, confirm.", at=5.0))
+        await settle(h)
+        assert h.of("confirm.result")[-1]["decision"] == "unclear"
+        await h.session.close()
+
+    run(t)
+
+
+def test_handoff_pauses_input_until_current_provider_plays_and_keeps_mute() -> None:
+    async def t() -> None:
+        h = harness()
+        await h.session.start()
+        await h.session.switch_output("heygen", 1)
+        await h.session.on_audio(b"audio")
+        await h.session.on_message({"type": "text", "text": "do not process during handoff"})
+        assert h.ears.audio == [] and h.brain.heard == []
+        await h.session.output_ready(0)
+        assert h.session.output_switching
+        await h.session.output_ready(1)
+        await h.session.on_audio(b"audio")
+        assert h.ears.audio == [b"audio"]
+        await h.session.on_message({"type": "mute", "muted": True})
+        await h.session.switch_output("tavus", 2)
+        await h.session.output_ready(2)
+        sent = len(h.ears.audio)
+        await h.session.on_audio(b"muted")
+        assert len(h.ears.audio) == sent and h.session.muted
+        await h.session.close()
+
+    run(t)
+
+
 def test_the_quote_read_back_is_spoken_word_for_word_from_code() -> None:
     async def t() -> None:
         brain = FakeBrain(scripts=[[Step(TextDelta("I can do that.")), Step(QuoteOut(QUOTE))]])

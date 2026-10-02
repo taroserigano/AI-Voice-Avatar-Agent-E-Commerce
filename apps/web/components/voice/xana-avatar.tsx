@@ -18,11 +18,15 @@ export function XanaAvatar({
   state,
   greenscreen,
   background,
+  onPlaying,
+  onStopped,
 }: {
   stream: MediaStream;
   state: VoiceStateName | "off";
   greenscreen: boolean;
   background: Background;
+  onPlaying: () => void;
+  onStopped: () => void;
 }) {
   const video = useRef<HTMLVideoElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -31,12 +35,15 @@ export function XanaAvatar({
   // Only shown once, after the customer turned video on, so this never runs on the server.
   const [webgl] = useState(() => Boolean(document.createElement("canvas").getContext("webgl")));
   const keyed = greenscreen && webgl;
+  const [blocked, setBlocked] = useState(false);
 
   useEffect(() => {
     const el = video.current;
     if (!el || el.srcObject === stream) return;
     el.srcObject = stream;
-    void el.play().catch(() => undefined);
+    let cancelled = false;
+    void el.play().catch(() => { if (!cancelled) setBlocked(true); });
+    return () => { cancelled = true; el.srcObject = null; };
   }, [stream]);
 
   // Key out the green, frame by frame, while the room is on a green screen.
@@ -70,7 +77,6 @@ export function XanaAvatar({
 
   return (
     <div
-      aria-hidden
       className={cn(
         "relative aspect-video w-[min(36rem,92vw)] overflow-hidden rounded-[2rem] border border-white/10 bg-black",
         "shadow-[0_24px_80px_-12px_rgb(103_64_222/0.55)] transition-shadow duration-300",
@@ -79,8 +85,13 @@ export function XanaAvatar({
       )}
     >
       {/* Plays her voice; hidden under the keyed canvas when there is one. */}
-      <video ref={video} autoPlay playsInline className="absolute inset-0 size-full object-cover" />
-      <canvas ref={canvas} className={cn("absolute inset-0 size-full object-cover", !keyed && "hidden")} />
+      <video ref={video} autoPlay playsInline aria-label="Xana avatar"
+        onPlaying={() => { setBlocked(false); onPlaying(); }}
+        onPause={onStopped} onError={onStopped}
+        className="absolute inset-0 size-full object-cover" />
+      <canvas ref={canvas} aria-hidden className={cn("absolute inset-0 size-full object-cover", !keyed && "hidden")} />
+      {blocked ? <button type="button" className="absolute inset-x-8 bottom-6 z-10 rounded-xl bg-brand-600 px-4 py-3 font-semibold"
+        onClick={() => { void video.current?.play().catch(() => setBlocked(true)); }}>Play avatar audio</button> : null}
       <div className="pointer-events-none absolute inset-0 rounded-[2rem] shadow-[inset_0_0_0_1px_rgb(255_255_255/0.08)]" />
     </div>
   );

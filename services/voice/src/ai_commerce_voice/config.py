@@ -93,7 +93,7 @@ class VoiceSettings(BaseSettings):
 
     # Xana's face: a Tavus avatar in echo mode (docs/features/10-xana-avatar). Off unless
     # VOICE_AVATAR=tavus and a key and PAL are set; the customer still turns it on per call.
-    voice_avatar: Literal["off", "tavus"] = "off"
+    voice_avatar: Literal["off", "tavus", "heygen", "both"] = "off"
     tavus_api_key: str | None = Field(
         default=None, validation_alias=AliasChoices("TAVUS_APIKEY", "TAVUS_API_KEY")
     )
@@ -107,6 +107,18 @@ class VoiceSettings(BaseSettings):
     # Tavus doesn't join or bill test-mode conversations (tests only).
     tavus_test_mode: bool = False
 
+    # LiveAvatar uses its own developer key; a HeyGen video API key is not compatible.
+    liveavatar_api_key: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices(
+            "LIVEAVATAR_API_KEY", "HEYGEN_LIVE_APIKEY", "HEYGEN_LIVE_API_KEY"
+        ),
+    )
+    heygen_avatar_id: str | None = None
+    heygen_sandbox: bool = True
+    heygen_max_live: int = Field(default=2, ge=1, le=20)
+    heygen_max_session_s: int = Field(default=60, ge=30, le=1200)
+
     # Turn-taking. Silence that ends the customer's turn (server VAD), and how long Xana waits
     # for answer audio before saying a filler.
     voice_end_silence_ms: int = 450
@@ -117,7 +129,15 @@ class VoiceSettings(BaseSettings):
 
     @property
     def avatar_ready(self) -> bool:
-        return self.voice_avatar == "tavus" and bool(self.tavus_api_key and self.tavus_pal_id)
+        return self.voice_avatar in ("tavus", "both") and bool(
+            self.tavus_api_key and self.tavus_pal_id
+        )
+
+    @property
+    def heygen_ready(self) -> bool:
+        return self.voice_avatar in ("heygen", "both") and bool(
+            self.liveavatar_api_key and (self.heygen_sandbox or self.heygen_avatar_id)
+        )
 
     @property
     def is_dev(self) -> bool:
