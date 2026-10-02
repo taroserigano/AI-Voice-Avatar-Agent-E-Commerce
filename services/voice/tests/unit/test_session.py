@@ -336,6 +336,27 @@ def test_a_yes_before_the_read_back_finished_playing_does_not_confirm() -> None:
     run(t)
 
 
+def test_a_yes_while_the_read_back_is_still_being_made_drops_it_and_the_call_carries_on() -> None:
+    # Found live (2026-10-01): the read-back was cut off before its voice was made, never
+    # ended, and the call never went back to listening.
+    async def t() -> None:
+        h = harness(FakeBrain(scripts=[[Step(QuoteOut(QUOTE))]]), first_audio_s=0.3)
+        await h.session.start()
+        h.ears.hear(Final("Return the oat milk, it was spoiled.", at=1.0))
+        await asyncio.sleep(0.1)  # the quote is out; its read-back voice isn't made yet
+        (readback,) = [s["segment"] for s in h.of("segment.start") if s["kind"] == "confirm"]
+        h.ears.hear(Final("Yes", at=1.2))
+        await settle(h)
+        assert h.of("confirm.result")[-1]["decision"] == "unclear"
+        assert any(readback in m["segments"] for m in h.of("drop"))
+        assert not h.session.segments[readback].heard_complete
+        await play_all(h)
+        assert h.session.state == "listening"
+        await h.session.close()
+
+    run(t)
+
+
 def test_a_clear_yes_after_the_read_back_lets_the_browser_confirm() -> None:
     async def t() -> None:
         h = harness(

@@ -381,6 +381,7 @@ class VoiceSession:
                 self._turn.cancel()
                 with contextlib.suppress(asyncio.CancelledError, Exception):
                     await self._turn
+                await self._drop_unmade()
         self._turn_is_say = say is not None
         self._turn = asyncio.create_task(
             self._run_turn(
@@ -392,6 +393,19 @@ class VoiceSession:
                 message_id=message_id,
             )
         )
+
+    async def _drop_unmade(self) -> None:
+        """A cancelled turn's speech that was still being made never ends: drop it (the
+        browser stops what it has of it), so it can't count as heard or keep the call from
+        going back to listening. Speech already made plays on, as it would have."""
+        cut = [s.number for s in self.segments.values() if not s.complete and not s.synthesized]
+        if not cut:
+            return
+        for n in cut:
+            self.segments[n].complete = True
+            self.segments[n].dropped = True
+            self.segments[n].heard_complete = False
+        await self.send_json({"type": "drop", "segments": cut})
 
     async def _run_turn(
         self,
