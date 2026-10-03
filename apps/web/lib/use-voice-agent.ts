@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CaptionSegment } from "./voice-captions";
+import { captionFor, type CaptionSegment } from "./voice-captions";
 import {
   MIC_RATE,
   SPEECH_RATE,
@@ -54,8 +54,22 @@ export type VoiceAvatar = {
   playbackStopped: () => void;
 };
 
+/** One finished exchange, for the conversation panel: what the customer said, what Xena was
+ *  heard saying, and the cards and sources that came with it. */
+export type VoiceTurn = {
+  id: number;
+  user: string;
+  xena: string;
+  cards: Record<string, unknown>[];
+  citations: Citation[];
+};
+
 export type VoiceAgent = {
   state: VoiceStateName | "off";
+  /** Earlier exchanges in this call, oldest first (the current one is live in the fields below). */
+  history: VoiceTurn[];
+  /** Cards sent during the current exchange only. */
+  turnCards: Record<string, unknown>[];
   ready: Ready | null;
   userText: string;
   userFinal: boolean;
@@ -103,6 +117,18 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
   const [confirmDecision, setConfirmDecision] = useState<"yes" | "no" | "unclear" | null>(null);
   const [citations, setCitations] = useState<Citation[]>([]);
   const [cards, setCards] = useState<Record<string, unknown>[]>([]);
+  const [history, setHistory] = useState<VoiceTurn[]>([]);
+  const [turnCards, setTurnCards] = useState<Record<string, unknown>[]>([]);
+  // The exchange in progress, read when the next one starts (refs: read inside a server event).
+  const turnRef = useRef<{ user: string; cards: Record<string, unknown>[]; citations: Citation[] }>({
+    user: "", cards: [], citations: [],
+  });
+  const segmentsRef = useRef<CaptionSegment[]>([]);
+  const stateRef = useRef<VoiceStateName | "off">("off");
+  const turnIdRef = useRef(0);
+  useEffect(() => {
+    segmentsRef.current = segments;
+  }, [segments]);
   const [metrics, setMetrics] = useState<TurnMetrics | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [muted, setMutedState] = useState(false);
@@ -196,13 +222,25 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
           break;
         case "state":
           setState(msg.state);
+          stateRef.current = msg.state;
           if (msg.state === "hearing") setToolLabel(null);
           break;
         case "user.partial":
           setUserText(msg.text);
           setUserFinal(false);
           break;
-        case "user.final":
+        case "user.final": {
+          // A new exchange (she was listening, not mid-answer, which is a corrected
+          // transcript): the one before it goes into the history as it was heard.
+          const prev = turnRef.current;
+          const said = captionFor(segmentsRef.current);
+          const fresh = stateRef.current === "listening" || stateRef.current === "hearing";
+          if (fresh && (prev.user || said || prev.cards.length)) {
+            const done: VoiceTurn = { id: ++turnIdRef.current, user: prev.user, xena: said, cards: prev.cards, citations: prev.citations };
+            setHistory((h) => [...h.slice(-49), done]);
+          }
+          turnRef.current = fresh ? { user: msg.text, cards: [], citations: [] } : { ...prev, user: msg.text };
+          if (fresh) setTurnCards([]);
           setUserText(msg.text);
           setUserFinal(true);
           // A new question: the previous answer's captions and cards give way.
@@ -212,6 +250,7 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
           setConfirmDecision(null);
           setMetrics(null);
           break;
+        }
         case "segment.start":
           generationsRef.current.set(msg.segment, msg.generation ?? 0);
           if ((msg.generation ?? 0) < requestRef.current) {
@@ -264,6 +303,8 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
           break;
         case "card":
           setCards((cs) => [...cs.slice(-5), msg.card]);
+          turnRef.current = { ...turnRef.current, cards: [...turnRef.current.cards, msg.card] };
+          setTurnCards(turnRef.current.cards);
           break;
         case "quote":
           setQuote(msg.quote);
@@ -272,6 +313,7 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
           break;
         case "citations":
           setCitations(msg.citations);
+          turnRef.current = { ...turnRef.current, citations: msg.citations };
           break;
         case "confirm.result":
           if ((msg.generation ?? 0) !== requestRef.current) break;
@@ -579,6 +621,8 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
 
   return {
     state,
+    history,
+    turnCards,
     ready,
     userText,
     userFinal,

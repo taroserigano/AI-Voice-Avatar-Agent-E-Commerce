@@ -11,6 +11,7 @@ import type { AvatarProvider, QuoteCard } from "@/lib/voice-protocol";
 import { XanaProviderTabs } from "./xana-provider-tabs";
 import { XanaAvatar } from "./xana-avatar";
 import { XanaAvatarConnecting } from "./xana-avatar-connecting";
+import { XanaChatPanel } from "./xana-chat-panel";
 import { XanaLookPicker } from "./xana-look-picker";
 import { XanaOrb } from "./xana-orb";
 
@@ -96,6 +97,17 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
   const live = state !== "off" && state !== "error";
   const face = voice.avatar.status === "live" && voice.avatar.stream ? voice.avatar.stream : null;
   const videoOffered = live && voice.avatar.offer.available;
+  const chat = {
+    history: voice.history,
+    current: {
+      user: voice.userText,
+      userFinal: voice.userFinal,
+      xena: captionNow,
+      cards: voice.turnCards,
+      citations: voice.citations,
+    },
+    state,
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-voice-night text-white focus-inverse">
@@ -120,6 +132,7 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
         </Link>
       </header>
 
+      <div className="flex min-h-0 flex-1">
       {/* Stage */}
       <main
         ref={stage}
@@ -252,7 +265,18 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
             {voice.error}
           </p>
         ) : null}
+
+        {/* Narrow screens: the conversation under the stage. */}
+        {live ? <XanaChatPanel {...chat} className="mt-6 h-[60dvh] w-full max-w-2xl lg:hidden" /> : null}
       </main>
+
+      {/* Wide screens: the conversation beside the stage. */}
+      {live ? (
+        <aside className="hidden w-108 shrink-0 py-5 pr-5 lg:flex">
+          <XanaChatPanel {...chat} className="w-full" />
+        </aside>
+      ) : null}
+      </div>
 
       {/* Controls */}
       <footer className="border-t border-white/10 px-4 pb-4 pt-5 text-center">
