@@ -1,9 +1,15 @@
-"""Which tools each assistant may use. Neither has a tool that confirms, pays, or refunds."""
+"""Which tools each assistant may use. Neither has a tool that confirms, pays, or refunds.
+
+Xena reads everything the store has about products (details, ratings, reviews) and about the
+signed-in customer (orders, returns, cart, support cases, account activity), read-only except
+pricing and proposing a return and opening a support case. She can't add to the cart.
+"""
 
 from __future__ import annotations
 
 from langchain_core.tools import BaseTool
 
+from assistant.account_tools import get_my_account_activity, get_my_cart, list_my_support_cases
 from assistant.return_tools import (
     get_refund_status,
     get_return_options,
@@ -14,6 +20,7 @@ from assistant.tools import (
     STEPH_TOOLS,
     get_order_status,
     get_product_details,
+    get_product_reviews,
     handoff_to_person,
     list_my_orders,
     list_stores,
@@ -32,6 +39,10 @@ XANA_TOOLS: list[BaseTool] = [
     search_policies,
     list_stores,
     get_product_details,
+    get_product_reviews,
+    get_my_cart,
+    list_my_support_cases,
+    get_my_account_activity,
     handoff_to_person,
 ]
 

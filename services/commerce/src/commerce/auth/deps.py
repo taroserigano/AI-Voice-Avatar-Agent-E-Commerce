@@ -28,7 +28,8 @@ from commerce.config import Settings, get_settings
 from commerce.db import get_db
 
 # (method, path template) pairs the assistant may call on a customer's behalf: reading the
-# catalog, stores, policies, their own cart, orders, and returns; adding to their cart;
+# catalog, product reviews, stores, policies, and the customer's own cart, orders, returns,
+# support cases, and account activity (each route scopes to the principal); adding to their cart;
 # pricing a return (a quote changes nothing); and opening a support case. Nothing that
 # confirms, pays, refunds, or signs in.
 ASSISTANT_ROUTES: frozenset[tuple[str, str]] = frozenset(
@@ -37,6 +38,7 @@ ASSISTANT_ROUTES: frozenset[tuple[str, str]] = frozenset(
         ("GET", "/v1/catalog/vocabulary"),
         ("GET", "/v1/products"),
         ("GET", "/v1/products/{product_id}"),
+        ("GET", "/v1/products/{product_id}/reviews"),
         ("GET", "/v1/stores"),
         ("GET", "/v1/policies/search"),
         ("GET", "/v1/policies/{doc_id}"),
@@ -48,7 +50,9 @@ ASSISTANT_ROUTES: frozenset[tuple[str, str]] = frozenset(
         ("GET", "/v1/returns"),
         ("POST", "/v1/returns/quote"),
         ("GET", "/v1/returns/quotes/{quote_id}"),
+        ("GET", "/v1/support/cases"),
         ("POST", "/v1/support/cases"),
+        ("GET", "/v1/activity"),
     }
 )
 

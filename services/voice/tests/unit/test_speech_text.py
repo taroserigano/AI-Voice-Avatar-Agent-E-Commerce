@@ -76,6 +76,16 @@ def test_tool_fillers_say_what_xana_is_doing() -> None:
     assert len(all_phrases()) == len(set(all_phrases()))
 
 
+def test_every_xana_tool_name_with_a_filler_is_a_real_tool_and_is_pre_rendered() -> None:
+    from assistant.toolsets import XANA_TOOLS
+
+    names = {t.name for t in XANA_TOOLS}
+    assert set(BY_TOOL) <= names  # a renamed tool would silently lose its filler
+    for tool in ("get_product_reviews", "get_my_cart", "list_my_support_cases"):
+        assert BY_TOOL[tool] and set(BY_TOOL[tool]) <= set(all_phrases())
+    assert set(BY_TOOL["get_my_account_activity"]) <= set(all_phrases())
+
+
 def test_policy_questions_become_search_queries_without_the_small_talk() -> None:
     assert retrieval_query("What's your return policy for opened headphones?") == (
         "return opened headphones"

@@ -73,6 +73,10 @@ REVIEWED_TOOLS = {
     "propose_return",
     "get_refund_status",
     "suggest_xana",
+    "get_product_reviews",
+    "get_my_cart",
+    "list_my_support_cases",
+    "get_my_account_activity",
 }
 
 

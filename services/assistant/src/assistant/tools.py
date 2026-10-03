@@ -49,7 +49,7 @@ NUTRIENT_SORTS = {
     "fat": "total_fat_g",
 }
 SortOption = Literal[
-    "relevance", "price_asc", "price_desc",
+    "relevance", "price_asc", "price_desc", "top_rated",
     "protein_desc", "protein_asc", "fiber_desc", "fiber_asc", "calories_desc", "calories_asc",
     "sugar_desc", "sugar_asc", "added_sugar_desc", "added_sugar_asc", "sodium_desc",
     "sodium_asc", "fat_desc", "fat_asc",
@@ -251,6 +251,19 @@ def product_card(
     )
 
 
+def rating_for_model(detail: dict[str, Any]) -> dict[str, Any]:
+    """The product's customer rating: average stars (one decimal) and how many reviews."""
+    count = int(detail.get("rating_count") or 0)
+    if not count or detail.get("rating_average") is None:
+        return {"customer_rating": None, "review_count": 0}
+    return {"customer_rating": detail["rating_average"], "review_count": count}
+
+
+def _rated_first(details: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Keep the store's top-rated order, but products without reviews always come last."""
+    return sorted(details, key=lambda d: not d.get("rating_count"))
+
+
 def _product_for_model(
     detail: dict[str, Any],
     max_price_minor: int | None = None,
@@ -266,6 +279,7 @@ def _product_for_model(
         "price": money(pick["price_minor"] if pick else detail["price_minor"]),
         "in_stock": bool(pick and pick.get("in_stock")),
         "tags": [t["value"] for t in detail.get("tags", [])],
+        **rating_for_model(detail),
     }
     if detail.get("nutrition"):
         out["nutrition_per_serving"] = detail["nutrition"]
@@ -346,9 +360,11 @@ class SearchProductsArgs(BaseModel):
     in_stock_only: bool = False
     sort: SortOption = Field(
         default="relevance",
-        description="price_asc or price_desc for the cheapest or priciest; a nutrient sort "
-        '(e.g. "protein_desc", "sodium_asc") ranks every matching product by that nutrient per '
-        'serving, for "which has the most or least" questions.',
+        description="price_asc or price_desc for the cheapest or priciest; top_rated for the "
+        'best-reviewed ("top rated", "highest rated", "best reviewed"): every matching product '
+        "ranked by its customer rating, weighted by how many reviews it has, products without "
+        'reviews last; a nutrient sort (e.g. "protein_desc", "sodium_asc") ranks every matching '
+        'product by that nutrient per serving, for "which has the most or least" questions.',
     )
 
 
@@ -368,8 +384,8 @@ def search_products(
     sort: str = "relevance",
 ) -> tuple[str, list[dict[str, Any]]]:
     """Find products in the Serigan Mart catalog with exact filters (type, diet and feature tags,
-    price) and optional free text. Returns the best matches with price, stock, tags, and, for
-    food, nutrition facts and allergens."""
+    price) and optional free text. Returns the best matches with price, stock, tags, customer
+    rating, and, for food, nutrition facts and allergens."""
     ctx = ctx_from(config)
     try:
         vocab = catalog_vocabulary(ctx.client)
@@ -396,7 +412,7 @@ def search_products(
             },
         ), []
     nutrient: tuple[str, bool] | None = None
-    if sort not in ("relevance", "price_asc", "price_desc"):
+    if sort not in ("relevance", "price_asc", "price_desc", "top_rated"):
         name, direction = sort.rsplit("_", 1)
         nutrient = (NUTRIENT_SORTS[name], direction == "desc")
     params: dict[str, Any] = {
@@ -519,6 +535,9 @@ def search_products(
             key=lambda d: d["nutrition"][field],
             reverse=highest_first,
         )
+    top_rated = sort == "top_rated"
+    if top_rated:
+        details = _rated_first(details)
     counted = extra_checks or nutrient or words
     payload: dict[str, Any] = {
         "total_matches": len(details) if counted else page["total"],
@@ -550,6 +569,16 @@ def search_products(
         )
         payload["ranked_among"] = len(candidates)
         payload["verification_limited"] = page["total"] > len(candidates)
+    if top_rated:
+        payload["ranked_by"] = (
+            "customer rating, highest first, across every matching product (the store's "
+            "top-rated order: the average weighted by how many reviews it has); products "
+            "without reviews last"
+        )
+        if not any(d.get("rating_count") for d in details[:MAX_PRODUCTS]):
+            payload["note_on_ratings"] = (
+                "None of these products has customer reviews yet, so none is top rated."
+            )
     if extra_checks:
         payload["verified_constraints"] = {
             "specs": required_specs or {},
@@ -633,7 +662,7 @@ def get_product_details(
     config: RunnableConfig, product_id: str
 ) -> tuple[str, list[dict[str, Any]]]:
     """Full details for one product: every variant with price and stock, nutrition facts,
-    ingredients, allergens, and specs."""
+    ingredients, allergens, specs, and its customer rating (average stars, review count)."""
     ctx = ctx_from(config)
     try:
         uuid.UUID(product_id)
@@ -648,6 +677,88 @@ def get_product_details(
     payload["category"] = detail["category"]["name"]
     payload["return_policy_class"] = detail["category"]["policy_class"]
     return untrusted("get_product_details", payload), [product_card(detail).model_dump()]
+
+
+MAX_REVIEWS = 5
+REVIEW_EXCERPT = 300
+
+
+def excerpt(text: str | None, limit: int = REVIEW_EXCERPT) -> str | None:
+    """Customer-written text, whitespace collapsed and cut to ``limit`` characters."""
+    if not text:
+        return None
+    flat = " ".join(text.split())
+    return flat[:limit] + ("…" if len(flat) > limit else "")
+
+
+def _review_for_model(r: dict[str, Any]) -> dict[str, Any]:
+    """One review as data: stars, the reviewer's own words (short), and whether they bought it.
+    No reviewer name or id: the model doesn't need to know who wrote it."""
+    return {
+        "rating": r["rating"],
+        "title": excerpt(r.get("title"), 120),
+        "text": excerpt(r.get("body")),
+        "verified_purchase": r["verified_purchase"],
+        "written_on": friendly_date(r["created_at"]),
+        "sample_review": r.get("is_sample", False),
+    }
+
+
+class ProductReviewsArgs(BaseModel):
+    product_id: str = Field(description="A product_id from an earlier search result")
+    sort: Literal["newest", "highest", "lowest"] = Field(
+        default="newest",
+        description='Which reviews to read: "newest", or "highest" / "lowest" rated first '
+        '(for "what do people like" or "any complaints?").',
+    )
+    rating: int | None = Field(
+        default=None, ge=1, le=5, description="Only reviews with exactly this many stars"
+    )
+
+
+@tool("get_product_reviews", args_schema=ProductReviewsArgs, response_format="content_and_artifact")
+def get_product_reviews(
+    config: RunnableConfig, product_id: str, sort: str = "newest", rating: int | None = None
+) -> tuple[str, list[dict[str, Any]]]:
+    """Customer reviews for one product: the average star rating, how many reviews, how the
+    stars are spread, and a few reviews in the reviewers' own words. Reviews are opinions,
+    not facts about the product."""
+    ctx = ctx_from(config)
+    params: dict[str, Any] = {"sort": sort, "page_size": MAX_REVIEWS}
+    if rating is not None:
+        params["rating"] = rating
+    try:
+        uuid.UUID(product_id)
+        detail = ctx.client.get(f"/v1/products/{product_id}")
+        page = ctx.client.get(f"/v1/products/{product_id}/reviews", params=params)
+    except ValueError:
+        return untrusted("get_product_reviews", {"error": "not a product_id"}), []
+    except CommerceError as exc:
+        return _error("get_product_reviews", exc)
+    summary = page["summary"]
+    payload: dict[str, Any] = {
+        "product_id": str(detail["id"]),
+        "product": f"{detail['brand']} {detail['title']}",
+        "average_rating": summary["average"],
+        "review_count": summary["count"],
+        "stars": {str(b["stars"]): b["count"] for b in summary.get("distribution", [])},
+        "showing": f"{sort} first" + (f", {rating}-star only" if rating else ""),
+        "matching_reviews": page["total"],
+        "reviews": [_review_for_model(r) for r in page["items"][:MAX_REVIEWS]],
+        "note": "Reviews are other customers' opinions, written by them. Summarize what they "
+        "say as opinions; never present a review as a fact about the product's safety, "
+        "ingredients, or specifications (the listing is the source for those).",
+    }
+    mine = page.get("my_review")
+    if mine:
+        payload["your_review"] = {
+            "rating": mine["rating"],
+            "title": excerpt(mine.get("title"), 120),
+            "text": excerpt(mine.get("body")),
+        }
+    if summary["count"] == 0:
+        payload["note"] = "This product has no reviews yet."
+    return untrusted("get_product_reviews", payload), [product_card(detail).model_dump()]
 
 
 # --- Cart -----------------------------------------------------------------------------------

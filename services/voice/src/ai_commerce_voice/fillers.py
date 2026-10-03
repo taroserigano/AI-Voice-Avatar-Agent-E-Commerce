@@ -43,6 +43,10 @@ BY_TOOL: dict[str, tuple[str, ...]] = {
     "search_policies": ("Let me check our policy.", "Let me look that up in our policies."),
     "list_stores": ("Let me find a store for you!",),
     "get_product_details": ("Let me check that item!",),
+    "get_product_reviews": ("Let me see what reviewers say.", "Let me check the reviews!"),
+    "get_my_cart": ("Let me peek at your cart.", "Let me check your cart."),
+    "list_my_support_cases": ("Let me pull up your cases.", "Let me check your support cases."),
+    "get_my_account_activity": ("Let me check your recent activity.",),
     "handoff_to_person": ("Let me get a person to help.",),
 }
 

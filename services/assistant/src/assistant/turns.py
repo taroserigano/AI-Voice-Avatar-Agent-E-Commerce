@@ -60,6 +60,10 @@ TOOL_LABELS = {
     "quote_return": "Pricing your return…",
     "propose_return": "Preparing your quote…",
     "get_refund_status": "Checking your refunds…",
+    "get_product_reviews": "Reading the reviews…",
+    "get_my_cart": "Checking your cart…",
+    "list_my_support_cases": "Looking up your support cases…",
+    "get_my_account_activity": "Checking your recent activity…",
 }
 
 
@@ -105,7 +109,7 @@ class ProductCards:
         if tool == "search_products":
             self.search = list(cards)
             return []
-        if tool == "get_product_details":
+        if tool in ("get_product_details", "get_product_reviews"):
             self.details += cards
             return []
         return cards

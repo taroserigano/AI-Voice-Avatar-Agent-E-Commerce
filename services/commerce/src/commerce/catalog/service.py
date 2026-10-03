@@ -361,7 +361,19 @@ def list_products(
         elif sort == SortOrder.NEWEST:
             rows.sort(key=lambda r: r[0].created_at, reverse=True)
         elif sort == SortOrder.TOP_RATED:
-            rows.sort(key=lambda r: (-bayesian_rating(r.rating_avg, r.rating_count), r[0].title))
+            # PostgreSQL's avg() is a Decimal: make it a float before blending it with the prior
+            # (Decimal + float raised a TypeError, a 500 for "top rated" with any search text).
+            # Same order as browsing: blended rating, then more reviews, then title.
+            rows.sort(
+                key=lambda r: (
+                    -bayesian_rating(
+                        None if r.rating_avg is None else float(r.rating_avg),
+                        int(r.rating_count or 0),
+                    ),
+                    -int(r.rating_count or 0),
+                    r[0].title,
+                )
+            )
         total = len(rows)
         rows = rows[start : start + page_size]
     else:

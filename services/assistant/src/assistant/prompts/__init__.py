@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 PROMPT_DIR = Path(__file__).resolve().parent
-PROMPT_VERSIONS = {"steph": "steph.v1", "xana": "xana.v3"}
+PROMPT_VERSIONS = {"steph": "steph.v1", "xana": "xana.v4"}
 VOICE_NOTE = (
     "\n\n## This turn is spoken\n"
     "The customer is talking to you by voice. Answer in one or two short sentences with no "
