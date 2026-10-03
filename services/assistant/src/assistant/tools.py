@@ -214,8 +214,26 @@ def names_all(detail: dict[str, Any], words: list[str]) -> bool:
 
 
 def _variant_text(v: dict[str, Any]) -> str:
+    """A variant's name and attributes, plus the ways people say them: "4 x 5.3 oz cups" is
+    also a "4-pack" and "pack of 4", and "fl oz" is "fluid ounces". Found by the golden eval:
+    the voice model asked for the "4-pack" and was told no such variant exists."""
     attrs = " ".join(str(x) for x in (v.get("attributes") or {}).values())
-    return f"{v['name']} {attrs}"
+    text = f"{v['name']} {attrs}"
+    aliases = []
+    pack = re.match(r"\s*(\d+)\s*[x×]\s", v["name"])
+    if pack:
+        n = pack.group(1)
+        aliases += [f"{n} pack", f"pack of {n}", f"{n} count", f"{n} ct"]
+    units = (
+        (r"\bfl oz\b", ("fluid ounces", "fluid ounce", "ounces", "oz")),
+        (r"(?<!fl )\boz\b", ("ounces", "ounce")),
+        (r"\blbs?\b", ("pounds", "pound")),
+        (r"\bct\b", ("count",)),
+    )
+    for unit, words in units:
+        if re.search(unit, text, re.I):
+            aliases += [re.sub(unit, w, text, flags=re.I) for w in words]
+    return " | ".join([text, *aliases])
 
 
 def _selected_variant(
@@ -288,6 +306,9 @@ RETURN_GROUPS = {
 }
 
 
+MAX_VARIANTS = 24
+
+
 def _product_for_model(
     detail: dict[str, Any],
     max_price_minor: int | None = None,
@@ -322,7 +343,10 @@ def _product_for_model(
                 "price": money(v["price_minor"]),
                 "in_stock": v["in_stock"],
             }
-            for v in detail["variants"][:6]
+            # Every size and pack: with only the first 6, diapers in Size 6 (the 7th) read as
+            # "not offered" when it was out of stock (golden eval, 2026-10-03). The catalog's
+            # largest has 12.
+            for v in detail["variants"][:MAX_VARIANTS]
         ]
     return out
 
@@ -564,6 +588,22 @@ def search_products(
     top_rated = sort == "top_rated"
     if top_rated:
         details = _rated_first(details)
+    # "Nonna Lucia's Marinara Sauce" is that product, not also its low-sodium sibling. Matched
+    # over every result and put first: with a nutrient sort, a named product outside the top
+    # results was left out and its sugar read off another milk (golden eval, 2026-10-03).
+    exact_id: str | None = None
+    if query:
+        wanted = " ".join(query_words(query))
+        exact = [
+            d
+            for d in details
+            if " ".join(query_words(f"{d['brand']} {d['title']}")) == wanted
+            or " ".join(query_words(d["title"])) == wanted
+        ]
+        if len(exact) == 1:
+            exact_id = str(exact[0]["id"])
+            if nutrient or top_rated or sort != "relevance":
+                details = [exact[0], *(d for d in details if d is not exact[0])]
     counted = extra_checks or nutrient or words
     payload: dict[str, Any] = {
         "total_matches": len(details) if counted else page["total"],
@@ -573,17 +613,8 @@ def search_products(
             for d in details[:MAX_PRODUCTS]
         ],
     }
-    if query:
-        # "Nonna Lucia's Marinara Sauce" is that product, not also its low-sodium sibling.
-        wanted = " ".join(query_words(query))
-        exact = [
-            str(d["id"])
-            for d in details[:MAX_PRODUCTS]
-            if " ".join(query_words(f"{d['brand']} {d['title']}")) == wanted
-            or " ".join(query_words(d["title"])) == wanted
-        ]
-        if len(exact) == 1:
-            payload["exact_name_match"] = exact[0]
+    if exact_id:
+        payload["exact_name_match"] = exact_id
     if note_type:
         payload["note_on_type"] = (
             f"The product named isn't a {', '.join(product_types or [])}; it's listed as "
@@ -1011,7 +1042,8 @@ def list_my_orders(
     try:
         summaries = ctx.client.get("/v1/orders")[:MAX_ORDERS]
         details = with_brands(
-            ctx.client, list(_READS.map(lambda o: ctx.client.get(f"/v1/orders/{o['id']}"), summaries))
+            ctx.client,
+            list(_READS.map(lambda o: ctx.client.get(f"/v1/orders/{o['id']}"), summaries)),
         )
     except CommerceError as exc:
         return _error("list_my_orders", exc)
@@ -1025,7 +1057,9 @@ def list_my_orders(
             d for d in details if any(all(w in named(ln) for w in words) for ln in d["lines"])
         ]
     payload = {
-        "orders": [_with_return_options(d, options) for d, options in _return_options(ctx.client, details)],
+        "orders": [
+            _with_return_options(d, options) for d, options in _return_options(ctx.client, details)
+        ],
         "count": len(details),
     }
     return untrusted("list_my_orders", payload), [order_card(d).model_dump() for d in details[:5]]
@@ -1209,9 +1243,7 @@ def policy_search(client: CommerceClient, question: str, limit: int = 4) -> dict
     types section when the question is about returning some kind of item."""
     # Both searches at once: the item-types one doesn't depend on the first.
     extra_future = (
-        _READS.submit(
-            client.get, "/v1/policies/search", params={"q": ITEM_TYPES_QUERY, "limit": 1}
-        )
+        _READS.submit(client.get, "/v1/policies/search", params={"q": ITEM_TYPES_QUERY, "limit": 1})
         if ITEM_RETURN_QUESTION.search(question)
         else None
     )

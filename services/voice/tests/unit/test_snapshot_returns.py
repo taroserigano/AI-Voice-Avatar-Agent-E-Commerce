@@ -55,3 +55,19 @@ def test_the_prompt_says_how_many_orders_there_are() -> None:
 
     system = system_prompt("Alice", date(2026, 10, 3), orders_snapshot([order(), order("delivered")]))
     assert '"order_count": 2' in system
+
+
+def test_a_partly_returned_line_says_how_many_are_left_and_returns_say_where_they_stand() -> None:
+    """Found by the golden eval: voice said both backpacks were returnable when one had been
+    returned, and called an in-transit return "fully returned"."""
+    d = order("delivered")
+    d["return_options"] = {"lines": [{"order_line_id": d["lines"][0]["id"], "eligible": True,
+                                      "reason": "within_window", "quantity": 2, "returned_quantity": 1,
+                                      "returnable_quantity": 1}]}  # fmt: skip
+    d["returns"] = [{"rma_number": "RMA-1", "status": "in_transit",
+                     "items": [{"quantity": 1, "product_title": "Oat milk"}], "refund": None}]  # fmt: skip
+    [snap] = orders_snapshot([d])
+    assert snap["items"] == ["2 × Oat milk, 64 oz (returnable now: 1 of 2; 1 already returned)"]
+    assert snap["returns"] == [
+        {"rma_number": "RMA-1", "status": "in transit", "items": ["1 × Oat milk"], "refund": "not issued yet"}
+    ]

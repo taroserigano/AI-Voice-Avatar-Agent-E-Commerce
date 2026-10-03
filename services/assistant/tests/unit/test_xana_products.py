@@ -239,3 +239,50 @@ def test_xana_asks_again_on_an_ambiguous_follow_up() -> None:
     )
     assert reply.tool_calls == []
     assert "Which product" in reply.content
+
+
+def test_every_variant_is_shown_so_a_later_size_isnt_read_as_missing() -> None:
+    """Found by the golden eval: only the first 6 variants were listed, so diapers in Size 6
+    (the 7th, out of stock) were answered as "not offered"."""
+    from assistant.tools import _product_for_model
+
+    detail = {
+        "id": "p1", "title": "Everyday Diapers", "brand": "Serigan Mart Baby", "product_type": "diapers",
+        "price_minor": 1999, "tags": [], "category": {"policy_class": "standard"},
+        "variants": [{"id": f"v{i}", "name": f"Size {i}", "price_minor": 1999, "in_stock": i != 6}
+                     for i in range(1, 9)],
+    }  # fmt: skip
+    names = [v["name"] for v in _product_for_model(detail)["variants"]]
+    assert names == [f"Size {i}" for i in range(1, 9)]
+
+
+def test_cards_come_from_the_search_the_answer_is_about() -> None:
+    """Found by the golden eval: "only low fat ones" was answered with 1% milk, but the cards
+    came from a later near-miss search for 2% reduced-fat milk."""
+    from assistant.turns import ProductCards
+
+    def card(title: str) -> dict[str, str]:
+        return {"kind": "product", "id": title, "title": title}
+
+    cards = ProductCards()
+    cards.take("search_products", [card("1% Low Fat Milk"), card("1% Low Fat Lactose-Free Milk")])
+    cards.take("search_products", [card("2% Reduced Fat Milk")])
+    shown = cards.final("Serigan Mart Kitchen 1% Low Fat Milk is $2.19 for a half gallon.")
+    assert [c["title"] for c in shown] == ["1% Low Fat Milk", "1% Low Fat Lactose-Free Milk"]
+    # An answer that names no product keeps the last search, as before.
+    assert [c["title"] for c in cards.final("Here are some options.")] == ["2% Reduced Fat Milk"]
+
+
+def test_a_pack_is_found_by_how_people_say_it() -> None:
+    """Found by the golden eval: "the 4-pack of 5.3 oz cups" found no variant named
+    "4 x 5.3 oz cups", and the price question was answered "I couldn't find that yogurt"."""
+    from assistant.tools import _selected_variant
+
+    detail = {"variants": [
+        {"id": "a", "name": "32 oz tub", "price_minor": 599, "in_stock": True},
+        {"id": "b", "name": "4 x 5.3 oz cups", "price_minor": 359, "in_stock": True},
+    ]}  # fmt: skip
+    for terms in (["4-pack"], ["pack of 4"], ["4-pack", "5.3 oz cups"], ["5.3 ounces"]):
+        pick = _selected_variant(detail, variant_terms=terms)
+        assert pick is not None and pick["id"] == "b", terms
+    assert _selected_variant(detail, variant_terms=["6-pack"]) is None

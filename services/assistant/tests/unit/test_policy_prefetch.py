@@ -29,3 +29,16 @@ def test_an_old_fault_also_searches_for_the_manufacturer_warranty() -> None:
     assert "warranty manufacturer" in query
     # A fault with no sign of age is a return question, not a warranty one.
     assert "warranty" not in retrieval_query("the earbuds I got are defective")
+
+
+def test_food_that_went_bad_asks_for_the_perishable_rule() -> None:
+    """Found by the golden eval: "the whole milk ... was bad" didn't retrieve section 2.2."""
+    from assistant.policy_prefetch import retrieval_query
+
+    assert "perishable" in retrieval_query("the whole milk from the older grocery order was bad, refund it")
+    assert "perishable" in retrieval_query("my eggs were cracked")
+    assert "perishable" not in retrieval_query("my headphones were cracked")
+    from assistant.policy_prefetch import wants_policy
+
+    assert wants_policy("my eggs were cracked")
+    assert not wants_policy("do you have eggs?")

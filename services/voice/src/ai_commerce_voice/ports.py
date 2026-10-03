@@ -137,6 +137,8 @@ class QuoteOut:
 @dataclass(frozen=True)
 class TurnEnded:
     citations: list[dict[str, Any]] = field(default_factory=list)
+    # Sections the answer cited but the call never retrieved (removed from what's shown).
+    invalid_citations: list[str] = field(default_factory=list)
     first_token_ms: float | None = None
     error: str | None = None
 

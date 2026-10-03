@@ -379,3 +379,18 @@ def test_products_that_say_every_search_word_come_before_near_misses() -> None:
     assert titles == ["Unsweetened Vanilla Almond Milk", "Vanilla Almond Milk"]
     # No product says them all: the relevance results stay.
     assert len(search(query="something for breakfast")) == 3
+
+
+def test_a_named_product_comes_first_even_under_a_nutrient_sort() -> None:
+    """Found by the golden eval: "which has more sugar, X or Y?" searched Y by name sorted by
+    sugar; Y wasn't in the top results, and another milk's sugar was read as Y's."""
+    import assistant.commerce as commerce_mod
+    from assistant.tools import search_products
+
+    commerce_mod._vocabulary = None
+    config = {"configurable": {"ctx": ToolContext(client=ManyCereals(), agent="xana")}}
+    content, cards = search_products.func(  # type: ignore[attr-defined]
+        config, query="Cereal 3", product_types=["cereal"], sort="fiber_desc"
+    )
+    assert [c["title"] for c in cards if c["kind"] == "product"][0] == "Cereal 3"
+    assert '"exact_name_match"' in content

@@ -238,8 +238,18 @@ def test_a_failure_after_she_answered_ends_the_turn_without_an_error() -> None:
     assert isinstance(end, TurnEnded) and end.error is None
 
 
-def test_a_failure_before_any_answer_still_says_so() -> None:
-    brain, _, _ = brain_with([("fail", "")])
+def test_a_stall_before_any_answer_is_retried_once() -> None:
+    """Found by the golden eval: an OpenAI read timeout before the first word failed the turn."""
+    brain, _, model = brain_with([("fail", ""), "We have 34 milk products."])
+    events = asyncio.run(collect(brain.turn("How many kinds of milk do you have?")))
+    assert "34 milk" in "".join(e.text for e in events if isinstance(e, TextDelta))
+    end = events[-1]
+    assert isinstance(end, TurnEnded) and end.error is None
+    assert len(model.seen) == 2
+
+
+def test_a_second_failure_before_any_answer_still_says_so() -> None:
+    brain, _, _ = brain_with([("fail", ""), ("fail", "")])
     end = asyncio.run(collect(brain.turn("How many kinds of milk do you have?")))[-1]
     assert isinstance(end, TurnEnded) and end.error and "went wrong" in end.error
 

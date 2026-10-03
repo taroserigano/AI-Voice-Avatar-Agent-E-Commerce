@@ -65,7 +65,14 @@ from assistant.policy_prefetch import (
     wants_policy,
 )
 from assistant.prompts import catalog_size
-from assistant.tools import ToolContext, _order_for_model, policy_search, untrusted
+from assistant.tools import (
+    ToolContext,
+    _order_for_model,
+    friendly_date,
+    money,
+    policy_search,
+    untrusted,
+)
 from assistant.toolsets import XANA_TOOLS
 from assistant.turns import (
     TOOL_LABELS,
@@ -77,7 +84,7 @@ from assistant.turns import (
 
 log = logging.getLogger(__name__)
 
-PROMPT_VERSION = "xana.voice.v6"
+PROMPT_VERSION = "xana.voice.v7"
 PROMPT_DIR = Path(__file__).resolve().parent / "prompts"
 SNAPSHOT_ORDERS = 12
 
@@ -96,17 +103,33 @@ def orders_snapshot(details: list[dict[str, Any]]) -> list[dict[str, Any]]:
     out = []
     for d in details[:SNAPSHOT_ORDERS]:
         o = _order_for_model(d)
+
+        # Found by the golden eval: "returnable now" on 2 backpacks when 1 was already
+        # returned, and "fully_returned" read aloud as done while that return was in transit.
+        def can_return(ln: dict[str, Any]) -> str:
+            done = ln.get("returned_quantity") or 0
+            if ln["reason"] == "fully_returned":
+                return " (already in a return: see this order's returns for where it stands)"
+            if not ln["eligible"]:
+                return f" (not returnable: {ln['reason']})"
+            if done:
+                left = ln["returnable_quantity"]
+                return f" (returnable now: {left} of {ln['quantity']}; {done} already returned)"
+            return " (returnable now)"
+
         returnable = {
-            str(ln["order_line_id"]): (
-                " (returnable now)" if ln["eligible"] else f" (not returnable: {ln['reason']})"
-            )
+            str(ln["order_line_id"]): can_return(ln)
             for ln in (d.get("return_options") or {}).get("lines", [])
         }
         delivery = o.get("delivery") or {}
 
         def item(i: dict[str, Any]) -> str:
             variant = i.get("variant") or ""
-            shown = variant and variant.lower() not in ("standard", "each") and variant.lower() not in i["title"].lower()
+            shown = (
+                variant
+                and variant.lower() not in ("standard", "each")
+                and variant.lower() not in i["title"].lower()
+            )
             return (
                 f"{i['quantity']} × "
                 + (f"{i['brand']} " if i.get("brand") else "")
@@ -128,10 +151,28 @@ def orders_snapshot(details: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "latest_update": delivery.get("latest_update"),
                 "total": o["total"],
                 "shipping": o["shipping"],
+                "returns": [_return_for_snapshot(r) for r in d.get("returns") or []],
                 "order_id": o["order_id"],
             }
         )
     return out
+
+
+def _return_for_snapshot(r: dict[str, Any]) -> dict[str, Any]:
+    """A return on the order as get_refund_status shows it: its RMA, where it stands, and the
+    refund (none until the warehouse receives and checks the item)."""
+    refund = r.get("refund") or {}
+    return {
+        "rma_number": r["rma_number"],
+        "status": str(r["status"]).replace("_", " "),
+        "items": [f"{i['quantity']} × {i['product_title']}" for i in r.get("items", [])],
+        "refund": (
+            f"{refund['status']}, {money(refund['amount_minor'])}"
+            + (f" on {friendly_date(refund['settled_at'])}" if refund.get("settled_at") else "")
+            if refund
+            else "not issued yet"
+        ),
+    }
 
 
 def system_prompt(
@@ -307,9 +348,7 @@ class XanaBrain:
         mid = message_id or str(uuid.uuid4())
         messages: list[AnyMessage] = [HumanMessage(content=text, id=mid)]
         snapshot = await self.graph.aget_state(self._config())
-        history: list[AnyMessage] = [
-            m for m in snapshot.values.get("messages", []) if m.id != mid
-        ]
+        history: list[AnyMessage] = [m for m in snapshot.values.get("messages", []) if m.id != mid]
         # A section read earlier in the call stays citable (as in the chat).
         citable: dict[str, dict[str, Any]] = earlier_citations(history)
         escalated = escalation_reason(text, history)
@@ -375,81 +414,117 @@ class XanaBrain:
         first_token_ms: float | None = None
         answer: list[str] = []
         citable = dict(citable or {})
-        # Text streamed during the current agent step: its final message repeats it (the
-        # Responses API gives the chunks and the final message different ids).
-        streamed_this_step = False
         announced: set[str] = set()
         # Calls already announced from their streamed name, not yet seen complete.
         early: list[str] = []
         products = ProductCards()
-        try:
-            stream = self.graph.astream(
-                graph_input, self._config(), stream_mode=["messages", "updates"]
-            )
-            async for mode, chunk in cast(AsyncIterator[tuple[str, Any]], stream):
-                if mode == "messages":
-                    message, meta = chunk
-                    if meta.get("langgraph_node") != "agent" or not isinstance(
-                        message, AIMessageChunk
-                    ):
-                        continue
-                    for tc in message.tool_call_chunks or []:
-                        name = tc.get("name")
-                        key = tc.get("id") or f"{message.id}:{tc.get('index')}"
-                        if name and key not in announced:
-                            announced.add(key)
-                            early.append(name)
-                            yield ToolStarted(name, TOOL_LABELS.get(name, "Working on it…"))
-                    delta = message_text(message)
-                    if delta:
-                        if first_token_ms is None:
-                            first_token_ms = (time.perf_counter() - started) * 1000
-                        streamed_this_step = True
-                        answer.append(delta)
-                        yield TextDelta(delta)
+        # A model call that stalls before she has said anything is retried once from the
+        # checkpoint (input None resumes the failed step; finished tool calls aren't rerun), so
+        # the caller hears the filler a little longer instead of "something went wrong". Seen
+        # on the golden eval: 14 of 1,997 voice cases hit an OpenAI read timeout (2026-10-03).
+        attempts = 0
+        while True:
+            attempts += 1
+            try:
+                async for event in self._step(
+                    graph_input, answer, citable, products, announced, early
+                ):
+                    if isinstance(event, TextDelta) and first_token_ms is None:
+                        first_token_ms = (time.perf_counter() - started) * 1000
+                    yield event
+                break
+            except Exception as exc:
+                if not answer and attempts == 1 and _transient(exc):
+                    log.warning("voice model step failed (%s); retrying once", type(exc).__name__)
+                    graph_input = None
                     continue
-                for node, update in (chunk or {}).items():
-                    if node == "__interrupt__":
-                        for pending in update:
-                            yield QuoteOut(dict(pending.value))
-                        continue
-                    for message in (update or {}).get("messages", []):
-                        if isinstance(message, AIMessage):
-                            for call in message.tool_calls:
-                                if call["name"] in early:
-                                    early.remove(call["name"])
-                                else:
-                                    yield ToolStarted(
-                                        call["name"],
-                                        TOOL_LABELS.get(call["name"], "Working on it…"),
-                                    )
-                            if not streamed_this_step and (text := message_text(message)):
-                                answer.append(text)
-                                yield TextDelta(text)
-                            streamed_this_step = False
-                        elif isinstance(message, ToolMessage):
-                            cards = []
-                            for card in message.artifact or []:
-                                if card.get("kind") == "citation":
-                                    citable[card["cite"]] = card
-                                else:
-                                    cards.append(card)
-                            for card in products.take(message.name, cards):
-                                yield CardOut(card)
-        except Exception:
-            log.exception("voice turn failed")
-            # She already answered (a later step failed, e.g. a network timeout): end the turn
-            # there rather than put an error under an answer the customer just heard.
-            yield TurnEnded(
-                first_token_ms=first_token_ms,
-                error=None
-                if answer
-                else "Sorry, something went wrong on our side. Please try again.",
-            )
-            return
-        for card in products.final():
+                log.exception("voice turn failed")
+                # She already answered (a later step failed, e.g. a network timeout): end the
+                # turn there rather than put an error under an answer the customer just heard.
+                yield TurnEnded(
+                    first_token_ms=first_token_ms,
+                    error=None
+                    if answer
+                    else "Sorry, something went wrong on our side. Please try again.",
+                )
+                return
+        for card in products.final("".join(answer)):
             yield CardOut(card)
         valid, invalid = split_citations("".join(answer), citable)
         if invalid:
             log.warning("voice answer cited sections it didn't retrieve: %s", invalid)
-        yield TurnEnded(citations=valid, first_token_ms=first_token_ms)
+        yield TurnEnded(
+            citations=valid, invalid_citations=list(invalid), first_token_ms=first_token_ms
+        )
+
+    async def _step(
+        self,
+        graph_input: Any,
+        answer: list[str],
+        citable: dict[str, dict[str, Any]],
+        products: ProductCards,
+        announced: set[str],
+        early: list[str],
+    ) -> AsyncIterator[AgentEvent]:
+        """One run of the graph to its end or its next interrupt, as events."""
+        # Text streamed during the current agent step: its final message repeats it (the
+        # Responses API gives the chunks and the final message different ids).
+        streamed_this_step = False
+        stream = self.graph.astream(
+            graph_input, self._config(), stream_mode=["messages", "updates"]
+        )
+        async for mode, chunk in cast(AsyncIterator[tuple[str, Any]], stream):
+            if mode == "messages":
+                message, meta = chunk
+                if meta.get("langgraph_node") != "agent" or not isinstance(message, AIMessageChunk):
+                    continue
+                for tc in message.tool_call_chunks or []:
+                    name = tc.get("name")
+                    key = tc.get("id") or f"{message.id}:{tc.get('index')}"
+                    if name and key not in announced:
+                        announced.add(key)
+                        early.append(name)
+                        yield ToolStarted(name, TOOL_LABELS.get(name, "Working on it…"))
+                delta = message_text(message)
+                if delta:
+                    streamed_this_step = True
+                    answer.append(delta)
+                    yield TextDelta(delta)
+                continue
+            for node, update in (chunk or {}).items():
+                if node == "__interrupt__":
+                    for pending in update:
+                        yield QuoteOut(dict(pending.value))
+                    continue
+                for message in (update or {}).get("messages", []):
+                    if isinstance(message, AIMessage):
+                        for call in message.tool_calls:
+                            if call["name"] in early:
+                                early.remove(call["name"])
+                            else:
+                                yield ToolStarted(
+                                    call["name"],
+                                    TOOL_LABELS.get(call["name"], "Working on it…"),
+                                )
+                        if not streamed_this_step and (text := message_text(message)):
+                            answer.append(text)
+                            yield TextDelta(text)
+                        streamed_this_step = False
+                    elif isinstance(message, ToolMessage):
+                        cards = []
+                        for card in message.artifact or []:
+                            if card.get("kind") == "citation":
+                                citable[card["cite"]] = card
+                            else:
+                                cards.append(card)
+                        for card in products.take(message.name, cards):
+                            yield CardOut(card)
+
+
+def _transient(exc: BaseException) -> bool:
+    """A timeout or dropped connection to the model provider, worth one more try."""
+    names = {type(e).__name__ for e in (exc, exc.__cause__, exc.__context__) if e is not None}
+    return isinstance(exc, (TimeoutError, ConnectionError)) or bool(
+        names & {"APITimeoutError", "OpenAITimeoutError", "APIConnectionError", "ReadTimeout",
+                 "RemoteProtocolError", "ReadError", "InternalServerError"}
+    )  # fmt: skip

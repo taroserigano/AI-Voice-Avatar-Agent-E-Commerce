@@ -37,10 +37,10 @@ from langchain_core.language_models import BaseChatModel
 
 from ai_commerce_voice.avatar_session import AvatarSession, Face
 from ai_commerce_voice.brain import (
+    SNAPSHOT_ORDERS,
     XanaBrain,
     build_voice_graph,
     make_context,
-    SNAPSHOT_ORDERS,
     orders_snapshot,
     system_prompt,
 )
@@ -118,9 +118,10 @@ def pick_model(settings: VoiceSettings, http: httpx.AsyncClient) -> ModelPick:
             reasoning={"effort": effort},
             streaming=True,
             # A dropped connection is retried at once: a 20 s connect wait left a caller in
-            # silence for ~40 s (2026-10-02). Reading the answer may still take up to 20 s.
+            # silence for ~40 s (2026-10-02).
             max_retries=2,
-            timeout=httpx.Timeout(20, connect=4),
+            # 15 s between streamed chunks: a stalled call is retried once by the brain.
+            timeout=httpx.Timeout(15, connect=4),
             max_tokens=400 if effort in ("none", "low") else 1200,
             http_async_client=http,
             model_kwargs={

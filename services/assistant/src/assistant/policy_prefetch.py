@@ -27,7 +27,9 @@ POLICY_WORDS = re.compile(
     r"opened|damaged|broken|defective|restocking|final sale|cancel\w*|perishables?|spoiled|"
     r"inspect\w*|labels?|drop.?offs?|eligib\w*|window|price match|gift cards?|"
     r"(?:sales )?tax(?:es|ed)?|warrant\w*|free shipping|shipping (?:cost|fee|charge)s?|"
-    r"send (?:it |them |this |that )?back|money back|take (?:it |them )?back|exchange)\b",
+    r"send (?:it |them |this |that )?back|money back|take (?:it |them )?back|exchange|"
+    r"doesn'?t work|stopped working|not working|reasons?|lost|stolen|late|delay\w*|approve\w*|"
+    r"swap|wrong (?:item|size|color|one)|hasn'?t (?:arrived|moved|changed|updated|come))\b",
     re.IGNORECASE,
 )
 
@@ -40,7 +42,11 @@ LABEL_QUESTION = re.compile(
 
 
 def wants_policy(text: str) -> bool:
-    return bool(POLICY_WORDS.search(text) or LABEL_QUESTION.search(text))
+    return bool(
+        POLICY_WORDS.search(text)
+        or LABEL_QUESTION.search(text)
+        or (_FOOD.search(text) and _SPOILED.search(text))
+    )
 
 
 # Conversational words that match the wrong sections ("What's *your* return *policy*..." ranks
@@ -169,6 +175,19 @@ _FAULT = re.compile(
     re.I,
 )
 _LONG_AGO = re.compile(r"\b(?:months?|years?|\d+ weeks|several weeks|a while)\b", re.I)
+# Food that went bad: "the whole milk was bad" ranked discount splitting first and "my eggs were
+# cracked" the label glossary; the perishable rule (section 2.2) wasn't retrieved and the voice
+# answer cited it from memory (golden eval, 2026-10-03).
+_FOOD = re.compile(
+    r"\b(?:milk|cheese|cheddar|yogh?urt|eggs?|meat|chicken|beef|pork|fish|salmon|seafood|produce|"
+    r"fruit|berries|vegetables?|lettuce|bread|bakery|frozen|ice cream|groceries|grocery|food)\b",
+    re.I,
+)
+_SPOILED = re.compile(
+    r"\b(?:bad|went off|spoiled|spoilt|sour|soured|expired|moldy|mouldy|rotten|stale|cracked|"
+    r"thawed|melted|leaking|leaked|smelled|smells|past (?:its|the) date)\b",
+    re.I,
+)
 
 
 def retrieval_query(text: str) -> str:
@@ -177,6 +196,8 @@ def retrieval_query(text: str) -> str:
     said = _AMOUNT.sub(" much back paid ", _TIMING.sub(" timing ", text.lower()))
     if _FAULT.search(said) and _LONG_AGO.search(said):
         said += " warranty manufacturer after the return window"
+    if _FOOD.search(said) and _SPOILED.search(said):
+        said += " perishable fresh frozen food spoiled damaged within 7 days of delivery"
     words = re.findall(r"[a-z0-9]+(?:'[a-z]+)?", said)
     kept = [w for w in words if w not in _FILLER]
     return " ".join(dict.fromkeys(kept)) or text.strip()

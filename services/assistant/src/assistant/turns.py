@@ -111,29 +111,48 @@ def earlier_citations(messages: list[BaseMessage]) -> dict[str, dict[str, Any]]:
 
 
 class ProductCards:
-    """Which product cards a turn shows: every product read in detail, then the results of the
-    turn's last catalog search. Earlier searches that the assistant refined away (a broad
-    keyword search before the verified one) were near misses and stay off the screen."""
+    """Which product cards a turn shows: every product read in detail, then the results of one
+    catalog search: the last one whose products the answer names, or the turn's last search
+    when it names none. Other searches (a broad keyword search before the verified one, a
+    near miss looked up but not offered) stay off the screen. Found by the golden eval: the
+    answer offered 1% low-fat milk while the cards showed 2% from a later near-miss search."""
 
     def __init__(self) -> None:
-        self.search: list[dict[str, Any]] = []
+        self.searches: list[list[dict[str, Any]]] = []
         self.details: list[dict[str, Any]] = []
+
+    @property
+    def search(self) -> list[dict[str, Any]]:
+        return self.searches[-1] if self.searches else []
 
     def take(self, tool: str | None, cards: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Keep this tool's product cards for the end of the turn; return the others now."""
         if tool == "search_products":
-            self.search = list(cards)
+            self.searches.append(list(cards))
             return []
         if tool in ("get_product_details", "get_product_reviews"):
             self.details += cards
             return []
         return cards
 
-    def final(self) -> list[dict[str, Any]]:
-        summary = [c for c in self.search if c.get("kind") != "product"]
+    def final(self, answer: str = "") -> list[dict[str, Any]]:
+        search = self.search
+        said = answer.lower()
+        if said:
+            named = [
+                s
+                for s in self.searches
+                if any(
+                    c.get("kind") == "product" and c.get("title") and c["title"].lower() in said
+                    for c in s
+                )
+            ]
+            if named:
+                search = named[-1]
+        summary = [c for c in search if c.get("kind") != "product"]
         out: list[dict[str, Any]] = []
         seen: set[str] = set()
-        for card in [*self.details, *self.search]:
+        for card in [*self.details, *search]:
             if card.get("kind") == "product" and card.get("id") not in seen:
                 seen.add(card["id"])
                 out.append(card)
@@ -227,7 +246,7 @@ def run_turn(
         )
         return
 
-    for card in products.final():
+    for card in products.final("".join(answer)):
         yield sse("card", card)
     valid, invalid = split_citations("".join(answer), citable)
     if invalid:
@@ -271,7 +290,7 @@ def history(messages: list[BaseMessage]) -> list[MessageOut]:
                 id=turn["id"],
                 role="assistant",
                 text=text,
-                cards=turn["cards"] + turn["products"].final(),
+                cards=turn["cards"] + turn["products"].final(text),
                 citations=[CitationCard(**c) for c in valid],
             )
         )
