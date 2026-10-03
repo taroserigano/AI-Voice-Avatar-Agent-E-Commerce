@@ -77,6 +77,8 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
   // the whole page to the bottom, which pushed her face off the top). Once the customer scrolls
   // themselves, leave the page where they put it until their next question.
   const transcript = useRef<HTMLDivElement>(null);
+  // Narrow screens show the conversation panel instead of the transcript lines.
+  const narrowChat = useRef<HTMLDivElement>(null);
   const follow = useRef(true);
   const userFinal = voice.userFinal ? voice.userText : null;
   useEffect(() => {
@@ -86,7 +88,7 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
     const el = stage.current;
     if (!follow.current || !el || el.scrollHeight <= el.clientHeight) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    transcript.current?.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
+    (transcript.current?.offsetParent ? transcript.current : narrowChat.current)?.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
   }, [captionNow, voice.userText, quote]);
   const stopFollowing = () => {
     follow.current = false;
@@ -148,11 +150,11 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
         )}
       >
         {/* With her face on screen the welcome heading gives its room to the video. */}
-        <p className={cn("text-xs font-bold uppercase tracking-[0.32em] text-brand-200 sm:text-sm", face && "sr-only")}>
+        <p className={cn("text-xs font-bold uppercase tracking-[0.32em] text-brand-200 sm:text-sm", live && "sr-only")}>
           Orders &amp; returns, in conversation
         </p>
         <h1
-          className={cn("mt-3 font-display text-5xl font-extrabold tracking-[-0.04em] sm:text-7xl", face && "sr-only")}
+          className={cn("mt-3 font-display text-5xl font-extrabold tracking-[-0.04em] sm:text-7xl", live && "sr-only")}
         >
           Meet Xena
         </h1>
@@ -207,7 +209,7 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
         </div>
 
         {/* Live transcript: the customer's words as they speak, then Xena's as she says them. */}
-        <div ref={transcript} className="mt-4 w-full max-w-2xl scroll-mb-4 space-y-3 text-lg leading-relaxed sm:text-xl">
+        <div ref={transcript} className={cn("mt-4 w-full max-w-2xl scroll-mb-4 space-y-3 text-lg leading-relaxed sm:text-xl", live && "max-lg:hidden")}>
           {voice.userText ? (
             <p className={cn("text-neutral-300", !voice.userFinal && "italic")}>
               <span className="sr-only">You said: </span>“{voice.userText}”
@@ -267,7 +269,11 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
         ) : null}
 
         {/* Narrow screens: the conversation under the stage. */}
-        {live ? <XanaChatPanel {...chat} className="mt-6 h-[60dvh] w-full max-w-2xl lg:hidden" /> : null}
+        {live ? (
+          <div ref={narrowChat} className="mt-4 w-full max-w-2xl scroll-mb-4 lg:hidden">
+            <XanaChatPanel {...chat} className="h-[60dvh]" />
+          </div>
+        ) : null}
       </main>
 
       {/* Wide screens: the conversation beside the stage. */}
