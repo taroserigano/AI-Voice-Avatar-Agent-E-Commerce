@@ -192,3 +192,52 @@ def test_store_answers_come_from_the_store_list() -> None:
 def test_every_order_scenario_is_used() -> None:
     used = {c["order"] for c in RETURN_CASES if "order" in c}
     assert {spec.key for spec in DEV_ORDERS} <= used
+
+
+ALL_CASES = PRODUCT_CASES + RETURN_CASES + BATCH_CASES
+# Replies that answer nothing. Found by the eval audit (2026-10-03): 128 turns' only content
+# check passed one of these (catch-all alternatives like "|products|orders|" or "|only|").
+# A refusal ("I can only help with shopping") and a bare "which one?" are left out: for an
+# off-topic or clarifying case those are the right answer.
+EMPTY_REPLIES = [
+    "Sure! I can help with products, orders, returns, and shopping at Serigan Mart.",
+    "Thanks for reaching out to Serigan Mart. Is there anything else about your orders I can help with?",
+    "Let me check that for you.",
+    "Yes! Anything else?",
+    "No problem. What else can I do for you?",
+    "Canberra! Anything about our products?",
+]
+STRONG_CHECKS = ("cite", "cite_any", "order_facts", "quote", "search", "expect_empty", "product_title",
+                 "winner_title", "winner_words", "mentions_code", "mentions", "uses", "uses_any",
+                 "result_constraints", "clarify_re")  # fmt: skip
+
+
+def _no_nulls(value: Any) -> bool:
+    if value is None:
+        return False
+    if isinstance(value, dict):
+        return all(_no_nulls(v) for v in value.values())
+    if isinstance(value, list):
+        return all(_no_nulls(v) for v in value)
+    return True
+
+
+@pytest.mark.parametrize("case", ALL_CASES, ids=lambda c: c["id"])
+def test_expectations_hold_no_nulls(case: dict[str, Any]) -> None:
+    """A null where the scorer expects a list crashed three cases (b08 amounts, 2026-10-03)."""
+    assert all(_no_nulls(t["expect"]) for t in case["turns"])
+
+
+def test_no_content_check_passes_an_empty_reply() -> None:
+    weak = []
+    for case in ALL_CASES:
+        for t in case["turns"]:
+            e = t["expect"]
+            pats = e.get("mentions_re") or []
+            if not pats or any(e.get(k) for k in STRONG_CHECKS):
+                continue
+            for reply in EMPTY_REPLIES:
+                if all(re.search(p, reply, re.IGNORECASE) for p in pats):
+                    weak.append(f"{case['id']}: {t['user'][:50]!r} passes {reply!r}")
+                    break
+    assert not weak, "\n".join(weak)

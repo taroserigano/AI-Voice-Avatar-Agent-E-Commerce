@@ -10,14 +10,15 @@ Conversations are checkpointed in memory, not saved.
 from __future__ import annotations
 
 import asyncio
+import json
 import time
 import uuid
 from datetime import date
 from typing import Any
 
 import httpx
-from langchain_core.messages import AIMessage
 from langgraph.checkpoint.memory import InMemorySaver
+from xana_eval import turn_contexts
 
 from ai_commerce_voice.app import _recent_orders, pick_model
 from ai_commerce_voice.brain import (
@@ -43,6 +44,7 @@ async def _run(user_web: httpx.Client, texts: list[str]) -> list[dict[str, Any]]
     client = CommerceClient(customer.id, a)
     first_name = customer.name.split(" ")[0]
     orders = _recent_orders(client)
+    snapshot = orders_snapshot(orders) if orders is not None else None
     vocabulary = catalog_vocabulary(client)
     async with httpx.AsyncClient(timeout=30) as http:
         pick = pick_model(v, http)
@@ -52,12 +54,7 @@ async def _run(user_web: httpx.Client, texts: list[str]) -> list[dict[str, Any]]
             ctx=ToolContext(client=client, agent="xana", first_name=first_name, voice=True),
             voice=make_context(
                 pick.model,
-                system=system_prompt(
-                    first_name,
-                    date.today(),
-                    orders_snapshot(orders) if orders is not None else None,
-                    vocabulary,
-                ),
+                system=system_prompt(first_name, date.today(), snapshot, vocabulary),
                 max_tool_calls=v.voice_max_tool_calls,
                 strong=pick.strong,
                 strong_name=pick.strong_name,
@@ -88,6 +85,7 @@ async def _run(user_web: httpx.Client, texts: list[str]) -> list[dict[str, Any]]
                     got["quotes"].append(ev.quote)
                 elif isinstance(ev, TurnEnded):
                     got["citations"] = ev.citations or []
+                    got["invalid_citations"] = list(ev.invalid_citations or [])
                     if ev.error:
                         got["errors"].append(ev.error)
             got["turn_ms"] = round((time.perf_counter() - started) * 1000)
@@ -96,14 +94,15 @@ async def _run(user_web: httpx.Client, texts: list[str]) -> list[dict[str, Any]]
             )
             got["escalated"] = state.values.get("escalated")
             out.append(got)
-        # What the model asked each tool, for failure review.
+        # What the model asked each tool and what came back, per turn; the call-start orders
+        # snapshot in the system prompt is evidence for every turn.
         state = await brain.graph.aget_state({"configurable": {"thread_id": brain.conversation_id}})
-        out[-1]["tool_calls"] = [
-            {"name": c["name"], "args": c["args"]}
-            for m in state.values.get("messages", [])
-            if isinstance(m, AIMessage)
-            for c in m.tool_calls
-        ]
+        found = turn_contexts(state.values.get("messages", []), texts)
+        for got, f in zip(out, found, strict=True):
+            got["tool_calls"] = f["tool_calls"]
+            got["contexts"] = f["contexts"] + (
+                [{"tool": "orders_snapshot", "content": json.dumps(snapshot)}] if snapshot else []
+            )
         client.close()
         return out
 

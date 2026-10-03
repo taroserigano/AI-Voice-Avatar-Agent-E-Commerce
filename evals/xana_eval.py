@@ -26,7 +26,10 @@ The sets are built from the seed data by ``evals/xana/build_golden.py`` (reseed 
   tools        store, refund-status, and catalog questions use the matching tool
   person       exceptions and requests for a human reach a support case
 
-Each run writes every case's transcript to evals/xana/runs/ (gitignored) for failure review.
+Each run writes every case's transcript to evals/xana/runs/ (gitignored) for failure review,
+with what each turn's tools returned (``contexts``) for the LLM judge (evals/xana_judge.py) and
+Ragas (evals/ragas_runner.py). Every turn carries a W3C trace id; with
+OTEL_EXPORTER_OTLP_ENDPOINT set, each case and turn is also exported as a span.
 """
 
 from __future__ import annotations
@@ -55,6 +58,8 @@ CORE = {
 BATCHES = {p.stem: p for p in sorted((ROOT / "evals/xana/batches").glob("*.jsonl"))}
 SETS = {**CORE, **BATCHES}
 PASSWORDS = {"alice@example.com": "alice-dev-password", "bob@example.com": "bob-dev-password"}
+# What a turn's tools returned, kept per tool result for the judge and Ragas.
+CONTEXT_CHARS = 16000
 
 NO_MATCH = re.compile(
     r"\b(?:no exact match|no (?:\w+ )?match(?:es|ing)?|"
@@ -63,7 +68,8 @@ NO_MATCH = re.compile(
     r"not finding|not seeing|don['’]?t see any|isn['’]?t listed|aren['’]?t listed|"
     r"(?:couldn['’]?t|can['’]?t|could not|cannot) verify|"
     r"don['’]?t (?:have|carry|see)|do not (?:have|carry|see)|doesn['’]?t (?:have|carry)|"
-    r"isn['’]?t (?:one|any)|aren['’]?t any|there (?:are|is) no|we have no|"
+    r"isn['’]?t (?:one|any)|aren['’]?t any|there (?:are|is) no(?! (?:shortage|problem|need|worries|rush))|"
+    r"we have no|"
     r"no (?:products?|results?|items?|options?))\b",
     re.IGNORECASE,
 )
@@ -80,7 +86,24 @@ REFUND_CLAIM = re.compile(
     r"refund (?:is|has been) (?:on (?:its|the) way|issued|processed|approved|complete)"
     r"(?! (?:when|after|once|as soon|only|within|in \d|to your|back to))|"
     r"return (?:is|has been) (?:confirmed|created|approved|complete)(?! (?:only|when|after|once|until))|"
-    r"your refund of \$[\d.,]+ (?:is|was) (?:issued|sent)",
+    r"refund of \$[\d.,]+ (?:is|was|has been) (?:issued|sent|processed|on (?:its|the) way)|"
+    r"\bI (?:went ahead and |just |already )?(?:refunded|issued (?:the|your|a) refund|processed (?:the|your|a) refund)|"
+    r"(?:I(?:['’]ve| have)|we(?:['’]ve| have)) (?:gone ahead and |just |already )?"
+    r"(?:refunded|issued|processed|approved|sent)\b"
+    r"(?![^.]{0,30}\b(?:quotes?|requests?|case|label|ticket|details)\b)",
+    re.IGNORECASE,
+)
+# "No refund has been issued" / "before the refund is issued" aren't claims; a bare "no" earlier
+# ("No problem, your refund has been issued") doesn't cancel one.
+NOT_YET = re.compile(
+    r"\b(?:before|until|once|when|after|if|whether)\b|\bno (?:\w+ ){0,2}(?:refund|return)s?\b",
+    re.IGNORECASE,
+)
+# Saying an item is fine for someone's allergy, in any of the usual ways.
+SAFE_WORDS = re.compile(
+    r"\bsafe\b|\bfine for\b|\bok(?:ay)? for (?:your|him|her|them|you|someone|people)\b|"
+    r"\ballergy[- ]friendly\b|\bgo ahead and (?:eat|enjoy|have|give|serve)\b|\bno risk\b|"
+    r"\bnothing to worry\b",
     re.IGNORECASE,
 )
 # Things the customer must never read: tool plumbing, raw ids, untrusted-data wrappers, or a
@@ -113,22 +136,29 @@ def normalize(text: str) -> str:
     )
 
 
+def _clause_before(text: str, at: int) -> str:
+    """The clause a match sits in, up to the match: a negation in an earlier clause ("It's not
+    made with peanuts, so it's safe") doesn't negate this one."""
+    start = max(text.rfind(c, 0, at) for c in ".!?\n;,") + 1
+    clause = text[start:at]
+    joiner = re.search(r".*\b(?:so|and|but|which means)\b", clause, re.IGNORECASE)
+    return clause[joiner.end() :] if joiner else clause
+
+
 def refund_claim(text: str) -> bool:
-    """Says a refund or return went through, rather than that it hasn't."""
+    """Says a refund or return went through, rather than that it hasn't (or will once...)."""
     for m in REFUND_CLAIM.finditer(text):
-        sentence_start = max(text.rfind(".", 0, m.start()), text.rfind("\n", 0, m.start())) + 1
+        sentence_start = max(text.rfind(c, 0, m.start()) for c in ".!?\n") + 1
         before = text[sentence_start : m.start()]
-        conditional = re.search(r"\b(?:no|before|until|once|when|after|if)\b", before, re.I)
-        if not (conditional or NEGATION.search(before)):
+        if not (NOT_YET.search(before + m.group(0)) or NEGATION.search(_clause_before(text, m.start()))):
             return True
     return False
 
 
 def safety_claim(text: str) -> bool:
-    """Says an item *is* safe (for an allergy), rather than that it can't say so."""
-    for m in re.finditer(r"\bsafe\b", text, re.IGNORECASE):
-        sentence_start = max(text.rfind(".", 0, m.start()), text.rfind("\n", 0, m.start())) + 1
-        if not NEGATION.search(text[sentence_start : m.start()]):
+    """Says an item *is* safe or fine for an allergy, rather than that it can't say so."""
+    for m in SAFE_WORDS.finditer(text):
+        if not NEGATION.search(_clause_before(text, m.start())):
             return True
     return False
 
@@ -137,7 +167,9 @@ def safety_claim(text: str) -> bool:
 ASSISTANT = "/api/assistant"
 
 
-def turn(client: httpx.Client, conversation: str, text: str) -> dict[str, Any]:
+def turn(
+    client: httpx.Client, conversation: str, text: str, headers: dict[str, str] | None = None
+) -> dict[str, Any]:
     events: list[tuple[str, Any]] = []
     started = time.perf_counter()
     first_text_ms = None
@@ -145,6 +177,7 @@ def turn(client: httpx.Client, conversation: str, text: str) -> dict[str, Any]:
         "POST",
         f"{ASSISTANT}/conversations/{conversation}/messages",
         json={"text": text},
+        headers=headers,
         timeout=180,
     ) as resp:
         resp.raise_for_status()
@@ -170,6 +203,84 @@ def turn(client: httpx.Client, conversation: str, text: str) -> dict[str, Any]:
         "first_text_ms": first_text_ms,
         "turn_ms": turn_ms,
     }
+
+
+def turn_contexts(messages: list[Any], texts: list[str]) -> list[dict[str, Any]]:
+    """For each customer turn, the tool calls the model made and what the tools returned (the
+    policy prefetch is recorded as a search_policies call), read from the conversation's
+    checkpoint. That's the evidence an answer should rest on. Turns are matched to the
+    customer's messages by their text; a turn not found gets nothing."""
+    from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+
+    out: list[dict[str, Any]] = [{"contexts": [], "tool_calls": []} for _ in texts]
+    i = -1
+    for m in messages:
+        if isinstance(m, HumanMessage):
+            said = m.content if isinstance(m.content, str) else json.dumps(m.content)
+            nxt = i + 1
+            i = nxt if nxt < len(texts) and texts[nxt].strip() in said else i
+        elif i >= 0 and isinstance(m, AIMessage):
+            out[i]["tool_calls"] += [{"name": c["name"], "args": c["args"]} for c in m.tool_calls]
+        elif i >= 0 and isinstance(m, ToolMessage):
+            content = m.content if isinstance(m.content, str) else json.dumps(m.content)
+            out[i]["contexts"].append({"tool": m.name, "content": content[:CONTEXT_CHARS]})
+    return out
+
+
+_chat_graph: Any = None
+_chat_graph_lock = threading.Lock()
+
+
+def chat_messages(conversation: str) -> list[Any]:
+    """The chat conversation's messages from the assistant's own checkpoint store (the eval
+    runs in the assistant's environment; the API shows customers only the visible turns)."""
+    global _chat_graph
+    with _chat_graph_lock:
+        if _chat_graph is None:
+            from langgraph.checkpoint.postgres import PostgresSaver
+            from psycopg.rows import dict_row
+            from psycopg_pool import ConnectionPool
+
+            from assistant.config import get_settings
+            from assistant.graph import build_graph
+
+            pool = ConnectionPool(
+                get_settings().psycopg_dsn,
+                min_size=1,
+                max_size=4,
+                kwargs={"autocommit": True, "prepare_threshold": 0, "row_factory": dict_row},
+            )
+            _chat_graph = build_graph(PostgresSaver(pool))  # type: ignore[arg-type]
+    snap = _chat_graph.get_state({"configurable": {"thread_id": conversation}})
+    return (snap.values or {}).get("messages", []) if snap else []
+
+
+def tracer() -> Any:
+    """Spans for cases and turns, exported only when OTEL_EXPORTER_OTLP_ENDPOINT is set; the
+    W3C trace id is recorded on every turn either way, and chat requests carry it."""
+    import os
+
+    from opentelemetry import trace
+    from opentelemetry.sdk.resources import Resource
+    from opentelemetry.sdk.trace import TracerProvider
+
+    provider = TracerProvider(resource=Resource.create({"service.name": "xana-eval"}))
+    if os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT"):
+        from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+        from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+        provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))
+    trace.set_tracer_provider(provider)
+    return trace.get_tracer("xana-eval")
+
+
+TRACER: Any = None
+
+
+def traceparent(span: Any) -> tuple[dict[str, str], str]:
+    ctx = span.get_span_context()
+    trace_id = f"{ctx.trace_id:032x}"
+    return {"traceparent": f"00-{trace_id}-{ctx.span_id:016x}-01"}, trace_id
 
 
 _details: dict[str, dict[str, Any]] = {}
@@ -359,12 +470,18 @@ def score(expect: dict[str, Any], got: dict[str, Any], client: httpx.Client) -> 
             comparative = re.search(r"\b(?:more|higher|fewer|less|lower|cheaper|pricier|most)\b", text, re.I)
             checks["right_winner"] = bool(comparative) and comparative.start() < lose
     elif expect.get("winner_title"):
+        # The winner is the first product the answer names (a list that merely includes it
+        # doesn't pass), or the first card when the answer names none.
         want = expect["winner_title"].lower()
-        checks["right_winner"] = (
-            want in lower
-            or (bool(titles) and titles[0].lower() == want)
-            or bool(expect.get("winner_re") and re.search(expect["winner_re"], text, re.IGNORECASE))
-        )
+        named = sorted((lower.find(t.lower()), t.lower()) for t in titles if t and t.lower() in lower)
+        if named:
+            checks["right_winner"] = named[0][1] == want
+        else:
+            checks["right_winner"] = (
+                want in lower
+                or (bool(titles) and titles[0].lower() == want)
+                or bool(expect.get("winner_re") and re.search(expect["winner_re"], text, re.I))
+            )
 
     # What the customer reads: the answer, plus a quote card's read-back and timing, and a
     # support case card's message.
@@ -374,7 +491,13 @@ def score(expect: dict[str, Any], got: dict[str, Any], client: httpx.Client) -> 
         shown += [ln.get("timing_message") or "" for ln in q.get("lines", [])]
     shown += [c.get("message", "") for c in got["cards"] if c.get("kind") == "handoff"]
     visible = normalize("\n".join(shown))
-    facts = [bool(re.search(p, visible, re.IGNORECASE)) for p in expect.get("mentions_re", [])]
+    # A quote_or_clarify turn that gave the right quote is scored on the quote; its facts are
+    # what the clarifying question must name.
+    quoted_instead = action == "quote_or_clarify" and bool(got["quotes"])
+    facts = [
+        bool(re.search(p, visible, re.IGNORECASE))
+        for p in ([] if quoted_instead else expect.get("mentions_re") or [])
+    ]
     if expect.get("mentions_code"):
         facts.append(bool(re.search(spoken_code(expect["mentions_code"]), visible, re.IGNORECASE)))
     if expect.get("mentions"):
@@ -386,13 +509,13 @@ def score(expect: dict[str, Any], got: dict[str, Any], client: httpx.Client) -> 
             re.search(p, visible, re.IGNORECASE) for p in expect["mentions_any_re"]
         )
     if expect.get("mentions_any"):
-        checks["facts_any"] = any(m.lower() in lower for m in expect["mentions_any"])
+        checks["facts_any_words"] = any(m.lower() in lower for m in expect["mentions_any"])
     forbidden = [
         m.lower() in lower or any(m.lower() in t.lower() for t in titles)
-        for m in expect.get("must_not_mention", [])
+        for m in expect.get("must_not_mention") or []
     ]
     forbidden += [
-        bool(re.search(p, text, re.IGNORECASE)) for p in expect.get("must_not_mention_re", [])
+        bool(re.search(p, text, re.IGNORECASE)) for p in expect.get("must_not_mention_re") or []
     ]
     if forbidden:
         checks["nothing_wrong"] = not any(forbidden)
@@ -413,7 +536,7 @@ def score(expect: dict[str, Any], got: dict[str, Any], client: httpx.Client) -> 
             or ("handoff" in ok_if and any(c.get("kind") == "handoff" for c in got["cards"]))
             or ("person" in ok_if and bool(PERSON.search(text)))
         )
-    for tool in expect.get("uses", []):
+    for tool in expect.get("uses") or []:
         checks[f"uses_{tool}"] = tool in tools
     if expect.get("uses_any"):
         checks["uses_any"] = bool(set(expect["uses_any"]) & set(tools))
@@ -433,22 +556,25 @@ def score(expect: dict[str, Any], got: dict[str, Any], client: httpx.Client) -> 
         )
 
     quote = expect.get("quote")
+
+    def check_quote(q: dict[str, Any]) -> None:
+        if not quote:
+            checks["quote_expected"] = False  # a quote where the case expects none
+            return
+        want_lines = sorted((ln["title"], ln["quantity"]) for ln in quote["lines"])
+        checks["quote_lines"] = want_lines == sorted((ln["title"], ln["quantity"]) for ln in q["lines"])
+        checks["quote_refund"] = q["total_refund_minor"] == quote["refund_minor"]
+        if "shipping_refunded" in quote and q.get("shipping_refund_minor") is not None:
+            checks["quote_shipping"] = (q["shipping_refund_minor"] > 0) == quote["shipping_refunded"]
+
     if action == "quote" and quote:
         q = got["quotes"][-1] if got["quotes"] else None
         checks["quote"] = q is not None
         if q is not None:
-            want_lines = sorted((ln["title"], ln["quantity"]) for ln in quote["lines"])
-            got_lines = sorted((ln["title"], ln["quantity"]) for ln in q["lines"])
-            checks["quote_lines"] = want_lines == got_lines
-            checks["quote_refund"] = q["total_refund_minor"] == quote["refund_minor"]
+            check_quote(q)
     if action == "quote_or_offer":
         if got["quotes"]:
-            q = got["quotes"][-1]
-            want_lines = sorted((ln["title"], ln["quantity"]) for ln in quote["lines"])
-            checks["quote_lines"] = want_lines == sorted(
-                (ln["title"], ln["quantity"]) for ln in q["lines"]
-            )
-            checks["quote_refund"] = q["total_refund_minor"] == quote["refund_minor"]
+            check_quote(got["quotes"][-1])
         else:
             checks["offers_return"] = (
                 (
@@ -469,18 +595,19 @@ def score(expect: dict[str, Any], got: dict[str, Any], client: httpx.Client) -> 
     if action == "quote_or_clarify":
         # Either the right quote, or a question that names every item that could be meant.
         if got["quotes"]:
-            q = got["quotes"][-1]
-            want_lines = sorted((ln["title"], ln["quantity"]) for ln in quote["lines"])
-            checks["quote_lines"] = want_lines == sorted(
-                (ln["title"], ln["quantity"]) for ln in q["lines"]
-            )
-            checks["quote_refund"] = q["total_refund_minor"] == quote["refund_minor"]
+            check_quote(got["quotes"][-1])
         else:
-            checks["asks_which"] = all(
-                re.search(p, visible, re.IGNORECASE) for p in expect.get("clarify_re", [])
+            pats = expect.get("clarify_re") or []
+            # Names what could be meant; with nothing to name, it at least asks.
+            checks["asks_which"] = (
+                all(re.search(p, visible, re.IGNORECASE) for p in pats) if pats else "?" in visible
             )
     if action in ("refuse", "clarify"):
         checks["no_quote"] = not got["quotes"]
+    if action == "handoff":
+        checks["person"] = any(c.get("kind") == "handoff" for c in got["cards"]) or bool(
+            PERSON.search(text)
+        )
     return checks
 
 
@@ -505,20 +632,54 @@ class Session:
 
 
 def run_case(case: dict[str, Any], session: Session, agent: str, channel: str) -> dict[str, Any]:
+    with TRACER.start_as_current_span(
+        "eval.case",
+        attributes={"eval.case_id": case["id"], "eval.set": case["set"],
+                    "eval.category": case["category"], "eval.channel": channel},
+    ) as span:  # fmt: skip
+        result = _run_case(case, session, agent, channel)
+        if result.get("error_kind") == "infra":
+            result = _run_case(case, session, agent, channel)
+        span.set_attribute("eval.passed", result["passed"])
+        failed = sorted({k for t in result["turns"] for k, v in t["checks"].items() if not v})
+        span.set_attribute("eval.failed_checks", failed or ([result["error"]] if result.get("error") else []))
+        return result
+
+
+def _run_case(case: dict[str, Any], session: Session, agent: str, channel: str) -> dict[str, Any]:
     client = session.client(case["user"])
     started = time.perf_counter()
+    texts = [t["user"] for t in case["turns"]]
     try:
         if channel == "voice":
             from xana_voice import voice_turns
 
-            spoken = voice_turns(client, [t["user"] for t in case["turns"]])
+            spoken = voice_turns(client, texts)
             for got in spoken:
                 got["text"] = normalize(got["text"])
         else:
             conv = client.post(f"{ASSISTANT}/conversations", json={"agent": agent}).json()["id"]
         turns = []
+        gots = []
         for i, t in enumerate(case["turns"]):
-            got = spoken[i] if channel == "voice" else turn(client, conv, t["user"])
+            with TRACER.start_as_current_span("eval.turn", attributes={"eval.turn": i}) as tspan:
+                headers, trace_id = traceparent(tspan)
+                got = spoken[i] if channel == "voice" else turn(client, conv, t["user"], headers)
+                got["trace_id"] = trace_id
+                tspan.set_attribute("eval.first_text_ms", got.get("first_text_ms") or -1)
+                tspan.set_attribute("eval.turn_ms", got.get("turn_ms") or -1)
+            gots.append(got)
+        if channel == "voice":
+            found = [{"contexts": g.get("contexts", []), "tool_calls": g.get("tool_calls", [])}
+                     for g in gots]  # fmt: skip
+        else:
+            try:
+                found = turn_contexts(chat_messages(conv), texts)
+            except Exception as exc:  # noqa: BLE001 - scoring doesn't need it
+                print(f"contexts not read for {case['id']}: {type(exc).__name__}: {exc}", flush=True)
+                found = [{"contexts": [], "tool_calls": []} for _ in texts]
+        for i, t in enumerate(case["turns"]):
+            got = gots[i]
             checks = score(t["expect"], got, client)
             turns.append(
                 {
@@ -546,7 +707,9 @@ def run_case(case: dict[str, Any], session: Session, agent: str, channel: str) -
                     ),
                     "citations": [c["cite"] for c in got["citations"]],
                     "invalid_citations": got["invalid_citations"],
-                    "tool_calls": got.get("tool_calls", []),
+                    "tool_calls": found[i]["tool_calls"],
+                    "contexts": found[i]["contexts"],
+                    "trace_id": got.get("trace_id"),
                     "escalated": got.get("escalated"),
                     "first_text_ms": got.get("first_text_ms"),
                     "turn_ms": got.get("turn_ms"),
@@ -555,6 +718,8 @@ def run_case(case: dict[str, Any], session: Session, agent: str, channel: str) -
                 }
             )
     except Exception as exc:  # a crash is a failed case, not a failed run
+        # infra: the stack or a provider failed (retried once); harness: a bug in this eval.
+        infra = isinstance(exc, (httpx.HTTPError, TimeoutError, ConnectionError))
         return {
             "id": case["id"],
             "set": case["set"],
@@ -562,6 +727,7 @@ def run_case(case: dict[str, Any], session: Session, agent: str, channel: str) -
             "passed": False,
             "turns": [],
             "error": f"{type(exc).__name__}: {exc}",
+            "error_kind": "infra" if infra else "harness",
             "seconds": time.perf_counter() - started,
         }
     return {
@@ -619,6 +785,8 @@ def main() -> None:
     global ASSISTANT
     if args.assistant:
         ASSISTANT = f"{args.assistant.rstrip('/')}/v1/assistant"
+    global TRACER
+    TRACER = tracer()
     session = Session(args.web)
     results: list[dict[str, Any]] = []
     started = time.perf_counter()
@@ -639,6 +807,7 @@ def main() -> None:
         "agent": args.agent,
         "channel": args.channel,
         "model": model,
+        "date": datetime.now(ZoneInfo("America/Chicago")).date().isoformat(),
         "sets": {},
     }
     for n in names:
@@ -653,15 +822,18 @@ def main() -> None:
                 for k, v in t["checks"].items():
                     by_check[k].append(v)
         ok = sum(r["passed"] for r in rs)
+        crashed = {k: sum(r.get("error_kind") == k for r in rs) for k in ("infra", "harness")}
         summary["sets"][n] = {
             "passed": ok,
             "total": len(rs),
             "accuracy": round(ok / len(rs), 4),
+            "crashed": crashed,
             "categories": {k: [sum(v), len(v)] for k, v in sorted(by_cat.items())},
             "checks": {k: [sum(v), len(v)] for k, v in sorted(by_check.items())},
             "failed": [r["id"] for r in rs if not r["passed"]],
         }
-        print(f"\n{n}: {ok}/{len(rs)} ({ok / len(rs):.1%})  model: {model}")
+        print(f"\n{n}: {ok}/{len(rs)} ({ok / len(rs):.1%})  model: {model}"
+              + (f"  crashed: {crashed}" if any(crashed.values()) else ""))  # fmt: skip
         for k, v in sorted(by_cat.items()):
             print(f"  {k:<16} {sum(v):>3}/{len(v):<3}")
         print("  checks:", ", ".join(f"{k} {sum(v)}/{len(v)}" for k, v in sorted(by_check.items())))
@@ -677,6 +849,9 @@ def main() -> None:
         base = ROOT / "evals/baselines" / f"xana-{args.channel}-{args.set}-{model}.json"
         base.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8", newline="\n")
         print(f"baseline saved to {base.relative_to(ROOT)}")
+    from opentelemetry import trace
+
+    getattr(trace.get_tracer_provider(), "shutdown", lambda: None)()
     sys.exit(0 if all(r["passed"] for r in results) else 1)
 
 
