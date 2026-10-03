@@ -1,19 +1,31 @@
 # Xena golden sets
 
-Two sets of 200 questions each, scored against the live assistant:
+2,000 questions in ten sets of 200, scored against the live assistant (chat) and the voice brain:
 
-| File | What it covers |
+| Set | What it covers |
 |---|---|
 | `products.jsonl` | Filtered searches (type, tags, exclusions, price), spec and size searches, honest "no match", facts about one named product (nutrition, specs, variant price, stock, options, ingredients), allergy questions, label meanings, "which has the most" and comparisons, multi-turn refinement. |
 | `returns.jsonl` | Return quotes with the exact refund in cents, ineligible returns (window, perishables, final sale, not delivered, canceled, already returned), items not on the account, clarifying questions, return and shipping policy with citations, return rules for kinds of items, refund status, safety (another customer's order, prompt injection, typed "yes", card numbers, exceptions), stores and drop-offs. |
+| `batches/b03-catalog` | Product facts, specs, variant prices, stock by size, ingredients, allergies, worded the way customers ask. |
+| `batches/b04-returns-wide` | Return rules for 60 kinds of items, quotes, refusals, not found, which-item questions, policy, refund status, stores. |
+| `batches/b05-orders` | Where's my order, carrier, tracking, delivery and order dates, totals, order numbers, account history. |
+| `batches/b06-noisy` | Questions from the other sets with typos, all caps, chatty openers, and speech-to-text style (lowercase, fillers). |
+| `batches/b07-multiturn` | Follow-ups, refinements, corrections, topic switches, return flows over several turns. |
+| `batches/b08-safety` | Prompt injection, other customers' data, card numbers, off-topic, health advice, typed confirmations, made-up amounts, things that don't exist. |
+| `batches/b09-compare` | "Which has the most", two-product comparisons, price comparisons, counts, budgets. |
+| `batches/b10-holdout` | A mix built from other seeds plus new cases. Not a true holdout: it ran every round (see "How much to trust the scores"). |
 
-The questions are written by hand in `build_golden.py`. Every expected fact is read from the
-seed data (catalog, orders, stores, policy sections), so a golden answer can't be a typo.
-`services/commerce/tests/unit/test_xana_golden.py` checks the written files against the seed
-data on every test run. Rebuild after changing the seed data or the questions:
+`build_golden.py` (the two core sets, hand-written) and `build_batches.py` (b03-b10, from the
+seed data with fixed seeds) write the files. Every expected fact is read from the seed data
+(catalog, orders, returns, stores, policy sections), so a golden answer can't be a typo.
+`services/commerce/tests/unit/test_xana_golden.py` checks the files against the seed data on
+every test run (5,604 checks), and fails when an expectation holds a null or when a reply that
+answers nothing ("Sure! I can help with orders and returns.") would pass a case's only content
+check. Rebuild after changing the seed data or the questions:
 
 ```
 pnpm eval:xana:build
+uv run --directory services/assistant python ../../evals/xana/build_batches.py
 ```
 
 ## Running
@@ -22,53 +34,119 @@ Reseed first (`pnpm db:seed`) so order dates are relative to today, start the st
 (`pnpm dev`), then:
 
 ```
-pnpm eval:xana                     # chat (Xena on /support), both sets
+pnpm eval:xana                     # chat (Xena on /support), all 2,000
 pnpm eval:xana:voice               # the voice brain, typed turns, no speech synthesized
-pnpm eval:xana -- --set returns --only xr-001,xr-010 --workers 8
-pnpm eval:xana -- --record-baseline   # evals/baselines/xana-<channel>-<set>-<model>.json
+pnpm eval:xana -- --set b05-orders,b07-multiturn --workers 6
+pnpm eval:xana -- --only xr-001,xr-010
 pnpm eval:xana -- --assistant http://127.0.0.1:8111   # an assistant started with other settings
 ```
 
-Every turn records `first_text_ms` (when the first words arrive) and `turn_ms`. Time with
-`--workers 1`: parallel conversations slow each other down.
+Each run writes every case's transcript to `evals/xana/runs/` (gitignored): the answer, tools,
+cards, quote, citations, timings, a W3C trace id, and what each turn's tools returned
+(`contexts`, read from the conversation's checkpoint; voice also has its orders snapshot). With
+`OTEL_EXPORTER_OTLP_ENDPOINT` set, each case and turn is also exported as an OpenTelemetry span
+(`xana-eval`), and chat requests carry the trace header so the services' spans join it.
 
-Each run writes every case's transcript (answer, tools, cards, quote, citations, and for voice
-the tool arguments) to `evals/xana/runs/`, which is gitignored. Use it to review failures.
+After a run, on its transcript file:
+
+```
+pnpm eval:xana:judge evals/xana/runs/<run>.json              # LLM judge, every turn
+pnpm eval:xana:judge evals/xana/runs/<run>.json --calibrate 60   # also a sample for a person to label
+pnpm eval:xana:ragas evals/xana/runs/<run>.json              # Ragas, policy turns
+pnpm eval:xana:langsmith evals/xana/runs/<run>.json --dry-run    # LangSmith experiment (needs LANGSMITH_API_KEY)
+```
 
 ## How a case is scored
 
+### Rule checks (pass/fail; the headline score)
+
 From what the customer sees, not from the model's words alone. A quote must be the server's own
-quote for exactly the expected units and refund. Product cards must match the filters and the
-listing facts, read back from the product API. Facts are regular expressions that accept
-natural phrasings ("one-year" for "1-year", "1,000" for "1000"). A citation must be a section
-retrieved in the same turn. A case passes only if every check on every turn passes.
+quote for exactly the expected units, refund, and shipping refund. Product cards must match the
+filters and the listing facts, read back from the product API. Order facts (dates, carrier,
+tracking, total) are compared with the live order. Facts are regular expressions that accept
+natural phrasings ("one-year" for "1-year", codes read character by character). Every turn is
+checked for leaked tool names or ids and for citations of sections the conversation never
+retrieved. Claim detectors ("your refund has been issued", "it's safe for your allergy") are
+tested on labeled sentences in `evals/test_xana_detectors.py`. A crash is reported as `infra`
+(the stack or provider; retried once) or `harness` (a bug in the eval), apart from wrong answers.
 
-When a check fails on a correct answer, fix the check in `build_golden.py` or
-`evals/xana_eval.py` and say why. Don't loosen it to hide a wrong answer.
+When a check fails on a correct answer, fix the check and say why. Don't loosen it to hide a
+wrong answer. Safety checks stay rule-based (docs/handoff/ACCEPTANCE_AND_EVALS.md).
 
-## Results (2026-09-30)
+### LLM judge (`evals/xana_judge.py`; quality, a soft signal)
 
-| Channel | Model | Products | Returns |
+gpt-6.1-sol (a newer model than the chat assistant's gpt-6-sol, so it isn't grading its own
+answers) scores each turn 1-5 on grounded, helpful, clear, and tone, with a good/minor/bad verdict
+and the unsupported claims it found. It sees what Xena had: the tool results for the
+conversation so far, and what Xena's instructions give her (the customer's name, the catalog
+counts and tag meanings, and the store's operating rules: returns open after delivery, refunds
+to the original payment method, ask which item when two could match, a person can be brought
+in). Without those it marked correct answers as invented. It prints where it disagrees with the
+rule checks: rule-passed but judged bad (a check may be missing) and rule-failed but judged good
+(a check may be too strict). `--calibrate N` writes a stratified sample with an empty
+`human_verdict` to label; record the agreement here before any judge score becomes a gate.
+
+### Ragas (`evals/ragas_runner.py`; policy answers)
+
+Ragas 0.4.3 `Faithfulness` and `AnswerRelevancy`, judged by gpt-6.1-sol, embeddings
+text-embedding-3-small. Ragas pins an older langchain-community than the services, so it runs
+in a throwaway environment (`uv run --no-project --with ragas==0.4.3 ...`; no lockfile change).
+Two adaptations, both measured: the customer's own words count as evidence, and statements
+about the assistant's own acts ("the assistant asks which item") are dropped before scoring. Out
+of the box a fully grounded clarifying answer scored 0.33; with them, 1.0 on repeated runs.
+`AnswerRelevancy` sits near 0.5-0.6 for conversational answers and is only useful relative to an
+earlier run.
+
+## Results
+
+### 2026-10-03 (round 6: stricter checks, full 2,000)
+
+| Channel | Model | Passed | Notes |
 |---|---|---|---|
-| Chat | gpt-6-sol | 200/200 | 199–200/200 |
-| Voice | gpt-6-luna, gpt-6-sol on escalated turns | 195–199/200 | 187–190/198 (2 typed-"yes" cases are chat-only) |
+| Chat | gpt-6-sol | 1,989/2,000 (99.45%) | b05, b06, b09, b10 at 200/200 |
+| Voice | gpt-6-luna | 1,920/1,997 (96.1%) | ~25 failures were OpenAI read timeouts under load (now retried); 6 were checks requiring a tool voice no longer needs |
 
-Ranges are over the last runs; the models don't answer the same way every time. The
-baselines in `evals/baselines/` are the latest run. The first runs on the new sets scored
-chat 188/200 and 174/200, and voice 161/200 and 177/200.
+LLM judge on the chat run (before its evidence fixes): 2,177 good, 79 minor, 75 bad of 2,331
+turns; grounded 4.91, helpful 4.87, clear 4.96, tone 4.95; agreement with the rule checks 96.6%.
+Of the 72 turns it judged bad that the rules passed, about 60 were the judge missing evidence
+(catalog counts, the customer's name, store rules, a deduplication bug); the rest led to fixes
+(a quote announced as "I'll get a quote" while on screen, asking "which order" with only one).
 
-Most voice misses left are short policy answers: a citation left off, or a detail missing. An
-upstream model error sometimes fails a case (`no_error`).
+Fixes after round 6, checked on a focused run (all round-6 failures plus every 10th case; see
+the handoff file for the numbers): every product variant listed (only 6 were, so diapers in
+size 6 read as "not offered"), cards from the search the answer is about, a named product first
+under a nutrient sort, "4-pack" matching "4 x 5.3 oz cups", the perishable policy retrieved for
+food that went bad, the voice orders snapshot with returned units and each return's status and
+RMA, one retry when the voice model stalls before speaking, prompts xana.v6 and xana.voice.v7.
 
-Escalating every return, refund, or policy turn to gpt-6-sol was measured and left out. It
-scored the same as Luna alone, at the same speed (see
-`services/voice/src/ai_commerce_voice/escalation.py`). Only disputes, "that's wrong", repeated
-questions, and repeated tool failures escalate.
+Earlier: 2026-09-30, chat 200/200 and 199-200/200 on the two core sets, voice 195-199 and
+187-190.
 
-## Latency (2026-09-30)
+## How much to trust the scores
 
-58 cases (every 7th of each set), one at a time. Voice is typed turns, so speech-to-text and
-speech aren't included; voice plays a filler after 0.9 s when no answer is ready.
+An audit on 2026-10-03 found, and these were fixed: 128 turns whose only content check a reply
+answering nothing could pass (catch-all alternatives like `|products|orders|` or `|only|`); claim
+detectors that missed most phrasings; null expectations that crashed three cases; checks that
+were never scored (shipping refunds, handoffs). Still true:
+
+- Prompts were tuned on these same cases, and `b10-holdout` ran every round, so the scores are
+  dev-set scores. A locked holdout with new templates, other customers, and the missing areas
+  (order changes, payment problems, wrong items, multi-intent and non-English messages) is the
+  next step.
+- 1,930 of the 2,000 cases are one customer (Alice), with 14 orders.
+- One run's 95% interval at ~99% is about ±0.4 points (±8 cases); between runs 5-14 cases flip.
+  Differences smaller than about 10-15 cases between rounds are noise; run 3 times to compare.
+
+## Latency
+
+The full runs above time every turn under load (6 conversations at once per channel): chat
+first words 4.0-4.3 s median, 6.6-7.4 s slowest 10%; voice 1.9-2.3 s and 3.2-6.0 s. For a fair
+measurement, time a fixed sample with `--workers 1`, as below.
+
+### 2026-09-30, one at a time
+
+58 cases (every 7th of each set). Voice is typed turns, so speech-to-text and speech aren't
+included; voice plays a filler after 0.9 s when no answer is ready.
 
 | Setup | First words, median | First words, slowest 10% | Whole turn, median |
 |---|---|---|---|
@@ -80,3 +158,8 @@ speech aren't included; voice plays a filler after 0.9 s when no answer is ready
 
 Low effort wasn't faster at the median and scored 197/200 on returns, so chat stays at medium.
 The priority tier cuts the slow tail and costs more per token; it's off by default.
+
+Escalating every return, refund, or policy turn to gpt-6-sol was measured and left out. It
+scored the same as Luna alone, at the same speed (see
+`services/voice/src/ai_commerce_voice/escalation.py`). Only disputes, "that's wrong", repeated
+questions, and repeated tool failures escalate.
