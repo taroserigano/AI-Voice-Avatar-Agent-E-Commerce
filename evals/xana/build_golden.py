@@ -108,7 +108,9 @@ def mg(x: float) -> str:
 
 
 def calories(x: float) -> str:
-    return rf"(?:{num(x)}\s?(?:cal|kcal|calories)|calories\W{{1,4}}{num(x)})"
+    n = rf"(?:{num(x)}|zero|no)" if x == 0 else num(x)
+    after = r"\s?(?:cal|kcal|calories|per\b|for\b|in\b)"
+    return rf"(?:{n}(?={after})|calories\W{{1,4}}{n})"
 
 
 def price(minor: int) -> str:
@@ -409,7 +411,9 @@ def spec_pattern(value: str) -> str:
                    "W": r"(?:W\b|watts?)", "oz": r"(?:fl\.?\s?|fluid\s)?(?:oz|ounces?)", "gal": r"(?:gal|gallons?)",
                    "mAh": r"(?:mAh|milliamp)", "people": r"(?:people|persons?)"}.get(unit, re.escape(unit))  # fmt: skip
         return rf"(?<![\d.]){n}\s?[-‑]?\s?{unit_re}"
-    return r"[\s-]+".join(re.escape(w) for w in head.lower().split())
+    # "Sweat-resistant" is also "sweat resistance"; "Water-resistant" also "water resistant".
+    words = re.split(r"[\s-]+", head.lower())
+    return r"[\s-]+".join(re.escape(w[:6]) + r"\w*" if len(w) > 6 else re.escape(w) for w in words)
 
 
 SPEC_FACTS: list[tuple[str, str, list[str]]] = [
@@ -513,7 +517,7 @@ def allergy_case(text: str, p: ProductSeed, allergen: str) -> None:
     pattern = (
         rf"(?:contains?|containing|lists?|listed|has|includes?|made with|identif\w*|names?|shows?|allergens?)\b[^.]{{0,60}}{re.escape(allergen.rstrip('s'))}"
         if listed
-        else r"(?:doesn't|does not|don't|isn't|not)\b[^.]{0,40}(?:list|contain|include|name)|names no|lists no|no (?:major )?allergens|no\b[^.]{0,30}listed|not listed|none listed|"
+        else r"(?:doesn't|does not|don't|isn't|not)\b[^.]{0,40}(?:list|contain|include|name|mention)|names no|lists no|no (?:major )?allergens|no\b[^.]{0,30}listed|not listed|none listed|"
         + rf"\bnot {re.escape(allergen)}|\bno {re.escape(allergen)}|{re.escape(allergen)}[^.]{{0,20}}(?:isn't|is not|aren't|are not) (?:listed|among)"
     )
     add_product(
@@ -633,6 +637,21 @@ superlative("Which dog food is the cheapest?", {"product_type": ["dog-food"]},
             lambda p: -min_price(p), "price", lambda p: price(min_price(p)))  # fmt: skip
 
 
+def winner_first(w: ProductSeed, other: ProductSeed) -> dict[str, Any]:
+    """Words that tell the two apart, for checking which one the answer names first ("The Dark
+    Chocolate Bar has more: 190, versus 180 for the Milk Chocolate Bar")."""
+
+    def own(p: ProductSeed, q: ProductSeed) -> list[str]:
+        brands = f"{p.brand} {q.brand}".lower()
+        words = [x for x in re.findall(r"[A-Za-z][A-Za-z'-]+", p.title)
+                 if x.lower() not in q.title.lower() and x.lower() not in brands]  # fmt: skip
+        if p.brand != q.brand:
+            words += [p.brand, p.brand.split()[0]]
+        return words
+
+    return {"winner_words": own(w, other), "loser_words": own(other, w)}
+
+
 def compare(
     a: ProductSeed, b: ProductSeed, field: str, word: str, fmt: Callable[[float], str]
 ) -> None:
@@ -648,7 +667,7 @@ def compare(
     by_brand = rf"|\b{re.escape(w.brand)}\b" if w.brand != other.brand else ""
     add_product("comparison", [{"user": f"Which has more {word}, the {name(a)} or the {name(b)}?",
                                 "expect": {"action": "product_details", "winner": w.slug,
-                                           "winner_title": w.title,
+                                           "winner_title": w.title, **winner_first(w, other),
                                            "winner_re": r"\b" + r"\b.{0,40}\b".join(map(re.escape, distinct)) + r"\b" + by_brand,
                                            "mentions_re": [fmt(va), fmt(vb)]}}],
                 note=f"{a.title} {va:g} vs {b.title} {vb:g}")  # fmt: skip
@@ -905,8 +924,9 @@ def refuse(text: str | list[str], user: str, order_key: str | None, reason: str,
 
 PAST_7 = r"(?:7|seven)[- ]days?"
 PAST_30 = r"(?:30|thirty)[- ]days?"
-FINAL = r"final sale"
-NOT_DELIVERED = r"(?:once|until|after) (?:it|the order|the package|your order|they|the items?)(?:'s| is| are| has been| have been)? (?:been )?(?:delivered|arrives?)|still in progress|can't start (?:a|the) return yet|(?:hasn't|has not|hasn't been|not been|isn't|not yet|until it(?:'s| is| has been)?|once it(?:'s| is| has been)?|after it(?:'s| is| has been)?)\s*(?:been\s*)?(?:delivered|arrive[sd]?)|on its way|in transit|out for delivery"
+FINAL = (r"final sale|(?:can't|cannot|can not) be (?:returned|refunded)|"
+         r"(?:isn't|is not|aren't|are not|not) (?:returnable|refundable)")
+NOT_DELIVERED = r"(?:haven't|have not|hasn't|has not) (?:\w+ )?(?:arrived|been delivered)|(?:once|until|after) (?:it|the order|the package|your order|they|the items?)(?:'s| is| are| has been| have been)? (?:been )?(?:delivered|arrives?)|still in progress|can't start (?:a|the) return yet|(?:hasn't|has not|hasn't been|not been|isn't|not yet|until it(?:'s| is| has been)?|once it(?:'s| is| has been)?|after it(?:'s| is| has been)?)\s*(?:been\s*)?(?:delivered|arrive[sd]?)|on its way|in transit|out for delivery"
 CANCELED = r"cancel+ed"
 ALREADY = r"already (?:\w+ ){0,2}returned|already on its way|already in transit|already started|in transit|nothing left|no units left|already have a return|return is already"
 
@@ -1249,7 +1269,7 @@ policy(
 policy(
     "Can you extend my return window?",
     [R + "2-4"],
-    [r"can't|cannot|not able|unable|no\b"],
+    [r"can't|cannot|not able|unable|no\b|neither"],
     offers_person_ok=True,
     cite_ok_if=["handoff"],
 )
@@ -1270,7 +1290,7 @@ policy("How do I confirm a return by voice?", [R + "5-3", G + "5-2"], [r"yes|rea
 policy(
     "Does Xena decide whether my return is eligible?",
     [R + "5-1", G + "3-1", G + "3-2", G + "6"],
-    [r"policy engine|never decide|doesn't decide|don't decide|do not decide|the store's|rules"],
+    [r"policy engine|never decide|doesn't decide|don't decide|do not decide|the store's|rules|not me|returns? system"],
 )
 policy("I bought 3 shirts with a $10 discount on the line. If I return one, how much discount comes off its refund?",
        [R + "7-2", R + "7-6"], [r"\$3\.33"])  # fmt: skip

@@ -42,14 +42,18 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import httpx
 
 ROOT = Path(__file__).resolve().parents[1]
-SETS = {
+# The two hand-written sets, then the batches (evals/xana/build_batches.py), 200 cases each.
+CORE = {
     "products": ROOT / "evals/xana/products.jsonl",
     "returns": ROOT / "evals/xana/returns.jsonl",
 }
+BATCHES = {p.stem: p for p in sorted((ROOT / "evals/xana/batches").glob("*.jsonl"))}
+SETS = {**CORE, **BATCHES}
 PASSWORDS = {"alice@example.com": "alice-dev-password", "bob@example.com": "bob-dev-password"}
 
 NO_MATCH = re.compile(
@@ -57,6 +61,7 @@ NO_MATCH = re.compile(
     r"none (?:of (?:the|them|those) )?(?:\w+ )?(?:match|matched|meet|met|fit)|"
     r"couldn['’]?t find|didn['’]?t find|cannot find|can['’]?t find|could not find|did not find|"
     r"not finding|not seeing|don['’]?t see any|isn['’]?t listed|aren['’]?t listed|"
+    r"(?:couldn['’]?t|can['’]?t|could not|cannot) verify|"
     r"don['’]?t (?:have|carry|see)|do not (?:have|carry|see)|doesn['’]?t (?:have|carry)|"
     r"isn['’]?t (?:one|any)|aren['’]?t any|there (?:are|is) no|we have no|"
     r"no (?:products?|results?|items?|options?))\b",
@@ -74,8 +79,17 @@ REFUND_CLAIM = re.compile(
     r"(?<!n['’]t )(?<!not )(?:has|have) been (?:refunded|issued|processed|approved)|"
     r"refund (?:is|has been) (?:on (?:its|the) way|issued|processed|approved|complete)"
     r"(?! (?:when|after|once|as soon|only|within|in \d|to your|back to))|"
-    r"return (?:is|has been) (?:confirmed|created|approved|complete)|"
+    r"return (?:is|has been) (?:confirmed|created|approved|complete)(?! (?:only|when|after|once|until))|"
     r"your refund of \$[\d.,]+ (?:is|was) (?:issued|sent)",
+    re.IGNORECASE,
+)
+# Things the customer must never read: tool plumbing, raw ids, untrusted-data wrappers, or a
+# citation marker left over after the valid ones are taken out.
+LEAK = re.compile(
+    r"\[\[cite|untrusted_data|\b(?:search_products|get_product_details|list_my_orders|"
+    r"get_order_status|get_return_options|quote_return|propose_return|get_refund_status|"
+    r"search_policies|list_stores|handoff_to_person|quote_id|line_id|order_id|product_id|"
+    r"variant_id)\b|\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b",
     re.IGNORECASE,
 )
 NEGATION = re.compile(
@@ -181,6 +195,71 @@ def cited(got: dict[str, Any], wanted: str) -> bool:
     return False
 
 
+_orders: dict[tuple[int, str], dict[str, Any]] = {}
+
+
+def order_detail(client: httpx.Client, order_id: str) -> dict[str, Any]:
+    key = (id(client), order_id)
+    with _details_lock:
+        if key in _orders:
+            return _orders[key]
+    resp = client.get(f"/api/v1/orders/{order_id}")
+    resp.raise_for_status()
+    with _details_lock:
+        _orders[key] = resp.json()
+    return _orders[key]
+
+
+STORE_TZ = ZoneInfo("America/Chicago")
+
+
+def day_re(iso: str | None) -> str:
+    """A date as the customer may read it: "Oct 6", "October 6th", "10/6", or today/yesterday/
+    tomorrow when it is one of those (in the store's time zone, like the site)."""
+    if not iso:
+        return r"(?!x)x"
+    d = datetime.fromisoformat(iso.replace("Z", "+00:00")).astimezone(STORE_TZ).date()
+    month = d.strftime("%B")
+    alts = [rf"{month[:3]}(?:{month[3:]})?\.?\s+{d.day}(?:st|nd|rd|th)?\b", rf"\b{d.month}/0?{d.day}\b",
+            rf"\b{d.day}(?:st|nd|rd|th)? of {month}"]  # fmt: skip
+    today = datetime.now(STORE_TZ).date()
+    offset = (d - today).days
+    if offset in (-1, 0, 1):
+        alts.append({-1: r"\byesterday\b", 0: r"\btoday\b", 1: r"\btomorrow\b"}[offset])
+    return "(?:" + "|".join(alts) + ")"
+
+
+DIGIT_WORDS = ["zero|oh", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+
+
+def spoken_code(code: str) -> str:
+    """An order or tracking number as written ("SW136076") or read out ("S W one three six…")."""
+    parts = [f"(?:{c}|{DIGIT_WORDS[int(c)]})" if c.isdigit() else re.escape(c) for c in code]
+    return r"[\s,-]{0,2}".join(parts)
+
+
+def order_fact_re(client: httpx.Client, fact: dict[str, Any]) -> str:
+    """The regex for one live fact about one of the customer's orders (read from the store, so
+    dates follow the last reseed)."""
+    d = order_detail(client, fact["order_id"])
+    ship = (d.get("shipments") or [{}])[0]
+    field = fact["field"]
+    if field == "tracking_number":
+        return spoken_code(ship["tracking_number"])
+    if field == "carrier":
+        return re.escape(ship["carrier"])
+    if field == "arriving_by":
+        return day_re(ship.get("estimated_delivery_at") or d.get("estimated_delivery_at"))
+    if field == "delivered_on":
+        return day_re(d.get("delivered_at"))
+    if field == "placed_on":
+        return day_re(d.get("placed_at"))
+    if field == "total":
+        m = d["total_minor"]
+        return re.escape(f"${m // 100:,}.{m % 100:02d}")
+    raise ValueError(f"unknown order fact {field}")
+
+
 def score(expect: dict[str, Any], got: dict[str, Any], client: httpx.Client) -> dict[str, bool]:
     checks: dict[str, bool] = {}
     action = expect.get("action")
@@ -190,11 +269,25 @@ def score(expect: dict[str, Any], got: dict[str, Any], client: httpx.Client) -> 
     titles = [c.get("title", "") for c in products]
     tools = got["tools"]
     checks["no_error"] = not got["errors"] and bool(text or got["quotes"] or got["cards"])
+    # Answer quality on every turn: nothing internal on screen, and no citation of a section
+    # the turn didn't read.
+    valid = {c["cite"] for c in got["citations"]}
+    shown_text = re.sub(
+        r"\[\[cite:([^\]]+)\]\]",
+        lambda m: "" if m.group(1) in valid or m.group(1).split("#")[0] in valid else m.group(0),
+        text,
+    )
+    checks["clean"] = not LEAK.search(shown_text)
+    checks["valid_cites"] = not got["invalid_citations"]
 
     if action == "search":
         checks["uses_catalog"] = "search_products" in tools
     elif action == "product_details":
-        checks["uses_catalog"] = bool({"search_products", "get_product_details"} & set(tools))
+        # A follow-up about the product just discussed may be answered from the details read a
+        # turn ago (faster, and still the listing's facts, which the facts check verifies).
+        checks["uses_catalog"] = bool(
+            {"search_products", "get_product_details"} & set(tools)
+        ) or bool(expect.get("from_context"))
     if expect.get("product_title"):
         want = expect["product_title"].lower()
         checks["right_product"] = want in lower or any(t.lower() == want for t in titles)
@@ -250,7 +343,22 @@ def score(expect: dict[str, Any], got: dict[str, Any], client: httpx.Client) -> 
 
         checks["details"] = bool(products) and all(detail_ok(c) for c in products)
 
-    if expect.get("winner_title"):
+    if expect.get("winner_words") is not None:
+        # Two named products: the answer names the winner first ("X has more ..., versus Y").
+        def first_at(words: list[str]) -> int:
+            spots = [m.start() for w in words for m in re.finditer(rf"\b{re.escape(w)}\b", text, re.I)]
+            return min(spots, default=len(text) + 1)
+
+        lose = first_at(expect["loser_words"])
+        if expect["winner_words"]:
+            win = first_at(expect["winner_words"])
+            checks["right_winner"] = win <= len(text) and win < lose
+        else:
+            # The winner's name is all in the other's ("Sour Cream" vs "Light Sour Cream"): the
+            # other one must not be the one said to have more.
+            comparative = re.search(r"\b(?:more|higher|fewer|less|lower|cheaper|pricier|most)\b", text, re.I)
+            checks["right_winner"] = bool(comparative) and comparative.start() < lose
+    elif expect.get("winner_title"):
         want = expect["winner_title"].lower()
         checks["right_winner"] = (
             want in lower
@@ -267,6 +375,8 @@ def score(expect: dict[str, Any], got: dict[str, Any], client: httpx.Client) -> 
     shown += [c.get("message", "") for c in got["cards"] if c.get("kind") == "handoff"]
     visible = normalize("\n".join(shown))
     facts = [bool(re.search(p, visible, re.IGNORECASE)) for p in expect.get("mentions_re", [])]
+    if expect.get("mentions_code"):
+        facts.append(bool(re.search(spoken_code(expect["mentions_code"]), visible, re.IGNORECASE)))
     if expect.get("mentions"):
         facts += [m.lower() in visible.lower() for m in expect["mentions"]]
     if facts:
@@ -305,6 +415,17 @@ def score(expect: dict[str, Any], got: dict[str, Any], client: httpx.Client) -> 
         )
     for tool in expect.get("uses", []):
         checks[f"uses_{tool}"] = tool in tools
+    if expect.get("uses_any"):
+        checks["uses_any"] = bool(set(expect["uses_any"]) & set(tools))
+    if expect.get("not_uses"):
+        checks["not_uses"] = not (set(expect["not_uses"]) & set(tools))
+    if expect.get("order_facts"):
+        checks["order_facts"] = all(
+            re.search(order_fact_re(client, f), visible, re.IGNORECASE)
+            for f in expect["order_facts"]
+        )
+    if expect.get("no_product_cards"):
+        checks["no_product_cards"] = not products
 
     if expect.get("offers_person"):
         checks["person"] = any(c.get("kind") == "handoff" for c in got["cards"]) or bool(
@@ -330,8 +451,34 @@ def score(expect: dict[str, Any], got: dict[str, Any], client: httpx.Client) -> 
             checks["quote_refund"] = q["total_refund_minor"] == quote["refund_minor"]
         else:
             checks["offers_return"] = (
-                "get_return_options" in tools or bool(re.search(r"\breturnable\b", text, re.I))
-            ) and bool(re.search(r"\beligible\b|can (?:be )?return|\byes\b", text, re.I))
+                (
+                    "get_return_options" in tools
+                    or "list_my_orders" in tools
+                    or bool(re.search(r"\breturnable\b", text, re.I))
+                )
+                and bool(re.search(r"\beligible\b|can (?:be )?return|\byes\b", text, re.I))
+            ) or bool(
+                re.search(
+                    r"(?:want|like) (?:me )?to (?:start (?:a|the) )?return|start (?:a|the) return|"
+                    r"(?:want|like) me to (?:start|set up|do) (?:that|it|one|this|a refund|the refund)|"
+                    r"set up (?:a|the) return|shall I (?:start|return)",
+                    text,
+                    re.I,
+                )
+            )
+    if action == "quote_or_clarify":
+        # Either the right quote, or a question that names every item that could be meant.
+        if got["quotes"]:
+            q = got["quotes"][-1]
+            want_lines = sorted((ln["title"], ln["quantity"]) for ln in quote["lines"])
+            checks["quote_lines"] = want_lines == sorted(
+                (ln["title"], ln["quantity"]) for ln in q["lines"]
+            )
+            checks["quote_refund"] = q["total_refund_minor"] == quote["refund_minor"]
+        else:
+            checks["asks_which"] = all(
+                re.search(p, visible, re.IGNORECASE) for p in expect.get("clarify_re", [])
+            )
     if action in ("refuse", "clarify"):
         checks["no_quote"] = not got["quotes"]
     return checks
@@ -410,6 +557,7 @@ def run_case(case: dict[str, Any], session: Session, agent: str, channel: str) -
     except Exception as exc:  # a crash is a failed case, not a failed run
         return {
             "id": case["id"],
+            "set": case["set"],
             "category": case["category"],
             "passed": False,
             "turns": [],
@@ -418,6 +566,7 @@ def run_case(case: dict[str, Any], session: Session, agent: str, channel: str) -
         }
     return {
         "id": case["id"],
+        "set": case["set"],
         "category": case["category"],
         "passed": all(t["passed"] for t in turns),
         "turns": turns,
@@ -427,7 +576,12 @@ def run_case(case: dict[str, Any], session: Session, agent: str, channel: str) -
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--set", choices=("products", "returns", "all"), default="all")
+    parser.add_argument(
+        "--set",
+        default="all",
+        help="all, core (products and returns), batches, or set names joined by commas: "
+        + ", ".join(SETS),
+    )
     parser.add_argument("--web", default="http://127.0.0.1:3100")
     parser.add_argument("--assistant", default=None)
     parser.add_argument("--agent", choices=("xana", "steph"), default="xana")
@@ -438,9 +592,13 @@ def main() -> None:
     parser.add_argument("--record-baseline", action="store_true")
     args = parser.parse_args()
 
-    names = ["products", "returns"] if args.set == "all" else [args.set]
+    groups = {"all": list(SETS), "core": list(CORE), "batches": list(BATCHES)}
+    names = groups.get(args.set) or args.set.split(",")
+    unknown = [n for n in names if n not in SETS]
+    if unknown:
+        parser.error(f"unknown set {unknown}; known: {', '.join(SETS)}")
     cases = [
-        json.loads(line)
+        {**json.loads(line), "set": n}
         for n in names
         for line in SETS[n].read_text(encoding="utf-8").splitlines()
         if line.strip()
@@ -484,8 +642,7 @@ def main() -> None:
         "sets": {},
     }
     for n in names:
-        prefix = "xp-" if n == "products" else "xr-"
-        rs = [r for r in results if r["id"].startswith(prefix)]
+        rs = [r for r in results if r["set"] == n]
         if not rs:
             continue
         by_cat: dict[str, list[bool]] = defaultdict(list)
