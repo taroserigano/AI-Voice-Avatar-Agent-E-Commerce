@@ -95,6 +95,21 @@ def split_citations(
     return list(valid.values()), invalid
 
 
+def earlier_citations(messages: list[BaseMessage]) -> dict[str, dict[str, Any]]:
+    """The policy sections retrieved in the conversation the model still sees (its recent
+    history), so a follow-up answer may cite a section read a turn ago ("can you make an
+    exception?" after the return-window answer) without searching again."""
+    from assistant.graph import recent_history
+
+    citable: dict[str, dict[str, Any]] = {}
+    for m in recent_history(list(messages)):  # type: ignore[arg-type]
+        if isinstance(m, ToolMessage):
+            for card in m.artifact or []:
+                if isinstance(card, dict) and card.get("kind") == "citation":
+                    citable[card["cite"]] = card
+    return citable
+
+
 class ProductCards:
     """Which product cards a turn shows: every product read in detail, then the results of the
     turn's last catalog search. Earlier searches that the assistant refined away (a broad
@@ -143,7 +158,11 @@ def run_turn(
         "run_name": f"{agent}-turn",
     }
     answer: list[str] = []
-    citable: dict[str, dict[str, Any]] = {}
+    try:
+        earlier = graph.get_state(config).values.get("messages", [])
+    except Exception:  # noqa: BLE001 - only citations from this turn, then
+        earlier = []
+    citable: dict[str, dict[str, Any]] = earlier_citations(earlier)
     products = ProductCards()
     current_id: str | None = None
     # Text streamed during the current agent step: its final message repeats it, and the
@@ -239,12 +258,14 @@ def history(messages: list[BaseMessage]) -> list[MessageOut]:
     the cards and valid citations from that turn's tool results."""
     out: list[MessageOut] = []
     turn: dict[str, Any] | None = None
+    # As in the live turn: a section retrieved earlier stays citable later on.
+    seen: dict[str, dict[str, Any]] = {}
 
     def close() -> None:
         if turn is None:
             return
         text = "\n\n".join(t for t in turn["texts"] if t)
-        valid, _ = split_citations(text, turn["citable"])
+        valid, _ = split_citations(text, {**seen, **turn["citable"]})
         out.append(
             MessageOut(
                 id=turn["id"],
@@ -276,6 +297,7 @@ def history(messages: list[BaseMessage]) -> list[MessageOut]:
             for card in m.artifact or []:
                 if card.get("kind") == "citation":
                     turn["citable"][card["cite"]] = card
+                    seen[card["cite"]] = card
                 else:
                     cards.append(card)
             turn["cards"] += turn["products"].take(m.name, cards)

@@ -14,6 +14,7 @@ import contextlib
 import json
 import re
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from typing import Any, Literal
 
@@ -111,6 +112,21 @@ def _facts(detail: dict[str, Any]) -> list[str]:
     for key, value in list((detail.get("specs") or {}).items())[:3]:
         facts.append(f"{key}: {value}")
     return facts
+
+
+# Reads that don't depend on each other (an order's details, one per order) run side by side:
+# each is a ~20-70 ms round trip, and a dozen in a row is most of a second.
+_READS = ThreadPoolExecutor(max_workers=12, thread_name_prefix="commerce-read")
+DETAILS_PER_CALL = 60  # GET /v1/product-details takes up to 60 ids
+
+
+def product_details(client: CommerceClient, ids: list[str]) -> list[dict[str, Any]]:
+    """Several products in full, in the order given, in one call per 60 (GET
+    /v1/product-details) instead of one per product. Unknown or inactive products are left
+    out."""
+    chunks = [ids[i : i + DETAILS_PER_CALL] for i in range(0, len(ids), DETAILS_PER_CALL)]
+    pages = list(_READS.map(lambda c: client.get("/v1/product-details", params={"id": c}), chunks))
+    return [d for page in pages for d in page]
 
 
 def has_words(needle: str, text: str) -> bool:
@@ -264,6 +280,14 @@ def _rated_first(details: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return sorted(details, key=lambda d: not d.get("rating_count"))
 
 
+RETURN_GROUPS = {
+    "standard": "standard (30 days from delivery)",
+    "inspection": "inspected electronics (30 days; refunded after inspection)",
+    "perishable": "perishable (no change-of-mind returns; quality problems within 7 days)",
+    "final_sale": "final sale (not returnable)",
+}
+
+
 def _product_for_model(
     detail: dict[str, Any],
     max_price_minor: int | None = None,
@@ -280,6 +304,8 @@ def _product_for_model(
         "in_stock": bool(pick and pick.get("in_stock")),
         "tags": [t["value"] for t in detail.get("tags", [])],
         **rating_for_model(detail),
+        # Which return rule applies (standard, inspected, perishable, final sale).
+        "return_group": RETURN_GROUPS.get((detail.get("category") or {}).get("policy_class", "")),
     }
     if detail.get("nutrition"):
         out["nutrition_per_serving"] = detail["nutrition"]
@@ -447,7 +473,7 @@ def search_products(
             items += more["items"]
         words = query_words(query)
         limit = RANK_LIMIT if nutrient else 24 if (extra_checks or words) else MAX_PRODUCTS
-        candidates = [ctx.client.get(f"/v1/products/{item['id']}") for item in items[:limit]]
+        candidates = product_details(ctx.client, [item["id"] for item in items[:limit]])
     except CommerceError as exc:
         return _error("search_products", exc)
 
@@ -516,7 +542,7 @@ def search_products(
             try:
                 untyped = {k: v for k, v in params.items() if k != "product_type"}
                 again = ctx.client.get("/v1/products", params=untyped)
-                others = [ctx.client.get(f"/v1/products/{i['id']}") for i in again["items"][:12]]
+                others = product_details(ctx.client, [i["id"] for i in again["items"][:12]])
             except CommerceError:
                 others = []
             named = [
@@ -928,9 +954,10 @@ def with_brands(client: CommerceClient, details: list[dict[str, Any]]) -> list[d
         for ln in d.get("lines", [])
         if ln.get("product_id") and str(ln["product_id"]) not in _BRANDS
     }
-    for pid in wanted:
+    if wanted:
         with contextlib.suppress(CommerceError, httpx.HTTPError):
-            _BRANDS[pid] = client.get(f"/v1/products/{pid}")["brand"]
+            for d in product_details(client, sorted(wanted)):
+                _BRANDS[str(d["id"])] = d["brand"]
     for d in details:
         for ln in d.get("lines", []):
             brand = _BRANDS.get(str(ln.get("product_id")))
@@ -984,7 +1011,7 @@ def list_my_orders(
     try:
         summaries = ctx.client.get("/v1/orders")[:MAX_ORDERS]
         details = with_brands(
-            ctx.client, [ctx.client.get(f"/v1/orders/{o['id']}") for o in summaries]
+            ctx.client, list(_READS.map(lambda o: ctx.client.get(f"/v1/orders/{o['id']}"), summaries))
         )
     except CommerceError as exc:
         return _error("list_my_orders", exc)
@@ -997,8 +1024,47 @@ def list_my_orders(
         details = [
             d for d in details if any(all(w in named(ln) for w in words) for ln in d["lines"])
         ]
-    payload = {"orders": [_order_for_model(d) for d in details], "count": len(details)}
+    payload = {
+        "orders": [_with_return_options(d, options) for d, options in _return_options(ctx.client, details)],
+        "count": len(details),
+    }
     return untrusted("list_my_orders", payload), [order_card(d).model_dump() for d in details[:5]]
+
+
+def _return_options(
+    client: CommerceClient, details: list[dict[str, Any]]
+) -> list[tuple[dict[str, Any], dict[str, Any] | None]]:
+    """Each order with the store's return options for it (delivered orders only; read side by
+    side). The store decides eligibility; a failed read just leaves the options out."""
+
+    def read(d: dict[str, Any]) -> dict[str, Any] | None:
+        if d.get("status") != "delivered":
+            return None
+        try:
+            return client.get(f"/v1/orders/{d['id']}/return-options")  # type: ignore[no-any-return]
+        except (CommerceError, httpx.HTTPError):
+            return None
+
+    return list(zip(details, _READS.map(read, details), strict=True))
+
+
+def _with_return_options(detail: dict[str, Any], options: dict[str, Any] | None) -> dict[str, Any]:
+    """An order for the model, with what the store says each item can return right now."""
+    order = _order_for_model(detail)
+    by_line = {str(ln["order_line_id"]): ln for ln in (options or {}).get("lines", [])}
+    for item in order["items"]:
+        ln = by_line.get(item["line_id"])
+        if ln is not None:
+            item["return"] = {
+                "eligible": ln["eligible"],
+                "reason": ln["reason"],
+                "returnable_quantity": ln["returnable_quantity"],
+                "already_returned": ln["returned_quantity"],
+                "max_refund": money(ln["max_refund_minor"]),
+                "refund_timing": ln["refund_timing"],
+                "explanation": ln["message"],
+            }
+    return order
 
 
 class OrderStatusArgs(BaseModel):
@@ -1141,11 +1207,19 @@ ITEM_TYPES_QUERY = "item types groups standard inspected perishable final sale d
 def policy_search(client: CommerceClient, question: str, limit: int = 4) -> dict[str, Any]:
     """The approved policy sections for a question (``/v1/policies/search``), plus the item
     types section when the question is about returning some kind of item."""
+    # Both searches at once: the item-types one doesn't depend on the first.
+    extra_future = (
+        _READS.submit(
+            client.get, "/v1/policies/search", params={"q": ITEM_TYPES_QUERY, "limit": 1}
+        )
+        if ITEM_RETURN_QUESTION.search(question)
+        else None
+    )
     result: dict[str, Any] = client.get(
         "/v1/policies/search", params={"q": question, "limit": limit}
     )
-    if ITEM_RETURN_QUESTION.search(question):
-        extra = client.get("/v1/policies/search", params={"q": ITEM_TYPES_QUERY, "limit": 1})
+    if extra_future is not None:
+        extra = extra_future.result()
         have = {r["cite"] for r in result["results"]}
         result["results"] += [r for r in extra["results"] if r["cite"] not in have]
     return result

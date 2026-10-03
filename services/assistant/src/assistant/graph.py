@@ -84,8 +84,9 @@ def route(state: AssistantState, config: RunnableConfig) -> dict[str, Any]:
     # Tools read the signals from the server-side context (e.g. the return reason for a quote).
     ctx.signals = signals.model_dump()
     update: dict[str, Any] = {"tool_calls_this_turn": 0, "signals": signals.model_dump()}
-    # A turn trying to talk its way past the rules is declined without tools.
-    if search is not None and not signals.bypass_attempt:
+    # A turn trying to talk its way past the rules is still declined, and it may cite the rule:
+    # the prefetch only reads approved policy text.
+    if search is not None:
         question, pending = search
         try:
             result = pending.result(timeout=PREFETCH_TIMEOUT_S)

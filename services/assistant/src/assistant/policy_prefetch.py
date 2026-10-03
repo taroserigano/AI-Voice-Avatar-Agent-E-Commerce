@@ -25,7 +25,9 @@ PREFETCH_SECTIONS = 6
 POLICY_WORDS = re.compile(
     r"\b(polic(y|ies)|returns?|returned|returning|refunds?|refunded|exchanges?|warrant(y|ies)|"
     r"opened|damaged|broken|defective|restocking|final sale|cancel\w*|perishables?|spoiled|"
-    r"inspect\w*|labels?|drop.?offs?|eligib\w*|window|price match|gift cards?)\b",
+    r"inspect\w*|labels?|drop.?offs?|eligib\w*|window|price match|gift cards?|"
+    r"(?:sales )?tax(?:es|ed)?|warrant\w*|free shipping|shipping (?:cost|fee|charge)s?|"
+    r"send (?:it |them |this |that )?back|money back|take (?:it |them )?back|exchange)\b",
     re.IGNORECASE,
 )
 
@@ -159,10 +161,22 @@ _AMOUNT = re.compile(
 )
 
 
+# "It's defective and it's been two months": past the window, the answer is the manufacturer's
+# warranty (section 12.2), which words like "defective" alone don't find.
+_FAULT = re.compile(
+    r"\b(?:defective|broken|broke|stopped working|doesn'?t work|won'?t (?:turn on|work|charge)|"
+    r"faulty|died)\b",
+    re.I,
+)
+_LONG_AGO = re.compile(r"\b(?:months?|years?|\d+ weeks|several weeks|a while)\b", re.I)
+
+
 def retrieval_query(text: str) -> str:
     """The customer's words as a search query: timing questions say "timing", refund-amount
-    questions say what section 7 says, filler goes."""
+    questions say what section 7 says, an old fault asks about the warranty, filler goes."""
     said = _AMOUNT.sub(" much back paid ", _TIMING.sub(" timing ", text.lower()))
+    if _FAULT.search(said) and _LONG_AGO.search(said):
+        said += " warranty manufacturer after the return window"
     words = re.findall(r"[a-z0-9]+(?:'[a-z]+)?", said)
     kept = [w for w in words if w not in _FILLER]
     return " ".join(dict.fromkeys(kept)) or text.strip()

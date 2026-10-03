@@ -101,6 +101,16 @@ class Store:
         self.calls: list[tuple[str, dict[str, Any] | None]] = []
 
     def get(self, path: str, params: dict[str, Any] | None = None) -> Any:
+        if path == "/v1/product-details":  # the bulk read, answered one product at a time
+            found = []
+            for pid in (params or {})["id"]:
+                try:
+                    found.append(self.get(f"/v1/products/{pid}"))
+                except AssertionError:
+                    raise
+                except Exception:  # noqa: BLE001 - an unknown product is left out
+                    pass
+            return found
         self.calls.append((path, params))
         value = self.routes[path]
         if isinstance(value, Exception):

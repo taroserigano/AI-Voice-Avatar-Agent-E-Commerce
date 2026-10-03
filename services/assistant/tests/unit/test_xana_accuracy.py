@@ -82,6 +82,16 @@ class Orders:
         self.product_reads = 0
 
     def get(self, path: str, params: dict[str, Any] | None = None) -> Any:
+        if path == "/v1/product-details":  # the bulk read, answered one product at a time
+            found = []
+            for pid in (params or {})["id"]:
+                try:
+                    found.append(self.get(f"/v1/products/{pid}"))
+                except AssertionError:
+                    raise
+                except Exception:  # noqa: BLE001 - an unknown product is left out
+                    pass
+            return found
         if path == "/v1/orders":
             return [{"id": "o1"}]
         if path == "/v1/orders/o1":
@@ -106,7 +116,23 @@ class Orders:
             }
         if path == "/v1/products/p-pens":
             self.product_reads += 1
-            return {"brand": "Quillmark"}
+            return {"id": "p-pens", "brand": "Quillmark"}
+        if path == "/v1/orders/11111111-1111-4111-8111-111111111111/return-options":
+            return {
+                "order_id": "11111111-1111-4111-8111-111111111111",
+                "lines": [
+                    {
+                        "order_line_id": "l1",
+                        "eligible": True,
+                        "reason": "within_window",
+                        "returnable_quantity": 1,
+                        "returned_quantity": 0,
+                        "max_refund_minor": 1405,
+                        "refund_timing": "instant",
+                        "message": "Returnable until Oct 23.",
+                    }
+                ],
+            }
         raise AssertionError(path)
 
 
@@ -118,6 +144,24 @@ def test_an_order_item_is_found_by_its_brand() -> None:
     assert '"brand": "Quillmark"' in content and '"count": 1' in content and cards
     list_my_orders.func(config, contains="quillmark")  # type: ignore[attr-defined]
     assert client.product_reads == 1  # a product's brand is read once
+
+
+def test_listed_orders_carry_the_stores_return_options_for_each_item() -> None:
+    tools_mod._BRANDS.clear()
+    client = Orders()
+    config = {"configurable": {"ctx": ToolContext(client=client, agent="xana")}}  # type: ignore[arg-type]
+    content, _ = list_my_orders.func(config)  # type: ignore[attr-defined]
+    item = json.loads(content.split("\n", 1)[1].rsplit("\n", 1)[0])["orders"][0]["items"][0]
+    # The store's decision, not the model's: eligible, why, how many, and the most it refunds.
+    assert item["return"] == {
+        "eligible": True,
+        "reason": "within_window",
+        "returnable_quantity": 1,
+        "already_returned": 0,
+        "max_refund": "$14.05",
+        "refund_timing": "instant",
+        "explanation": "Returnable until Oct 23.",
+    }
 
 
 ORDER = "7a762eb8-e306-5151-bbc2-33e29b160f12"
@@ -133,6 +177,16 @@ class Returns:
         self.quoted: dict[str, Any] | None = None
 
     def get(self, path: str, params: dict[str, Any] | None = None) -> Any:
+        if path == "/v1/product-details":  # the bulk read, answered one product at a time
+            found = []
+            for pid in (params or {})["id"]:
+                try:
+                    found.append(self.get(f"/v1/products/{pid}"))
+                except AssertionError:
+                    raise
+                except Exception:  # noqa: BLE001 - an unknown product is left out
+                    pass
+            return found
         if path == "/v1/orders":
             return [{"id": ORDER}]
         assert path == f"/v1/orders/{ORDER}/return-options"
@@ -209,6 +263,16 @@ class PlantMilks:
     }
 
     def get(self, path: str, params: dict[str, Any] | None = None) -> Any:
+        if path == "/v1/product-details":  # the bulk read, answered one product at a time
+            found = []
+            for pid in (params or {})["id"]:
+                try:
+                    found.append(self.get(f"/v1/products/{pid}"))
+                except AssertionError:
+                    raise
+                except Exception:  # noqa: BLE001 - an unknown product is left out
+                    pass
+            return found
         if path == "/v1/catalog/vocabulary":
             return {"product_types": [{"value": "plant-milk", "label": "Plant milk"}], "tags": []}
         if path == "/v1/products":
@@ -261,6 +325,16 @@ class ManyCereals:
         self.ids = [f"c{i:02d}" for i in range(70)]
 
     def get(self, path: str, params: dict[str, Any] | None = None) -> Any:
+        if path == "/v1/product-details":  # the bulk read, answered one product at a time
+            found = []
+            for pid in (params or {})["id"]:
+                try:
+                    found.append(self.get(f"/v1/products/{pid}"))
+                except AssertionError:
+                    raise
+                except Exception:  # noqa: BLE001 - an unknown product is left out
+                    pass
+            return found
         if path == "/v1/catalog/vocabulary":
             return {"product_types": [{"value": "cereal", "label": "Cereal"}], "tags": []}
         if path == "/v1/products":

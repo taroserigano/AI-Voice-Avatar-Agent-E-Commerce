@@ -67,13 +67,19 @@ from assistant.policy_prefetch import (
 from assistant.prompts import catalog_size
 from assistant.tools import ToolContext, _order_for_model, policy_search, untrusted
 from assistant.toolsets import XANA_TOOLS
-from assistant.turns import TOOL_LABELS, ProductCards, message_text, split_citations
+from assistant.turns import (
+    TOOL_LABELS,
+    ProductCards,
+    earlier_citations,
+    message_text,
+    split_citations,
+)
 
 log = logging.getLogger(__name__)
 
-PROMPT_VERSION = "xana.voice.v5"
+PROMPT_VERSION = "xana.voice.v6"
 PROMPT_DIR = Path(__file__).resolve().parent / "prompts"
-SNAPSHOT_ORDERS = 8
+SNAPSHOT_ORDERS = 12
 
 
 @lru_cache
@@ -82,7 +88,11 @@ def _template() -> str:
 
 
 def orders_snapshot(details: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """The recent orders the model may read at once: the chat tool's own whitelist, shortened."""
+    """The recent orders the model may read at once: the chat tool's own whitelist, shortened.
+
+    Each order starts with its items (with their size or color), so "which carrier brought my
+    headphones?" is read off the right order; measured on the golden eval, a nested layout with
+    the items last had the voice model take dates and carriers from a neighbouring order."""
     out = []
     for d in details[:SNAPSHOT_ORDERS]:
         o = _order_for_model(d)
@@ -93,32 +103,32 @@ def orders_snapshot(details: list[dict[str, Any]]) -> list[dict[str, Any]]:
             for ln in (d.get("return_options") or {}).get("lines", [])
         }
         delivery = o.get("delivery") or {}
+
+        def item(i: dict[str, Any]) -> str:
+            variant = i.get("variant") or ""
+            shown = variant and variant.lower() not in ("standard", "each") and variant.lower() not in i["title"].lower()
+            return (
+                f"{i['quantity']} × "
+                + (f"{i['brand']} " if i.get("brand") else "")
+                + i["title"]
+                + (f", {variant}" if shown else "")
+                + returnable.get(i["line_id"], "")
+            )
+
         out.append(
             {
-                "order_id": o["order_id"],
+                "items": [item(i) for i in o["items"]][:6],
                 "order_number": o["order_number"],
                 "status": o["status"],
                 "placed_on": o["placed_on"],
-                "arriving_by": o["arriving_by"],
                 "delivered_on": o["delivered_on"],
-                "delivery": (
-                    {
-                        "status": delivery.get("status"),
-                        "carrier": delivery.get("carrier"),
-                        "arriving_by": delivery.get("arriving_by"),
-                        "latest_update": delivery.get("latest_update"),
-                    }
-                    if delivery
-                    else None
-                ),
+                "arriving_by": o["arriving_by"],
+                "carrier": delivery.get("carrier"),
+                "tracking_number": delivery.get("tracking_number"),
+                "latest_update": delivery.get("latest_update"),
                 "total": o["total"],
-                "items": [
-                    f"{i['quantity']} × "
-                    + (f"{i['brand']} " if i.get("brand") else "")
-                    + i["title"]
-                    + returnable.get(i["line_id"], "")
-                    for i in o["items"]
-                ][:6],
+                "shipping": o["shipping"],
+                "order_id": o["order_id"],
             }
         )
     return out
@@ -132,7 +142,7 @@ def system_prompt(
 ) -> str:
     # Fixed instructions first (cacheable), then this call's facts.
     orders = (
-        untrusted("orders_snapshot", {"orders": snapshot})
+        untrusted("orders_snapshot", {"order_count": len(snapshot), "orders": snapshot})
         if snapshot is not None
         else "(not loaded: use list_my_orders)"
     )
@@ -296,11 +306,12 @@ class XanaBrain:
         # (the customer's words and any prefetched policy search) instead of adding to them.
         mid = message_id or str(uuid.uuid4())
         messages: list[AnyMessage] = [HumanMessage(content=text, id=mid)]
-        citable: dict[str, dict[str, Any]] = {}
-        history: list[AnyMessage] = []
-        if self.voice.strong is not None:
-            snapshot = await self.graph.aget_state(self._config())
-            history = [m for m in snapshot.values.get("messages", []) if m.id != mid]
+        snapshot = await self.graph.aget_state(self._config())
+        history: list[AnyMessage] = [
+            m for m in snapshot.values.get("messages", []) if m.id != mid
+        ]
+        # A section read earlier in the call stays citable (as in the chat).
+        citable: dict[str, dict[str, Any]] = earlier_citations(history)
         escalated = escalation_reason(text, history)
         prefetched = await self._prefetch_policies(text, mid)
         if prefetched is not None:

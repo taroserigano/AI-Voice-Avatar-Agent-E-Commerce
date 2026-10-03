@@ -40,6 +40,7 @@ from ai_commerce_voice.brain import (
     XanaBrain,
     build_voice_graph,
     make_context,
+    SNAPSHOT_ORDERS,
     orders_snapshot,
     system_prompt,
 )
@@ -247,7 +248,7 @@ def _warm_policy_search(client: CommerceClient) -> None:
 
 def _recent_orders(client: CommerceClient) -> list[dict[str, Any]] | None:
     try:
-        summaries = client.get("/v1/orders")[:8]
+        summaries = client.get("/v1/orders")[:SNAPSHOT_ORDERS]
         details = list(_pool.map(lambda o: client.get(f"/v1/orders/{o['id']}"), summaries))
         delivered = [d for d in details if d.get("status") == "delivered"]
         # Whether each item can be returned right now, from the returns engine: the model

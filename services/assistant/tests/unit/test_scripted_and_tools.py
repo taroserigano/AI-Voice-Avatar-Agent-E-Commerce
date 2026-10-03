@@ -12,7 +12,7 @@ from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from assistant.scripted import ScriptedChatModel, parse_product_request, plan, read_payload
 from assistant.tools import STEPH_TOOLS, untrusted
 from assistant.toolsets import ALL_TOOLS, tools_for
-from assistant.turns import history, split_citations
+from assistant.turns import earlier_citations, history, split_citations
 
 EVALS = Path(__file__).resolve().parents[4] / "evals" / "assistant"
 
@@ -257,3 +257,31 @@ def test_history_rebuilds_turns_with_cards_and_valid_citations() -> None:
     assert out[1].text.endswith("[[cite:returns-and-refunds#rr-2-1]]")
     assert [c.cite for c in out[1].citations] == ["returns-and-refunds#rr-2-1"]
     assert out[1].cards == []
+
+
+def test_a_section_read_in_an_earlier_turn_stays_citable_but_an_unread_one_does_not() -> None:
+    citation = {
+        "kind": "citation",
+        "cite": "returns-and-refunds#rr-2-4",
+        "doc_title": "Return and refund policy",
+        "number": "2.4",
+        "title": "No extensions in chat",
+        "version": "v",
+        "url": "/returns-policy#rr-2-4",
+        "excerpt": "x",
+    }
+    messages = [
+        HumanMessage("return my kettle", id="h1"),
+        AIMessage("", tool_calls=[{"name": "search_policies", "args": {}, "id": "c1"}], id="a1"),
+        ToolMessage(content="{}", tool_call_id="c1", name="search_policies", artifact=[citation]),
+        AIMessage("Its window closed.", id="a2"),
+        HumanMessage("can you make an exception?", id="h2"),
+        AIMessage(
+            "I can't extend it. [[cite:returns-and-refunds#rr-2-4]] "
+            "[[cite:returns-and-refunds#rr-9]]",
+            id="a3",
+        ),
+    ]
+    assert list(earlier_citations(messages)) == ["returns-and-refunds#rr-2-4"]
+    out = history(messages)
+    assert [c.cite for c in out[3].citations] == ["returns-and-refunds#rr-2-4"]
