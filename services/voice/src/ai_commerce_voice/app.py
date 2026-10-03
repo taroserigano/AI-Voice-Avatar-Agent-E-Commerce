@@ -116,8 +116,10 @@ def pick_model(settings: VoiceSettings, http: httpx.AsyncClient) -> ModelPick:
             use_responses_api=True,
             reasoning={"effort": effort},
             streaming=True,
-            max_retries=1,
-            timeout=20,
+            # A dropped connection is retried at once: a 20 s connect wait left a caller in
+            # silence for ~40 s (2026-10-02). Reading the answer may still take up to 20 s.
+            max_retries=2,
+            timeout=httpx.Timeout(20, connect=4),
             max_tokens=400 if effort in ("none", "low") else 1200,
             http_async_client=http,
             model_kwargs={
@@ -510,6 +512,7 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
             confirm=confirm_rule,
             fillers=state["fillers"],
             filler_after_ms=settings.voice_filler_after_ms,
+            face_filler_after_ms=settings.voice_face_filler_after_ms,
             max_turn_s=settings.voice_max_turn_s,
         )
         session_ref["s"] = session

@@ -25,6 +25,24 @@ def prompt_version(agent: str) -> str:
     return PROMPT_VERSIONS[agent]
 
 
+def catalog_size(vocabulary: dict[str, Any]) -> str:
+    """How big the catalog is, from the vocabulary's live counts, so "how many products do you
+    have?" gets a real number instead of "I don't know". Empty when the counts are missing."""
+    types = [t for t in vocabulary.get("product_types", []) if t.get("count")]
+    if not types:
+        return ""
+    total = sum(int(t["count"]) for t in types)
+    per_type = ", ".join(f"{t['value']} {t['count']}" for t in types)
+    return (
+        "\n\n## Catalog size\n"
+        f"The store lists {total} products right now, across {len(types)} product types. "
+        "A product can come in several sizes or colors, and listed doesn't mean in stock. "
+        "When the customer asks how many products the store has, or how many of a kind, answer "
+        "with these numbers. "
+        f"Products per type: {per_type}."
+    )
+
+
 def render_prompt(
     agent: str, *, first_name: str, vocabulary: dict[str, Any], today: date, voice: bool = False
 ) -> str:
@@ -37,4 +55,4 @@ def render_prompt(
         .replace("{product_types}", types)
         .replace("{tags}", tags)
     )
-    return text + (VOICE_NOTE if voice else "")
+    return text + catalog_size(vocabulary) + (VOICE_NOTE if voice else "")

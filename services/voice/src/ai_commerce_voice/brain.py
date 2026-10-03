@@ -64,6 +64,7 @@ from assistant.policy_prefetch import (
     retrieval_query,
     wants_policy,
 )
+from assistant.prompts import catalog_size
 from assistant.tools import ToolContext, _order_for_model, policy_search, untrusted
 from assistant.toolsets import XANA_TOOLS
 from assistant.turns import TOOL_LABELS, ProductCards, message_text, split_citations
@@ -144,6 +145,7 @@ def system_prompt(
         f"## Your orders right now\n\n{orders}\n\n"
         f"## Catalog filters\n\nUse only these exact values in product search. "
         f"Product types: {types or '(unavailable)'}. Tags: {tags or '(unavailable)'}.\n"
+        f"{catalog_size(vocab)}\n"
     )
 
 
@@ -425,9 +427,13 @@ class XanaBrain:
                                 yield CardOut(card)
         except Exception:
             log.exception("voice turn failed")
+            # She already answered (a later step failed, e.g. a network timeout): end the turn
+            # there rather than put an error under an answer the customer just heard.
             yield TurnEnded(
                 first_token_ms=first_token_ms,
-                error="Sorry, something went wrong on our side. Please try again.",
+                error=None
+                if answer
+                else "Sorry, something went wrong on our side. Please try again.",
             )
             return
         for card in products.final():

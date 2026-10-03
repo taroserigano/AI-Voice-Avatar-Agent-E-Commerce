@@ -133,6 +133,9 @@ class VoiceSession:
     confirm: ConfirmRule
     fillers: dict[str, FillerClip]
     filler_after_ms: int = 900
+    # With her face on, nothing is heard for the face's own ~1 s anyway: a filler sooner
+    # covers that wait (docs/features/12-xena-latency, L1).
+    face_filler_after_ms: int = 300
     max_turn_s: float = 45.0
     picker: FillerPicker = field(default_factory=FillerPicker)
     clock: Callable[[], float] = time.monotonic
@@ -156,6 +159,7 @@ class VoiceSession:
     _turn_is_say: bool = False
     muted: bool = False
     output_generation: int = 0
+    output_provider: str = "local"
     spoken_confirmation: bool = True
     output_switching: bool = False
 
@@ -218,6 +222,7 @@ class VoiceSession:
         self.output_switching = True
         await self._barge_in()
         self.output_generation = generation
+        self.output_provider = provider
         self.output_switching = provider != "local"
         # LiveAvatar playout timing needs a connected acceptance test. Its return flow
         # deliberately uses the existing explicit confirmation button in the meantime.
@@ -430,7 +435,9 @@ class VoiceSession:
         if quiet:
             self._filler_played = True
         filler_timer = (
-            None if quiet else asyncio.create_task(self._filler_after(self.filler_after_ms, clock))
+            None
+            if quiet
+            else asyncio.create_task(self._filler_after(self._filler_wait_ms(), clock))
         )
 
         async def speak(chunk: str) -> None:
@@ -602,6 +609,11 @@ class VoiceSession:
                 with contextlib.suppress(Exception):
                     await utterance.cancel()
         return seg
+
+    def _filler_wait_ms(self) -> int:
+        return (
+            self.filler_after_ms if self.output_provider == "local" else self.face_filler_after_ms
+        )
 
     async def _filler_after(self, ms: int, clock: TurnClock) -> None:
         await asyncio.sleep(ms / 1000)

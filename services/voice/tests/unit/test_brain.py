@@ -156,6 +156,13 @@ class ScriptModel(BaseChatModel):
         run_manager: CallbackManagerForLLMRun | None = None,
         **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
+        if self.replies and isinstance(self.replies[0], tuple) and self.replies[0][0] == "fail":
+            # Says these words, then the connection drops (e.g. an OpenAI timeout).
+            _, words = self.replies.pop(0)
+            self.seen.append(list(messages))
+            for word in words.split():
+                yield ChatGenerationChunk(message=AIMessageChunk(content=word + " ", id="ai-x"))
+            raise TimeoutError("Request timed out.")
         msg = self._next(messages)
         if msg.tool_calls:
             call = msg.tool_calls[0]
@@ -190,7 +197,9 @@ def brain_with(replies: list[Any]) -> tuple[XanaBrain, FakeStore, ScriptModel]:
         conversation_id="conv-1",
         ctx=ctx,
         voice=make_context(
-            model, system=system_prompt("Alice", date(2026, 9, 26), snapshot), max_tool_calls=6
+            model,
+            system=system_prompt("Alice", date(2026, 9, 26), snapshot),
+            max_tool_calls=6,
         ),
         model="script",
         simulated=True,
@@ -217,6 +226,34 @@ def test_a_tool_call_is_announced_as_soon_as_its_name_streams_and_the_answer_fol
     end = events[-1]
     assert isinstance(end, TurnEnded) and end.error is None and end.first_token_ms is not None
     assert f"/v1/orders/{ORDER_ID}" in store.calls
+
+
+def test_a_failure_after_she_answered_ends_the_turn_without_an_error() -> None:
+    # Found live (2026-10-02): an OpenAI timeout after a full answer put "something went
+    # wrong" under it.
+    brain, _, _ = brain_with([("fail", "We have 34 milk products.")])
+    events = asyncio.run(collect(brain.turn("How many kinds of milk do you have?")))
+    assert "34 milk" in "".join(e.text for e in events if isinstance(e, TextDelta))
+    end = events[-1]
+    assert isinstance(end, TurnEnded) and end.error is None
+
+
+def test_a_failure_before_any_answer_still_says_so() -> None:
+    brain, _, _ = brain_with([("fail", "")])
+    end = asyncio.run(collect(brain.turn("How many kinds of milk do you have?")))[-1]
+    assert isinstance(end, TurnEnded) and end.error and "went wrong" in end.error
+
+
+def test_the_catalog_size_is_in_the_prompt() -> None:
+    vocab = {
+        "product_types": [
+            {"value": "milk", "label": "Milk", "count": 34},
+            {"value": "tv", "label": "TV", "count": 8},
+        ],
+        "tags": [],
+    }
+    system = system_prompt("Alice", date(2026, 9, 26), None, vocab)
+    assert "42 products" in system and "milk 34" in system and "tv 8" in system
 
 
 def test_the_model_sees_the_recent_orders_snapshot_as_untrusted_data() -> None:

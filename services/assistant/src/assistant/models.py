@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from dataclasses import dataclass
 from functools import lru_cache
 
@@ -105,3 +106,26 @@ def choose_model() -> ModelChoice:
             return ModelChoice(openai, settings.assistant_openai_model, simulated=False)
     log.warning("using the scripted assistant model: %s", reason)
     return ModelChoice(scripted.model, scripted.name, True, reason)
+
+
+RECHECK_UNREACHABLE_S = 30.0
+_fallback_since: float | None = None
+
+
+def current_model() -> ModelChoice:
+    """The chosen model; a fallback picked only because the provider couldn't be reached is
+    checked again every 30 s. A network blip at startup used to leave the scripted model
+    answering until a restart (2026-10-02)."""
+    global _fallback_since
+    choice = choose_model()
+    if not (choice.simulated and (choice.reason or "").startswith("couldn't reach")):
+        _fallback_since = None
+        return choice
+    now = time.monotonic()
+    if _fallback_since is None:
+        _fallback_since = now
+    elif now - _fallback_since >= RECHECK_UNREACHABLE_S:
+        _fallback_since = None
+        choose_model.cache_clear()
+        choice = choose_model()
+    return choice

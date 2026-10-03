@@ -123,6 +123,8 @@ class VoiceSettings(BaseSettings):
     # for answer audio before saying a filler.
     voice_end_silence_ms: int = 450
     voice_filler_after_ms: int = 900
+    # Sooner with her face on: the face adds ~1 s before anything is heard (plan 12, L1).
+    voice_face_filler_after_ms: int = 300
     voice_max_turn_s: float = 45.0
     voice_max_tool_calls: int = 6
     voice_max_session_s: int = 20 * 60

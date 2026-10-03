@@ -71,13 +71,24 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
   const status = STATUS[state];
   const captionNow = captionFor(voice.segments);
 
-  // On short screens the newest words can fall below the fold: keep them in view.
+  // On short screens the newest words can fall below the fold: bring them just into view (not
+  // the whole page to the bottom, which pushed her face off the top). Once the customer scrolls
+  // themselves, leave the page where they put it until their next question.
+  const transcript = useRef<HTMLDivElement>(null);
+  const follow = useRef(true);
+  const userFinal = voice.userFinal ? voice.userText : null;
+  useEffect(() => {
+    follow.current = true;
+  }, [userFinal]);
   useEffect(() => {
     const el = stage.current;
-    if (!el || el.scrollHeight <= el.clientHeight) return;
+    if (!follow.current || !el || el.scrollHeight <= el.clientHeight) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    el.scrollTo({ top: el.scrollHeight, behavior: reduce ? "auto" : "smooth" });
+    transcript.current?.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
   }, [captionNow, voice.userText, quote]);
+  const stopFollowing = () => {
+    follow.current = false;
+  };
   const hint = state === "thinking" && voice.toolLabel ? voice.toolLabel : status.hint;
   const caption = captionNow;
   const level = state === "speaking" ? voice.speechLevel : voice.micLevel;
@@ -94,7 +105,7 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
             <SparklesIcon className="size-6 text-white" />
           </span>
           <div className="leading-tight">
-            <p className="font-display text-lg font-extrabold tracking-[0.2em]">XANA</p>
+            <p className="font-display text-lg font-extrabold tracking-[0.2em]">XENA</p>
             <p className="text-sm text-neutral-300">Your AI voice assistant</p>
           </div>
         </div>
@@ -109,11 +120,28 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
       </header>
 
       {/* Stage */}
-      <main ref={stage} id="main" className="flex flex-1 flex-col items-center overflow-y-auto px-4 pb-6 pt-6 text-center sm:pt-10">
-        <p className="text-xs font-bold uppercase tracking-[0.32em] text-brand-200 sm:text-sm">
+      <main
+        ref={stage}
+        id="main"
+        onWheel={stopFollowing}
+        onTouchMove={stopFollowing}
+        onKeyDown={(e) => {
+          if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(e.key)) stopFollowing();
+        }}
+        className={cn(
+          "flex flex-1 flex-col items-center overflow-y-auto px-4 pb-6 text-center",
+          face ? "pt-3 sm:pt-4" : "pt-6 sm:pt-10",
+        )}
+      >
+        {/* With her face on screen the welcome heading gives its room to the video. */}
+        <p className={cn("text-xs font-bold uppercase tracking-[0.32em] text-brand-200 sm:text-sm", face && "sr-only")}>
           Orders &amp; returns, in conversation
         </p>
-        <h1 className="mt-3 font-display text-5xl font-extrabold tracking-[-0.04em] sm:text-7xl">Meet Xena</h1>
+        <h1
+          className={cn("mt-3 font-display text-5xl font-extrabold tracking-[-0.04em] sm:text-7xl", face && "sr-only")}
+        >
+          Meet Xena
+        </h1>
         <XanaProviderTabs provider={provider} disabled={confirming} />
         <section role="tabpanel" id="avatar-provider-panel" aria-labelledby={`avatar-tab-${provider}`} className="mt-4">
         {face ? (
@@ -159,7 +187,7 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
         </div>
 
         {/* Live transcript: the customer's words as they speak, then Xena's as she says them. */}
-        <div className="mt-4 w-full max-w-2xl space-y-3 text-lg leading-relaxed sm:text-xl">
+        <div ref={transcript} className="mt-4 w-full max-w-2xl scroll-mb-4 space-y-3 text-lg leading-relaxed sm:text-xl">
           {voice.userText ? (
             <p className={cn("text-neutral-300", !voice.userFinal && "italic")}>
               <span className="sr-only">You said: </span>“{voice.userText}”

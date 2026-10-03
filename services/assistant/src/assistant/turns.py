@@ -36,7 +36,7 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.types import Command
 
-from assistant.models import choose_model
+from assistant.models import current_model
 from assistant.prompts import prompt_version
 from assistant.schemas import CitationCard, MessageOut
 from assistant.tools import ToolContext
@@ -131,7 +131,7 @@ def run_turn(
     resume: dict[str, Any] | None = None,
 ) -> Iterator[str]:
     """Run a customer message (``text``) or resume a paused turn (``resume``) as SSE."""
-    choice = choose_model()
+    choice = current_model()
     config: RunnableConfig = {
         "configurable": {"thread_id": conversation_id, "ctx": ctx},
         "recursion_limit": 20,
