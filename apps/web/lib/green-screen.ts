@@ -16,15 +16,35 @@ void main() {
   gl_Position = vec4(a_pos, 0.0, 1.0);
 }`;
 
+// Edges: the video stores colour at half resolution, so the outermost ring of pixels around
+// her is a light grey-green mix that read as a white outline on dark backgrounds. The matte is
+// pulled in by a pixel (each pixel keeps no more opacity than its weakest neighbour), then
+// softened a little so hair doesn't look cut out. Tuned on real frames of Julia (blonde hair,
+// the hardest case) and Rose over Night and Sunlit room (2026-10-03); taking the green back out
+// of edge pixels instead left a red line, so edges are only despilled.
 const FRAGMENT = `
 precision mediump float;
 uniform sampler2D u_video;
 uniform sampler2D u_bg;
+uniform vec2 u_px;
 varying vec2 v_uv;
-void main() {
-  vec3 c = texture2D(u_video, v_uv).rgb;
+float key(vec2 uv) {
+  vec3 c = texture2D(u_video, uv).rgb;
   float k = c.g - max(c.r, c.b * 0.85);
-  float a = clamp(1.0 - (k - 0.12) / 0.23, 0.0, 1.0);
+  return clamp(1.0 - (k - 0.06) / 0.24, 0.0, 1.0);
+}
+float choked(vec2 uv) {
+  float a = 1.0;
+  for (int dy = -1; dy <= 1; dy++)
+    for (int dx = -1; dx <= 1; dx++)
+      a = min(a, key(uv + vec2(float(dx), float(dy)) * u_px));
+  return a;
+}
+void main() {
+  float a = (2.0 * choked(v_uv)
+    + choked(v_uv + vec2(u_px.x, 0.0)) + choked(v_uv - vec2(u_px.x, 0.0))
+    + choked(v_uv + vec2(0.0, u_px.y)) + choked(v_uv - vec2(0.0, u_px.y))) / 6.0;
+  vec3 c = texture2D(u_video, v_uv).rgb;
   c.g = min(c.g, max(c.r, c.b));
   vec3 bg = texture2D(u_bg, v_uv).rgb;
   gl_FragColor = vec4(mix(bg, c, a), 1.0);
@@ -80,6 +100,7 @@ export function createGreenScreen(canvas: HTMLCanvasElement, video: HTMLVideoEle
   };
   const videoTex = texture(0, "u_video");
   const bgTex = texture(1, "u_bg");
+  const px = gl.getUniformLocation(program, "u_px");
 
   return {
     render() {
@@ -87,6 +108,7 @@ export function createGreenScreen(canvas: HTMLCanvasElement, video: HTMLVideoEle
       if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
+        gl.uniform2f(px, 1 / canvas.width, 1 / canvas.height);
       }
       gl.viewport(0, 0, canvas.width, canvas.height);
       gl.activeTexture(gl.TEXTURE0);
