@@ -10,6 +10,7 @@ import { captionFor, dollars } from "@/lib/voice-captions";
 import type { AvatarProvider, QuoteCard } from "@/lib/voice-protocol";
 import { XanaProviderTabs } from "./xana-provider-tabs";
 import { XanaAvatar } from "./xana-avatar";
+import { XanaAvatarConnecting } from "./xana-avatar-connecting";
 import { XanaLookPicker } from "./xana-look-picker";
 import { XanaOrb } from "./xana-orb";
 
@@ -152,6 +153,12 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
             background={voice.avatar.background}
             onPlaying={voice.avatar.playbackStarted}
             onStopped={voice.avatar.playbackStopped}
+          />
+        ) : live && voice.avatar.wanted && provider === "tavus" ? (
+          <XanaAvatarConnecting
+            look={voice.avatar.look}
+            label={voice.avatar.looks.find((l) => l.key === voice.avatar.look)?.label ?? null}
+            background={voice.avatar.background}
           />
         ) : (
 
