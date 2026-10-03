@@ -32,8 +32,13 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, them
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${bricolage.variable}`}>
+    // Browser extensions can add attributes to <html> before React loads; that one element's
+    // mismatch is expected, not a bug in the page.
+    <html lang="en" className={`${inter.variable} ${bricolage.variable}`} suppressHydrationWarning>
       <head>
+        {/* The site has its own light and dark designs: Dark Reader leaves it alone instead of
+            rewriting every icon's styles before React loads (a hydration error otherwise). */}
+        <meta name="darkreader-lock" />
         {/* Back/forward re-check of the session on private pages; see the component. */}
         <SessionGuard />
       </head>
