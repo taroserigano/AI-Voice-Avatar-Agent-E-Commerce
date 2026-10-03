@@ -33,6 +33,12 @@ def _load(name: str) -> list[dict[str, Any]]:
 
 PRODUCT_CASES = _load("products.jsonl")
 RETURN_CASES = _load("returns.jsonl")
+# The batches (evals/xana/build_batches.py): 200 more each, of every kind.
+BATCHES = {
+    path.stem: _load(f"batches/{path.name}")
+    for path in sorted((ROOT / "evals" / "xana" / "batches").glob("*.jsonl"))
+}
+BATCH_CASES = [c for cases in BATCHES.values() for c in cases]
 
 
 def _min_price(p: ProductSeed) -> int:
@@ -72,12 +78,15 @@ def _listing_text(p: ProductSeed) -> str:
 
 
 def test_each_golden_set_has_200_unique_cases() -> None:
-    for cases in (PRODUCT_CASES, RETURN_CASES):
+    assert len(BATCHES) == 8
+    for cases in (PRODUCT_CASES, RETURN_CASES, *BATCHES.values()):
         assert len(cases) == 200
         assert len({c["id"] for c in cases}) == 200
+    every = [c["id"] for c in (*PRODUCT_CASES, *RETURN_CASES, *BATCH_CASES)]
+    assert len(every) == len(set(every)) == 2000
 
 
-@pytest.mark.parametrize("case", PRODUCT_CASES, ids=lambda c: c["id"])
+@pytest.mark.parametrize("case", PRODUCT_CASES + BATCH_CASES, ids=lambda c: c["id"])
 def test_product_case_agrees_with_the_catalog(case: dict[str, Any]) -> None:
     for t in case["turns"]:
         expect = t["expect"]
@@ -92,7 +101,8 @@ def test_product_case_agrees_with_the_catalog(case: dict[str, Any]) -> None:
                 assert found, f"{case['id']}: nothing satisfies the expected filters"
         if "product" in expect:
             p = CATALOG[expect["product"]]
-            assert expect["product_title"] == p.title
+            # A follow-up about "it" names the product without repeating its title.
+            assert expect.get("product_title", p.title) == p.title
             if case["category"] not in ("allergy",):
                 listing = _listing_text(p)
                 for pattern in expect.get("mentions_re", []):
@@ -124,7 +134,7 @@ def _policy_sections() -> set[str]:
 SECTIONS = _policy_sections()
 
 
-@pytest.mark.parametrize("case", RETURN_CASES, ids=lambda c: c["id"])
+@pytest.mark.parametrize("case", RETURN_CASES + BATCH_CASES, ids=lambda c: c["id"])
 def test_return_case_agrees_with_orders_policy_and_stores(case: dict[str, Any]) -> None:
     for t in case["turns"]:
         expect = t["expect"]

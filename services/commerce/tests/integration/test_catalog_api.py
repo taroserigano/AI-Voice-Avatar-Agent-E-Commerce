@@ -114,5 +114,24 @@ def test_search_degrades_instead_of_failing_when_opensearch_is_down(
     assert keyword_module  # module import kept for clarity of what is patched
 
 
+def test_product_details_reads_many_products_in_the_order_asked(alice: TestClient) -> None:
+    items = alice.get("/v1/products", params={"product_type": "milk", "page_size": 5}).json()
+    ids = [i["id"] for i in items["items"]][::-1]
+    missing = "00000000-0000-0000-0000-000000000000"
+    got = alice.get("/v1/product-details", params={"id": [ids[0], missing, *ids[1:]]}).json()
+    assert [d["id"] for d in got] == ids
+    for d in got:
+        one = alice.get(f"/v1/products/{d['id']}").json()
+        assert {k: v for k, v in d.items() if k != "as_of"} == {
+            k: v for k, v in one.items() if k != "as_of"
+        }
+
+
+def test_product_details_needs_one_to_sixty_ids(alice: TestClient) -> None:
+    assert alice.get("/v1/product-details").status_code == 422
+    many = ["00000000-0000-0000-0000-000000000000"] * 61
+    assert alice.get("/v1/product-details", params={"id": many}).status_code == 422
+
+
 def test_unknown_product_is_404(alice: TestClient) -> None:
     assert alice.get("/v1/products/00000000-0000-0000-0000-000000000000").status_code == 404

@@ -21,7 +21,13 @@ from commerce.catalog.schemas import (
     SearchSuggestions,
     SortOrder,
 )
-from commerce.catalog.service import ProductFilters, get_product, list_categories, list_products
+from commerce.catalog.service import (
+    ProductFilters,
+    get_product,
+    get_products,
+    list_categories,
+    list_products,
+)
 from commerce.catalog.tags import tag_label
 from commerce.db import get_db
 from commerce.search.suggest import suggest
@@ -96,6 +102,21 @@ def search_suggest(
     # backspacing and retyping instant.
     response.headers["Cache-Control"] = "private, max-age=60"
     return suggest(db, q)
+
+
+@router.get("/product-details", response_model=list[ProductDetail])
+def product_details(
+    db: DbDep,
+    principal: CurrentUser,
+    product_id: Annotated[
+        list[uuid.UUID], Query(alias="id", min_length=1, max_length=60, description="Up to 60 ids")
+    ],
+) -> list[ProductDetail]:
+    """Several products in full (variants with price and stock, nutrition, ingredients,
+    allergens, specs), in the order asked. Unknown or inactive ids are left out. For the
+    assistant's catalog search, which reads every candidate it verifies: one call instead of one
+    per product, and, unlike opening a product page, nothing is recorded as viewed."""
+    return get_products(db, product_id)
 
 
 @router.get(

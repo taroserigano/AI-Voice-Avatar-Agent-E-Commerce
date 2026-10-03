@@ -38,6 +38,7 @@ ASSISTANT_ROUTES: frozenset[tuple[str, str]] = frozenset(
         ("GET", "/v1/catalog/vocabulary"),
         ("GET", "/v1/products"),
         ("GET", "/v1/products/{product_id}"),
+        ("GET", "/v1/product-details"),
         ("GET", "/v1/products/{product_id}/reviews"),
         ("GET", "/v1/stores"),
         ("GET", "/v1/policies/search"),

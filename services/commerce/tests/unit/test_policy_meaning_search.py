@@ -46,6 +46,7 @@ def wired(monkeypatch: pytest.MonkeyPatch) -> Any:
         )
         monkeypatch.setattr(policy_search, "_qdrant_policy_index", lambda: vectors)
         monkeypatch.setattr(policy_search, "_sync_in_background", lambda: None)
+        policy_search._cache.clear()
 
     return wire
 
@@ -74,3 +75,36 @@ def test_a_down_vector_store_never_fails_the_search(wired: Any) -> None:
     result = policy_search.search_policies("opened headphones", top_k=4)
     assert result.semantic == "unavailable"
     assert [h.key for h in result.hits] == [PRIVACY]
+
+
+class CountingVectors(FakeVectors):
+    calls = 0
+
+    def search(self, query: str, top_k: int) -> list[FakeHit]:
+        CountingVectors.calls += 1
+        return super().search(query, top_k)
+
+
+def test_a_repeated_question_is_answered_from_the_cache_until_a_policy_changes(
+    wired: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    CountingVectors.calls = 0
+    wired([PRIVACY], CountingVectors([STANDARD]))
+    first = policy_search.search_policies("Can I return opened headphones?", top_k=4)
+    again = policy_search.search_policies("can i return  opened headphones?", top_k=4)
+    assert again.hits == first.hits and CountingVectors.calls == 1
+    # An edited policy changes the content hash: the old answer isn't served.
+    monkeypatch.setattr(policy_search, "content_hash", lambda: "edited")
+    policy_search.search_policies("can I return opened headphones?", top_k=4)
+    assert CountingVectors.calls == 2
+
+
+def test_a_keywords_only_answer_is_not_cached(
+    wired: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    wired([PRIVACY], FakeVectors([], fail=True))
+    policy_search.search_policies("opened headphones", top_k=4)
+    # Qdrant is back: the next search uses it instead of the keywords-only answer.
+    monkeypatch.setattr(policy_search, "_qdrant_policy_index", lambda: FakeVectors([STANDARD]))
+    result = policy_search.search_policies("opened headphones", top_k=4)
+    assert result.semantic == "used" and STANDARD in [h.key for h in result.hits]

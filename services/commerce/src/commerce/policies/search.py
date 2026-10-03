@@ -360,11 +360,40 @@ def _semantic_ids(query: str, top_k: int) -> tuple[list[str], SemanticState]:
     return [hit.id for hit in resp.result.hits], "used"
 
 
+# Recent answers, by policy version and query. The same questions come up again and again
+# ("how long do I have to return something?"), and each search costs an embedding call
+# (~200-400 ms, more under load). Editing a policy changes content_hash(), so nothing stale is
+# served; a result that fell back to keywords only isn't kept.
+_CACHE_SIZE = 512
+_CACHE_SECONDS = 600.0
+_cache: dict[tuple[str, str, int], tuple[float, PolicySearchResult]] = {}
+_cache_lock = threading.Lock()
+# Its own threads: the meaning search below waits on _pool, so it can't run in _pool itself.
+_searches = ThreadPoolExecutor(max_workers=8, thread_name_prefix="policy-search")
+
+
+def _cache_key(query: str, top_k: int) -> tuple[str, str, int]:
+    return (content_hash(), " ".join(query.lower().split()), top_k)
+
+
 def search_policies(query: str, top_k: int = 5) -> PolicySearchResult:
+    key = _cache_key(query, top_k)
+    with _cache_lock:
+        hit = _cache.get(key)
+        if hit and time.monotonic() - hit[0] < _CACHE_SECONDS:
+            return hit[1]
     sections = _sections()
+    # Keywords (OpenSearch) and meaning (embedding + Qdrant) side by side, not one after the other.
+    semantic = _searches.submit(_semantic_ids, query, top_k * 3)
     keyword_ids = get_policy_keyword_index().search(query, top_k=top_k * 3)
-    semantic_ids, state = _semantic_ids(query, top_k * 3)
+    semantic_ids, state = semantic.result()
     lists: Sequence[Sequence[str]] = [keyword_ids, semantic_ids] if semantic_ids else [keyword_ids]
     merged = reciprocal_rank_fusion(lists) if semantic_ids else keyword_ids
     hits = [PolicyHit(*sections[key]) for key in merged if key in sections][:top_k]
-    return PolicySearchResult(hits=hits, semantic=state)
+    result = PolicySearchResult(hits=hits, semantic=state)
+    if state != "unavailable":
+        with _cache_lock:
+            if len(_cache) >= _CACHE_SIZE:
+                _cache.pop(next(iter(_cache)))
+            _cache[key] = (time.monotonic(), result)
+    return result

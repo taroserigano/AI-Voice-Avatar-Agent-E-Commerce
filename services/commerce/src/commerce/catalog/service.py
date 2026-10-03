@@ -569,18 +569,15 @@ def _facets(
     )
 
 
-def get_product(db: Session, product_id: uuid.UUID) -> ProductDetail | None:
-    product = db.scalar(
-        select(Product)
-        .options(
-            selectinload(Product.category),
-            selectinload(Product.variants).selectinload(Variant.price),
-            selectinload(Product.variants).selectinload(Variant.balances),
-        )
-        .where(Product.id == product_id, Product.is_active.is_(True))
+def _with_stock_and_prices() -> Any:
+    return select(Product).options(
+        selectinload(Product.category),
+        selectinload(Product.variants).selectinload(Variant.price),
+        selectinload(Product.variants).selectinload(Variant.balances),
     )
-    if product is None:
-        return None
+
+
+def _product_detail(product: Product, rating: Any) -> ProductDetail | None:
     variants = []
     for v in product.variants:
         if not v.is_active or v.price is None:
@@ -601,12 +598,6 @@ def get_product(db: Session, product_id: uuid.UUID) -> ProductDetail | None:
         )
     if not variants:
         return None
-    ratings = rating_stats_subquery()
-    rating = db.execute(
-        select(ratings.c.rating_avg, ratings.c.rating_count).where(
-            ratings.c.product_id == product.id
-        )
-    ).first()
     details = product.details or {}
     # the option quick add would pick: cheapest in stock, else cheapest (as in listings)
     default = min(variants, key=lambda v: (not v.in_stock, v.price_minor))
@@ -638,6 +629,50 @@ def get_product(db: Session, product_id: uuid.UUID) -> ProductDetail | None:
         variants=variants,
         as_of=utcnow(),
     )
+
+
+def get_product(db: Session, product_id: uuid.UUID) -> ProductDetail | None:
+    product = db.scalar(
+        _with_stock_and_prices().where(Product.id == product_id, Product.is_active.is_(True))
+    )
+    if product is None:
+        return None
+    ratings = rating_stats_subquery()
+    rating = db.execute(
+        select(ratings.c.rating_avg, ratings.c.rating_count).where(
+            ratings.c.product_id == product.id
+        )
+    ).first()
+    return _product_detail(product, rating)
+
+
+def get_products(db: Session, product_ids: list[uuid.UUID]) -> list[ProductDetail]:
+    """Several products in full, in the order asked, in two queries. Unknown, inactive, and
+    unpriced products are left out."""
+    if not product_ids:
+        return []
+    products = {
+        p.id: p
+        for p in db.scalars(
+            _with_stock_and_prices().where(
+                Product.id.in_(product_ids), Product.is_active.is_(True)
+            )
+        )
+    }
+    ratings = rating_stats_subquery()
+    rows = db.execute(
+        select(ratings.c.product_id, ratings.c.rating_avg, ratings.c.rating_count).where(
+            ratings.c.product_id.in_(list(products))
+        )
+    ).all()
+    by_product = {r.product_id: r for r in rows}
+    out = []
+    for pid in dict.fromkeys(product_ids):
+        product = products.get(pid)
+        detail = _product_detail(product, by_product.get(pid)) if product else None
+        if detail is not None:
+            out.append(detail)
+    return out
 
 
 def list_categories(db: Session) -> list[CategoryOut]:
