@@ -19,7 +19,7 @@ import httpx
 from langchain_core.messages import AIMessage
 from langgraph.checkpoint.memory import InMemorySaver
 
-from ai_commerce_voice.app import _recent_orders, after_tool_settings, pick_model
+from ai_commerce_voice.app import _recent_orders, pick_model
 from ai_commerce_voice.brain import (
     XanaBrain,
     build_voice_graph,
@@ -61,7 +61,6 @@ async def _run(user_web: httpx.Client, texts: list[str]) -> list[dict[str, Any]]
                 max_tool_calls=v.voice_max_tool_calls,
                 strong=pick.strong,
                 strong_name=pick.strong_name,
-                after_tool=after_tool_settings(v, pick.simulated),
             ),
             model=pick.name,
             simulated=pick.simulated,

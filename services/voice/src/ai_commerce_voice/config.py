@@ -83,9 +83,6 @@ class VoiceSettings(BaseSettings):
     # (measured: effort "none" looked up an order it already had). Priority processing took
     # the first token from ~600-950 ms to ~450-590 ms (2026-09-26).
     voice_llm_reasoning: Literal["none", "low", "medium"] = "low"
-    # The call that turns a tool's result into words mostly phrases it: no reasoning there
-    # saves time (plan 12, L3). "same" keeps voice_llm_reasoning.
-    voice_llm_after_tool_reasoning: Literal["same", "none", "low"] = "none"
     voice_llm_service_tier: Literal["default", "priority", "flex"] = "priority"
     # "auto": the real model when a key is set, the labeled scripted one otherwise.
     voice_llm_mode: Literal["auto", "openai", "scripted"] = "auto"

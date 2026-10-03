@@ -100,14 +100,6 @@ class ModelPick:
     strong_name: str | None = None
 
 
-def after_tool_settings(settings: VoiceSettings, simulated: bool) -> dict[str, Any] | None:
-    """Request settings for the model call right after a tool result (plan 12, L3)."""
-    effort = settings.voice_llm_after_tool_reasoning
-    if simulated or effort == "same":
-        return None
-    return {"reasoning": {"effort": effort}}
-
-
 def pick_model(settings: VoiceSettings, http: httpx.AsyncClient) -> ModelPick:
     if settings.voice_llm_mode == "scripted" or (
         settings.voice_llm_mode == "auto" and not settings.openai_api_key
@@ -497,7 +489,6 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
                 system=system,
                 max_tool_calls=settings.voice_max_tool_calls,
                 bind_extra=extra,
-                after_tool=after_tool_settings(settings, pick.simulated),
             ),
             model=pick.name,
             simulated=pick.simulated,

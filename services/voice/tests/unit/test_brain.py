@@ -118,8 +118,6 @@ class ScriptModel(BaseChatModel):
 
     replies: list[Any]
     seen: list[list[BaseMessage]] = []
-    # Request settings each streamed call was made with (e.g. reasoning effort).
-    settings: list[dict[str, Any]] = []
 
     @property
     def _llm_type(self) -> str:
@@ -158,7 +156,6 @@ class ScriptModel(BaseChatModel):
         run_manager: CallbackManagerForLLMRun | None = None,
         **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
-        self.settings.append(kwargs)
         if self.replies and isinstance(self.replies[0], tuple) and self.replies[0][0] == "fail":
             # Says these words, then the connection drops (e.g. an OpenAI timeout).
             _, words = self.replies.pop(0)
@@ -190,11 +187,9 @@ class ScriptModel(BaseChatModel):
             yield ChatGenerationChunk(message=AIMessageChunk(content=word + " ", id=msg.id))
 
 
-def brain_with(
-    replies: list[Any], after_tool: dict[str, Any] | None = None
-) -> tuple[XanaBrain, FakeStore, ScriptModel]:
+def brain_with(replies: list[Any]) -> tuple[XanaBrain, FakeStore, ScriptModel]:
     store = FakeStore()
-    model = ScriptModel(replies=replies, seen=[], settings=[])
+    model = ScriptModel(replies=replies, seen=[])
     snapshot = orders_snapshot([order()])
     ctx = ToolContext(client=store, agent="xana", first_name="Alice", voice=True)  # type: ignore[arg-type]
     brain = XanaBrain(
@@ -205,7 +200,6 @@ def brain_with(
             model,
             system=system_prompt("Alice", date(2026, 9, 26), snapshot),
             max_tool_calls=6,
-            after_tool=after_tool,
         ),
         model="script",
         simulated=True,
@@ -248,26 +242,6 @@ def test_a_failure_before_any_answer_still_says_so() -> None:
     brain, _, _ = brain_with([("fail", "")])
     end = asyncio.run(collect(brain.turn("How many kinds of milk do you have?")))[-1]
     assert isinstance(end, TurnEnded) and end.error and "went wrong" in end.error
-
-
-FAST = {"reasoning": {"effort": "none"}}
-
-
-def test_only_the_call_after_a_tool_result_skips_reasoning() -> None:
-    # Plan 12, L3: deciding what to look up keeps its reasoning; wording the result doesn't.
-    brain, _, model = brain_with(
-        [("get_order_status", {"order_number": "E2EA6BC6"}), "It arrives Wednesday."],
-        after_tool=FAST,
-    )
-    asyncio.run(collect(brain.turn("Where's order E2EA6BC6?")))
-    assert "reasoning" not in model.settings[0]
-    assert model.settings[1].get("reasoning") == {"effort": "none"}
-
-
-def test_a_policy_answer_from_the_prefetch_keeps_its_reasoning() -> None:
-    brain, _, model = brain_with(["Opened items are fine to send back."], after_tool=FAST)
-    asyncio.run(collect(brain.turn("What's your return policy for opened items?")))
-    assert len(model.settings) == 1 and "reasoning" not in model.settings[0]
 
 
 def test_the_catalog_size_is_in_the_prompt() -> None:

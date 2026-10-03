@@ -26,7 +26,7 @@ it with a quick spoken acknowledgement.
 |---|---|---|---|
 | L1 | **Filler sooner when the face is on**: 0.3 s after the transcript instead of 0.9 s. The face's ~1.1 s means a reply is never heard sooner than that anyway, so a short "One sec" covers the wait. | First sound ~0.6 s sooner with video | A filler before a fast answer; with video that wait exists regardless |
 | ~~L2~~ | ~~Warm the face up when video starts.~~ **Dropped**: the slow first reply (1.85 s) showed up in 1 of 3 runs (the other first replies were 0.83 s and 1.14 s), and a warm-up still playing when her first real reply arrives would make Tavus drop that reply. | — | — |
-| L3 | **Answer faster after a tool call**: the model call that turns a tool result into words runs with reasoning effort "none" (the first call, which decides what to look up, keeps "low"). | ~0.3-0.8 s on product, order, and store questions | Answer quality: gated on the voice golden eval |
+| ~~L3~~ | ~~Answer faster after a tool call (reasoning effort "none" on the call after a tool result).~~ **Dropped after measuring**: no faster (median first word 2.19 s vs 1.97 s, 11-12 tool questions each, interleaved). That call already spends almost nothing on reasoning. | — | — |
 | L4 | **Faster default face** (decision for Taro): the Phoenix-4.5 "Rose – Business" face is ~0.3 s faster than the green-screen looks but has its own office background. Offer it as a "Fastest" look, or make it the default. | ~0.3 s per reply | Product choice |
 | L5 | Speech-to-text: the final transcript takes ~1.2 s. Deepgram Flux (decision 25, needs a key) ends turns from the words themselves. | ~0.5-0.8 s per turn | Separate plan; not in this round |
 
