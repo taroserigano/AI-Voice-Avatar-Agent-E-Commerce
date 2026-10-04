@@ -36,6 +36,17 @@ run it, what's left, and the traps. `evals/xana/README.md` explains the eval its
     `evals/xana/runs/20261003-1837*`).
 - **Round-7 latency, under load:** chat first words 4.6 s median, 7.6 s slowest 10%; voice
   2.1 s / 3.9 s (was 6.0 s before the stall retry).
+- **Ragas on the round-6 policy turns:**
+
+  | Channel | Turns | Faithfulness | Answer relevancy | Below 0.7 |
+  |---|---|---|---|---|
+  | Chat | 665 | 0.894 | 0.623 | 92 |
+  | Voice | 518 | 0.851 | 0.641 | 124 |
+
+  The low scores cluster in b08 safety (0.78 chat, 0.76 voice). Many of the 0.0s are refusals
+  ("I can't write a fake receipt"), where Ragas likely counts claims about what Xena can do as
+  unsupported. Review the 0.0 list in `<run>.ragas.json` by hand before acting on it. If it's
+  that pattern, give the refusal turns the same store rules the judge now gets.
 - **Judge fixes since:** it now dedupes evidence on the full text (it had dropped a second
   policy search) and gets the store facts Xena gets. Both changes came after the round-6 judge
   pass, so re-judge before quoting the 3.2%.
