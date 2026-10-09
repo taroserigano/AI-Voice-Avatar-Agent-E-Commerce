@@ -14,6 +14,7 @@ import contextlib
 import json
 import re
 import uuid
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from typing import Any, Literal
@@ -241,12 +242,14 @@ def _selected_variant(
     max_price_minor: int | None = None,
     in_stock_only: bool = False,
     variant_terms: list[str] | None = None,
+    min_price_minor: int | None = None,
 ) -> dict[str, Any] | None:
     variants = detail.get("variants") or []
     eligible = [
         v
         for v in variants
         if (max_price_minor is None or v["price_minor"] <= max_price_minor)
+        and (min_price_minor is None or v["price_minor"] >= min_price_minor)
         and (not in_stock_only or v.get("in_stock"))
         and all(has_words(t, _variant_text(v)) for t in variant_terms or [])
     ]
@@ -263,11 +266,12 @@ def product_card(
     max_price_minor: int | None = None,
     in_stock_only: bool = False,
     variant_terms: list[str] | None = None,
+    min_price_minor: int | None = None,
 ) -> ProductCard:
     """A product card; tags the customer asked for (``highlight``) come first."""
     wanted = highlight or []
     tags = sorted(detail.get("tags", []), key=lambda t: t["value"] not in wanted)
-    pick = _selected_variant(detail, max_price_minor, in_stock_only, variant_terms)
+    pick = _selected_variant(detail, max_price_minor, in_stock_only, variant_terms, min_price_minor)
     return ProductCard(
         id=str(detail["id"]),
         title=detail["title"],
@@ -314,8 +318,9 @@ def _product_for_model(
     max_price_minor: int | None = None,
     in_stock_only: bool = False,
     variant_terms: list[str] | None = None,
+    min_price_minor: int | None = None,
 ) -> dict[str, Any]:
-    pick = _selected_variant(detail, max_price_minor, in_stock_only, variant_terms)
+    pick = _selected_variant(detail, max_price_minor, in_stock_only, variant_terms, min_price_minor)
     out = {
         "product_id": str(detail["id"]),
         "title": detail["title"],
@@ -332,6 +337,10 @@ def _product_for_model(
         out["nutrition_per_serving"] = detail["nutrition"]
     if detail.get("allergens") is not None:
         out["allergens"] = detail["allergens"]
+    if detail.get("ingredients"):
+        # Search results leave the list out (get_product_details replaces this with it): voice
+        # said "the listing doesn't give the ingredients" from a search result (golden eval).
+        out["ingredients"] = "listed: call get_product_details to read them"
     if detail.get("specs"):
         out["specs"] = detail["specs"]
     if detail.get("variants"):
@@ -407,6 +416,12 @@ class SearchProductsArgs(BaseModel):
         max_length=9,
     )
     max_price_dollars: float | None = Field(default=None, ge=0, le=100000)
+    min_price_dollars: float | None = Field(
+        default=None,
+        ge=0,
+        le=100000,
+        description='The lowest price the customer wants ("over $100", "between $50 and $80").',
+    )
     in_stock_only: bool = False
     sort: SortOption = Field(
         default="relevance",
@@ -432,6 +447,7 @@ def search_products(
     max_price_dollars: float | None = None,
     in_stock_only: bool = False,
     sort: str = "relevance",
+    min_price_dollars: float | None = None,
 ) -> tuple[str, list[dict[str, Any]]]:
     """Find products in the Serigan Mart catalog with exact filters (type, diet and feature tags,
     price) and optional free text. Returns the best matches with price, stock, tags, customer
@@ -480,6 +496,10 @@ def search_products(
     max_price_minor = round(max_price_dollars * 100) if max_price_dollars is not None else None
     if max_price_minor is not None:
         params["max_price"] = max_price_minor
+    # "Headphones over $100" had no filter and leaned on a price sort (support probe, 2026-10-08).
+    min_price_minor = round(min_price_dollars * 100) if min_price_dollars is not None else None
+    if min_price_minor is not None:
+        params["min_price"] = min_price_minor
     if in_stock_only:
         params["in_stock"] = True
     extra_checks = bool(
@@ -543,7 +563,9 @@ def search_products(
                 for t in required_title_terms or []
             )
             and not (actual_allergens & {a.casefold() for a in exclude_allergens or []})
-            and _selected_variant(detail, max_price_minor, in_stock_only, terms_for(detail))
+            and _selected_variant(
+                detail, max_price_minor, in_stock_only, terms_for(detail), min_price_minor
+            )
             is not None
         )
 
@@ -573,7 +595,9 @@ def search_products(
                 d
                 for d in others
                 if names_all(d, words) and has_words(d["brand"], query or "")
-                and _selected_variant(d, max_price_minor, in_stock_only, terms_for(d))
+                and _selected_variant(
+                    d, max_price_minor, in_stock_only, terms_for(d), min_price_minor
+                )
             ]  # fmt: skip
             if named:
                 details = named
@@ -609,10 +633,20 @@ def search_products(
         "total_matches": len(details) if counted else page["total"],
         "filters_used": {k: v for k, v in params.items() if k not in ("page_size",)},
         "results": [
-            _product_for_model(d, max_price_minor, in_stock_only, terms_for(d))
+            _product_for_model(d, max_price_minor, in_stock_only, terms_for(d), min_price_minor)
             for d in details[:MAX_PRODUCTS]
         ],
     }
+    # "What brands of X do you carry?": the six results shown named two of three brands
+    # (customer-support probe, 2026-10-08). Counted over every match fetched, not just those.
+    brand_source = details if counted else items
+    payload["brands"] = dict(
+        sorted(
+            Counter(d.get("brand") for d in brand_source if d.get("brand")).items(),
+            key=lambda kv: (-kv[1], kv[0]),
+        )
+    )
+    payload["brands_cover_every_match"] = len(items) >= page["total"]
     if exact_id:
         payload["exact_name_match"] = exact_id
     if note_type:
@@ -656,7 +690,9 @@ def search_products(
     return untrusted("search_products", payload), [
         summary,
         *(
-            product_card(d, tags, max_price_minor, in_stock_only, terms_for(d)).model_dump()
+            product_card(
+                d, tags, max_price_minor, in_stock_only, terms_for(d), min_price_minor
+            ).model_dump()
             for d in details[:MAX_PRODUCTS]
         ),
     ]
@@ -690,12 +726,14 @@ def search_summary_card(
     chips = [type_labels.get(t, t) for t in params.get("product_type", [])]
     chips += [tag_labels.get(t, t) for t in params.get("tag", [])]
     chips += [f"Not {tag_labels.get(t, t).lower()}" for t in params.get("exclude_tag", [])]
+    if "min_price" in params:
+        chips.append(f"Over {money(params['min_price'])}")
     if "max_price" in params:
         chips.append(f"Under {money(params['max_price'])}")
     if params.get("q"):
         chips.append(f"\u201c{params['q']}\u201d")
     query: list[tuple[str, Any]] = []
-    for key in ("q", "product_type", "tag", "exclude_tag", "max_price", "sort"):
+    for key in ("q", "product_type", "tag", "exclude_tag", "min_price", "max_price", "sort"):
         value = params.get(key)
         if value in (None, "", "relevance"):
             continue
@@ -868,7 +906,7 @@ def order_number(order_id: str) -> str:
 
 
 STATUS_LABELS = {
-    "paid": "Order placed",
+    "paid": "Preparing",  # the label the order pages show (paid, not shipped yet)
     "fulfilling": "In progress",
     "delivered": "Delivered",
     "canceled": "Canceled",
@@ -1007,20 +1045,32 @@ def _order_for_model(detail: dict[str, Any]) -> dict[str, Any]:
         "delivered_on": friendly_date(detail.get("delivered_at")),
         "arriving_by": store_day(detail.get("estimated_delivery_at")),
         "delivery": _delivery_for_model(detail),
-        "total": money(detail["total_minor"]),
+        # The order page's payment summary, so "did my discount apply?" and "how much tax?"
+        # have answers (customer-support probe, 2026-10-08).
+        "subtotal": money(detail.get("subtotal_minor", 0)),
+        "discount": money(detail.get("discount_minor", 0)),
         "shipping": money(detail.get("shipping_minor", 0)),
-        "items": [
-            {
-                "line_id": str(ln["id"]),
-                "title": ln["product_title"],
-                "brand": ln.get("brand"),
-                "variant": ln["variant_name"],
-                "quantity": ln["quantity"],
-                "paid_per_unit": money(ln["unit_price_minor"]),
-            }
-            for ln in detail.get("lines", [])
-        ],
+        "tax": money(detail.get("tax_minor", 0)),
+        "total": money(detail["total_minor"]),
+        "items": [_line_for_model(ln) for ln in detail.get("lines", [])],
     }
+
+
+def _line_for_model(ln: dict[str, Any]) -> dict[str, Any]:
+    item = {
+        "line_id": str(ln["id"]),
+        "title": ln["product_title"],
+        "brand": ln.get("brand"),
+        "variant": ln["variant_name"],
+        "quantity": ln["quantity"],
+        "price_per_unit": money(ln["unit_price_minor"]),
+    }
+    if ln.get("amount_discount_minor"):
+        item["line_discount"] = money(ln["amount_discount_minor"])
+    if ln.get("amount_total_minor") is not None:
+        item["line_tax"] = money(ln.get("amount_tax_minor", 0))
+        item["line_total"] = money(ln["amount_total_minor"])  # after discount, with tax
+    return item
 
 
 class ListOrdersArgs(BaseModel):
@@ -1061,6 +1111,9 @@ def list_my_orders(
             _with_return_options(d, options) for d, options in _return_options(ctx.client, details)
         ],
         "count": len(details),
+        # Every order on the account is listed when there are fewer than the limit, so totals
+        # over them are all-time totals.
+        "all_orders_listed": not contains and len(summaries) < MAX_ORDERS,
     }
     return untrusted("list_my_orders", payload), [order_card(d).model_dump() for d in details[:5]]
 
@@ -1263,8 +1316,11 @@ class PolicyArgs(BaseModel):
 
 @tool("search_policies", args_schema=PolicyArgs, response_format="content_and_artifact")
 def search_policies(config: RunnableConfig, question: str) -> tuple[str, list[dict[str, Any]]]:
-    """Search Serigan Mart's approved policies (returns and refunds, shipping, product labels, how
-    returns are handled). Answer policy questions only from these sections and cite them."""
+    """Search Serigan Mart's approved policies and help center: returns and refunds, shipping and
+    delivery, product labels, how returns are handled, and how the site works (account, password,
+    checkout, payment methods, promo codes, gift cards, cart, order pages, receipts, changing or
+    canceling an order, reviews, stores, contacting us). Answer only from these sections and cite
+    them."""
     ctx = ctx_from(config)
     try:
         result = policy_search(ctx.client, question)

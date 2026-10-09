@@ -198,7 +198,8 @@ send packages on to our warehouse; they can't give refunds in cash or on the spo
 ### 6.3 One package per return
 
 Pack every item from one return in one package with its label. If you're returning items from two
-orders, start two returns.
+orders, start two returns. Each return has its own label, so send each one in its own package:
+don't put two returns in one box.
 
 ### 6.4 Perishables
 

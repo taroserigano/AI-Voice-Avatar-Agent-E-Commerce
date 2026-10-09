@@ -1039,5 +1039,7 @@ class UserSeed:
 DEV_USERS: tuple[UserSeed, ...] = (
     UserSeed("alice@example.com", "Alice Rivera", "customer", "alice-dev-password"),
     UserSeed("bob@example.com", "Bob Chen", "customer", "bob-dev-password"),
+    # A third shopper with different orders, for Xena's customer-support holdout eval.
+    UserSeed("dana@example.com", "Dana Brooks", "customer", "dana-dev-password"),
     UserSeed("staff@example.com", "Sam Staff", "staff", "staff-dev-password"),
 )

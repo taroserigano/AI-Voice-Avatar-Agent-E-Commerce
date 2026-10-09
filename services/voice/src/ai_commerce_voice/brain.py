@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 import time
 import uuid
 from collections.abc import AsyncIterator
@@ -71,6 +72,7 @@ from assistant.tools import (
     friendly_date,
     money,
     policy_search,
+    store_day,
     untrusted,
 )
 from assistant.toolsets import XANA_TOOLS
@@ -84,7 +86,7 @@ from assistant.turns import (
 
 log = logging.getLogger(__name__)
 
-PROMPT_VERSION = "xana.voice.v7"
+PROMPT_VERSION = "xana.voice.v8"
 PROMPT_DIR = Path(__file__).resolve().parent / "prompts"
 SNAPSHOT_ORDERS = 12
 
@@ -103,19 +105,30 @@ def orders_snapshot(details: list[dict[str, Any]]) -> list[dict[str, Any]]:
     out = []
     for d in details[:SNAPSHOT_ORDERS]:
         o = _order_for_model(d)
+        # The last day to start a return, so the model never counts days: "how many days do I
+        # have left?" was answered "it has passed" with 5 days to go (support set, 2026-10-08).
+        until = store_day(d.get("return_window_ends_at"))
 
         # Found by the golden eval: "returnable now" on 2 backpacks when 1 was already
         # returned, and "fully_returned" read aloud as done while that return was in transit.
-        def can_return(ln: dict[str, Any]) -> str:
+        def can_return(ln: dict[str, Any], until: str | None = until) -> str:
             done = ln.get("returned_quantity") or 0
             if ln["reason"] == "fully_returned":
                 return " (already in a return: see this order's returns for where it stands)"
             if not ln["eligible"]:
                 return f" (not returnable: {ln['reason']})"
+            if ln.get("refund_timing") == "no_return_needed":
+                # "I don't like the pizza, can I return it?" was told yes (support set,
+                # 2026-10-08): fresh food is refunded only for a quality problem.
+                return (
+                    " (refundable now only for a quality problem such as spoiled, damaged, or"
+                    " thawed, not a change of mind; nothing to send back)"
+                )
+            by = f", until {until}" if until else ""
             if done:
                 left = ln["returnable_quantity"]
-                return f" (returnable now: {left} of {ln['quantity']}; {done} already returned)"
-            return " (returnable now)"
+                return f" (returnable now{by}: {left} of {ln['quantity']}; {done} already returned)"
+            return f" (returnable now{by})"
 
         returnable = {
             str(ln["order_line_id"]): can_return(ln)
@@ -123,18 +136,24 @@ def orders_snapshot(details: list[dict[str, Any]]) -> list[dict[str, Any]]:
         }
         delivery = o.get("delivery") or {}
 
-        def item(i: dict[str, Any]) -> str:
+        def item(i: dict[str, Any], returnable: dict[str, str] = returnable) -> str:
             variant = i.get("variant") or ""
+            # Whole words: size "M" was hidden because "m" is in "women's" (support set).
             shown = (
                 variant
                 and variant.lower() not in ("standard", "each")
-                and variant.lower() not in i["title"].lower()
+                and not re.search(rf"\b{re.escape(variant)}\b", i["title"], re.IGNORECASE)
             )
+            # What it cost ("how much were the running shoes?" had no answer in the snapshot).
+            paid = f", {i['price_per_unit']} each" if i.get("price_per_unit") else ""
+            if i.get("line_discount"):
+                paid += f" ({i['line_discount']} off the line)"
             return (
                 f"{i['quantity']} × "
                 + (f"{i['brand']} " if i.get("brand") else "")
                 + i["title"]
                 + (f", {variant}" if shown else "")
+                + paid
                 + returnable.get(i["line_id"], "")
             )
 
@@ -151,11 +170,28 @@ def orders_snapshot(details: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "latest_update": delivery.get("latest_update"),
                 "total": o["total"],
                 "shipping": o["shipping"],
+                "tax": o.get("tax"),
+                "discount": o.get("discount"),
                 "returns": [_return_for_snapshot(r) for r in d.get("returns") or []],
                 "order_id": o["order_id"],
             }
         )
     return out
+
+
+def _minor(amount: str | None) -> int:
+    return round(float((amount or "$0").replace("$", "").replace(",", "")) * 100)
+
+
+def snapshot_totals(snapshot: list[dict[str, Any]]) -> dict[str, Any]:
+    """Counts and sums for "how many orders?" and "how much have I spent?", worked out here: the
+    voice model added up the snapshot itself and was off by a dollar (support set, 2026-10-08)."""
+    placed = [o for o in snapshot if o.get("status") != "Canceled"]
+    return {
+        "order_count": len(snapshot),
+        "all_orders_listed": len(snapshot) < SNAPSHOT_ORDERS,
+        "total_spent_on_orders_not_canceled": money(sum(_minor(o.get("total")) for o in placed)),
+    }
 
 
 def _return_for_snapshot(r: dict[str, Any]) -> dict[str, Any]:
@@ -183,7 +219,7 @@ def system_prompt(
 ) -> str:
     # Fixed instructions first (cacheable), then this call's facts.
     orders = (
-        untrusted("orders_snapshot", {"order_count": len(snapshot), "orders": snapshot})
+        untrusted("orders_snapshot", {**snapshot_totals(snapshot), "orders": snapshot})
         if snapshot is not None
         else "(not loaded: use list_my_orders)"
     )

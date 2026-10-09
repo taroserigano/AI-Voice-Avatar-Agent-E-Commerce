@@ -36,15 +36,21 @@ _NS = uuid.UUID("8c4f2a6e-1d3b-4e57-9a0c-7b5e2f19d6a3")
 _CARDS = {
     "alice@example.com": ("visa", "4242"),
     "bob@example.com": ("mastercard", "4444"),
+    "dana@example.com": ("amex", "0005"),
 }
 _OTHER_CARDS = (("visa", "1881"), ("amex", "0005"), ("discover", "1117"))
 
 # Where each shopper's packages go (city only; no street addresses are stored).
-_CITIES = {"alice@example.com": "Austin, TX", "bob@example.com": "Seattle, WA"}
+_CITIES = {
+    "alice@example.com": "Austin, TX",
+    "bob@example.com": "Seattle, WA",
+    "dana@example.com": "Dallas, TX",
+}
 _WAREHOUSE = "Serigan Mart Fulfillment Center, Fort Worth, TX"
 _HUBS = {
     "Austin, TX": ("Dallas, TX", "Round Rock, TX"),
     "Seattle, WA": ("Denver, CO", "Kent, WA"),
+    "Dallas, TX": ("Fort Worth, TX", "Irving, TX"),
 }
 _CARRIERS = (("Serigan Mart Ground", "Ground", "LG"), ("Swiftline Parcel", "2-Day", "SW"))
 

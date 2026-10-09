@@ -29,7 +29,22 @@ POLICY_WORDS = re.compile(
     r"(?:sales )?tax(?:es|ed)?|warrant\w*|free shipping|shipping (?:cost|fee|charge)s?|"
     r"send (?:it |them |this |that )?back|money back|take (?:it |them )?back|exchange|"
     r"doesn'?t work|stopped working|not working|reasons?|lost|stolen|late|delay\w*|approve\w*|"
-    r"swap|wrong (?:item|size|color|one)|hasn'?t (?:arrived|moved|changed|updated|come))\b",
+    r"swap|wrong (?:item|size|color|one)|hasn'?t (?:arrived|moved|changed|updated|come)|"
+    # How the site works (the help center) and shipping rules (customer-support probe,
+    # 2026-10-08: "do you ship to Canada?", "how do I reset my password?" went unanswered).
+    r"disputes?|chargebacks?|charged (?:twice|double|wrong\w*|more)|double.?charged|billing|"
+    r"payment methods?|pay(?:pal| with| by)|apple pay|google pay|credit cards?|debit cards?|"
+    r"check ?out|promo(?: codes?)?|coupons?|discount codes?|rewards?|loyalty|points|"
+    r"passwords?|log ?in|sign(?:ed)? ?(?:in|up|out)|accounts?|e-?mail address|my e-?mail|"
+    r"wish ?lists?|favorites|save for later|receipts?|invoices?|"
+    r"(?:write|leave|post|edit|delete) (?:a |my )?reviews?|"
+    r"(?:change|modify|edit|update) (?:my |the )?(?:order|address|delivery)|"
+    r"internationa\w*|ship (?:to|outside)|deliver (?:to|outside)|countr(?:y|ies)|canada|mexico|"
+    r"fulfilling|preparing|phone number|contact|customer service|"
+    r"manuals?|cables|accessories|packaging|(?:original|the|without a) box|tags|different card|"
+    r"pick ?up|in.?store|"
+    r"never (?:came|arrived|got here|showed up)|didn'?t (?:come|arrive|get here)|missing|"
+    r"call (?:you|someone|customer)|hours|place (?:an |the |my )?order|order (?:it|this) for me)\b",
     re.IGNORECASE,
 )
 
@@ -44,6 +59,8 @@ LABEL_QUESTION = re.compile(
 def wants_policy(text: str) -> bool:
     return bool(
         POLICY_WORDS.search(text)
+        or _ABROAD.search(text)
+        or _FAIR_USE.search(text)
         or LABEL_QUESTION.search(text)
         or (_FOOD.search(text) and _SPOILED.search(text))
     )
@@ -190,12 +207,35 @@ _SPOILED = re.compile(
 )
 
 
+# Somewhere we don't ship: "I live in Japan, can I order?" retrieved checkout and answered
+# "checkout is off", not "we ship to the US only" (support set, 2026-10-08).
+_ABROAD = re.compile(
+    r"\b(?:abroad|overseas|internationa\w*|"
+    r"outside (?:the )?(?:US|U\.S\.|USA|United States|country)|"
+    r"canada|mexico|uk|united kingdom|england|britain|ireland|france|germany|spain|italy|"
+    r"netherlands|europe|australia|new zealand|japan|china|korea|india|philippines|brazil|"
+    r"argentina|colombia|puerto rico|toronto|vancouver|london|paris|tokyo|sydney)\b",
+    re.IGNORECASE,
+)
+# "Will I get banned for returning too much?" missed fair use (section 15).
+_FAIR_USE = re.compile(
+    r"\b(?:bann?ed|ban me|blacklist\w*|blocked|too many returns|"
+    r"return(?:ing)? too (?:much|many|often)|"
+    r"how many returns|limit on returns|abus\w*)\b",
+    re.IGNORECASE,
+)
+
+
 def retrieval_query(text: str) -> str:
     """The customer's words as a search query: timing questions say "timing", refund-amount
     questions say what section 7 says, an old fault asks about the warranty, filler goes."""
     said = _AMOUNT.sub(" much back paid ", _TIMING.sub(" timing ", text.lower()))
     if _FAULT.search(said) and _LONG_AGO.search(said):
         said += " warranty manufacturer after the return window"
+    if _ABROAD.search(said):
+        said += " where we ship addresses in the united states only international"
+    if _FAIR_USE.search(said):
+        said += " fair use decline returns that look like abuse high rate of returns"
     if _FOOD.search(said) and _SPOILED.search(said):
         said += " perishable fresh frozen food spoiled damaged within 7 days of delivery"
     words = re.findall(r"[a-z0-9]+(?:'[a-z]+)?", said)

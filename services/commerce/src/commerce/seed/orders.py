@@ -52,6 +52,7 @@ DEV_SHIP_TO: dict[str, ShipTo] = {
         "Alice Rivera", "4127 Bluebonnet Ln", "Plano", "TX", "75023", line2="Apt 2B"
     ),
     "bob@example.com": ShipTo("Bob Chen", "918 W Magnolia Ave", "Fort Worth", "TX", "76104"),
+    "dana@example.com": ShipTo("Dana Brooks", "2714 Greenville Ave", "Dallas", "TX", "75206"),
 }
 
 
@@ -159,6 +160,49 @@ DEV_ORDERS: tuple[OrderSpec, ...] = (
     OrderSpec(
         "bob-canceled", "bob@example.com", OrderStatus.CANCELED, 5, None,
         (LineSpec("kettleworth-french-press", "STD", 1),),
+        "Canceled before shipping: nothing to return.",
+    ),
+    # Dana: other kinds of items and states than Alice's, for the customer-support holdout.
+    OrderSpec(
+        "dana-preparing", "dana@example.com", OrderStatus.PAID, 0, None,
+        (LineSpec("lumen-labs-beam-go-waterproof-bluetooth-speaker", "TEAL", 1),
+         LineSpec("ironpeak-nutrition-chocolate-chip-cookie-dough-protein-bar", "12CT", 1)),
+        "Paid today and not shipped yet (Preparing): no tracking, can't be returned yet.",
+    ),
+    OrderSpec(
+        "dana-running", "dana@example.com", OrderStatus.DELIVERED, 27, 25,
+        (LineSpec("stridewell-men-s-cushioned-running-shoes-black", "SIZE-9", 1),
+         LineSpec("tempo-athletics-women-s-high-waisted-leggings-25-in-navy", "M", 2,
+                  discount_minor=500)),
+        "Delivered 25 days ago: returnable for 5 more days. Two leggings with a $5.00 line "
+        "discount, split per unit on a return.",
+    ),
+    OrderSpec(
+        "dana-tv", "dana@example.com", OrderStatus.DELIVERED, 16, 14,
+        (LineSpec("novaview-55-inch-4k-uhd-smart-tv", "EA", 1),),
+        "A TV delivered 14 days ago: electronics, refunded after inspection.",
+    ),
+    OrderSpec(
+        "dana-kitchen-old", "dana@example.com", OrderStatus.DELIVERED, 44, 41,
+        (LineSpec("crispwell-digital-air-fryer-6-qt", "6QT", 1),
+         LineSpec("serigan-mart-home-bamboo-cutting-board-15-x-10-in", "EA", 1)),
+        "Delivered 41 days ago: past the return window (warranty questions).",
+    ),
+    OrderSpec(
+        "dana-frozen", "dana@example.com", OrderStatus.DELIVERED, 4, 3,
+        (LineSpec("brickyard-pizza-co-bbq-chicken-pizza", "EA", 2),
+         LineSpec("moonlit-creamery-coffee-ice-cream", "PT", 1)),
+        "Frozen food delivered 3 days ago, under $35 so it paid shipping: melted or thawed "
+        "food is refunded without sending it back.",
+    ),
+    OrderSpec(
+        "dana-pet", "dana@example.com", OrderStatus.DELIVERED, 9, 7,
+        (LineSpec("meadowbrook-pet-puppy-dry-dog-food-chicken-and-brown-rice", "15LB", 1),),
+        "Dog food delivered 7 days ago: a standard item, returnable.",
+    ),
+    OrderSpec(
+        "dana-canceled", "dana@example.com", OrderStatus.CANCELED, 20, None,
+        (LineSpec("kettleworth-end-grain-acacia-cutting-board-18-x-12-in", "EA", 1),),
         "Canceled before shipping: nothing to return.",
     ),
 )  # fmt: skip
