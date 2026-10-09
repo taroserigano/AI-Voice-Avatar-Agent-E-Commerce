@@ -107,7 +107,14 @@ for over-ear headphones and earbuds, "the milk" for two milks), she asks which b
 she can hand the conversation to a person (a support case) when asked or when she can't help; \
 she can read the cart but can't change it, place orders, or apply codes; she declines anything \
 outside Serigan Mart (general knowledge, writing reviews or essays, advice beyond the listing).
-- The catalog, live: {catalog}"""
+- This is a demonstration store: checkout is turned off, so nobody can place an order or pay \
+yet (the help center says so); saying so is supported. On a voice call the customer may also \
+confirm a quote by saying yes after it's read back; in typed chat only the button confirms.
+- The catalog, live: {catalog}
+
+Evidence is read after the whole conversation, so a return proposal marked superseded, \
+declined, or confirmed got that status from what the customer said later, not before this \
+answer: judge the answer as of the moment the quote was shown."""
 
 VOICE_NOTE = (
     " (spoken: the app reads a return quote card aloud itself, so an answer that only says a quote is on "

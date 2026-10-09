@@ -194,8 +194,11 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
                     yield sse(
                         "text",
                         {
-                            "delta": "To confirm, tap Confirm return on the quote. "
-                            "(By voice, say yes after I read it back.)"
+                            # Not "say yes": typed here, a yes never confirms (the judge read
+                            # the old "(By voice, say yes...)" as offering that, 2026-10-08).
+                            "delta": "To confirm, tap Confirm return on the quote. A typed yes "
+                            "doesn't confirm it; on a voice call, a spoken yes after I read "
+                            "the quote back does."
                         },
                     )
                     yield sse("quote", waiting)
