@@ -135,8 +135,24 @@ def orders_snapshot(details: list[dict[str, Any]]) -> list[dict[str, Any]]:
             for ln in (d.get("return_options") or {}).get("lines", [])
         }
         delivery = o.get("delivery") or {}
+        # On every item line: told to fetch the tracking number with get_order_status, voice
+        # said "I'll check" and stopped, 8 times in 2,000, and named the pens' brand as their
+        # carrier (round 9, 2026-10-09). Read off the item's own line, it can't come from a
+        # neighbouring order either.
+        shipped = ", ".join(
+            part
+            for part in (
+                f"carrier {delivery['carrier']}" if delivery.get("carrier") else "",
+                f"tracking {delivery['tracking_number']}"
+                if delivery.get("tracking_number")
+                else "",
+            )
+            if part
+        )
 
-        def item(i: dict[str, Any], returnable: dict[str, str] = returnable) -> str:
+        def item(
+            i: dict[str, Any], returnable: dict[str, str] = returnable, shipped: str = shipped
+        ) -> str:
             variant = i.get("variant") or ""
             # Whole words: size "M" was hidden because "m" is in "women's" (support set).
             shown = (
@@ -155,6 +171,7 @@ def orders_snapshot(details: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 + (f", {variant}" if shown else "")
                 + paid
                 + returnable.get(i["line_id"], "")
+                + (f" [{shipped}]" if shipped else "")
             )
 
         out.append(

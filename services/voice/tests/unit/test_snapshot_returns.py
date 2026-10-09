@@ -53,6 +53,8 @@ def test_each_order_reads_items_first_with_its_own_carrier_and_tracking() -> Non
     assert snap["carrier"] == "Serigan Mart Ground"
     assert snap["tracking_number"] == "LG686754189358"
     assert snap["delivered_on"] == "Wed, Sep 30"
+    # And on the item's own line, so "tracking number for the oat milk?" needs no lookup.
+    assert snap["items"][0].endswith("[carrier Serigan Mart Ground, tracking LG686754189358]")
 
 
 def test_the_prompt_says_how_many_orders_there_are() -> None:
