@@ -117,6 +117,20 @@ earlier run.
 
 ## Results
 
+### 2026-10-08/09 (rounds 8 and 9: support-rep coverage, locked holdout)
+
+| Set | Chat, gpt-6-sol | Voice, gpt-6-luna |
+|---|---|---|
+| 2,000 golden, round 8 (3 runs) | mean 99.8% (1,995-1,996) | mean 98.8% (1,963-1,980) |
+| 2,000 golden, round 9 | 1,996 (99.8%) | 1,985 (99.4%) |
+| Support dev (204), round 9 | 203 (99.5%) | 201 (98.5%) |
+| Locked holdout (223), rounds 8 and 9 | 218, 217 (97.6%) | 214, 213 (95.7%) |
+
+LLM judge on round 8 (run 3, after the judge fixes): chat 98.9% good, 0.3% bad, 99.4% agreement
+with the rule checks; voice 94.4% good, 3.1% bad, 96.8% agreement. gpt-6-astra on chat (round
+9 code): 1,986/2,000, holdout 218/223, slower than gpt-6-sol. Details and the list of fixes are in
+`HANDOFF.md`.
+
 ### 2026-10-03 (round 6: stricter checks, full 2,000)
 
 | Channel | Model | Passed | Notes |
@@ -147,10 +161,10 @@ answering nothing could pass (catch-all alternatives like `|products|orders|` or
 detectors that missed most phrasings; null expectations that crashed three cases; checks that
 were never scored (shipping refunds, handoffs). Still true:
 
-- Prompts were tuned on these same cases, and `b10-holdout` ran every round, so the scores are
-  dev-set scores. A locked holdout with new templates, other customers, and the missing areas
-  (order changes, payment problems, wrong items, multi-intent and non-English messages) is the
-  next step.
+- Prompts were tuned on the 2,000 and the support dev set, so those are dev-set scores. The
+  locked holdout (`locked/holdout.jsonl`: new templates, three customers, order changes,
+  payment, multi-intent, long and non-English messages) is the honest number, and it runs 2-4
+  points lower.
 - 1,930 of the 2,000 cases are one customer (Alice), with 14 orders.
 - One run's 95% interval at ~99% is about ±0.4 points (±8 cases); between runs 5-14 cases flip.
   Differences smaller than about 10-15 cases between rounds are noise; run 3 times to compare.
@@ -160,6 +174,11 @@ were never scored (shipping refunds, handoffs). Still true:
 The full runs above time every turn under load (6 conversations at once per channel): chat
 first words 4.0-4.3 s median, 6.6-7.4 s slowest 10%; voice 1.9-2.3 s and 3.2-6.0 s. For a fair
 measurement, time a fixed sample with `--workers 1`, as below.
+
+### 2026-10-09, one at a time
+
+200 cases (every 10th). Voice gpt-6-luna: first words 2.0 s median, 3.1 s slowest 10%. Chat
+gpt-6-sol: 3.9 s and 6.6 s. Chat gpt-6-astra: 5.7 s and 8.8 s.
 
 ### 2026-09-30, one at a time
 
