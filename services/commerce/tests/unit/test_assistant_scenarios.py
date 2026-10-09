@@ -183,7 +183,15 @@ def test_return_outcome_matches_the_policy(scenario: dict[str, Any]) -> None:
 
 
 def test_every_order_scenario_is_used_by_a_conversation() -> None:
-    used = {s["order"] for s in RETURNS if "order" in s}
+    # This file's conversations, or Xena's golden, support, and holdout sets (evals/xana).
+    xana = [
+        json.loads(line)
+        for f in sorted((EVALS.parent / "xana").rglob("*.jsonl"))
+        if "runs" not in f.parts
+        for line in f.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    used = {s["order"] for s in [*RETURNS, *xana] if "order" in s}
     assert {spec.key for spec in DEV_ORDERS} <= used
 
 

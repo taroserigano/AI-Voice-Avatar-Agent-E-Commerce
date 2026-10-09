@@ -181,16 +181,19 @@ class Judge:
         return json.loads(resp.output_text)
 
 
-CUSTOMERS = {"alice@example.com": "Alice (alice@example.com)", "bob@example.com": "Bob (bob@example.com)"}
+CUSTOMERS = {
+    "alice@example.com": "Alice (alice@example.com)",
+    "bob@example.com": "Bob (bob@example.com)",
+    "dana@example.com": "Dana (dana@example.com)",
+}
 
 
 def golden_users() -> dict[str, str]:
-    sys.path.insert(0, str(ROOT / "evals"))
-    from xana_eval import SETS
-
+    """Who asked each case: the golden sets, the support sets, and the locked holdout."""
     return {
         c["id"]: c["user"]
-        for path in SETS.values()
+        for path in sorted((ROOT / "evals/xana").rglob("*.jsonl"))
+        if "runs" not in path.parts
         for line in path.read_text(encoding="utf-8").splitlines()
         if line.strip()
         for c in [json.loads(line)]
@@ -253,7 +256,7 @@ def main() -> None:
     started = time.perf_counter()
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
         futures = {
-            pool.submit(judge, turn_prompt(c, i), CUSTOMERS.get(users.get(c["id"], ""), "unknown")): (c, i)
+            pool.submit(judge, turn_prompt(c, i), CUSTOMERS.get(c.get("user") or users.get(c["id"], ""), "unknown")): (c, i)
             for c, i in jobs
         }
         for n, fut in enumerate(as_completed(futures), 1):

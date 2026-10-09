@@ -1769,7 +1769,7 @@ def batch_07(seed: int = 7) -> Batch:
             for c in ps[i + 1:]:
                 if a.nutrition.serving_size != c.nutrition.serving_size:
                     continue
-                for f in set(sensible_fields(a)) & set(sensible_fields(c)):
+                for f in sorted(set(sensible_fields(a)) & set(sensible_fields(c))):  # sorted: set order varies by process
                     va, vc = getattr(a.nutrition, f), getattr(c.nutrition, f)
                     if abs(va - vc) >= max(2, 0.2 * max(va, vc)):
                         pairs.append((t, a, c, f))

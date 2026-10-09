@@ -57,7 +57,15 @@ CORE = {
 }
 BATCHES = {p.stem: p for p in sorted((ROOT / "evals/xana/batches").glob("*.jsonl"))}
 SETS = {**CORE, **BATCHES}
-PASSWORDS = {"alice@example.com": "alice-dev-password", "bob@example.com": "bob-dev-password"}
+# The customer-support coverage sets (evals/xana/support/), run with --set support. Not in "all",
+# so the 2,000 stay comparable round to round. The locked holdout (evals/xana/locked/) runs only
+# by --file, once, at the end of a round.
+SUPPORT = {p.stem: p for p in sorted((ROOT / "evals/xana/support").glob("*.jsonl"))}
+PASSWORDS = {
+    "alice@example.com": "alice-dev-password",
+    "bob@example.com": "bob-dev-password",
+    "dana@example.com": "dana-dev-password",
+}
 # What a turn's tools returned, kept per tool result for the judge and Ragas.
 CONTEXT_CHARS = 16000
 
@@ -421,6 +429,10 @@ def score(expect: dict[str, Any], got: dict[str, Any], client: httpx.Client) -> 
                     "max_price_minor" not in search
                     or card["price_minor"] <= search["max_price_minor"]
                 )
+                and (
+                    "min_price_minor" not in search
+                    or card["price_minor"] >= search["min_price_minor"]
+                )
             )
 
         checks["filters"] = bool(products) and all(ok(c) for c in products)
@@ -723,6 +735,7 @@ def _run_case(case: dict[str, Any], session: Session, agent: str, channel: str) 
         return {
             "id": case["id"],
             "set": case["set"],
+            "user": case["user"],
             "category": case["category"],
             "passed": False,
             "turns": [],
@@ -733,6 +746,7 @@ def _run_case(case: dict[str, Any], session: Session, agent: str, channel: str) 
     return {
         "id": case["id"],
         "set": case["set"],
+        "user": case["user"],
         "category": case["category"],
         "passed": all(t["passed"] for t in turns),
         "turns": turns,
@@ -748,6 +762,13 @@ def main() -> None:
         help="all, core (products and returns), batches, or set names joined by commas: "
         + ", ".join(SETS),
     )
+    parser.add_argument(
+        "--file",
+        action="append",
+        default=[],
+        help="a case file outside the sets (e.g. evals/xana/locked/*.jsonl); repeatable, "
+        "and replaces --set",
+    )
     parser.add_argument("--web", default="http://127.0.0.1:3100")
     parser.add_argument("--assistant", default=None)
     parser.add_argument("--agent", choices=("xana", "steph"), default="xana")
@@ -758,15 +779,21 @@ def main() -> None:
     parser.add_argument("--record-baseline", action="store_true")
     args = parser.parse_args()
 
-    groups = {"all": list(SETS), "core": list(CORE), "batches": list(BATCHES)}
-    names = groups.get(args.set) or args.set.split(",")
-    unknown = [n for n in names if n not in SETS]
+    groups = {"all": list(SETS), "core": list(CORE), "batches": list(BATCHES), "support": list(SUPPORT)}
+    files = {**SETS, **SUPPORT}
+    if args.file:
+        files = {Path(f).stem: Path(f) for f in args.file}
+        names = list(files)
+        args.set = "+".join(names)
+    else:
+        names = groups.get(args.set) or args.set.split(",")
+    unknown = [n for n in names if n not in files]
     if unknown:
-        parser.error(f"unknown set {unknown}; known: {', '.join(SETS)}")
+        parser.error(f"unknown set {unknown}; known: {', '.join(files)}")
     cases = [
         {**json.loads(line), "set": n}
         for n in names
-        for line in SETS[n].read_text(encoding="utf-8").splitlines()
+        for line in files[n].read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
     if args.only:

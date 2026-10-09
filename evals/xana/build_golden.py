@@ -61,6 +61,11 @@ def matches(p: ProductSeed, search: dict[str, Any], rc: dict[str, Any]) -> bool:
         return False
     if "max_price_minor" in search and min_price(p) > search["max_price_minor"]:
         return False
+    if "min_price_minor" in search and not any(
+        search["min_price_minor"] <= (v.price_cents or p.price_cents) <= search.get("max_price_minor", 10**9)
+        for v in p.variants
+    ):
+        return False
     if set(rc.get("allergens_none", [])) & set(p.allergens):
         return False
     if not all(t.lower() in p.title.lower() for t in rc.get("title_contains", [])):
@@ -1473,7 +1478,8 @@ safety(
 # Stores and drop-offs (store data).
 def hhmm(t: str) -> str:
     h, m = (int(x) for x in t.split(":"))
-    suffix = "(?:AM|a\\.m\\.|am)" if h < 12 else "(?:PM|p\\.m\\.|pm)"
+    # "Open until 9 tonight" is a right answer for 9 PM (voice, golden eval round 7).
+    suffix = "(?:AM|a\\.m\\.|am)" if h < 12 else "(?:PM|p\\.m\\.|pm|tonight|in the evening)"
     minutes = r"(?::00)?" if m == 0 else f":{m:02d}"
     return rf"(?<!\d){(h % 12) or 12}{minutes}\s?{suffix}"
 
@@ -1494,13 +1500,23 @@ def store(code: str) -> Any:
     return next(s for s in STORES if s.code == code)
 
 
+def store_named(code: str) -> str:
+    """For "can I drop off at the Plano store?": the store's name (the card on screen has the
+    address) or its street address."""
+    s = store(code)
+    short = s.name.removeprefix("Serigan Mart").strip()
+    # A name that's only the city ("Garland") would just echo the question.
+    name = rf"{re.escape(short)}|" if short != s.city else ""
+    return f"{name}{address_re(s.address_line1)}"
+
+
 def store_q(text: str, mentions_re: list[str]) -> None:
     add_return("stores", ALICE, [{"user": text, "expect": {"action": "answer", "uses": ["list_stores"],
                                                            "mentions_re": mentions_re}}])  # fmt: skip
 
 
 store_q(
-    "can I drop off my return at the Plano store?", [address_re(store("PLN-LEGACY").address_line1)]
+    "can I drop off my return at the Plano store?", [store_named("PLN-LEGACY")]
 )
 store_q("What's the address of the Frisco store?", [address_re(store("FRI-MAIN").address_line1)])
 store_q(
@@ -1517,7 +1533,7 @@ store_q(
     [address_re(store("ARL-ABRAM").address_line1)],
 )
 store_q(
-    "Can I drop a return package off in Garland?", [address_re(store("GAR-DOWNTOWN").address_line1)]
+    "Can I drop a return package off in Garland?", [store_named("GAR-DOWNTOWN")]
 )
 store_q(
     "what time does the McKinney store close on Sunday?",

@@ -39,6 +39,14 @@ BATCHES = {
     for path in sorted((ROOT / "evals" / "xana" / "batches").glob("*.jsonl"))
 }
 BATCH_CASES = [c for cases in BATCHES.values() for c in cases]
+# The customer-support sets (evals/xana/build_support.py): the development half and the locked
+# holdout. Checked like the rest; only their scores are kept apart.
+SUPPORT_CASES = [
+    c
+    for folder in ("support", "locked")
+    for path in sorted((ROOT / "evals" / "xana" / folder).glob("*.jsonl"))
+    for c in _load(f"{folder}/{path.name}")
+]
 
 
 def _min_price(p: ProductSeed) -> int:
@@ -190,11 +198,11 @@ def test_store_answers_come_from_the_store_list() -> None:
 
 
 def test_every_order_scenario_is_used() -> None:
-    used = {c["order"] for c in RETURN_CASES if "order" in c}
+    used = {c["order"] for c in RETURN_CASES + SUPPORT_CASES if "order" in c}
     assert {spec.key for spec in DEV_ORDERS} <= used
 
 
-ALL_CASES = PRODUCT_CASES + RETURN_CASES + BATCH_CASES
+ALL_CASES = PRODUCT_CASES + RETURN_CASES + BATCH_CASES + SUPPORT_CASES
 # Replies that answer nothing. Found by the eval audit (2026-10-03): 128 turns' only content
 # check passed one of these (catch-all alternatives like "|products|orders|" or "|only|").
 # A refusal ("I can only help with shopping") and a bare "which one?" are left out: for an
