@@ -52,7 +52,7 @@ def test_each_order_reads_items_first_with_its_own_carrier_and_tracking() -> Non
     assert list(snap)[0] == "items"
     assert snap["carrier"] == "Serigan Mart Ground"
     assert snap["tracking_number"] == "LG686754189358"
-    assert snap["delivered_on"] == "Sep 30"
+    assert snap["delivered_on"] == "Wed, Sep 30"
 
 
 def test_the_prompt_says_how_many_orders_there_are() -> None:

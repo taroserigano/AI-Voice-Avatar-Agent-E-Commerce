@@ -61,6 +61,7 @@ def wants_policy(text: str) -> bool:
         POLICY_WORDS.search(text)
         or _ABROAD.search(text)
         or _FAIR_USE.search(text)
+        or _DISPUTE.search(text)
         or LABEL_QUESTION.search(text)
         or (_FOOD.search(text) and _SPOILED.search(text))
     )
@@ -197,13 +198,23 @@ _LONG_AGO = re.compile(r"\b(?:months?|years?|\d+ weeks|several weeks|a while)\b"
 # answer cited it from memory (golden eval, 2026-10-03).
 _FOOD = re.compile(
     r"\b(?:milk|cheese|cheddar|yogh?urt|eggs?|meat|chicken|beef|pork|fish|salmon|seafood|produce|"
-    r"fruit|berries|vegetables?|lettuce|bread|bakery|frozen|ice cream|groceries|grocery|food)\b",
+    r"fruit|berries|vegetables?|lettuce|bread|bakery|frozen|ice cream|groceries|grocery|food|"
+    r"pizzas?|waffles|dairy|deli|sushi|steaks?|shrimp|produce)\b",
     re.I,
 )
 _SPOILED = re.compile(
     r"\b(?:bad|went off|spoiled|spoilt|sour|soured|expired|moldy|mouldy|rotten|stale|cracked|"
     r"thawed|melted|leaking|leaked|smelled|smells|past (?:its|the) date)\b",
     re.I,
+)
+
+
+# Food they don't want any more: "I don't like the pizza, can I return it?" retrieved condition
+# and label sections, and voice cited section 2.1 from memory (support set, round 9, 2026-10-08).
+_CHANGED_MIND = re.compile(
+    r"\b(?:don'?t (?:like|want|need)|didn'?t (?:like|want)|chang\w* (?:my |of )?mind|"
+    r"not hungry|tastes? (?:bad|weird|gross)|ordered too much|too many)\b",
+    re.IGNORECASE,
 )
 
 
@@ -226,6 +237,18 @@ _FAIR_USE = re.compile(
 )
 
 
+# "What if you say my return was damaged by me?" retrieved the condition rules, not what happens
+# when an item fails inspection or how to disagree (sections 11.3 and 16.2; support set,
+# 2026-10-08).
+_DISPUTE = re.compile(
+    r"\b(?:disagree\w*|don'?t agree|not fair|unfair|appeal|"
+    r"(?:say|says|said|claim\w*|decide\w*) (?:that )?(?:i|my \w+|it was|it's) "
+    r"\w*\s?(?:damag\w*|broke\w*)|"
+    r"damaged (?:it )?(?:by me|myself)|i damaged|fail(?:s|ed)? (?:the )?inspection)\b",
+    re.IGNORECASE,
+)
+
+
 def retrieval_query(text: str) -> str:
     """The customer's words as a search query: timing questions say "timing", refund-amount
     questions say what section 7 says, an old fault asks about the warranty, filler goes."""
@@ -236,8 +259,13 @@ def retrieval_query(text: str) -> str:
         said += " where we ship addresses in the united states only international"
     if _FAIR_USE.search(said):
         said += " fair use decline returns that look like abuse high rate of returns"
+    if _DISPUTE.search(said):
+        said += " inspection outcomes failed not refunded ship it back review"
+        said += " disagreeing with a decision"
     if _FOOD.search(said) and _SPOILED.search(said):
         said += " perishable fresh frozen food spoiled damaged within 7 days of delivery"
+    elif _FOOD.search(said) and _CHANGED_MIND.search(said):
+        said += " perishable change of mind fresh frozen food quality problem"
     words = re.findall(r"[a-z0-9]+(?:'[a-z]+)?", said)
     kept = [w for w in words if w not in _FILLER]
     return " ".join(dict.fromkeys(kept)) or text.strip()

@@ -378,14 +378,35 @@ for t in rng.sample(sorted(t for t, ps in by_type.items() if len(ps) >= 2 and (t
 NAMED = [p for p in PRODUCTS if G.unique_name(p) and p.slug not in B.USED_SLUGS]
 def variant_re(v: str) -> str:
     pounds = re.match(r"(\d+(?:\.\d+)?) lb\b", v)
-    if pounds:  # "15 lb bag" is also "15-pound"
-        return rf"(?<![\d.]){re.escape(pounds.group(1))}\s?-?\s?(?:lb|lbs|pounds?)\b"
+    if pounds:  # "15 lb bag" is also "15-pound", and "15-, 30-, and 40-pound bags"
+        n = re.escape(pounds.group(1))
+        return rf"(?<![\d.]){n}(?:\s?-?\s?(?:lb|lbs|pounds?)\b|-,|-\s+(?:and|or)\b)"
     m = re.match(r"(\d+) x ", v)
     if not m:
         return G.spec_pattern(v)
     n = int(m.group(1))
     count = f"(?:{n}|{G.WORDS[n]})" if n <= 12 else str(n)
-    return rf"(?<![\d.]){count}\s?[- ]?(?:x\b|pack|count|ct\b)|pack of {count}|{G.spec_pattern(v)}"
+    # "4 x 5.3 oz cups" is also "a 4-pack" or "four 5.3 oz cups"
+    return (
+        rf"(?<![\d.]){count}\s?[- ]?(?:x\b|pack|count|ct\b)|pack of {count}|"
+        rf"\b{count}\s+\d[\d.]*\s?-?\s?[a-z]|{G.spec_pattern(v)}"
+    )
+
+
+SIZES = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"]
+
+
+def variants_re(names: list[str]) -> list[str]:
+    """Every variant named, or for a run of letter sizes also the range ("XS through XXL")."""
+    each = [variant_re(v) for v in names]
+    upper = [v.upper() for v in names]
+    if len(names) >= 3 and all(u in SIZES for u in upper):
+        at = [SIZES.index(u) for u in upper]
+        if at == list(range(at[0], at[0] + len(at))):
+            ahead = "".join(f"(?=.*(?:{e}))" for e in each)
+            span = rf"\b{upper[0]}\s*(?:through|thru|to|-|\u2013|\u2014)\s*{upper[-1]}\b"
+            return [rf"(?s)^{ahead}|{span}"]
+    return each
 
 
 multi_variant = [p for p in NAMED if 3 <= len(p.variants) <= 6 and len({v.name for v in p.variants}) == len(p.variants)]
@@ -393,7 +414,7 @@ for p in rng.sample(multi_variant, 20):
     names = [v.name for v in p.variants]
     one("variants", rng.choice(["what options does the {n} come in?", "what are the choices for the {n}?",
                                 "which sizes or colors does the {n} have?"]).format(n=name(p)),
-        answer(product_title=p.title, mentions_re=[variant_re(v) for v in names]),
+        answer(product_title=p.title, mentions_re=variants_re(names)),
         note=", ".join(names))  # fmt: skip
 with_warranty = [p for p in NAMED if p.specs.get("Warranty")]
 for p in rng.sample(with_warranty, 16):

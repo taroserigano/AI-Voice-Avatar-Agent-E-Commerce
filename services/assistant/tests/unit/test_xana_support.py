@@ -152,3 +152,40 @@ def test_a_refund_request_also_retrieves_the_return_window() -> None:
     asked.clear()
     tools_mod.policy_search(Policies(), "how much is shipping")  # type: ignore[arg-type]
     assert asked == ["how much is shipping"]
+
+
+def test_the_spending_total_is_summed_by_the_tool_and_leaves_out_canceled_orders() -> None:
+    """Chat added up Alice's order totals itself and said $814.58, not $809.58 (support set)."""
+    tools_mod._BRANDS.clear()
+
+    class TwoOrders(Orders):
+        def get(self, path: str, params: dict[str, Any] | None = None) -> Any:
+            if path == "/v1/orders":
+                return [{"id": "o1"}, {"id": "o2"}]
+            if path == "/v1/orders/o2":
+                canceled = super().get("/v1/orders/o1")
+                return {**canceled, "id": "o2", "status": "canceled", "total_minor": 500}
+            return super().get(path, params)
+
+    config = {"configurable": {"ctx": ToolContext(client=TwoOrders(), agent="xana")}}  # type: ignore[arg-type]
+    content, _ = list_my_orders.func(config)  # type: ignore[attr-defined]
+    assert _payload(content)["total_spent_on_orders_not_canceled"] == "$18.97"
+
+
+def test_disagreeing_with_a_damage_decision_retrieves_inspection_and_review() -> None:
+    for question in [
+        "what if you say my return was damaged by me?",
+        "I disagree with the decision on my return",
+    ]:
+        assert wants_policy(question), question
+        assert "inspection outcomes" in retrieval_query(question), question
+    assert "inspection outcomes" not in retrieval_query("my mug arrived damaged")
+
+
+def test_food_they_dont_want_any_more_asks_for_the_perishable_change_of_mind_rule() -> None:
+    for question in [
+        "I don't like the pizza, can I return it?",
+        "can I send back the ice cream? I changed my mind",
+    ]:
+        assert "perishable change" in retrieval_query(question), question
+    assert "perishable" not in retrieval_query("I don't like the headphones, can I return them?")

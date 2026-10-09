@@ -1041,8 +1041,10 @@ def _order_for_model(detail: dict[str, Any]) -> dict[str, Any]:
         "order_id": str(detail["id"]),
         "order_number": order_number(detail["id"]),
         "status": STATUS_LABELS.get(detail["status"], detail["status"]),
-        "placed_on": friendly_date(detail["placed_at"]),
-        "delivered_on": friendly_date(detail.get("delivered_at")),
+        # With the weekday, in the store's time zone: voice worked out weekdays itself and said
+        # "Friday, September 26" for a Saturday (judge, round 8, 2026-10-08).
+        "placed_on": store_day(detail["placed_at"]),
+        "delivered_on": store_day(detail.get("delivered_at")),
         "arriving_by": store_day(detail.get("estimated_delivery_at")),
         "delivery": _delivery_for_model(detail),
         # The order page's payment summary, so "did my discount apply?" and "how much tax?"
@@ -1114,6 +1116,11 @@ def list_my_orders(
         # Every order on the account is listed when there are fewer than the limit, so totals
         # over them are all-time totals.
         "all_orders_listed": not contains and len(summaries) < MAX_ORDERS,
+        # Summed here: the model added up Alice's totals itself and said $814.58, not $809.58
+        # (support set, 2026-10-08).
+        "total_spent_on_orders_not_canceled": money(
+            sum(d["total_minor"] for d in details if d.get("status") != "canceled")
+        ),
     }
     return untrusted("list_my_orders", payload), [order_card(d).model_dump() for d in details[:5]]
 
