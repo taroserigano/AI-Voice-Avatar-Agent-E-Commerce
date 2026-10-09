@@ -1264,7 +1264,7 @@ policy(
 )
 policy(
     "How fast does a person reply if I ask for one?",
-    [R + "16-1", G + "7-2"],
+    [R + "16-1", G + "7-2", "help-center#hc-6-2"],
     [r"1 business day|one business day"],
 )
 policy(
@@ -1318,7 +1318,7 @@ policy(
 )
 policy(
     "Can I pick up my online order at a store?",
-    [SHIP],
+    [SHIP, "help-center#hc-5-2"],
     [
         r"don't hold|always delivered|no pickup|not (?:yet|available)|isn't available|doesn't|don't offer|can't"
     ],

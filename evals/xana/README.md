@@ -15,8 +15,20 @@
 | `batches/b09-compare` | "Which has the most", two-product comparisons, price comparisons, counts, budgets. |
 | `batches/b10-holdout` | A mix built from other seeds plus new cases. Not a true holdout: it ran every round (see "How much to trust the scores"). |
 
-`build_golden.py` (the two core sets, hand-written) and `build_batches.py` (b03-b10, from the
-seed data with fixed seeds) write the files. Every expected fact is read from the seed data
+Two more files cover what a customer-support representative is asked beyond those 2,000 (added
+2026-10-08, when Taro asked that Xena handle every product, policy, and order-history question a
+support rep would):
+
+| File | What it covers |
+|---|---|
+| `support/support.jsonl` (204) | The development half: how the site works (account, checkout, payment, promo codes, gift cards, cart, receipts, order changes, reviews, stores, contacting us; the help center), shipping, every return-policy section, catalog-wide questions (brands, counts, cheapest and priciest, price ranges, things we don't sell), order amounts (subtotal, discount, tax, shipping), a third customer (Dana) with different orders, multi-part, long, and other-language messages, escalation. Run it, read the failures, fix. |
+| `locked/holdout.jsonl` (223) | The locked half, same kinds of questions. Never read its failures or tune on it: run it once at the end of a round (`--file`) and report it separately. |
+
+Each question goes to one file or the other by a fixed hash of its text, so adding questions
+never moves an existing one across.
+
+`build_golden.py` (the two core sets, hand-written), `build_batches.py` (b03-b10, from the
+seed data with fixed seeds), and `build_support.py` (the support and locked files) write the files. Every expected fact is read from the seed data
 (catalog, orders, returns, stores, policy sections), so a golden answer can't be a typo.
 `services/commerce/tests/unit/test_xana_golden.py` checks the files against the seed data on
 every test run (5,604 checks), and fails when an expectation holds a null or when a reply that
@@ -26,6 +38,7 @@ check. Rebuild after changing the seed data or the questions:
 ```
 pnpm eval:xana:build
 uv run --directory services/assistant python ../../evals/xana/build_batches.py
+uv run --directory services/assistant python ../../evals/xana/build_support.py
 ```
 
 ## Running
@@ -38,8 +51,13 @@ pnpm eval:xana                     # chat (Xena on /support), all 2,000
 pnpm eval:xana:voice               # the voice brain, typed turns, no speech synthesized
 pnpm eval:xana -- --set b05-orders,b07-multiturn --workers 6
 pnpm eval:xana -- --only xr-001,xr-010
+pnpm eval:xana -- --set support                       # the customer-support development half
+pnpm eval:xana -- --file evals/xana/locked/holdout.jsonl   # the locked half: once a round
 pnpm eval:xana -- --assistant http://127.0.0.1:8111   # an assistant started with other settings
 ```
+
+`all` is still the 2,000 golden questions, so rounds stay comparable; the support files run only
+when named.
 
 Each run writes every case's transcript to `evals/xana/runs/` (gitignored): the answer, tools,
 cards, quote, citations, timings, a W3C trace id, and what each turn's tools returned

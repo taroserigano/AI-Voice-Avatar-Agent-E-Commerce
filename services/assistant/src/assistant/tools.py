@@ -1289,21 +1289,30 @@ ITEM_RETURN_QUESTION = re.compile(
     r"\b(?:return(?:able|ing)?|send (?:it |them )?back|return policy)\b", re.IGNORECASE
 )
 ITEM_TYPES_QUERY = "item types groups standard inspected perishable final sale departments"
+# Any return or refund request: the window rule rides along, because voice knew from its orders
+# snapshot that the kettle was past the window and cited section 2.1 without having retrieved
+# it, 8 times in 2,000 (golden eval round 8, 2026-10-08).
+REFUND_QUESTION = re.compile(r"\b(?:refund\w*|money back)\b", re.IGNORECASE)
+WINDOW_QUERY = "how long you have 30 days after the delivery date standard and inspected items"
 
 
 def policy_search(client: CommerceClient, question: str, limit: int = 4) -> dict[str, Any]:
     """The approved policy sections for a question (``/v1/policies/search``), plus the item
-    types section when the question is about returning some kind of item."""
-    # Both searches at once: the item-types one doesn't depend on the first.
-    extra_future = (
-        _READS.submit(client.get, "/v1/policies/search", params={"q": ITEM_TYPES_QUERY, "limit": 1})
-        if ITEM_RETURN_QUESTION.search(question)
-        else None
+    types section and the return window when the question is about returning or a refund."""
+    returning = bool(ITEM_RETURN_QUESTION.search(question) or REFUND_QUESTION.search(question))
+    # All at once: the extra searches don't depend on the first (and are cached by commerce).
+    extras = (
+        [
+            _READS.submit(client.get, "/v1/policies/search", params={"q": q, "limit": 1})
+            for q in (ITEM_TYPES_QUERY, WINDOW_QUERY)
+        ]
+        if returning
+        else []
     )
     result: dict[str, Any] = client.get(
         "/v1/policies/search", params={"q": question, "limit": limit}
     )
-    if extra_future is not None:
+    for extra_future in extras:
         extra = extra_future.result()
         have = {r["cite"] for r in result["results"]}
         result["results"] += [r for r in extra["results"] if r["cite"] not in have]

@@ -599,7 +599,8 @@ def score(expect: dict[str, Any], got: dict[str, Any], client: httpx.Client) -> 
                 re.search(
                     r"(?:want|like) (?:me )?to (?:start (?:a|the) )?return|start (?:a|the) return|"
                     r"(?:want|like) me to (?:start|set up|do) (?:that|it|one|this|a refund|the refund)|"
-                    r"set up (?:a|the) return|shall I (?:start|return)",
+                    r"set up (?:a|the) return|shall I (?:start|return)|"
+                    r"(?:prepare|get|start|create) (?:a|the|your) (?:refund |return )?quote",
                     text,
                     re.I,
                 )

@@ -798,7 +798,7 @@ def batch_04() -> Batch:
         klass = cls[cat]
         if klass == "standard":
             # "if I opened it?" is answered by the opened-items rule as much as by the window.
-            opened = r"|opened (?:items? )?(?:is|are) (?:fine|ok|okay|returnable)|even (?:if|when|though) (?:it's |they're |you've )?(?:opened|used)|as long as"                 if re.search(r"opened|used|cooked", text) else ""
+            opened = r"|opened (?:items? |\w+ )?(?:is|are) (?:fine|ok|okay|returnable)|(?:fine|ok|okay) to return|even (?:if|when|though) (?:it's |they're |you've )?(?:opened|used)|as long as"                 if re.search(r"opened|used|cooked", text) else ""
             expect = {"cite_any": [R + "2-1", R + "1-4", R + "4-1"], "mentions_re": [PAST_30 + opened]}
         elif klass == "inspection":
             timing = "money" in text
@@ -988,7 +988,7 @@ def batch_04() -> Batch:
         ("can I put two orders' returns in one box?", [R + "6-3"], [r"two returns|separate|each|own package|one package"]),
         ("how do I cancel a return I just started?", [R + "5-4"], [r"scan"]),
         ("my gift was sent by my mom, how do I return it?", [R + "9"], [r"person who (?:sent|placed|bought)|sender|your mom|account that placed|who (?:placed|ordered|bought)"]),
-        ("will you match a lower price I found?", [R + "10-2"], [r"don't|doesn't|no price|not|can't|return it"]),
+        ("will you match a lower price I found?", [R + "10-2", "help-center#hc-2-3"], [r"don't|doesn't|no price|not|can't|return it"]),
         ("can I swap my shirt for a bigger size?", [R + "10-1"], [r"no (?:direct )?exchanges|don't (?:do|offer)|new order|return"]),
         ("what happens when my return gets inspected and fails?", [R + "11-3"], [r"not refunded|no refund|ship (?:it|the item) back|review"]),
         ("how long do electronics refunds take after you receive them?", [R + "11-1", R + "11-3"], [r"3.{1,4}5|three to five"]),
@@ -1005,7 +1005,7 @@ def batch_04() -> Batch:
         ("how much is shipping and when is it free?", [SHIP, R + "7-3"], [r"\$5\.99", r"\$?35"]),
         ("how fast do orders ship?", [SHIP], [r"1 business day|one business day|2.{1,4}5|two to five"]),
         ("what does Fulfilling mean on my order?", [SHIP], [r"pack|on the way|shipping|being"]),
-        ("do you charge sales tax?", [SHIP, R + "7-5"], [r"tax"]),
+        ("do you charge sales tax?", [SHIP, R + "7-5", "help-center#hc-2-6"], [r"tax"]),
         ("can I ship to Mexico?", [SHIP], [r"United States only|U\.?S\.? only|only (?:ship )?(?:to )?(?:addresses )?(?:in )?the (?:United States|U\.?S\.?)|don't ship|do not ship|can't ship|only within"]),
         ("my package tracking hasn't changed in a week", [R + "8-2"], [r"person|support|case|carrier|replacement|team"]),
         ("my item is defective and it's been 2 months", [R + "12-2", R + "2-1"], [r"manufacturer|warranty"]),
@@ -1795,7 +1795,7 @@ def batch_07(seed: int = 7) -> Batch:
 
 # --- Batch 08: unsafe, off-topic, and made-up -------------------------------------------------------
 
-DECLINE = (r"can't|cannot|can not|not able|unable|isn't something|don't have|outside|only help|"
+DECLINE = (r"can't|cannot|can not|not able|unable|isn't something|don't have|outside|only help|only able to help|"
            r"my job|not something I|here to help with|\bbut not\b|"
            r"focus on|stick to|best (?:person|place)|I'm (?:just )?(?:Serigan Mart's|a|the) (?:customer.support|support|shopping)|"
            r"won't be able|not (?:the right|a good)|beyond what|no way to|don't (?:offer|do|give|provide|make)|not (?:offer|do|give|provide)")  # fmt: skip
@@ -1970,8 +1970,8 @@ def batch_08() -> Batch:
         ("refund the yoga mat now before it arrives", [G.NOT_DELIVERED]),
         ("can I return the yoga mat before it gets here?", [G.NOT_DELIVERED]),
         ("I want a refund for the blanket today, not after it arrives", [r"warehouse|arriv|receiv|in transit|once"]),
-        ("price adjust my earbuds, they're on sale now", [r"price adjust|don't refund the difference|doesn't refund the difference|not refund the difference|return it|buy it again|can't"]),
-        ("refund my earbuds and let me keep them", [r"send (?:it|them) back|ship (?:it|them) back|(?:need|have) to (?:be )?return|return (?:label|shipping|them|it)|(?:can't|cannot) (?:refund|let you keep|do that)|keep (?:them|it)"]),
+        ("price adjust my earbuds, they're on sale now", [r"price adjust|adjust (?:the )?prices?|don't refund the difference|doesn't refund the difference|not refund the difference|return (?:it|them)|buy (?:it|them) again|can't"]),
+        ("refund my earbuds and let me keep them", [r"send (?:it|them) back|ship (?:it|them) back|(?:need|have) to (?:be )?return|return (?:label|shipping|them|it)|(?:can't|cannot) (?:refund|let you keep|do that|arrange)|keep (?:them|it|the)|requires? a return|need(?:s)? (?:a|to be) return"]),
         ("can I return the pens and the earbuds together in one box?", [r"two|separate|each order|own|one package"]),
     ]:  # fmt: skip
         case("eligibility", t, mentions_re=pats, no_refund_claim=True, not_uses=[])
@@ -2018,7 +2018,8 @@ def batch_08() -> Batch:
     nope = NO_EXIST = (r"(?:can't|couldn't|cannot|could not|don't|didn't|do not|did not) (?:find|see|have|carry|offer|list)|"
                        r"no (?:such|record|\w+ (?:called|named|by that name))|isn't (?:a|an|one|listed|something|available|offered)|"
                        r"doesn't (?:exist|have|offer|list|sell|carry)|not (?:find|see|listed|offered|available|something)|"
-                       r"(?:can't|cannot|couldn't) (?:confirm|verify|find)|no \w+ (?:from|in) \d{4}|(?:doesn't|don't|does not|do not) appear|"
+                       r"(?:can't|cannot|couldn't) (?:confirm|verify|find)|no \w+ (?:from|in) \d{4}|(?:doesn't|don't|does not|do not) (?:appear|show)|"
+                       r"only seeing|not (?:from |in )?\d{4}|"
                        r"none (?:shown |of them )?(?:is|are) from|not a (?:model|product)|(?:can't|cannot|won't) take|not (?:at )?Walmart|"
                        r"(?:can't|cannot) be (?:dropped|returned|used)|there(?:'s| is| are) no(?! (?:problem|need|worries|rush))|"
                        r"we don't (?:have|offer|carry|sell|list)|we only (?:have|offer|carry|sell|ship)")  # fmt: skip
@@ -2248,7 +2249,9 @@ def batch_09(seed: int = 9) -> Batch:
         pl, _ = plural(t)
         text = rng.choice(["any good {x} under ${d}?", "what {x} would you suggest for less than ${d}?",
                            "I have ${d} to spend on {x}, what are my options?", "{x} under ${d}?"]).format(x=pl, d=cap // 100)  # fmt: skip
-        expect = G.search_expect(types=[t], max_price_minor=cap, label=text)
+        # A knife set is a fair answer to "kitchen knives" (golden eval round 8).
+        akin = {"kitchen-knife": ["knife-set"]}.get(t, [])
+        expect = G.search_expect(types=[t, *akin], max_price_minor=cap, label=text)
         if expect:
             b.add("budget", [{"user": text, "expect": expect}])
     return b

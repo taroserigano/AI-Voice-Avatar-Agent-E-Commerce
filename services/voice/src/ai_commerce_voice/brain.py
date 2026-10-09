@@ -224,7 +224,12 @@ def system_prompt(
         else "(not loaded: use list_my_orders)"
     )
     vocab = vocabulary or {}
-    types = ", ".join(str(t["value"]) for t in vocab.get("product_types", []))
+    # With each type's count, as chat has: "how many kinds of cat food?" was answered with
+    # dog food's 27 (golden eval round 8).
+    types = ", ".join(
+        f"{t['value']} ({t['count']})" if t.get("count") is not None else str(t["value"])
+        for t in vocab.get("product_types", [])
+    )
     tags = ", ".join(f"{t['value']} ({t['label']})" for t in vocab.get("tags", []))
     return (
         f"{_template()}\n\n## This call\n\nYou're talking with {first_name or 'the customer'}, "

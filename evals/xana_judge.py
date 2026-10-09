@@ -323,12 +323,30 @@ def main() -> None:
             strata[(r["verdict"], r["rule_passed"])].append(r)
         per = max(1, args.calibrate // max(1, len(strata)))
         picked = [r for rs in strata.values() for r in rng.sample(rs, min(per, len(rs)))]
+        # Small strata leave room: fill up to N from the rest, so the sample is the size asked.
+        rest = [r for r in judged if r not in picked]
+        picked += rng.sample(rest, max(0, min(args.calibrate - len(picked), len(rest))))
+        rng.shuffle(picked)
+        by_case = {c["id"]: c for c in cases}
         label = args.run.with_suffix(".calibrate.jsonl")
         with label.open("w", encoding="utf-8", newline="\n") as f:
             for r in picked:
-                f.write(json.dumps({"id": r["id"], "turn": r["turn"], "user": r["user"], "answer": r["answer"],
-                                    "judge_verdict": r["verdict"], "judge_reason": r["reason"],
-                                    "human_verdict": None, "human_note": ""}, ensure_ascii=False) + "\n")  # fmt: skip
+                c = by_case[r["id"]]
+                t = c["turns"][r["turn"]]
+                # What a person needs to judge it: the conversation so far, what was on screen,
+                # and the evidence Xena had (the same the judge saw).
+                f.write(json.dumps({
+                    "id": r["id"], "turn": r["turn"], "set": r["set"], "category": r["category"],
+                    "customer": c.get("user") or users.get(c["id"], ""),
+                    "before": [{"user": p["user"], "answer": p["answer"]} for p in c["turns"][: r["turn"]]],
+                    "user": r["user"], "answer": r["answer"],
+                    "on_screen": {"products": t.get("products") or [], "cards": t.get("other_cards") or [],
+                                  "quote": t.get("quote"), "citations": t.get("citations") or []},
+                    "evidence": evidence_block(c["turns"], r["turn"])[:6000],
+                    "rule_passed": r["rule_passed"],
+                    "judge_verdict": r["verdict"], "judge_reason": r["reason"],
+                    "human_verdict": None, "human_note": "",
+                }, ensure_ascii=False) + "\n")  # fmt: skip
         print(f"calibration sample ({len(picked)} turns, fill in human_verdict): {label.name}")
 
 
