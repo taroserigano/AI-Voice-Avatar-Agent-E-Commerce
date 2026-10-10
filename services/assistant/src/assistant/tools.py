@@ -286,7 +286,15 @@ def product_card(
         variant_id=str(pick["id"]) if pick else None,
         variant_name=pick["name"] if pick else None,
         facts=_facts(detail),
+        **_card_rating(detail),
     )
+
+
+def _card_rating(detail: dict[str, Any]) -> dict[str, Any]:
+    count = int(detail.get("rating_count") or 0)
+    if not count or detail.get("rating_average") is None:
+        return {"rating_average": None, "rating_count": 0}
+    return {"rating_average": float(detail["rating_average"]), "rating_count": count}
 
 
 def rating_for_model(detail: dict[str, Any]) -> dict[str, Any]:
@@ -665,6 +673,13 @@ def search_products(
             "customer rating, highest first, across every matching product (the store's "
             "top-rated order: the average weighted by how many reviews it has); products "
             "without reviews last"
+        )
+        # She said "Asparagus (5.0, 3 reviews) is top rated" over cards led by Broccoli (4.8,
+        # 5 reviews): the weighting puts more reviews first, so say it in the cards' order.
+        payload["say_in_this_order"] = (
+            "The first product is the top rated; the cards on screen show them in this order. "
+            "Name them in this order with each one's rating and review count, even when a later "
+            "one has a higher average from fewer reviews."
         )
         if not any(d.get("rating_count") for d in details[:MAX_PRODUCTS]):
             payload["note_on_ratings"] = (

@@ -23,6 +23,9 @@ export type ProductCard = {
   variant_id: string | null;
   variant_name: string | null;
   facts: string[];
+  /** Customer reviews (absent on cards saved before 2026-10-10). */
+  rating_average?: number | null;
+  rating_count?: number;
 };
 
 export type OrderCard = {

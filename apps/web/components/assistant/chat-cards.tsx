@@ -11,6 +11,7 @@ import {
   UserIcon,
 } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
+import { RatingBadge } from "@/components/ui/stars";
 import type {
   CartCard,
   Card,
@@ -96,7 +97,10 @@ function ProductChatCard({ card }: { card: ProductCard }) {
         <Link href={card.url} className="line-clamp-2 text-sm font-semibold leading-snug text-ink hover:text-brand-700">
           {card.title}
         </Link>
-        <p className="text-xs text-muted">{card.brand}</p>
+        <p className="flex flex-wrap items-center gap-x-2 text-xs text-muted">
+          <span>{card.brand}</span>
+          {card.rating_count ? <RatingBadge average={card.rating_average} count={card.rating_count} size="sm" /> : null}
+        </p>
         {card.tags.length ? (
           <ul className="mt-1 flex flex-wrap gap-1" aria-label="Labels">
             {card.tags.slice(0, 3).map((t) => (

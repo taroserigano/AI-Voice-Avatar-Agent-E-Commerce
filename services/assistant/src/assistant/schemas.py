@@ -37,6 +37,9 @@ class ProductCard(BaseModel):
     variant_id: str | None = None
     variant_name: str | None = None
     facts: list[str] = Field(default_factory=list)  # e.g. "0 g added sugar", "Milkfat: 0%"
+    # Customer reviews: average stars (one decimal), null with none; how many reviews.
+    rating_average: float | None = None
+    rating_count: int = 0
 
 
 class OrderLineBrief(BaseModel):

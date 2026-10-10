@@ -269,6 +269,10 @@ def test_top_rated_search_ranks_by_the_store_rating_and_puts_unreviewed_last(
     titles = [c["title"] for c in cards if c["kind"] == "product"]
     assert titles == ["Veg 1", "Veg 3", "Veg 4", "Veg 2"]
     assert next(c for c in cards if c["kind"] == "search")["url"].endswith("sort=top_rated")
+    # The cards carry the stars, and Xena is told to name them in the cards' order.
+    stars = [(c["rating_average"], c["rating_count"]) for c in cards if c["kind"] == "product"]
+    assert stars == [(4.8, 30), (1.5, 12), (4.2, 3), (None, 0)]
+    assert "in this order" in payload["say_in_this_order"]
 
 
 def test_top_rated_search_says_when_nothing_has_reviews(monkeypatch: pytest.MonkeyPatch) -> None:
