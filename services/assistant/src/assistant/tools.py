@@ -378,7 +378,7 @@ class SearchProductsArgs(BaseModel):
     product_types: list[str] = Field(
         default_factory=list,
         description='Product types, any of (e.g. ["milk"]). Use values from the catalog '
-        "vocabulary in the system prompt. To rank across a group (\"top rated vegetables\", "
+        'vocabulary in the system prompt. To rank across a group ("top rated vegetables", '
         '"cheapest snacks"), put every type of the group in this one search: separate searches '
         "are each ranked on their own, so none of them answers for the whole group. Only "
         "types that really are in the group: vegetables leave out fruit (apples, bananas, "
