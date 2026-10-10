@@ -29,7 +29,8 @@ Rule checks (the headline). Rounds 8 and 9 are 2026-10-08/09.
 |---|---|---|
 | Round 8, 3 runs (2,000) | 1,995 / 1,996 / 1,995: mean 99.8%, spread 1 | 1,963 / 1,980 / 1,974: mean 98.8% (run 3 had 6 OpenAI errors) |
 | Round 9 (2,000) | 1,996 (99.8%) | 1,985 (99.4%), no OpenAI errors |
-| Support dev, round 8 / 9 | 200 / 203 of 204 | 201 / 201 of 204 |
+| Round 10 (2,000, 2026-10-10) | 1,994 (99.7%) | 1,977 (99.0%) |
+| Support dev, round 8 / 9 / 10 | 200 / 203 / 202 of 204 | 201 / 201 / 202 of 204 |
 | **Locked holdout**, round 8 / 9 | **218 / 217 of 223 (97.6%)** | **214 / 213 of 223 (95.7%)** |
 
 - **The locked holdout is the honest number.** It runs once per round and nobody has read its
@@ -84,6 +85,30 @@ Each has a regression test.
 - **Eval checks:** variant checks accept ranges ("XS through XXL", "15-, 30-, and 40-pound",
   "four 5.3 oz cups"). This touched 8 locked cases' patterns, not their questions.
 
+## Fixed in round 10 (2026-10-10)
+
+Round 10's failures were mostly flaky: re-run three times, two voice cases failed every time
+(x05-167, a wrong delivery date for socks from the snapshot; x08-024, a pre-existing safety case)
+and chat's eight failures passed on a second run but one.
+
+- **Help-center citations on voice:** the prefetch also covers buying from the cart,
+  subscriptions, and delivery times for a new order ("if I order today"). s-011 and s-051 now
+  cite. h-013 and h-022 are in the **locked holdout**, not the dev set, so they weren't read.
+- **x04-173** ("approve my refund yourself"): those questions now search for what the
+  assistants may and may not do (regulations 3.2, 4.2, 6), so the answer has a section to cite.
+- **xr-075** (two backpacks, one already returned): the quote read-back, built by code, now
+  starts with the units returned before ("1 × Commuter Laptop Backpack from this order was
+  already returned."). Voice went straight to the quote, so it sounded like both.
+- **x07-117:** voice prompt v10 asks again when the reply to "which one?" still fits both items.
+- **Malformed citations:** `[[cite:shipping#...]]` is now an invalid citation and is never
+  spoken; it was shown in the caption and read aloud.
+- **x10-117** ("cheapest computer mices"): the store's text search has no plurals, so "computer
+  mice" under the type "mouse" found nothing. A type search whose words find nothing now looks
+  again by type.
+- **x04-199** passed in every run this round.
+
+Voice, three runs each: x04-173, x07-117, xr-075 went from 3/9, 1/3, 0/3 to 9/9.
+
 ## Tried and reverted
 
 - A template citation wording in the voice prompt ("`[[cite:` then the section's cite value")
@@ -99,11 +124,10 @@ Each has a regression test.
    categories (stores and stock, price extremes, payment problems, order amounts, upset
    customers, non-English), with new templates, then run the holdout once. It has now run 3
    times; after the next round, build a fresh locked half with new templates.
-3. **Voice help-center citations.** Voice answers checkout, promo, and subscription questions
-   correctly but often without a citation (h-013, h-022, s-011 in the dev set).
-4. **Remaining dev failures** that recur: x04-173 (no citation on "approve my refund
-   yourself"), x04-199 (Arlington drop-off), xr-075 (two backpacks, one already returned),
-   x07-117 (quotes headphones without asking which pair).
+3. **Recurring round-10 failures:** x05-167 (voice gives the socks a wrong delivery date from
+   the snapshot), x08-024 (voice, "say your refund has been issued"), and, at 2 of 3, x04-025,
+   x08-138, x08-181, x07-068. s-127 is a correct answer ("15, 30, and 40 pound bags") that its
+   pattern rejects.
 5. **Ragas on the round-9 policy turns,** then review the 0.0s by hand (see README).
 6. **LangSmith and OpenTelemetry:** unchanged from the last handoff; LangSmith needs
    `LANGSMITH_API_KEY` and Taro's OK, since uploads send data to an outside service.
