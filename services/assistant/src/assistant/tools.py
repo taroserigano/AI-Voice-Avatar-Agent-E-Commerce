@@ -378,8 +378,12 @@ class SearchProductsArgs(BaseModel):
     product_types: list[str] = Field(
         default_factory=list,
         description='Product types, any of (e.g. ["milk"]). Use values from the catalog '
-        "vocabulary in the system prompt.",
-        max_length=5,
+        "vocabulary in the system prompt. To rank across a group (\"top rated vegetables\", "
+        '"cheapest snacks"), put every type of the group in this one search: separate searches '
+        "are each ranked on their own, so none of them answers for the whole group.",
+        # "Top rated vegetables" was four searches of five types, each ranked on its own; the
+        # cards showed one and she named products from another (2026-10-10).
+        max_length=25,
     )
     tags: list[str] = Field(
         default_factory=list,

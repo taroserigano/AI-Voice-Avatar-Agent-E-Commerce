@@ -54,7 +54,8 @@ def products(
     in_stock: bool = False,
     product_type: Annotated[
         list[str] | None,
-        Query(max_length=10, description='Any of these types, e.g. "milk", "yogurt"'),
+        # Up to 30: a ranking across a group ("top rated vegetables") is ~20 fresh types.
+        Query(max_length=30, description='Any of these types, e.g. "milk", "yogurt"'),
     ] = None,
     tag: Annotated[
         list[str] | None,

@@ -283,6 +283,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/product-details": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Product Details
+         * @description Several products in full (variants with price and stock, nutrition, ingredients,
+         *     allergens, specs), in the order asked. Unknown or inactive ids are left out. For the
+         *     assistant's catalog search, which reads every candidate it verifies: one call instead of one
+         *     per product, and, unlike opening a product page, nothing is recorded as viewed.
+         */
+        get: operations["product_details_v1_product_details_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/products": {
         parameters: {
             query?: never;
@@ -2517,6 +2540,38 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    product_details_v1_product_details_get: {
+        parameters: {
+            query: {
+                /** @description Up to 60 ids */
+                id: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductDetail"][];
+                };
             };
             /** @description Validation Error */
             422: {

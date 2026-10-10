@@ -4092,6 +4092,61 @@
         ]
       }
     },
+    "/v1/product-details": {
+      "get": {
+        "description": "Several products in full (variants with price and stock, nutrition, ingredients,\nallergens, specs), in the order asked. Unknown or inactive ids are left out. For the\nassistant's catalog search, which reads every candidate it verifies: one call instead of one\nper product, and, unlike opening a product page, nothing is recorded as viewed.",
+        "operationId": "product_details_v1_product_details_get",
+        "parameters": [
+          {
+            "description": "Up to 60 ids",
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "description": "Up to 60 ids",
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "maxItems": 60,
+              "minItems": 1,
+              "title": "Id",
+              "type": "array"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProductDetail"
+                  },
+                  "title": "Response Product Details V1 Product Details Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Product Details",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
     "/v1/products": {
       "get": {
         "operationId": "products_v1_products_get",
@@ -4211,7 +4266,7 @@
                   "items": {
                     "type": "string"
                   },
-                  "maxItems": 10,
+                  "maxItems": 30,
                   "type": "array"
                 },
                 {
