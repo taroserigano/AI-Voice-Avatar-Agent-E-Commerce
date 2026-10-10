@@ -512,3 +512,32 @@ def test_tool_payloads_are_valid_json_inside_the_wrapper() -> None:
     content, _ = get_my_cart.func(config(Store({"/v1/cart": CART})))  # type: ignore[attr-defined]
     body = content.split("\n", 1)[1].rsplit("\n", 1)[0]
     assert json.loads(body)["item_count"] == 2
+
+
+def test_a_type_search_whose_words_find_nothing_looks_again_by_type(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """ "Computer mice" under the type "mouse": the store's text search has no plurals, found
+    nothing, and Xena said there were no mice (x10-117)."""
+    monkeypatch.setattr(commerce_mod, "_vocabulary", None)
+
+    def products(params: dict[str, Any]) -> dict[str, Any]:
+        if params.get("q"):
+            return {"items": [], "total": 0}
+        return {"items": [{"id": IDS[0]}], "total": 1}
+
+    store = Store(
+        {
+            "/v1/catalog/vocabulary": VOCAB,
+            "/v1/products": products,
+            f"/v1/products/{IDS[0]}": detail(
+                IDS[0], "Wired Optical Mouse", product_type="vegetables"
+            ),
+        }
+    )
+    content, cards = search_products.func(  # type: ignore[attr-defined]
+        config(store), query="computer mice", product_types=["vegetables"], sort="price_asc"
+    )
+    asked = [p for path, p in store.calls if path == "/v1/products"]
+    assert asked[0]["q"] == "computer mice" and "q" not in asked[1]
+    assert [c["title"] for c in cards if c["kind"] == "product"] == ["Wired Optical Mouse"]

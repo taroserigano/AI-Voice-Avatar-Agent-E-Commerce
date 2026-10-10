@@ -521,6 +521,12 @@ def search_products(
     )
     try:
         page = ctx.client.get("/v1/products", params=params)
+        if not page["items"] and query and params.get("product_type"):
+            # The store's text search has no plurals: "computer mice" under the type "mouse"
+            # found nothing, so she said there were no mice (x10-117). The type already says
+            # what it is: look again by type, and the words still pick among the results.
+            params = {k: v for k, v in params.items() if k != "q"}
+            page = ctx.client.get("/v1/products", params=params)
         items = list(page["items"])
         while nutrient and len(items) < min(page["total"], RANK_LIMIT):
             more = ctx.client.get(
