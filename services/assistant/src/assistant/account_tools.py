@@ -15,6 +15,14 @@ from langchain_core.tools import tool
 from pydantic import BaseModel, Field
 
 from assistant.commerce import CommerceError
+from assistant.schemas import (
+    ActivityBrief,
+    ActivityCard,
+    CartLineBrief,
+    CartSummaryCard,
+    SupportCaseBrief,
+    SupportCasesCard,
+)
 from assistant.tools import (
     _error,
     ctx_from,
@@ -28,6 +36,10 @@ from assistant.tools import (
 MAX_CART_LINES = 20
 MAX_CASES = 10
 MAX_ACTIVITY = 20
+# What the cards show (the model may read more).
+CARD_CART_LINES = 5
+CARD_CASES = 5
+CARD_ACTIVITY = 8
 
 # --- Cart -----------------------------------------------------------------------------------
 
@@ -67,7 +79,32 @@ def get_my_cart(config: RunnableConfig) -> tuple[str, list[dict[str, Any]]]:
         payload["warnings"] = list(cart["warnings"])
     if len(lines) > MAX_CART_LINES:
         payload["more_items_not_shown"] = len(lines) - MAX_CART_LINES
-    return untrusted("get_my_cart", payload), []
+    return untrusted("get_my_cart", payload), [cart_card(cart)] if lines else []
+
+
+def cart_card(cart: dict[str, Any]) -> dict[str, Any]:
+    lines = cart.get("items") or []
+    return CartSummaryCard(
+        item_count=cart["item_count"],
+        lines=[
+            CartLineBrief(
+                title=ln["product_title"],
+                variant_name=ln["variant_name"],
+                quantity=ln["quantity"],
+                line_total_minor=ln["line_total_minor"],
+                image_path=ln.get("image_path") or "",
+                in_stock=ln["in_stock"],
+                url=f"/products/{ln['product_id']}",
+            )
+            for ln in lines[:CARD_CART_LINES]
+        ],
+        more_lines=max(0, len(lines) - CARD_CART_LINES),
+        subtotal_minor=cart["subtotal_minor"],
+        shipping_minor=cart.get("shipping_minor", 0),
+        estimated_total_minor=cart.get("estimated_total_minor", cart["subtotal_minor"]),
+        free_shipping_remaining_minor=cart.get("free_shipping_remaining_minor") or 0,
+        currency=cart.get("currency", "USD"),
+    ).model_dump()
 
 
 # --- Support cases --------------------------------------------------------------------------
@@ -103,7 +140,23 @@ def list_my_support_cases(config: RunnableConfig) -> tuple[str, list[dict[str, A
             for c in cases[:MAX_CASES]
         ],
     }
-    return untrusted("list_my_support_cases", payload), []
+    card = SupportCasesCard(
+        cases=[
+            SupportCaseBrief(
+                reference=c["reference"],
+                topic=c["subject"],
+                status=c["status"],
+                status_label=CASE_STATUS.get(c["status"], c["status"]),
+                opened_at=str(c["opened_at"]),
+                order_number=order_number(c["order_id"]) if c.get("order_id") else None,
+                order_url=f"/orders/{c['order_id']}" if c.get("order_id") else None,
+                reply_within=c.get("reply_within"),
+            )
+            for c in cases[:CARD_CASES]
+        ],
+        total=len(cases),
+    )
+    return untrusted("list_my_support_cases", payload), [card.model_dump()] if cases else []
 
 
 # --- Account activity -----------------------------------------------------------------------
@@ -184,6 +237,7 @@ def get_my_account_activity(
     except CommerceError as exc:
         return _error("get_my_account_activity", exc)
     rows = []
+    briefs: list[ActivityBrief] = []
     for e in events[:MAX_ACTIVITY]:
         product = e.get("product")
         row: dict[str, Any] = {
@@ -199,4 +253,39 @@ def get_my_account_activity(
         if e.get("is_sample"):
             row["sample_history"] = True
         rows.append(row)
-    return untrusted("get_my_account_activity", {"events": rows, "count": len(rows)}), []
+        if len(briefs) < CARD_ACTIVITY:
+            briefs.append(_activity_brief(e))
+    cards = [ActivityCard(events=briefs).model_dump()] if briefs else []
+    return untrusted("get_my_account_activity", {"events": rows, "count": len(rows)}), cards
+
+
+def _activity_brief(e: dict[str, Any]) -> ActivityBrief:
+    product = e.get("product")
+    details = _activity_details(e)
+    detail = None
+    if "searched_for" in details:
+        detail = f"“{details['searched_for']}”"
+    elif "quantity" in details:
+        detail = f"Qty {details['quantity']}"
+    elif "order_total" in details:
+        detail = details["order_total"]
+    elif "refund_amount" in details:
+        detail = f"{details['refund_amount']} refunded"
+    elif "refund_quoted" in details:
+        detail = f"{details['refund_quoted']} refund"
+    elif "stars_given" in details:
+        detail = f"{details['stars_given']} stars"
+    elif "case_reference" in details:
+        detail = details["case_reference"]
+    return ActivityBrief(
+        what=ACTIVITY_LABELS.get(e["type"], e["type"]),
+        type=e["type"],
+        occurred_at=str(e["occurred_at"]),
+        product_title=product["title"] if product else None,
+        product_url=f"/products/{product['id']}" if product else None,
+        image_path=product.get("image_path") if product else None,
+        order_number=order_number(e["order_id"]) if e.get("order_id") else None,
+        order_url=f"/orders/{e['order_id']}" if e.get("order_id") else None,
+        detail=detail,
+        is_sample=bool(e.get("is_sample")),
+    )

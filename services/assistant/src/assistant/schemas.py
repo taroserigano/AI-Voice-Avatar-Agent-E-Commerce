@@ -97,6 +97,72 @@ class CartCard(BaseModel):
     currency: str = "USD"
 
 
+class CartLineBrief(BaseModel):
+    title: str
+    variant_name: str
+    quantity: int
+    line_total_minor: int
+    image_path: str
+    in_stock: bool
+    url: str
+
+
+class CartSummaryCard(BaseModel):
+    """What's in the customer's cart now (Xena reads it; she can't change it)."""
+
+    kind: Literal["cart_summary"] = "cart_summary"
+    item_count: int
+    lines: list[CartLineBrief]
+    more_lines: int = 0
+    subtotal_minor: int
+    shipping_minor: int
+    estimated_total_minor: int
+    free_shipping_remaining_minor: int = 0
+    currency: str = "USD"
+    url: str = "/cart"
+
+
+class SupportCaseBrief(BaseModel):
+    reference: str
+    topic: str
+    status: Literal["open", "waiting_on_customer", "resolved"] | str
+    status_label: str
+    opened_at: str
+    order_number: str | None = None
+    order_url: str | None = None
+    reply_within: str | None = None
+
+
+class SupportCasesCard(BaseModel):
+    """The customer's support cases, newest first."""
+
+    kind: Literal["support_cases"] = "support_cases"
+    cases: list[SupportCaseBrief]
+    total: int
+    url: str = "/support"
+
+
+class ActivityBrief(BaseModel):
+    what: str
+    type: str
+    occurred_at: str
+    product_title: str | None = None
+    product_url: str | None = None
+    image_path: str | None = None
+    order_number: str | None = None
+    order_url: str | None = None
+    detail: str | None = None
+    is_sample: bool = False
+
+
+class ActivityCard(BaseModel):
+    """The customer's recent account activity, newest first."""
+
+    kind: Literal["activity"] = "activity"
+    events: list[ActivityBrief]
+    url: str = "/activity"
+
+
 class HandoffCard(BaseModel):
     kind: Literal["handoff"] = "handoff"
     reason: str
@@ -155,6 +221,9 @@ Card = Annotated[
     | StoreCard
     | CitationCard
     | CartCard
+    | CartSummaryCard
+    | SupportCasesCard
+    | ActivityCard
     | HandoffCard
     | ReturnOptionsCard
     | ReturnStatusCard

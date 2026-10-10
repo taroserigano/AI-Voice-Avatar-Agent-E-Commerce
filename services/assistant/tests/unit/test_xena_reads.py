@@ -349,7 +349,33 @@ def test_cart_shows_items_and_totals_and_never_writes() -> None:
     assert payload["more_for_free_shipping"] == "$25.02"
     # Internal ids and stock levels stay out of the model's view.
     assert not all_keys(payload) & {"sku", "variant_id", "id", "version", "available"}
-    assert cards == [] and store.calls == [("/v1/cart", None)]
+    assert store.calls == [("/v1/cart", None)]
+    # The card shows the same cart, linked to the cart page (where it can be changed).
+    [card] = cards
+    assert card["kind"] == "cart_summary" and card["url"] == "/cart"
+    assert (card["item_count"], card["subtotal_minor"], card["estimated_total_minor"]) == (
+        2,
+        998,
+        1597,
+    )
+    assert card["lines"] == [
+        {
+            "title": "Plain Greek Yogurt",
+            "variant_name": "32 oz",
+            "quantity": 2,
+            "line_total_minor": 998,
+            "image_path": "/yogurt.svg",
+            "in_stock": True,
+            "url": f"/products/{PID}",
+        }
+    ]
+    assert card["free_shipping_remaining_minor"] == 2502
+
+
+def test_an_empty_cart_has_no_card() -> None:
+    empty = {**CART, "items": [], "item_count": 0, "subtotal_minor": 0}
+    _, cards = get_my_cart.func(config(Store({"/v1/cart": empty})))  # type: ignore[attr-defined]
+    assert cards == []
 
 
 def test_cart_error_is_reported_not_raised() -> None:
@@ -386,7 +412,18 @@ def test_support_cases_show_status_topic_and_order_number() -> None:
         "opened_on": "Sep 28",
         "reply_within": "1 business day",
     }
-    assert cards == []
+    [card] = cards
+    assert card["kind"] == "support_cases" and card["total"] == 12 and len(card["cases"]) == 5
+    assert card["cases"][0] == {
+        "reference": "CS-482113",
+        "topic": "Package arrived crushed",
+        "status": "waiting_on_customer",
+        "status_label": "Waiting on you",
+        "opened_at": "2026-09-28T15:00:00+00:00",
+        "order_number": "9B160F12",
+        "order_url": f"/orders/{ORDER}",
+        "reply_within": "1 business day",
+    }
 
 
 # --- Account activity ------------------------------------------------------------------------
@@ -451,7 +488,15 @@ def test_activity_is_bounded_and_reads_only_named_details() -> None:
     assert refund["refund_amount"] == "$12.63" and refund["rma_number"] == "RMA-1001"
     assert refund["order_number"] == "9B160F12"
     assert "alice@example.com" not in content and "77777777" not in content
-    assert cards == []
+    [card] = cards
+    assert card["kind"] == "activity" and card["url"] == "/activity"
+    first, second, third = card["events"]
+    assert first["what"] == "Searched the store"
+    assert first["detail"] == f"\u201c{INJECTION[:100]}\u201d"
+    assert second["product_url"] == f"/products/{PID}" and second["detail"] == "Qty 2"
+    assert second["is_sample"] and third["detail"] == "$12.63 refunded"
+    assert third["order_url"] == f"/orders/{ORDER}"
+    assert "alice@example.com" not in str(card) and "77777777" not in str(card)
 
 
 def test_activity_limit_is_capped() -> None:

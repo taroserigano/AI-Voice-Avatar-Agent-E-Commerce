@@ -9,7 +9,8 @@ import type { VoiceTurn } from "@/lib/use-voice-agent";
 import type { Citation, VoiceStateName } from "@/lib/voice-protocol";
 
 const CARD_KINDS = new Set([
-  "search", "xana", "product", "order", "store", "cart", "handoff", "return_options", "return_status",
+  "search", "xana", "product", "order", "store", "cart", "cart_summary", "support_cases", "activity",
+  "handoff", "return_options", "return_status",
 ]);
 
 export function shownCards(cards: Record<string, unknown>[]): Card[] {

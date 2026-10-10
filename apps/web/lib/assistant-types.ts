@@ -75,6 +75,61 @@ export type CartCard = {
   currency: string;
 };
 
+/** What's in the cart now (Xena reads it; she can't change it). */
+export type CartSummaryCard = {
+  kind: "cart_summary";
+  item_count: number;
+  lines: {
+    title: string;
+    variant_name: string;
+    quantity: number;
+    line_total_minor: number;
+    image_path: string;
+    in_stock: boolean;
+    url: string;
+  }[];
+  more_lines: number;
+  subtotal_minor: number;
+  shipping_minor: number;
+  estimated_total_minor: number;
+  free_shipping_remaining_minor: number;
+  currency: string;
+  url: string;
+};
+
+export type SupportCasesCard = {
+  kind: "support_cases";
+  cases: {
+    reference: string;
+    topic: string;
+    status: string;
+    status_label: string;
+    opened_at: string;
+    order_number: string | null;
+    order_url: string | null;
+    reply_within: string | null;
+  }[];
+  total: number;
+  url: string;
+};
+
+export type ActivityCard = {
+  kind: "activity";
+  events: {
+    what: string;
+    type: string;
+    occurred_at: string;
+    product_title: string | null;
+    product_url: string | null;
+    image_path: string | null;
+    order_number: string | null;
+    order_url: string | null;
+    detail: string | null;
+    is_sample: boolean;
+  }[];
+  url: string;
+};
+
 export type HandoffCard = { kind: "handoff"; reason: string; message: string };
 
 export type ReturnOptionsCard = {
@@ -142,6 +197,9 @@ export type Card =
   | OrderCard
   | StoreCard
   | CartCard
+  | CartSummaryCard
+  | SupportCasesCard
+  | ActivityCard
   | HandoffCard
   | ReturnOptionsCard
   | ReturnStatusCard;

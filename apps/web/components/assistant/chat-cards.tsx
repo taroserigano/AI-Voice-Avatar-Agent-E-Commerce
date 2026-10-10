@@ -2,6 +2,8 @@
 
 import {
   ArrowRightIcon,
+  CartIcon,
+  ChatIcon,
   CheckCircleIcon,
   ChevronDownIcon,
   ClockIcon,
@@ -13,7 +15,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { RatingBadge } from "@/components/ui/stars";
 import type {
+  ActivityCard,
   CartCard,
+  CartSummaryCard,
   Card,
   CitationCard,
   HandoffCard,
@@ -23,6 +27,7 @@ import type {
   ReturnStatusCard,
   SearchCard,
   StoreCard,
+  SupportCasesCard,
   XanaCard,
 } from "@/lib/assistant-types";
 import { formatDate, orderStatusMeta } from "@/lib/orders";
@@ -73,6 +78,12 @@ function OtherCard({ card, onAsk }: { card: Exclude<Card, ProductCard>; onAsk?: 
       return <StoreChatCard card={card} />;
     case "cart":
       return <CartChatCard card={card} />;
+    case "cart_summary":
+      return <CartSummaryChatCard card={card} />;
+    case "support_cases":
+      return <SupportCasesChatCard card={card} />;
+    case "activity":
+      return <ActivityChatCard card={card} />;
     case "handoff":
       return <HandoffChatCard card={card} />;
   }
@@ -247,6 +258,144 @@ function CartChatCard({ card }: { card: CartCard }) {
       </div>
       <Link href="/cart" className={smallLink}>
         View cart
+      </Link>
+    </article>
+  );
+}
+
+function CartSummaryChatCard({ card }: { card: CartSummaryCard }) {
+  const money = (minor: number) => formatMoney(minor, card.currency);
+  return (
+    <article className={cardBox} aria-label="Your cart">
+      <div className="flex items-center justify-between gap-2">
+        <p className="flex items-center gap-1.5 text-sm font-semibold text-ink">
+          <CartIcon className="size-4 text-brand-600" />
+          Your cart · {card.item_count} {card.item_count === 1 ? "item" : "items"}
+        </p>
+        <p className="text-sm font-semibold tabular-nums text-ink">{money(card.subtotal_minor)}</p>
+      </div>
+      <ul className="mt-2 space-y-1.5" aria-label="Items">
+        {card.lines.map((l) => (
+          <li key={l.url + l.variant_name} className="flex items-center gap-2 text-sm text-ink-soft">
+            {/* eslint-disable-next-line @next/next/no-img-element -- local product illustrations */}
+            <img src={l.image_path} alt="" width={28} height={28} className="size-7 shrink-0 rounded-lg bg-canvas object-contain" />
+            <Link href={l.url} className="min-w-0 flex-1 truncate hover:text-brand-700">
+              {l.quantity} × {l.title}
+              {l.variant_name ? <span className="text-muted"> · {l.variant_name}</span> : null}
+            </Link>
+            {!l.in_stock ? <span className="text-xs font-medium text-danger-700">Out of stock</span> : null}
+            <span className="tabular-nums text-ink">{money(l.line_total_minor)}</span>
+          </li>
+        ))}
+      </ul>
+      {card.more_lines ? <p className="mt-1 text-xs text-muted">and {card.more_lines} more</p> : null}
+      <p className="mt-2 text-xs text-muted">
+        {card.shipping_minor ? `Shipping ${money(card.shipping_minor)}` : "Free shipping"} · Estimated{" "}
+        {money(card.estimated_total_minor)} before tax
+        {card.free_shipping_remaining_minor ? ` · ${money(card.free_shipping_remaining_minor)} more for free shipping` : ""}
+      </p>
+      <Link href={card.url} className={`${smallLink} mt-2`}>
+        Go to cart <ArrowRightIcon className="size-3.5" />
+      </Link>
+    </article>
+  );
+}
+
+const caseTone: Record<string, "brand" | "warning" | "success"> = {
+  open: "brand",
+  waiting_on_customer: "warning",
+  resolved: "success",
+};
+
+function SupportCasesChatCard({ card }: { card: SupportCasesCard }) {
+  return (
+    <article className={cardBox} aria-label="Your support cases">
+      <p className="flex items-center gap-1.5 text-sm font-semibold text-ink">
+        <ChatIcon className="size-4 text-brand-600" />
+        Support cases
+        {card.total > card.cases.length ? (
+          <span className="font-normal text-muted">
+            · {card.cases.length} of {card.total}
+          </span>
+        ) : null}
+      </p>
+      <ul className="mt-2 divide-y divide-line" aria-label="Cases">
+        {card.cases.map((c) => (
+          <li key={c.reference} className="py-2 first:pt-0 last:pb-0">
+            <div className="flex items-start justify-between gap-2">
+              <p className="min-w-0 text-sm text-ink">
+                <span className="font-semibold tabular-nums">{c.reference}</span> · {c.topic}
+              </p>
+              <Badge tone={caseTone[c.status] ?? "neutral"}>{c.status_label}</Badge>
+            </div>
+            <p className="mt-0.5 text-xs text-muted">
+              Opened {formatDate(c.opened_at)}
+              {c.order_number && c.order_url ? (
+                <>
+                  {" · "}
+                  <Link href={c.order_url} className="hover:text-brand-700">
+                    Order #{c.order_number}
+                  </Link>
+                </>
+              ) : null}
+              {c.status !== "resolved" && c.reply_within ? ` · Reply within ${c.reply_within}` : ""}
+            </p>
+          </li>
+        ))}
+      </ul>
+      <Link href={card.url} className={`${smallLink} mt-2`}>
+        Open Support <ArrowRightIcon className="size-3.5" />
+      </Link>
+    </article>
+  );
+}
+
+function ActivityChatCard({ card }: { card: ActivityCard }) {
+  return (
+    <article className={cardBox} aria-label="Your recent activity">
+      <p className="flex items-center gap-1.5 text-sm font-semibold text-ink">
+        <ClockIcon className="size-4 text-brand-600" />
+        Recent activity
+      </p>
+      <ol className="mt-2 space-y-2 border-l border-line pl-3" aria-label="Events">
+        {card.events.map((e, i) => (
+          <li key={`${e.occurred_at}-${i}`} className="relative flex items-center gap-2">
+            <span aria-hidden className="absolute -left-4.25 size-2 rounded-full bg-brand-400 ring-2 ring-raised" />
+            {e.image_path ? (
+              /* eslint-disable-next-line @next/next/no-img-element -- local product illustrations */
+              <img src={e.image_path} alt="" width={28} height={28} className="size-7 shrink-0 rounded-lg bg-canvas object-contain" />
+            ) : null}
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm text-ink">
+                <span className="font-medium">{e.what}</span>
+                {e.product_title && e.product_url ? (
+                  <>
+                    {" · "}
+                    <Link href={e.product_url} className="text-ink-soft hover:text-brand-700">
+                      {e.product_title}
+                    </Link>
+                  </>
+                ) : null}
+                {e.detail ? <span className="text-ink-soft"> · {e.detail}</span> : null}
+              </p>
+              <p className="text-xs text-muted">
+                {formatDate(e.occurred_at)}
+                {e.order_number && e.order_url ? (
+                  <>
+                    {" · "}
+                    <Link href={e.order_url} className="hover:text-brand-700">
+                      Order #{e.order_number}
+                    </Link>
+                  </>
+                ) : null}
+                {e.is_sample ? " · Sample" : ""}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <Link href={card.url} className={`${smallLink} mt-2`}>
+        See all activity <ArrowRightIcon className="size-3.5" />
       </Link>
     </article>
   );
