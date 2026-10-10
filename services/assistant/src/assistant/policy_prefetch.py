@@ -34,6 +34,16 @@ POLICY_WORDS = re.compile(
     # 2026-10-08: "do you ship to Canada?", "how do I reset my password?" went unanswered).
     r"disputes?|chargebacks?|charged (?:twice|double|wrong\w*|more)|double.?charged|billing|"
     r"payment methods?|pay(?:pal| with| by)|apple pay|google pay|credit cards?|debit cards?|"
+    # Buying and subscriptions: voice answered "can I buy what's in my cart?" from the prompt,
+    # uncited (s-011, 2026-10-10). Narrow on purpose: "where can I buy oat milk" isn't policy.
+    r"buy (?:what'?s|everything|all|the (?:items?|stuff|things)) in (?:my |the )?(?:cart|basket)|"
+    r"(?:complete|finish|finali[sz]e) (?:my |the |a |this )?(?:order|purchase|checkout)|"
+    r"purchase (?:my |the )?(?:cart|basket|order)|pay for (?:my |the )?(?:cart|order|items)|"
+    r"subscri\w*|auto.?ship|auto.?renew\w*|recurring (?:orders?|deliver\w*)|"
+    # Delivery times for a new order (s-051: "when will my order arrive if I order today?").
+    r"if (?:i|we) (?:order|buy)(?: it| this| them)? (?:today|now|tonight|tomorrow)|"
+    r"how long (?:does|will|would) (?:shipping|delivery|it take to (?:ship|arrive|deliver))|"
+    r"delivery (?:times?|estimates?|speeds?)|shipping (?:times?|speeds?|options?)|"
     r"check ?out|promo(?: codes?)?|coupons?|discount codes?|rewards?|loyalty|points|"
     r"passwords?|log ?in|sign(?:ed)? ?(?:in|up|out)|accounts?|e-?mail address|my e-?mail|"
     r"wish ?lists?|favorites|save for later|receipts?|invoices?|"
@@ -249,6 +259,16 @@ _DISPUTE = re.compile(
 )
 
 
+# "Can you approve my refund yourself?" found the refund rules, not who decides (x04-173): these
+# ask the assistant to decide, so search for what the assistants may and may not do.
+_AUTHORITY = re.compile(
+    r"\b(?:yourself|on your own|(?:can|could|will|would) you (?:just |please )?(?:approve|"
+    r"authori[sz]e|override|waive|grant|issue|push (?:it |this )?through|make an exception|"
+    r"bend)|make an exception|override|waive)\b",
+    re.I,
+)
+
+
 def retrieval_query(text: str) -> str:
     """The customer's words as a search query: timing questions say "timing", refund-amount
     questions say what section 7 says, an old fault asks about the warranty, filler goes."""
@@ -262,6 +282,9 @@ def retrieval_query(text: str) -> str:
     if _DISPUTE.search(said):
         said += " inspection outcomes failed not refunded ship it back review"
         said += " disagreeing with a decision"
+    if _AUTHORITY.search(said):
+        said += " ai models never decide what assistants may and may not do only the customer"
+        said += " confirms"
     if _FOOD.search(said) and _SPOILED.search(said):
         said += " perishable fresh frozen food spoiled damaged within 7 days of delivery"
     elif _FOOD.search(said) and _CHANGED_MIND.search(said):

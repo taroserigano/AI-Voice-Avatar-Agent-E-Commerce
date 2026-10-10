@@ -86,7 +86,7 @@ from assistant.turns import (
 
 log = logging.getLogger(__name__)
 
-PROMPT_VERSION = "xana.voice.v9"
+PROMPT_VERSION = "xana.voice.v10"
 PROMPT_DIR = Path(__file__).resolve().parent / "prompts"
 SNAPSHOT_ORDERS = 12
 

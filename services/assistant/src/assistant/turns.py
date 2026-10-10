@@ -43,7 +43,9 @@ from assistant.tools import ToolContext
 
 log = logging.getLogger(__name__)
 
-CITE = re.compile(r"\[\[cite:([a-z0-9-]+(?:#[a-z]{2}(?:-\d+)+)?)\]\]")
+# Any marker, as the web reads them: a malformed one ("[[cite:shipping#...]]") is invalid, so it's
+# removed from what's shown instead of staying in the answer as text.
+CITE = re.compile(r"\[\[cite:([^\]\s]+)\]\]")
 # A whole-document citation sometimes comes back as "doc#doc": it means the document.
 DOC_AS_SECTION = re.compile(r"\[\[cite:([a-z0-9-]+)#\1\]\]")
 TOOL_LABELS = {

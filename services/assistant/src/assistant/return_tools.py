@@ -47,9 +47,12 @@ def resolve_order_id(client: CommerceClient, order_id: str) -> str:
         return found
 
 
-def resolve_lines(client: CommerceClient, order_id: str, lines: list[Any]) -> list[dict[str, Any]]:
-    """The requested lines with full ids; ValueError names a line that isn't on the order.
-    Resolved against the same lines the handles were made from (the return options)."""
+def resolve_lines(
+    client: CommerceClient, order_id: str, lines: list[Any]
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """The requested lines with full ids, and the return options they were resolved against
+    (the same lines the handles were made from); ValueError names a line that isn't on the
+    order."""
     opts = client.get(f"/v1/orders/{order_id}/return-options")
     ids = [str(ln["order_line_id"]) for ln in opts["lines"]]
     out = []
@@ -62,7 +65,7 @@ def resolve_lines(client: CommerceClient, order_id: str, lines: list[Any]) -> li
         if len(match) != 1:
             raise ValueError(given)
         out.append({"order_line_id": match[0], "quantity": qty})
-    return out
+    return out, opts
 
 
 TIMING_WORDS = {
@@ -110,9 +113,28 @@ def destination_words(dest: dict[str, Any] | None) -> str:
     return f"your {brand} ending in {last4}" if last4 else "your original payment method"
 
 
-def readback(quote: dict[str, Any]) -> str:
+def returned_before(client: CommerceClient, quote: dict[str, Any]) -> list[str]:
+    """Units of the quoted items returned before, as words ("1 × Commuter Laptop Backpack"):
+    "return both backpacks" with one already returned is a quote for one, and voice read only
+    the quote, so it sounded like both (xr-075, 2026-10-10)."""
+    try:
+        opts = client.get(f"/v1/orders/{quote['order_id']}/return-options")
+    except CommerceError:
+        return []
+    returned = {
+        str(ln["order_line_id"]): int(ln.get("returned_quantity") or 0) for ln in opts["lines"]
+    }
+    return [
+        f"{returned[str(ln['order_line_id'])]} × {ln['product_title']}"
+        for ln in quote["lines"]
+        if returned.get(str(ln["order_line_id"]))
+    ]
+
+
+def readback(quote: dict[str, Any], returned: list[str] | None = None) -> str:
     """The exact words read to the customer before they confirm. Built by code from the quote,
-    never by the model, so what's read is what's confirmed."""
+    never by the model, so what's read is what's confirmed. Units returned before are said
+    first, so a quote for fewer than they asked for doesn't sound like all of them."""
     items = "; ".join(
         f"{ln['quantity']} × {ln['product_title']}"
         + (f" ({ln['variant_name']})" if ln["variant_name"] else "")
@@ -125,15 +147,19 @@ def readback(quote: dict[str, Any]) -> str:
         if quote["shipping_refund_minor"]
         else ""
     )
+    before = ""
+    if returned:
+        was = "was" if len(returned) == 1 and returned[0].startswith("1 ") else "were"
+        before = f"{' and '.join(returned)} from this order {was} already returned. "
     return (
-        f"Here's your return: {items}. "
+        f"{before}Here's your return: {items}. "
         f"You'll get {money(quote['total_refund_minor'])} back{shipping}, "
         f"to {destination_words(quote.get('refund_destination'))}, {when}. "
         "Do you want me to confirm this return?"
     )
 
 
-def quote_card(quote: dict[str, Any]) -> dict[str, Any]:
+def quote_card(quote: dict[str, Any], returned: list[str] | None = None) -> dict[str, Any]:
     return {
         "kind": "return_quote",
         "quote_id": quote["id"],
@@ -160,7 +186,8 @@ def quote_card(quote: dict[str, Any]) -> dict[str, Any]:
         "needs_shipping": quote["needs_shipping"],
         "expires_at": quote["expires_at"],
         "policy_version": quote["policy_version"],
-        "readback": readback(quote),
+        "returned_before": returned or [],
+        "readback": readback(quote, returned),
     }
 
 
@@ -252,7 +279,7 @@ def quote_return(
     chosen = reason or (jev_reason.get("value") if jev_reason.get("act") else None) or "other"
     try:
         order_id = resolve_order_id(ctx.client, order_id)
-        resolved = resolve_lines(ctx.client, order_id, lines)
+        resolved, _ = resolve_lines(ctx.client, order_id, lines)
     except ValueError as exc:
         return untrusted(
             "quote_return",
@@ -319,7 +346,7 @@ def propose_return(config: RunnableConfig, quote_id: str) -> tuple[str, list[dic
         ]
 
     # Pause. The browser shows the card; the customer confirms or declines with the store.
-    outcome = interrupt(quote_card(quote))
+    outcome = interrupt(quote_card(quote, returned_before(ctx.client, quote)))
 
     # Resumed: check with the store what actually happened (never trust the resume message).
     try:

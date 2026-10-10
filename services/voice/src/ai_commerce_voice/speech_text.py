@@ -16,7 +16,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-CITE = re.compile(r"\[\[cite:([a-z0-9-]+(?:#[a-z]{2}(?:-\d+)+)?)\]\]")
+# Any marker, well formed or not: "[[cite:shipping#...]]" (s-011, 2026-10-10) is never said.
+CITE = re.compile(r"\[\[cite:[^\]]*\]\]")
 # A marker that may still be arriving: hold it back until it closes.
 _OPEN_CITE = re.compile(r"\[(\[(c(i(t(e(:[^\]]*)?)?)?)?)?)?$")
 _MARKDOWN = re.compile(r"(\*\*|__|`|^#+\s*|^\s*[-*]\s+)", re.MULTILINE)

@@ -106,3 +106,8 @@ def test_emoji_are_never_spoken() -> None:
     assert speakable("Your milk is in stock 🥛, enjoy!") == "Your milk is in stock, enjoy!"
     assert speakable("Happy puzzling! 🧩✨").strip() == "Happy puzzling!"
     assert speakable("Thumbs up 👍🏽.") == "Thumbs up."
+
+
+def test_a_malformed_citation_marker_is_never_spoken() -> None:
+    said = speakable("Standard shipping takes 2 to 5 business days. [[cite:shipping#...]]")
+    assert "cite" not in said and said.strip() == "Standard shipping takes 2 to 5 business days."

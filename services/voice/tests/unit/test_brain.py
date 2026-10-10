@@ -80,6 +80,16 @@ class FakeStore:
             }
         if path == f"/v1/orders/{ORDER_ID}":
             return order()
+        if path == f"/v1/orders/{ORDER_ID}/return-options":
+            # The read-back says units returned before; none here.
+            return {
+                "lines": [
+                    {
+                        "order_line_id": "11111111-1111-4111-8111-111111111111",
+                        "returned_quantity": 0,
+                    }
+                ]
+            }
         if path == f"/v1/returns/quotes/{QUOTE_ID}":
             return {
                 "id": QUOTE_ID,

@@ -256,7 +256,13 @@ def get_my_account_activity(
         if len(briefs) < CARD_ACTIVITY:
             briefs.append(_activity_brief(e))
     cards = [ActivityCard(events=briefs).model_dump()] if briefs else []
-    return untrusted("get_my_account_activity", {"events": rows, "count": len(rows)}), cards
+    payload = {
+        "events": rows,
+        "count": len(rows),
+        # "Where can I see what I've searched for?" wants the page, not only the list (s-008).
+        "full_history": 'The whole history is on the Activity page (from Orders, "Your activity").',
+    }
+    return untrusted("get_my_account_activity", payload), cards
 
 
 def _activity_brief(e: dict[str, Any]) -> ActivityBrief:
