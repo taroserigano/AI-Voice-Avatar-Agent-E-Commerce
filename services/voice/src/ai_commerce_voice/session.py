@@ -28,7 +28,7 @@ import contextlib
 import logging
 import re
 import time
-from collections.abc import AsyncIterator, Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable, Mapping
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
@@ -132,7 +132,7 @@ class VoiceSession:
     mouth: Mouth
     brain: Brain
     confirm: ConfirmRule
-    fillers: dict[str, FillerClip]
+    fillers: Mapping[str, FillerClip]
     filler_after_ms: int = 1500
     # With her face on, nothing is heard for the face's own ~1 s anyway: a filler sooner
     # covers that wait (docs/features/12-xena-latency, L1).

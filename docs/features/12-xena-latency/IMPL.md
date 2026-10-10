@@ -30,3 +30,24 @@ gain. Removed rather than kept as a setting.
 
 **Still open:** L4 (Taro: offer the faster Phoenix-4.5 face as a look, ~0.3 s per reply) and
 L5 (speech-to-text, its own plan). The voice golden eval needs a rerun on a steady network.
+
+## Backup voice (2026-10-10)
+
+Cartesia ran out of credit on 2026-10-09 (`402 quota_exceeded`), and every call went to text.
+Now `FallbackMouth` (`services/voice/src/ai_commerce_voice/mouth_fallback.py`) tries Cartesia
+first and switches to OpenAI speech (`mouth_openai.py`, `gpt-4o-mini-tts`, voice Marin) when:
+
+- Cartesia refuses the call at start. The `ready` message names the voice actually in use, and
+  the customer is told "Xena's usual voice isn't available right now, so she's using a backup
+  voice."
+- Cartesia fails an answer before any audio was heard. The same words are said again by the
+  backup, and the rest of the call stays on the backup. A failure after audio played is shown as
+  text, as before, because half an answer can't be re-said in another voice.
+
+Fillers are rendered in both voices at startup (cached in `.cache/fillers`), and a call plays
+the fillers of the voice it's using. Only when both voices fail does the call go to text.
+`VOICE_BACKUP_TTS=off` turns the backup off.
+
+Measured live: OpenAI's first audio is about 0.5-0.7 s on a warm connection (Cartesia's is
+about 0.13 s). OpenAI returns no word timings, so each clause's words are spread over its
+audio by length.

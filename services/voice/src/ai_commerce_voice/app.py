@@ -23,7 +23,7 @@ import hashlib
 import json
 import logging
 import uuid
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Iterator, Mapping
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
@@ -50,6 +50,8 @@ from ai_commerce_voice.face_heygen import SANDBOX_AVATAR, HeygenFace
 from ai_commerce_voice.face_tavus import TavusFace
 from ai_commerce_voice.fillers import all_phrases
 from ai_commerce_voice.mouth_cartesia import CartesiaMouth
+from ai_commerce_voice.mouth_fallback import FallbackMouth
+from ai_commerce_voice.mouth_openai import OpenAIMouth
 from ai_commerce_voice.mouth_text import TextOnlyMouth
 from ai_commerce_voice.ports import AgentEvent, Mouth, TurnEnded
 from ai_commerce_voice.session import FillerClip, VoiceSession
@@ -70,6 +72,10 @@ from assistant.tools import ToolContext, with_brands
 log = logging.getLogger(__name__)
 
 CACHE = Path(__file__).resolve().parents[2] / ".cache" / "fillers"
+BACKUP_VOICE_NOTICE = {
+    "type": "error",
+    "message": "Xena's usual voice isn't available right now, so she's using a backup voice.",
+}
 NOTICE = (
     "Xena is an AI assistant. Your voice is streamed to our speech providers to be turned into "
     "text and isn't stored; the transcript is saved with this conversation."
@@ -147,42 +153,75 @@ def pick_model(settings: VoiceSettings, http: httpx.AsyncClient) -> ModelPick:
 # --- fillers ----------------------------------------------------------------------------------
 
 
-def _cache_key(settings: VoiceSettings, text: str) -> str:
-    raw = f"{settings.cartesia_model}|{settings.cartesia_voice_id}|24000|{text}"
+def _cache_key(settings: VoiceSettings, text: str, provider: str = "cartesia") -> str:
+    if provider == "openai":
+        raw = f"openai|{settings.openai_tts_model}|{settings.openai_tts_voice}|24000|{text}"
+    else:
+        raw = f"{settings.cartesia_model}|{settings.cartesia_voice_id}|24000|{text}"
     return hashlib.sha256(raw.encode()).hexdigest()[:24]
 
 
-async def load_fillers(settings: VoiceSettings, clips: dict[str, FillerClip]) -> None:
-    """Every filler, from the disk cache or rendered with Skylar (two at a time: Cartesia's
+def make_mouth(settings: VoiceSettings, provider: str = "cartesia") -> Mouth:
+    if provider == "openai":
+        assert settings.openai_api_key
+        return OpenAIMouth(
+            settings.openai_api_key,
+            model=settings.openai_tts_model,
+            voice=settings.openai_tts_voice,
+            voice_name=settings.openai_tts_voice_name,
+        )
+    assert settings.cartesia_api_key
+    return CartesiaMouth(
+        settings.cartesia_api_key,
+        model=settings.cartesia_model,
+        version=settings.cartesia_version,
+        voice_id=settings.cartesia_voice_id,
+        voice_name=settings.cartesia_voice_name,
+    )
+
+
+def backup_ready(settings: VoiceSettings) -> bool:
+    return settings.voice_backup_tts == "openai" and bool(settings.openai_api_key)
+
+
+async def load_fillers(
+    settings: VoiceSettings, clips: dict[str, FillerClip], provider: str = "cartesia"
+) -> None:
+    """Every filler in one voice, from the disk cache or rendered (two at a time: Cartesia's
     concurrency limit is per account). Fills ``clips`` in place, so calls that started before
     rendering finished get the fillers as soon as they exist."""
     missing: list[str] = []
     CACHE.mkdir(parents=True, exist_ok=True)
     for text in all_phrases():
-        base = CACHE / _cache_key(settings, text)
+        base = CACHE / _cache_key(settings, text, provider)
         pcm, meta = base.with_suffix(".pcm"), base.with_suffix(".json")
         if pcm.exists() and meta.exists():
             clips[text] = FillerClip(text, pcm.read_bytes(), json.loads(meta.read_text("utf-8")))
         else:
             missing.append(text)
-    if missing and settings.cartesia_api_key:
-        mouth = CartesiaMouth(
-            settings.cartesia_api_key,
-            model=settings.cartesia_model,
-            version=settings.cartesia_version,
-            voice_id=settings.cartesia_voice_id,
-        )
-        await mouth.start()
+    key = settings.openai_api_key if provider == "openai" else settings.cartesia_api_key
+    if missing and key:
+        mouth = make_mouth(settings, provider)
+        try:
+            await mouth.start()
+        except Exception as exc:  # noqa: BLE001 - no fillers in this voice, the call goes on
+            log.warning("%s fillers not rendered: %s", provider, exc)
+            return
         gate = asyncio.Semaphore(2)
+        failed = 0
 
         async def one(text: str) -> None:
+            nonlocal failed
+            if failed >= 3:  # the engine is refusing (no credit): stop asking
+                return
             async with gate:
                 try:
                     audio, words = await mouth.synthesize(text)
                 except Exception as exc:  # noqa: BLE001 - a missing filler just isn't played
+                    failed += 1
                     log.warning("filler %r not rendered: %s", text, exc)
                     return
-            base = CACHE / _cache_key(settings, text)
+            base = CACHE / _cache_key(settings, text, provider)
             base.with_suffix(".pcm").write_bytes(audio)
             base.with_suffix(".json").write_text(json.dumps(words), "utf-8")
             clips[text] = FillerClip(text, audio, words)
@@ -191,7 +230,40 @@ async def load_fillers(settings: VoiceSettings, clips: dict[str, FillerClip]) ->
             await asyncio.gather(*(one(t) for t in missing))
         finally:
             await mouth.close()
-    log.info("voice fillers ready: %d of %d", len(clips), len(all_phrases()))
+    log.info("voice fillers ready (%s): %d of %d", provider, len(clips), len(all_phrases()))
+
+
+def fillers_for(
+    mouth: Mouth, primary: dict[str, FillerClip], backup: dict[str, FillerClip]
+) -> Mapping[str, FillerClip]:
+    if isinstance(mouth, FallbackMouth):
+        return VoiceFillers(mouth, primary, backup)
+    return backup if isinstance(mouth, OpenAIMouth) else primary
+
+
+class VoiceFillers(Mapping[str, FillerClip]):
+    """The fillers in the voice the call is using now: Skylar's, or the backup voice's once
+    Cartesia has refused (a filler in another voice would sound like a second person)."""
+
+    def __init__(
+        self, mouth: Mouth, primary: dict[str, FillerClip], backup: dict[str, FillerClip]
+    ) -> None:
+        self._mouth = mouth
+        self._primary = primary
+        self._backup = backup
+
+    def _clips(self) -> dict[str, FillerClip]:
+        on_backup = isinstance(self._mouth, FallbackMouth) and self._mouth.on_backup
+        return self._backup if on_backup else self._primary
+
+    def __getitem__(self, key: str) -> FillerClip:
+        return self._clips()[key]
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self._clips())
+
+    def __len__(self) -> int:
+        return len(self._clips())
 
 
 def make_face(settings: VoiceSettings, http: httpx.AsyncClient) -> TavusFace | None:
@@ -302,7 +374,7 @@ class CountingBrain:
 
 def create_app(checkpointer: Any | None = None) -> FastAPI:
     settings = get_settings()
-    state: dict[str, Any] = {"fillers": {}}
+    state: dict[str, Any] = {"fillers": {}, "backup_fillers": {}}
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -329,6 +401,11 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
             limits=httpx.Limits(max_keepalive_connections=20),
         )
         state["fillers_task"] = asyncio.create_task(load_fillers(settings, state["fillers"]))
+        if backup_ready(settings):
+            # Cheap, and ready before Cartesia ever refuses.
+            state["backup_fillers_task"] = asyncio.create_task(
+                load_fillers(settings, state["backup_fillers"], "openai")
+            )
         state["face"] = make_face(settings, state["http"])
         faces: dict[str, Face] = {}
         if state["face"] is not None:
@@ -388,7 +465,7 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
             await ws.close(code=4401)
             return
         await ws.accept()
-        if not settings.cartesia_api_key or not settings.openai_api_key:
+        if not settings.openai_api_key or not (settings.cartesia_api_key or backup_ready(settings)):
             await ws.send_json(
                 {
                     "type": "error",
@@ -407,13 +484,24 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
 
         client = CommerceClient(customer.id, a_settings)
         first_name = (customer.name or "").split(" ")[0]
-        mouth: Mouth = CartesiaMouth(
-            settings.cartesia_api_key,
-            model=settings.cartesia_model,
-            version=settings.cartesia_version,
-            voice_id=settings.cartesia_voice_id,
-            voice_name=settings.cartesia_voice_name,
-        )
+        session_ref: dict[str, VoiceSession] = {}
+
+        def voice_switched(reason: str) -> None:
+            # Mid-call (start-up switches are told in "ready"): say why her voice changed.
+            if "s" in session_ref:
+                task = asyncio.create_task(send_json(BACKUP_VOICE_NOTICE))
+                _background.add(task)
+                task.add_done_callback(_background.discard)
+
+        mouth: Mouth
+        if not settings.cartesia_api_key:
+            mouth = make_mouth(settings, "openai")
+        elif backup_ready(settings):
+            mouth = FallbackMouth(
+                make_mouth(settings), make_mouth(settings, "openai"), on_switch=voice_switched
+            )
+        else:
+            mouth = make_mouth(settings)
 
         async def start_mouth(m: Mouth) -> Mouth:
             # No voice is no reason to end the call: with the speech engine refusing (out of
@@ -427,7 +515,6 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
                     await m.close()
                 return TextOnlyMouth(str(exc), voice=settings.cartesia_voice_name)
 
-        session_ref: dict[str, VoiceSession] = {}
         ears = OpenAILiveEars(
             settings.openai_api_key,
             model=settings.voice_stt_model,
@@ -523,7 +610,7 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
             mouth=mouth,
             brain=CountingBrain(brain, conv.id, a_settings.max_turns_per_conversation),
             confirm=confirm_rule,
-            fillers=state["fillers"],
+            fillers=fillers_for(mouth, state["fillers"], state["backup_fillers"]),
             filler_after_ms=settings.voice_filler_after_ms,
             face_filler_after_ms=settings.voice_face_filler_after_ms,
             max_turn_s=settings.voice_max_turn_s,
@@ -544,7 +631,7 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
                 "type": "ready",
                 "conversation_id": str(conv.id),
                 "first_name": first_name,
-                "voice": {"provider": "cartesia", "name": settings.cartesia_voice_name},
+                "voice": {"provider": mouth.name, "name": mouth.voice},
                 "stt": {"provider": "openai", "model": settings.voice_stt_model},
                 "llm": {"model": pick.name, "simulated": pick.simulated},
                 "avatar": avatar.describe()["tavus"],
@@ -552,6 +639,8 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
                 "notice": NOTICE,
             }
         )
+        if isinstance(mouth, FallbackMouth) and mouth.on_backup:
+            await send_json(BACKUP_VOICE_NOTICE)
         waiting = await brain.pending_quote()
         if waiting:
             session.quote = waiting

@@ -72,6 +72,12 @@ class VoiceSettings(BaseSettings):
     cartesia_version: str = "2026-08-14"
     cartesia_voice_id: str = SKYLAR
     cartesia_voice_name: str = "Skylar"
+    # The backup voice when Cartesia refuses (out of credit, an outage): OpenAI speech with the
+    # OpenAI key. "off": the call goes to text instead.
+    voice_backup_tts: Literal["openai", "off"] = "openai"
+    openai_tts_model: str = "gpt-4o-mini-tts"
+    openai_tts_voice: str = "marin"
+    openai_tts_voice_name: str = "Marin"
 
     # Speech in and the model: OpenAI (decision 22).
     openai_api_key: str | None = Field(
