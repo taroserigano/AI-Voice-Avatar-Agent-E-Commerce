@@ -410,6 +410,9 @@ class XanaBrain:
         # A section read earlier in the call stays citable (as in the chat).
         citable: dict[str, dict[str, Any]] = earlier_citations(history)
         escalated = escalation_reason(text, history)
+        if wants_policy(text):
+            # The prefetch is a policy search like any other: show it as a step.
+            yield ToolStarted("search_policies", TOOL_LABELS["search_policies"])
         prefetched = await self._prefetch_policies(text, mid)
         if prefetched is not None:
             messages += prefetched

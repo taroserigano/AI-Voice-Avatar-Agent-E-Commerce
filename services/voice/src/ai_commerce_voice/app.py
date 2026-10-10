@@ -50,8 +50,10 @@ from ai_commerce_voice.face_heygen import SANDBOX_AVATAR, HeygenFace
 from ai_commerce_voice.face_tavus import TavusFace
 from ai_commerce_voice.fillers import all_phrases
 from ai_commerce_voice.mouth_cartesia import CartesiaMouth
-from ai_commerce_voice.ports import AgentEvent, TurnEnded
+from ai_commerce_voice.mouth_text import TextOnlyMouth
+from ai_commerce_voice.ports import AgentEvent, Mouth, TurnEnded
 from ai_commerce_voice.session import FillerClip, VoiceSession
+from ai_commerce_voice.suggestions import Suggester
 from assistant import voice as assistant_voice
 from assistant.commerce import (
     CommerceClient,
@@ -405,13 +407,26 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
 
         client = CommerceClient(customer.id, a_settings)
         first_name = (customer.name or "").split(" ")[0]
-        mouth = CartesiaMouth(
+        mouth: Mouth = CartesiaMouth(
             settings.cartesia_api_key,
             model=settings.cartesia_model,
             version=settings.cartesia_version,
             voice_id=settings.cartesia_voice_id,
             voice_name=settings.cartesia_voice_name,
         )
+
+        async def start_mouth(m: Mouth) -> Mouth:
+            # No voice is no reason to end the call: with the speech engine refusing (out of
+            # credit, HTTP 402, 2026-10-09) she answers as text instead.
+            try:
+                await m.start()
+                return m
+            except Exception as exc:  # noqa: BLE001 - any speech-engine failure
+                log.warning("speech engine unavailable, the call goes on as text: %s", exc)
+                with contextlib.suppress(Exception):
+                    await m.close()
+                return TextOnlyMouth(str(exc), voice=settings.cartesia_voice_name)
+
         session_ref: dict[str, VoiceSession] = {}
         ears = OpenAILiveEars(
             settings.openai_api_key,
@@ -433,11 +448,11 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
             warm = asyncio.create_task(asyncio.to_thread(_warm_policy_search, client))
             _background.add(warm)
             warm.add_done_callback(_background.discard)
-            conv, orders, *_ = await asyncio.gather(
+            conv, orders, _, mouth, _ = await asyncio.gather(
                 asyncio.to_thread(_own_or_new, customer, hello.get("conversation_id")),
                 asyncio.to_thread(_recent_orders, client),
                 ears.start(),
-                mouth.start(),
+                start_mouth(mouth),
                 warm_model(),
             )
         except Exception:
@@ -460,12 +475,8 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
         except (CommerceError, httpx.HTTPError) as exc:
             log.warning("couldn't read catalog filters for the call: %s", type(exc).__name__)
             vocabulary = {}
-        system = system_prompt(
-            first_name,
-            date.today(),
-            orders_snapshot(orders) if orders is not None else None,
-            vocabulary,
-        )
+        snapshot = orders_snapshot(orders) if orders is not None else None
+        system = system_prompt(first_name, date.today(), snapshot, vocabulary)
         extra: dict[str, Any] = {}
         if pick.simulated:
             extra = {
@@ -516,6 +527,7 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
             filler_after_ms=settings.voice_filler_after_ms,
             face_filler_after_ms=settings.voice_face_filler_after_ms,
             max_turn_s=settings.voice_max_turn_s,
+            suggester=Suggester(snapshot),
         )
         session_ref["s"] = session
         avatar = AvatarSession(

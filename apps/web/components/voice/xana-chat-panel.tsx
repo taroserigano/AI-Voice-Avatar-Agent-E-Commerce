@@ -12,7 +12,7 @@ const CARD_KINDS = new Set([
   "search", "xana", "product", "order", "store", "cart", "handoff", "return_options", "return_status",
 ]);
 
-function shownCards(cards: Record<string, unknown>[]): Card[] {
+export function shownCards(cards: Record<string, unknown>[]): Card[] {
   return cards.filter((c) => CARD_KINDS.has(String(c.kind))) as unknown as Card[];
 }
 

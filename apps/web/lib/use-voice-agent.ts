@@ -64,6 +64,20 @@ export type VoiceTurn = {
   citations: Citation[];
 };
 
+/** One thing Xena did for the current question ("Looking up your orders…"). */
+export type VoiceStep = { label: string; done: boolean };
+
+/** A new step: the ones before it are done (her tools run one after another). */
+export function addStep(steps: VoiceStep[], label: string): VoiceStep[] {
+  const last = steps.at(-1);
+  if (last && !last.done && last.label === label) return steps;
+  return [...steps.map((s) => ({ ...s, done: true })), { label, done: false }];
+}
+
+function allDone(steps: VoiceStep[]): VoiceStep[] {
+  return steps.some((s) => !s.done) ? steps.map((s) => ({ ...s, done: true })) : steps;
+}
+
 export type VoiceAgent = {
   state: VoiceStateName | "off";
   /** Earlier exchanges in this call, oldest first (the current one is live in the fields below). */
@@ -75,6 +89,10 @@ export type VoiceAgent = {
   userFinal: boolean;
   segments: CaptionSegment[];
   toolLabel: string | null;
+  /** What she did or is doing for this question, in order (shown while she works). */
+  steps: VoiceStep[];
+  /** Questions to tap next. */
+  suggestions: string[];
   quote: QuoteCard | null;
   quoteButtonOnly: boolean;
   confirmDecision: "yes" | "no" | "unclear" | null;
@@ -90,6 +108,8 @@ export type VoiceAgent = {
   setMuted: (muted: boolean) => void;
   interrupt: () => void;
   sendText: (text: string) => void;
+  /** Ask a question as text (a tapped suggestion); stops her first if she's talking. */
+  ask: (text: string) => void;
   quoteOutcome: (quoteId: string, outcome: "confirmed" | "declined") => void;
   avatar: VoiceAvatar;
   setVideo: (on: boolean) => void;
@@ -112,6 +132,8 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
   const [userFinal, setUserFinal] = useState(false);
   const [segments, setSegments] = useState<CaptionSegment[]>([]);
   const [toolLabel, setToolLabel] = useState<string | null>(null);
+  const [steps, setSteps] = useState<VoiceStep[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [quote, setQuote] = useState<QuoteCard | null>(null);
   const [readbackInterrupted, setReadbackInterrupted] = useState(false);
   const [confirmDecision, setConfirmDecision] = useState<"yes" | "no" | "unclear" | null>(null);
@@ -246,6 +268,7 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
           // A new question: the previous answer's captions and cards give way.
           setSegments([]);
           setToolLabel(null);
+          if (fresh) setSteps([]);
           setCitations([]);
           setConfirmDecision(null);
           setMetrics(null);
@@ -267,6 +290,15 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
             ...segs,
             { segment: msg.segment, text: msg.text, words: [], playedMs: 0, done: false },
           ]);
+          // Her answer is starting: the work behind it is done (a filler isn't the answer).
+          if (msg.kind !== "filler") setSteps(allDone);
+          break;
+        case "segment.unspoken":
+          // No voice for it (the speech engine failed): show its words anyway.
+          setSegments((segs) => segs.map((s) => (s.segment === msg.segment ? { ...s, done: true } : s)));
+          break;
+        case "suggestions":
+          setSuggestions(msg.items.slice(0, 4));
           break;
         case "segment.text":
           setSegments((segs) =>
@@ -300,6 +332,7 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
           break;
         case "tool":
           setToolLabel(msg.label);
+          setSteps((s) => addStep(s, msg.label));
           break;
         case "card":
           setCards((cs) => [...cs.slice(-5), msg.card]);
@@ -323,6 +356,7 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
           echoRef.current?.turnDone();
           setMetrics(msg.metrics);
           setToolLabel(null);
+          setSteps(allDone);
           break;
         case "error":
           setError(msg.message);
@@ -393,6 +427,8 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
     droppedRef.current.clear();
     setReady(null);
     setSegments([]);
+    setSteps([]);
+    setSuggestions([]);
     setMutedState(false);
     mutedRef.current = false;
     setError(null);
@@ -608,6 +644,13 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
 
   const interrupt = useCallback(() => send({ type: "interrupt" }), [send]);
   const sendText = useCallback((text: string) => send({ type: "text", text }), [send]);
+  const ask = useCallback(
+    (text: string) => {
+      if (stateRef.current === "speaking") send({ type: "interrupt" });
+      send({ type: "text", text });
+    },
+    [send],
+  );
   const quoteOutcome = useCallback(
     (quoteId: string, outcome: "confirmed" | "declined") => {
       setQuote(null);
@@ -628,6 +671,8 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
     userFinal,
     segments,
     toolLabel,
+    steps,
+    suggestions,
     quote,
     quoteButtonOnly: readbackInterrupted || (avatarWanted && provider === "heygen"),
     confirmDecision,
@@ -643,6 +688,7 @@ export function useVoiceAgent(conversationId?: string | null, provider: AvatarPr
     setMuted,
     interrupt,
     sendText,
+    ask,
     quoteOutcome,
     avatar: {
       provider,

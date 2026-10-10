@@ -320,7 +320,8 @@ def test_a_policy_question_is_answered_in_one_model_call_from_prefetched_section
     end = events[-1]
     assert isinstance(end, TurnEnded)
     assert [c["cite"] for c in end.citations] == ["returns-and-refunds#rr-4-1"]
-    assert not any(isinstance(e, ToolStarted) for e in events)
+    # The prefetch shows on screen as a step; the model itself made no tool call.
+    assert [e.name for e in events if isinstance(e, ToolStarted)] == ["search_policies"]
 
 
 def test_an_order_question_skips_the_policy_prefetch() -> None:

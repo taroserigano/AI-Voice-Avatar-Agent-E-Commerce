@@ -122,9 +122,11 @@ class VoiceSettings(BaseSettings):
     # Turn-taking. Silence that ends the customer's turn (server VAD), and how long Xena waits
     # for answer audio before saying a filler.
     voice_end_silence_ms: int = 450
-    voice_filler_after_ms: int = 900
+    # "On it!" only when the answer really takes a moment: at 0.9 s it played before most
+    # quick answers (Taro, 2026-10-09). The screen shows what she's doing meanwhile.
+    voice_filler_after_ms: int = 1500
     # Sooner with her face on: the face adds ~1 s before anything is heard (plan 12, L1).
-    voice_face_filler_after_ms: int = 300
+    voice_face_filler_after_ms: int = 800
     voice_max_turn_s: float = 45.0
     voice_max_tool_calls: int = 6
     voice_max_session_s: int = 20 * 60

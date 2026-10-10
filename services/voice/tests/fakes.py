@@ -181,8 +181,9 @@ def harness(
     *,
     filler_after_ms: int = 900,
     first_audio_s: float = 0.0,
+    mouth: Any = None,
 ) -> Harness:
-    ears, mouth = FakeEars(), FakeMouth(first_audio_s)
+    ears, mouth = FakeEars(), mouth or FakeMouth(first_audio_s)
     brain = brain or FakeBrain()
     sent: list[dict[str, Any]] = []
     audio: list[bytes] = []

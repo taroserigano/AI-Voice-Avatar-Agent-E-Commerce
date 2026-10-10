@@ -57,6 +57,10 @@ export type ServerMessage =
   | { type: "segment.end"; segment: number }
   | { type: "drop"; segments: number[] }
   | { type: "tool"; name: string; label: string }
+  /** A segment the speech engine couldn't voice: its words show as text instead. */
+  | { type: "segment.unspoken"; segment: number }
+  /** Questions the customer can tap next (sent at the start and after every answer). */
+  | { type: "suggestions"; items: string[] }
   | { type: "card"; card: Record<string, unknown> }
   | { type: "quote"; quote: QuoteCard }
   | { type: "citations"; citations: Citation[] }

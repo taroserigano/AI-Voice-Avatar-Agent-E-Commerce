@@ -6,9 +6,9 @@ Everything is streamed and overlapped, which is where the speed comes from:
   detection hears the end of the customer's turn (no clip upload, no browser-side guessing);
 - the model's answer streams into the speech engine clause by clause, and the audio streams
   to the browser as it's generated, so Xena starts talking while she's still "writing";
-- if no answer audio is ready ``filler_after_ms`` after the customer stops, or a tool call
-  starts before Xena has said anything, she says a short pre-recorded filler ("Let me
-  check that order.") so there's never dead air;
+- if no answer audio is ready ``filler_after_ms`` after the customer stops, she says a short
+  pre-recorded filler ("Let me check that order.", picked by the tool she's using) so there's
+  never long dead air; meanwhile the screen shows each step she's taking ("tool" messages);
 - if the customer talks over her, she stops at once (the browser drops queued audio) and
   listens.
 
@@ -57,6 +57,7 @@ from ai_commerce_voice.ports import (
     Words,
 )
 from ai_commerce_voice.speech_text import SpeechChunker, speakable
+from ai_commerce_voice.suggestions import Suggester
 
 log = logging.getLogger(__name__)
 
@@ -132,13 +133,15 @@ class VoiceSession:
     brain: Brain
     confirm: ConfirmRule
     fillers: dict[str, FillerClip]
-    filler_after_ms: int = 900
+    filler_after_ms: int = 1500
     # With her face on, nothing is heard for the face's own ~1 s anyway: a filler sooner
     # covers that wait (docs/features/12-xena-latency, L1).
-    face_filler_after_ms: int = 300
+    face_filler_after_ms: int = 800
     max_turn_s: float = 45.0
     picker: FillerPicker = field(default_factory=FillerPicker)
     clock: Callable[[], float] = time.monotonic
+    # Questions to tap next, sent at the start and after every answer.
+    suggester: Suggester | None = None
 
     state: str = "connecting"
     quote: dict[str, Any] | None = None
@@ -152,6 +155,10 @@ class VoiceSession:
     _readback_segment: int | None = None
     _answer_audio_started: bool = False
     _filler_played: bool = False
+    # The turn's first tool: it picks what the filler says ("Let me pull up your orders.").
+    _filler_tool: str | None = None
+    _turn_tools: list[str] = field(default_factory=list)
+    _speech_down_told: bool = False
     _hearing_task: asyncio.Task[None] | None = None
     # The turn started early on the live transcript: (item_id, text).
     _draft: tuple[str, str] | None = None
@@ -168,6 +175,8 @@ class VoiceSession:
     async def start(self) -> None:
         self._hearing_task = asyncio.create_task(self._hear())
         await self._set_state("listening")
+        if self.suggester is not None:
+            await self.send_json({"type": "suggestions", "items": self.suggester.initial()})
 
     async def close(self) -> None:
         for task in (self._turn, self._barge_timer, self._hearing_task):
@@ -425,6 +434,8 @@ class VoiceSession:
         await self._set_state("thinking")
         self._answer_audio_started = False
         self._filler_played = False
+        self._filler_tool = None
+        self._turn_tools = []
         utterance: Utterance | None = None
         forward: asyncio.Task[None] | None = None
         answer: Segment | None = None
@@ -472,8 +483,11 @@ class VoiceSession:
                             await speak(chunk)
                     elif isinstance(ev, ToolStarted):
                         await self.send_json({"type": "tool", "name": ev.name, "label": ev.label})
-                        if utterance is None:
-                            await self._play_filler(clock, tool=ev.name)
+                        self._turn_tools.append(ev.name)
+                        # No filler the moment a tool starts ("On it!" before quick answers):
+                        # the timer still decides when; the tool decides what it says.
+                        if utterance is None and self._filler_tool is None:
+                            self._filler_tool = ev.name
                     elif isinstance(ev, CardOut):
                         await self.send_json({"type": "card", "card": ev.card})
                     elif isinstance(ev, QuoteOut):
@@ -509,7 +523,14 @@ class VoiceSession:
             if forward is not None and not forward.done():
                 forward.cancel()
         await self.send_json({"type": "turn.done", "metrics": clock.metrics()})
-        await self._maybe_idle()
+        if self.suggester is not None and say is None:
+            items = self.suggester.after(text, self._turn_tools)
+            await self.send_json({"type": "suggestions", "items": items})
+        # This turn is done, though its task hasn't returned yet (so not _maybe_idle): with
+        # nothing left playing, back to listening. With no voice there's no "played" message
+        # to do it later, and the screen stayed on "Thinking" (2026-10-09).
+        if not self._talking() and self.state not in ("listening", "hearing"):
+            await self._set_state("listening")
 
     async def _events(
         self,
@@ -579,10 +600,23 @@ class VoiceSession:
                 seg.complete = True
                 seg.dropped = True
                 log.warning("speech failed: %s", ev.message)
-                await self.send_json({"type": "drop", "segments": [seg.number]})
-                await self.send_json(
-                    {"type": "error", "message": "My voice cut out. The answer is on screen."}
-                )
+                # Her words still reach the screen when her voice can't be made. This used to
+                # "drop" the segment, which wiped its text, then say "the answer is on screen":
+                # with the speech engine out of credit the customer got nothing (2026-10-09).
+                await self.send_json({"type": "segment.unspoken", "segment": seg.number})
+                if seg.sent_audio:
+                    await self.send_json(
+                        {"type": "error", "message": "My voice cut out. The answer is on screen."}
+                    )
+                elif not self._speech_down_told:
+                    self._speech_down_told = True
+                    await self.send_json(
+                        {
+                            "type": "error",
+                            "message": "Xena's voice isn't available right now, so her answers"
+                            " show as text.",
+                        }
+                    )
                 break
         await self.send_json({"type": "segment.end", "segment": seg.number})
 
@@ -617,7 +651,7 @@ class VoiceSession:
 
     async def _filler_after(self, ms: int, clock: TurnClock) -> None:
         await asyncio.sleep(ms / 1000)
-        await self._play_filler(clock)
+        await self._play_filler(clock, tool=self._filler_tool)
 
     async def _play_filler(self, clock: TurnClock, tool: str | None = None) -> None:
         if self._answer_audio_started or self._filler_played:

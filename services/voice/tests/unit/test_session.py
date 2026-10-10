@@ -145,7 +145,36 @@ def test_with_her_face_on_the_filler_comes_sooner() -> None:
     run(t)
 
 
-def test_a_tool_call_before_any_words_says_what_xana_is_doing() -> None:
+def test_a_slow_tool_call_gets_a_filler_that_says_what_xana_is_doing() -> None:
+    async def t() -> None:
+        brain = FakeBrain(
+            scripts=[
+                [
+                    Step(ToolStarted("get_order_status", "Checking your order…")),
+                    Step(TextDelta("It's out for delivery."), delay_s=0.3),
+                ]
+            ]
+        )
+        h = harness(brain, filler_after_ms=100)
+        await h.session.start()
+        h.ears.hear(Final("Where is order E2EA6BC6?", at=1.0))
+        await settle(h, 0.5)
+
+        # The step is on screen at once; the filler waits for the timer, then says the step.
+        assert h.of("tool") == [
+            {"type": "tool", "name": "get_order_status", "label": "Checking your order…"}
+        ]
+        filler_text = h.of("segment.text")[0]["text"]
+        assert filler_text in BY_TOOL["get_order_status"]
+        await h.session.close()
+
+    run(t)
+
+
+def test_a_quick_answer_after_a_tool_call_has_no_filler() -> None:
+    """ "On it!" played the moment a tool started, before answers that came a moment later
+    (Taro, 2026-10-09): a tool call alone no longer starts a filler."""
+
     async def t() -> None:
         brain = FakeBrain(
             scripts=[
@@ -158,13 +187,9 @@ def test_a_tool_call_before_any_words_says_what_xana_is_doing() -> None:
         h = harness(brain, filler_after_ms=5000)
         await h.session.start()
         h.ears.hear(Final("Where is order E2EA6BC6?", at=1.0))
-        await settle(h, 0.2)
+        await settle(h, 0.3)
 
-        assert h.of("tool") == [
-            {"type": "tool", "name": "get_order_status", "label": "Checking your order…"}
-        ]
-        filler_text = h.of("segment.text")[0]["text"]
-        assert filler_text in BY_TOOL["get_order_status"]
+        assert [m["kind"] for m in h.of("segment.start")] == ["answer"]
         await h.session.close()
 
     run(t)
@@ -557,6 +582,35 @@ def test_the_read_back_caption_is_exact_but_the_voice_skips_the_times_sign() -> 
         caption = [m["text"] for m in h.of("segment.text") if m["segment"] == confirm]
         assert caption == ["Here's your return: 1 × Oat milk. Confirm?"]
         assert h.mouth.spoken()[-1] == "Here's your return: 1 Oat milk. Confirm?"
+        await h.session.close()
+
+    run(t)
+
+
+def test_without_a_voice_her_answer_still_shows_as_text() -> None:
+    """With the speech engine out of credit, the call used to fail, and a failed answer was
+    dropped from the screen under "the answer is on screen" (2026-10-09)."""
+    from ai_commerce_voice.mouth_text import TextOnlyMouth
+
+    async def t() -> None:
+        brain = FakeBrain(scripts=[[Step(TextDelta("We have six oat milks."))]])
+        h = harness(brain, filler_after_ms=5000, mouth=TextOnlyMouth("HTTP 402"))
+        await h.session.start()
+        h.ears.hear(Final("Do you have oat milk?", at=1.0))
+        await settle(h, 0.3)
+
+        [start] = h.of("segment.start")
+        assert start["kind"] == "answer"
+        assert h.of("segment.text")[0]["text"] == "We have six oat milks."
+        assert h.of("segment.unspoken") == [
+            {"type": "segment.unspoken", "segment": start["segment"]}
+        ]
+        assert not h.of("drop")
+        assert [e["message"] for e in h.of("error")] == [
+            "Xena's voice isn't available right now, so her answers show as text."
+        ]
+        # Nothing to play, so she's listening again (it stayed on "thinking").
+        assert h.of("state")[-1]["state"] == "listening"
         await h.session.close()
 
     run(t)

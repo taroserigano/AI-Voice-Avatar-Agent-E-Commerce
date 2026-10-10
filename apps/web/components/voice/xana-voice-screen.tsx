@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { MicIcon, SparklesIcon, VideoIcon, XIcon } from "@/components/icons";
+import { CheckIcon, MicIcon, SparklesIcon, VideoIcon, XIcon } from "@/components/icons";
 import { cn } from "@/lib/cn";
 import { confirmQuote } from "@/lib/returns-confirm";
 import { useVoiceAgent } from "@/lib/use-voice-agent";
@@ -11,7 +11,8 @@ import type { AvatarProvider, QuoteCard } from "@/lib/voice-protocol";
 import { XanaProviderTabs } from "./xana-provider-tabs";
 import { XanaAvatar } from "./xana-avatar";
 import { XanaAvatarConnecting } from "./xana-avatar-connecting";
-import { XanaChatPanel } from "./xana-chat-panel";
+import { ChatCards } from "@/components/assistant/chat-cards";
+import { XanaChatPanel, shownCards } from "./xana-chat-panel";
 import { XanaLookPicker } from "./xana-look-picker";
 import { XanaOrb } from "./xana-orb";
 
@@ -93,12 +94,14 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
   const stopFollowing = () => {
     follow.current = false;
   };
-  const hint = state === "thinking" && voice.toolLabel ? voice.toolLabel : status.hint;
+  // The step itself shows as a pill under the status; the hint stays general.
+  const hint = state === "thinking" && voice.toolLabel && !voice.steps.length ? voice.toolLabel : status.hint;
   const caption = captionNow;
   const level = state === "speaking" ? voice.speechLevel : voice.micLevel;
   const live = state !== "off" && state !== "error";
   const face = voice.avatar.status === "live" && voice.avatar.stream ? voice.avatar.stream : null;
   const videoOffered = live && voice.avatar.offer.available;
+  const cardsNow = shownCards(voice.turnCards);
   const chat = {
     history: voice.history,
     current: {
@@ -194,7 +197,9 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
         ) : null}
         </section>
 
-        <div aria-live="polite" className="mt-1 min-h-20">
+        {/* shrink-0: with a min height of its own, the column squeezed it and its steps ran
+            over the transcript. */}
+        <div aria-live="polite" className="mt-1 min-h-20 shrink-0">
           <p className="font-display text-3xl font-bold tracking-tight">
             {status.title}
             {state === "thinking" ? <ThinkingDots /> : null}
@@ -206,6 +211,36 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
                 ? `Connecting ${provider === "heygen" ? "HeyGen" : "Tavus"} video. Microphone paused briefly…`
                 : hint}
           </p>
+          {/* What she's doing for this question, step by step, so a pause is never blank. */}
+          {live && voice.steps.length ? (
+            <ol aria-label="What Xena is doing" className="mx-auto mt-3 flex max-w-2xl flex-wrap justify-center gap-2">
+              {voice.steps.map((s, i) => (
+                <li
+                  key={`${i}-${s.label}`}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm motion-safe:animate-fade-in",
+                    s.done
+                      ? "border-white/10 bg-white/5 text-neutral-300"
+                      : "border-brand-300/40 bg-brand-500/15 text-brand-100",
+                  )}
+                >
+                  {s.done ? (
+                    <CheckIcon className="size-3.5 text-success-200" aria-hidden />
+                  ) : (
+                    <span aria-hidden className="size-3 rounded-full border-2 border-brand-200 border-t-transparent motion-safe:animate-spin" />
+                  )}
+                  {s.done ? s.label.replace(/…$/, "") : s.label}
+                  <span className="sr-only">{s.done ? " (done)" : " (in progress)"}</span>
+                </li>
+              ))}
+            </ol>
+          ) : null}
+          {/* Under the status, where it's seen ("her answers show as text" was below the fold). */}
+          {voice.error && state !== "error" ? (
+            <p role="alert" className="mt-3 text-sm text-danger-200">
+              {voice.error}
+            </p>
+          ) : null}
         </div>
 
         {/* Live transcript: the customer's words as they speak, then Xena's as she says them. */}
@@ -237,6 +272,14 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
           ) : null}
         </div>
 
+        {/* Wide screens: the products, orders, or stores she found, under her words (narrow
+            screens show them in the conversation below). */}
+        {live && cardsNow.length ? (
+          <div className="mt-4 w-full max-w-2xl text-left max-lg:hidden [&_article]:shadow-[0_12px_30px_-18px_rgb(0_0_0/0.7)]">
+            <ChatCards cards={cardsNow} />
+          </div>
+        ) : null}
+
         {quote ? (
           <QuotePanel
             quote={quote}
@@ -262,12 +305,6 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
 
         {voice.avatar.error ? <p className="mt-4 text-sm text-neutral-300">{voice.avatar.error}</p> : null}
 
-        {voice.error && state !== "error" ? (
-          <p role="alert" className="mt-4 text-sm text-danger-200">
-            {voice.error}
-          </p>
-        ) : null}
-
         {/* Narrow screens: the conversation under the stage. */}
         {live ? (
           <div ref={narrowChat} className="mt-4 w-full max-w-2xl scroll-mb-4 lg:hidden">
@@ -276,16 +313,26 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
         ) : null}
       </main>
 
-      {/* Wide screens: the conversation beside the stage. */}
-      {live ? (
-        <aside className="hidden w-108 shrink-0 py-5 pr-5 lg:flex">
-          <XanaChatPanel {...chat} className="w-full" />
-        </aside>
-      ) : null}
       </div>
 
       {/* Controls */}
       <footer className="border-t border-white/10 px-4 pb-4 pt-5 text-center">
+        {/* Questions to tap next: they change after every answer. */}
+        {live && voice.suggestions.length ? (
+          <div role="group" aria-label="Suggested questions" className="mb-4 flex flex-wrap justify-center gap-2">
+            {voice.suggestions.map((q) => (
+              <button
+                key={q}
+                type="button"
+                disabled={confirming}
+                onClick={() => voice.ask(q)}
+                className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-neutral-100 transition hover:border-brand-300/50 hover:bg-brand-500/15 disabled:opacity-50"
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+        ) : null}
         {live ? (
           <div className="flex flex-wrap justify-center gap-3">
             <button
