@@ -380,7 +380,9 @@ class SearchProductsArgs(BaseModel):
         description='Product types, any of (e.g. ["milk"]). Use values from the catalog '
         "vocabulary in the system prompt. To rank across a group (\"top rated vegetables\", "
         '"cheapest snacks"), put every type of the group in this one search: separate searches '
-        "are each ranked on their own, so none of them answers for the whole group.",
+        "are each ranked on their own, so none of them answers for the whole group. Only "
+        "types that really are in the group: vegetables leave out fruit (apples, bananas, "
+        "berries, avocados).",
         # "Top rated vegetables" was four searches of five types, each ranked on its own; the
         # cards showed one and she named products from another (2026-10-10).
         max_length=25,
