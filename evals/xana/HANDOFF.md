@@ -128,8 +128,8 @@ Voice, three runs each: x04-173, x07-117, xr-075 went from 3/9, 1/3, 0/3 to 9/9.
    the snapshot), x08-024 (voice, "say your refund has been issued"), and, at 2 of 3, x04-025,
    x08-138, x08-181, x07-068. s-127 is a correct answer ("15, 30, and 40 pound bags") that its
    pattern rejects.
-5. **Ragas on the round-9 policy turns,** then review the 0.0s by hand (see README).
-6. **LangSmith and OpenTelemetry:** unchanged from the last handoff; LangSmith needs
+4. **Ragas on the round-9 policy turns,** then review the 0.0s by hand (see README).
+5. **LangSmith and OpenTelemetry:** unchanged from the last handoff; LangSmith needs
    `LANGSMITH_API_KEY` and Taro's OK, since uploads send data to an outside service.
 
 ## Traps
