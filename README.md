@@ -1,230 +1,252 @@
-# Serigan Mart: AI commerce demo
+# Serigan Mart · Agentic AI Commerce
 
-A portfolio-quality online store with an AI shopping assistant. Everything sits behind
-sign-in: browse and search a catalog, keep a cart, and (in later milestones) check out with
-Stripe test mode and return items by text or voice.
+### Stateful AI agents for shopping, voice support, and customer-approved returns.
 
-The build follows [docs/PLAN_ai-commerce-build.md](docs/PLAN_ai-commerce-build.md). The
-requirements are in [docs/handoff/](docs/handoff/), and [HANDOFF.md](HANDOFF.md) has the
-current status and every decision made so far.
+![LangGraph](https://img.shields.io/badge/Agents-LangGraph-6D4AFF)
+![Python](https://img.shields.io/badge/Backend-Python%20%2B%20FastAPI-009688)
+![Next.js](https://img.shields.io/badge/Frontend-Next.js%20%2B%20TypeScript-111827)
+![OpenTelemetry](https://img.shields.io/badge/Observability-OpenTelemetry-F5A623)
 
-**Status:** Milestone 1 (sign-in and shopping foundation) is built, plus the redesign,
-reviews, order tracking, the return and refund policy, **Ask Steph** (the shopping
-assistant), **Xena** (voice and text returns and refunds on `/support`), return quotes and
-confirmation, and **Jev** decision signals. Stripe checkout and Temporal workflows come next. The current feature
-batch is planned in [docs/features/](docs/features/README.md).
+**Serigan Mart turns a complete shopping application into a practical agentic AI system:** agents retrieve product and policy evidence, call authenticated business tools, maintain conversation state, and pause for customer approval before a return is committed.
 
-## What works now
+The experience combines **Steph**, a shopping assistant, with **Xena**, a voice and text support agent with optional video avatars. Behind the interface are LangGraph workflows, hybrid retrieval, streaming responses, deterministic refund calculations, and an evaluation suite covering product questions, orders, returns, and adversarial requests.
 
-- **Sign-in wall.** Every page except sign-in, create account, privacy, terms, and
-  accessibility sends a signed-out visitor to `/sign-in?returnTo=…` and
-  returns them afterward. Every private API also answers 401 on its own, and the API refuses
-  to start if a route is missing the session check.
-- **Simple sign-in:** the API checks the email and password and sets a session cookie.
-  Nothing else: no rate limiting, password reset, or external identity provider.
-- **Catalog:** about 2,000 original products in 21 departments, mostly grocery. Every
-  product has a type and diet/feature tags (organic, fat free, sugar free, lactose free,
-  vegan, wireless, ...); food has nutrition facts, ingredients, and allergens. It's generated
-  deterministically (`services/commerce/src/commerce/seed/gen/`), and a test checks every tag
-  against the facts, since the assistant will answer from this data.
-- **Hybrid search:** OpenSearch (keywords, typos, SKUs, synonyms such as "nonfat" = "skim")
-  plus Pinecone (meaning), merged with reciprocal rank fusion. Price and stock always come
-  from PostgreSQL. Filters for type, tags (required or excluded), brand, and price; facets,
-  sorting, and pagination.
-- **Store locator:** 10 demo stores around Dallas-Fort Worth on a Google map, with hours,
-  open-now status, and directions.
-- **Order history for the dev accounts:** 14 orders covering every return case (inspection,
-  perishables, partial returns with cent rounding, final sale, late, not delivered, ...),
-  reset to fresh dates on every `pnpm db:seed`.
-- **Ask Steph:** a shopping assistant behind the button at the bottom right of every shop
-  page (`services/assistant`, LangGraph with Claude or OpenAI). It searches the catalog with exact filters
-  ("non fat organic milk, not regular milk"), shows product, order, store, and cart cards,
-  adds to the cart, checks orders, and answers policy questions with numbered citations it
-  can only take from sections it actually retrieved. Conversations are saved per customer.
-  It calls the commerce API with its own service identity for the signed-in customer (never
-  the customer's cookie), and it has no tool that can confirm, pay, or refund. Without a
-  working `ANTHROPIC_API_KEY` or `OPEN_AI_API`, a scripted model answers from the same tools
-  and the chat says **Simulated**.
-- **Support with Xena (`/support`):** talk (or type) to Xena about products, returns, and refunds. She
-  searches the same live catalog as Steph and opens product details for ingredient, allergen,
-  nutrition, specification, and variant questions. Unknown filters return no recommendation.
-  She finds the order and item, explains eligibility from the store's return options, prices the
-  return, and shows a quote card. The customer confirms with the **Confirm return** button, or
-  by voice: Xena reads the quote back (built by code, not the model) and only a clear, final
-  "yes" after the full read-back counts, checked by the app (a strict rule, plus Jev's vote
-  when enabled). The browser then confirms directly with the store using a single-use token the
-  assistant never sees; the conversation resumes and re-checks the outcome with the store.
-  Voice is turn-based over HTTP: Groq Whisper (or Deepgram, or the browser) for speech-to-text
-  and Cartesia `sonic-3.6-2026-08-27` (or the browser) for speech; talking over Xena stops her.
-  In development a "simulated speech" box drives the same path without a microphone. Order pages'
-  **Start a return** opens Xena on that item.
-- **Return quotes and confirmation (commerce API):** `POST /v1/returns/quote` prices a return
-  from the order's saved amounts (every seeded scenario matches the eval oracle to the cent);
-  `POST /v1/returns/quotes/{id}/confirmation` and `POST /v1/returns/confirm` (with an
-  `Idempotency-Key`) need the customer's own browser session, create exactly one return per
-  quote, and refuse altered, expired, stale, or reused quotes. Refunds are simulated until Stripe
-  is connected: perishables at confirmation, others at the (development-only) carrier scan,
-  warehouse receipt, or inspection, one refund per stage.
-- **Jev (TypeSafe):** one typed request per turn reads the intent, return reason, which order
-  line, escalation, and rule-bypass attempts; confident answers steer the assistant, and Jev can
-  veto (never cause) a spoken confirmation. A labeled simulator answers until `TYPESAFE_API_KEY`
-  is set; `pnpm eval:jev` compares the two.
-- **Return and refund policy:** a detailed, versioned policy plus the rules every channel
-  (site, Steph, Xena, staff) follows, public at `/returns-policy` with citable section anchors.
-  Its numbers are machine-readable and tested against the code.
-- **Assistant scripts:** scripted product Q&A and return conversations with known-right
-  answers in `evals/assistant/`, and the policy text they cite in `content/policies/`.
-- **Durable cart** per customer. Customers can't reach each other's carts or orders.
-- **Outbox publisher** that keeps OpenSearch and Pinecone in sync with PostgreSQL.
-- **OpenTelemetry everywhere:** one trace per page render, from Next.js through the API to
-  PostgreSQL and OpenSearch. Personal data is removed in-process and again in the collector.
-  A "Shopping" dashboard ships in Grafana.
-- **Search evals v1:** 54 labeled queries with a recorded baseline.
+**Built by [Taro Serigano](https://taroserigano.com/)** · [Storefront walkthrough](demos/xena-15s-live/serigan-mart-walkthrough-40s.mp4) · [Voice and avatar demo](demos/xena-15s-live/xena-employer-demo-avatar.mp4) · [Evaluation methodology](evals/xana/README.md)
 
-## Prerequisites
+> Portfolio sandbox with seeded customers and orders. Payment processing and refund settlement are simulated until the Stripe integration is connected.
 
-- Either an installed PostgreSQL 16 or newer (see [Without containers](#without-containers)),
-  or Docker Desktop / Podman with about 8 GB of RAM (OpenSearch needs about 2 GB)
-- Node.js 20.9 or newer, and pnpm 10
-- [uv](https://docs.astral.sh/uv/) (it installs Python 3.12 for you)
-- Optional: a Pinecone API key, for meaning-based search
+## Agentic AI at the core
 
-## Quick start
+| Capability | Engineering behind it |
+|---|---|
+| **Stateful tool-using agents** | LangGraph routes each turn through a model–tool loop, with PostgreSQL conversation checkpoints and separate tool permissions for shopping and support. |
+| **Human-in-the-loop execution** | Return proposals interrupt the graph. The customer confirms through the authenticated browser; the agent resumes and checks the result. |
+| **Grounded retrieval** | Retrieval-Augmented Generation (RAG) combines policy evidence and catalog facts with exact product filters. Citations must refer to sections actually retrieved. |
+| **Streaming voice and video** | Xena combines speech recognition, a LangGraph voice brain, streamed speech, interruption handling, captions, and optional Tavus or HeyGen avatars. |
+| **Controlled model escalation** | Code routes difficult voice turns—disputes, repeated questions, and repeated tool failures—to a stronger configured model. |
+| **Evaluation and observability** | A 2,000-case development suite, additional support and held-out sets, deterministic checks, model judging, Ragas evaluation, and OpenTelemetry trace correlation. |
+| **Advanced planning extensions** | Implemented DeepAgents planner, restricted research subagent, Agent-to-Agent (A2A) service, and resumable event-stream components; see their integration status below. |
+
+## What the agents can do
+
+### Steph · Shopping assistant
+
+Ask for products in natural language, refine requirements across turns, inspect nutrition and ingredients, check orders, and add selected products to the cart.
+
+**Example:** “Nonfat organic milk, not regular milk.”
+
+Steph searches with product types, required tags, and exclusions, then returns product cards with current prices. Follow-up questions can narrow the selection without restarting the conversation.
+
+### Xena · Voice, text, and avatar support
+
+Ask about delivery, tracking, product specifications, return eligibility, or refund status. Xena retrieves the signed-in customer's records, explains the applicable policy, and prepares a return quote when appropriate.
+
+The voice experience includes streamed speech, captions, customer interruptions, a configurable backup voice, and optional **Tavus / HeyGen LiveAvatar** video. Provider switching preserves the conversation and pending return context.
+
+Xena can propose a return or open a support case. Her toolset does **not** include payment, refund settlement, cart modification, or return-confirmation tools.
+
+## Architecture
+
+The map below shows the main commerce, chat, and streaming voice paths. External integrations depend on the configured credentials and provider availability.
+
+```mermaid
+flowchart TD
+    UI["Next.js storefront · authenticated customer"]
+
+    subgraph Agents["Agent experience"]
+        Chat["Steph and Xena chat · FastAPI + LangGraph"]
+        Voice["Xena voice service · streaming WebSocket"]
+        Jev["Jev · typed intent and triage signals"]
+        Media["Speech recognition + Cartesia speech · optional video avatars"]
+        Models["Configured language models · fallback and escalation"]
+    end
+
+    subgraph Business["Business execution and evidence"]
+        API["Commerce API · identity, tools, return rules"]
+        DB[("PostgreSQL · catalog, orders, quotes, checkpoints")]
+        Search["OpenSearch keywords + Pinecone semantic retrieval"]
+        Policy["Versioned policy sections · citable evidence"]
+        Outbox["Outbox worker · search index updates"]
+    end
+
+    Observe["OpenTelemetry · redacted traces, metrics, logs"]
+
+    UI -->|"Chat · Server-Sent Events"| Chat
+    UI -->|"Streaming audio"| Voice
+    UI -->|"Browse, cart, customer confirmation"| API
+    Chat --> Jev
+    Chat --> Models
+    Voice --> Models
+    Voice --> Media
+    Chat -->|"Scoped business tools"| API
+    Voice -->|"Scoped business tools"| API
+    Chat -->|"Conversation checkpoints"| DB
+    Voice -->|"Conversation checkpoints"| DB
+    API --> DB
+    API --> Search
+    Policy -->|"Indexed sections"| Search
+    DB --> Outbox
+    Outbox --> Search
+    Chat -.-> Observe
+    API -.-> Observe
+```
+
+**Data authority matters:** search finds candidates; PostgreSQL supplies authoritative price, stock, order, and refund data. The language model explains and coordinates actions; business code calculates amounts and enforces eligibility.
+
+### A return, from request to confirmation
+
+1. **Identify:** retrieve the customer's order and clarify which item and quantity they mean.
+2. **Validate:** the commerce service checks eligibility and calculates the refund from saved order amounts.
+3. **Propose:** show a quote card; the LangGraph conversation pauses for the customer's decision.
+4. **Confirm:** the browser obtains a quote-bound, single-use token and submits the customer's confirmation with an idempotency key. The token is kept out of model context.
+5. **Resume:** the assistant checks the outcome with the commerce service and explains the next step.
+
+Voice confirmation has an additional gate: the complete quote must be read back before a clear final confirmation can count. Provider-specific playback restrictions can require the on-screen confirmation button.
+
+## DeepAgents and A2A extensions
+
+The repository also contains a separate shopping planner for more complex goals, such as assembling a basket under a budget with dietary constraints.
+
+```mermaid
+flowchart TD
+    Request["Planning request · goal and constraints"]
+    Planner["DeepAgents planner · todos and state-backed scratch notes"]
+    Helper["Restricted research subagent · catalog reads only"]
+    Validator["Basket validator · current facts and constraint checks"]
+    Proposal["Validated basket proposal"]
+
+    Request -->|"In-process or authenticated A2A"| Planner
+    Planner -->|"Delegate research"| Helper
+    Helper -->|"Product evidence"| Planner
+    Planner --> Validator
+    Validator -->|"Revise if invalid"| Planner
+    Validator -->|"Accepted"| Proposal
+```
+
+- **Bounded autonomy:** model-call limits, tool-call limits, cancellation, and elapsed-time checks.
+- **Restricted delegation:** the helper can research products but cannot write carts, inspect orders, or execute payments.
+- **Code-enforced constraints:** budget, catalog allergen labels, and required or excluded tags are checked independently of the model. Parsed constraints can be tightened, not silently relaxed.
+- **Authenticated A2A transport:** short-lived delegation tokens bind customer identity, audience, and scope, with a process-local replay guard.
+- **Resumable streaming components:** typed Server-Sent Events (SSE), PostgreSQL event persistence, and reconnect/replay support.
+
+These components are implemented in [services/planner](services/planner) and [packages/assistant-stream](packages/assistant-stream). They are extension components; the default development launcher currently starts the commerce, assistant, voice, outbox, and web services, rather than a fully connected planner gateway. A separate [Qdrant retrieval package](packages/retrieval) is also implemented; the current commerce search path uses OpenSearch and Pinecone.
+
+## Reliability, permissions, and guardrails
+
+| Boundary | Implementation |
+|---|---|
+| Customer isolation | Server-validated sessions and ownership checks for carts, orders, and conversations. |
+| Agent identity | Scoped service identity acting for the authenticated customer; identity is injected by server code. |
+| Financial correctness | Return quotes derive from saved order amounts, with tests covering cent rounding and partial returns. |
+| Duplicate prevention | Quote validation, single-use confirmation tokens, and idempotent return creation. |
+| Prompt injection | Restricted toolsets, untrusted-content handling, retrieved-section citation checks, and adversarial evaluation cases. |
+| Provider failures | Configurable model fallbacks, a labeled scripted mode, speech-provider failover, and voice-to-text fallback behavior. |
+| Trace privacy | Sensitive-attribute removal and text redaction in the application and OpenTelemetry Collector. |
+
+## Evaluation: test the workflow, not just the wording
+
+The evaluation suite checks what the customer receives: **product cards, order facts, citations, quote amounts, and permitted actions**.
+
+| Layer | What it measures |
+|---|---|
+| 2,000 golden development cases | Product facts, filters, comparisons, orders, returns, noisy inputs, multi-turn conversations, and adversarial requests. |
+| 204 support development cases | Account and store questions, shipping, catalog-wide queries, escalation, and broader support coverage. |
+| 223 separate held-out cases | Additional templates, customers, and support scenarios, reported separately from the tuned development set. |
+| Deterministic checks | Exact quote amounts, expected product constraints, order evidence, unauthorized claims, and citation provenance. |
+| Language-model judge | Groundedness, helpfulness, clarity, tone, and disagreement with deterministic checks. |
+| Ragas | Policy-answer faithfulness and answer relevance. |
+| OpenTelemetry and LangSmith | Correlated evaluation traces and optional LangSmith experiment uploads for inspecting failures. |
+
+**Historical results:** the October 8–9 evaluation notes report round-9 counts of **1,996/2,000 chat cases** and **1,985/2,000 voice-brain cases** passing. The separate 223-case set recorded **217 chat passes** and **213 voice passes** in that round.
+
+These are recorded development results, not a claim about every deployment. The main suite was used for tuning, the separate set was evaluated across rounds, and voice-brain evaluations use typed turns rather than end-to-end microphone-to-audio testing. See [methodology, limitations, and run history](evals/xana/README.md).
+
+## Full-stack product experience
+
+- Multi-department catalog with product images, variants, nutrition, ingredients, allergens, ratings, and sample reviews.
+- Search with filters, sorting, pagination, synonyms, and optional semantic retrieval.
+- Persistent cart, seeded order history, and return/refund scenarios.
+- Ten demo store locations around Dallas–Fort Worth, with maps, hours, services, and directions.
+- Customer support conversations, support cases, and versioned return policies.
+- Responsive Next.js interface with accessible labels, captions, and generated TypeScript API contracts.
+
+## Technology stack
+
+| Layer | Technologies |
+|---|---|
+| Agent orchestration | LangGraph, LangChain, PostgreSQL checkpoints; DeepAgents and A2A extension components |
+| Model integration | Configurable OpenAI / Anthropic chat models; Jev intent and triage signals |
+| Voice and avatars | Streaming WebSockets, OpenAI transcription, Cartesia speech, Tavus, HeyGen LiveAvatar |
+| Backend | Python, FastAPI, Pydantic, SQLAlchemy, Alembic |
+| Frontend | Next.js, React, TypeScript, Tailwind CSS, TanStack Query |
+| Data and retrieval | PostgreSQL, OpenSearch, Pinecone; Qdrant in the separate retrieval package |
+| Quality and observability | pytest, Playwright, Vitest, Ruff, mypy, TypeScript checks, Ragas, OpenTelemetry, Grafana, LangSmith evaluation export |
+
+Jev and other external integrations require credentials. Missing integrations may use an explicitly labeled simulator or a documented fallback, depending on the component.
+
+## Run locally
+
+Requirements: **Node.js 20.9+**, **pnpm 10**, **uv**, and **PostgreSQL 16+** for the native-services setup. Docker/Podman is an alternative for the infrastructure stack. External model, speech, avatar, and semantic-search integrations need their corresponding credentials.
 
 ```bash
-cp .env.example .env        # then edit: Pinecone key, SEARCH_ENV=dev-<yourname>
-pnpm local:up               # PostgreSQL + OpenSearch on this machine (or: pnpm infra:up)
-pnpm bootstrap              # install deps, migrate, seed, build the search indexes
-pnpm dev                    # API :8000, outbox worker, web :3000
+git clone https://github.com/taroserigano/ai-commerce-portfolio.git
+cd ai-commerce-portfolio
+
+cp .env.example .env
+# Configure local service settings and the integrations you want to use.
+
+pnpm local:up
+pnpm bootstrap
+pnpm dev
 ```
 
-Open http://localhost:3000 and sign in with a development account:
+Open **http://localhost:3000**. Development account: `alice@example.com` / `alice-dev-password`. Seeded development accounts are limited to development, test, and continuous-integration environments.
 
-| Account | Password | Role |
-|---|---|---|
-| `alice@example.com` | `alice-dev-password` | customer |
-| `bob@example.com` | `bob-dev-password` | customer |
-| `staff@example.com` | `staff-dev-password` | staff |
+For container-based infrastructure, use `pnpm infra:up` instead of `pnpm local:up`. Inspect [.env.example](.env.example) for configuration and [the build plan](docs/PLAN_ai-commerce-build.md) for milestone details.
 
-These accounts exist only when `APP_ENV` is `dev`, `test`, or `ci`.
-
-### Without containers
-
-`pnpm local:up` runs just what the app needs, directly on your machine:
-
-- **PostgreSQL** from your own installation (`PG_BIN`, the newest
-  `C:\Program Files\PostgreSQL\<n>\bin`, or `pg_ctl` on your PATH). It uses a private data
-  folder with a `commerce` user and the `commerce` and `commerce_test` databases, so an
-  existing PostgreSQL service and its data are left alone. Port 5432 must be free.
-- **OpenSearch**, downloaded on first use (about 1 GB), localhost only.
-
-Both live in `%LOCALAPPDATA%\ai-commerce` (or `~/.local/share/ai-commerce`), outside the
-repo. `pnpm local:status` shows what's running; `pnpm local:down` stops both. Redis,
-Temporal, and the telemetry stack aren't needed to run the app yet; `pnpm dev` notices
-there's no OTel Collector and simply doesn't export telemetry.
-
-### Two checkouts at once (git worktrees)
-
-Give each checkout its own database, search indexes, and ports, so they never touch
-each other's data. In that checkout's `.env`:
+### Checks and evaluation
 
 ```bash
-COMMERCE_DATABASE_URL=postgresql+psycopg://commerce:commerce@localhost:5432/commerce_mybranch
-SEARCH_ENV=dev-mybranch
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm test:e2e
+
+pnpm eval:search
+pnpm eval:planner
+pnpm eval:jev
+pnpm eval:xana
+pnpm eval:xana:voice
 ```
 
-Create the database once (`CREATE DATABASE commerce_mybranch`), run `pnpm db:migrate`,
-`pnpm db:seed`, and `pnpm reindex`, then start it on other ports:
-`API_PORT=8200 WEB_PORT=3200 pnpm dev`. For its integration tests, set
-`COMMERCE_TEST_DATABASE_URL` to a separate test database.
+Integration tests and browser tests require their supporting services. Live evaluations require the running application and configured providers and can incur API charges. Reseed demo orders before return evaluations so their dates remain current.
 
-### Podman
+## Explore the implementation
 
-The `infra:*` scripts use whichever of Docker or Podman is running; set
-`CONTAINER_ENGINE=podman` (or `docker`) to choose. With Podman, create a **rootful** machine
-once, because OpenSearch asks for unlimited locked memory, which rootless containers can't
-grant:
-
-```bash
-podman machine init --cpus 4 --memory 8192 --rootful --now
-```
-
-`podman compose` runs the `docker-compose` or `podman-compose` program, so one of them must
-be installed.
-
-### Pinecone
-
-Pinecone is the only vector store and is always the real service; there is no local
-substitute. Set `PINECONE_API_KEY` and `PINECONE_INDEX_NAME` (default `ai-commerce`). The
-app creates that index with Pinecone's hosted embedding model if it doesn't exist, which
-needs a free index slot in your Pinecone project. It refuses to use an index it didn't
-create, so it can't write into another project's data. Each developer uses their own
-namespace through `SEARCH_ENV`.
-
-Without a working Pinecone setup, the app still runs: search is keyword-only and the page
-says so. After fixing the settings, run `pnpm reindex`.
-
-## Useful URLs
-
-| What | URL |
+| Path | Responsibility |
 |---|---|
-| Storefront | http://localhost:3000 |
-| API docs (development only) | http://localhost:8000/docs |
-| Assistant API docs (development only) | http://localhost:8001/docs |
-| Return and refund policy (public) | http://localhost:3000/returns-policy |
-| Grafana (traces, logs, metrics, dashboards) | http://localhost:3001 |
-| Temporal UI (used from Milestone 2) | http://localhost:8233 |
+| [apps/web](apps/web) | Storefront, chat, voice/video experience, and customer confirmation interface |
+| [services/assistant](services/assistant) | LangGraph chat workflows, business tools, policy retrieval, Jev signals |
+| [services/voice](services/voice) | Streaming voice agent, model escalation, speech failover, avatar lifecycle |
+| [services/commerce](services/commerce) | Authentication, catalog, cart, orders, returns, search, and outbox |
+| [services/planner](services/planner) | DeepAgents basket planner, constrained helper, and authenticated A2A service |
+| [packages/assistant-stream](packages/assistant-stream) | Typed streaming events, persistence, and reconnect/replay components |
+| [packages/retrieval](packages/retrieval) | Qdrant retrieval extension and embedding/index contracts |
+| [packages/telemetry](packages/telemetry) | Shared OpenTelemetry setup and redaction |
+| [packages/contracts](packages/contracts) | Generated API schema and TypeScript client |
+| [evals](evals) | Golden datasets, deterministic scoring, model judging, and evaluation export |
+| [infra](infra) | Local services, telemetry collector, and Grafana dashboard configuration |
 
-## Commands
+## Next enhancements
 
-| Command | What it does |
-|---|---|
-| `pnpm local:up` / `local:down` / `local:status` | Start, stop, or check PostgreSQL and OpenSearch without containers |
-| `pnpm infra:up` / `infra:down` / `infra:reset` | Start, stop, or wipe all local services in containers (Docker or Podman) |
-| `pnpm dev` | Run the commerce API, assistant API, outbox worker, and web app together |
-| `pnpm db:migrate` / `pnpm db:seed` | Apply migrations (commerce, then the assistant's tables and checkpoints) / seed catalog and dev accounts (safe to repeat) |
-| `pnpm reindex` | Rebuild OpenSearch and Pinecone from PostgreSQL |
-| `pnpm contracts` | Regenerate `packages/contracts` from the API's OpenAPI schema |
-| `pnpm lint` / `pnpm typecheck` | Ruff, ESLint, mypy (strict), tsc |
-| `pnpm test` | Python unit and integration tests, plus web unit tests |
-| `pnpm test:e2e` | Playwright browser tests (needs `pnpm dev` running) |
-| `pnpm eval:search` | Score search quality against the baseline |
-| `pnpm eval:jev` | Score Jev (or its simulator) on the labeled routing set |
+- Connect Stripe test checkout and refund settlement to the existing confirmation boundaries.
+- Add Temporal-backed durable checkout and return orchestration.
+- Complete storefront integration of the DeepAgents planner, authenticated A2A transport, and resumable stream components.
+- Migrate the primary voice transport to LiveKit Agents while preserving the current tool and confirmation controls. HeyGen's LiveKit-based media integration is separate from this planned migration.
+- Extend transport-level voice tracing beyond the timings and traces exported by the evaluation harness.
+- Expand customer diversity and independently maintained evaluation sets, and publish fresh benchmark artifacts after catalog or model changes.
+- Harden authentication and operational deployment before offering access beyond the development sandbox.
 
-`make <target>` wrappers exist for the same commands on macOS and Linux.
+---
 
-The app reads its database from `COMMERCE_DATABASE_URL`, never `DATABASE_URL`, so a `.env`
-shared with another project can't point it at that project's database. Integration tests
-always use a separate `commerce_test` database (`COMMERCE_TEST_DATABASE_URL`) and migrate it
-themselves.
-
-## Layout
-
-```
-apps/web/              Next.js storefront (App Router, Tailwind, TanStack Query)
-  proxy.ts             sign-in wall (convenience only; the API enforces 401)
-services/commerce/     FastAPI: auth, catalog, cart, orders, returns, policies, search, outbox, seed
-services/assistant/    FastAPI + LangGraph: Steph (and Xena), tools, scripted model, prompts
-packages/telemetry/    shared Python OpenTelemetry setup and redaction
-packages/contracts/    OpenAPI schema and generated TypeScript client
-infra/                 Docker Compose, OTel Collector config, Grafana dashboards
-evals/                 search queries, scorer, and baselines
-tests/e2e/             Playwright browser tests
-docs/                  build plan and handoff docs
-```
-
-`services/voice` and `workers/workflows` arrive with their milestones.
-
-## Connected vs. simulated (Milestone 1)
-
-| Integration | State |
-|---|---|
-| PostgreSQL, Redis, OpenSearch, OTel Collector, Grafana | Real (local Docker or Podman) |
-| Pinecone | Real service; code and guards tested, but the semantic path hasn't run end to end yet because the account had no free index slot |
-| Sign-in | Email and password checked by the API (by design, no other layers) |
-| Text assistant LLM | Claude when `ANTHROPIC_API_KEY` works; otherwise OpenAI `gpt-6-sol` when `OPEN_AI_API` works; otherwise the labeled scripted model |
-| Policy search | OpenSearch keyword search over policy sections; Pinecone joins when its index slot is free |
-| Jev (TypeSafe) | Real when `TYPESAFE_API_KEY` is set; otherwise the labeled simulator |
-| Speech-to-text / text-to-speech | Real: Groq Whisper and Cartesia with the keys in `.env` (Deepgram if keyed); the browser's own voice features otherwise. LiveKit (the plan's streaming voice) isn't connected yet |
-| Refunds | Simulated (records and states as Stripe will use them); Stripe checkout comes next |
-| Stripe, Temporal workflows | Not used yet |
+**Built to demonstrate end-to-end AI engineering: agent orchestration, grounded retrieval, streaming voice, business-system integration, explicit action boundaries, and measurable evaluation.**
