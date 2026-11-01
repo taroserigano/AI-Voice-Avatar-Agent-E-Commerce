@@ -28,3 +28,7 @@ evals/results/
 
 # Xena voice: pre-rendered filler audio (rebuildable)
 services/voice/.cache/
+
+# Local agent state and raw demo recordings (frames); finished videos live in demos/*/
+.claude/
+demos/**/out/

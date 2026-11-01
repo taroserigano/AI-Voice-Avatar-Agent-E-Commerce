@@ -61,7 +61,7 @@ test("provider routes preserve a muted call and pending return; keyboard tabs ac
   await expect(page).toHaveURL(/\/support\/voice\/tavus$/);
   await expect.poll(() => messages.filter((m) => m.type === "avatar.select").length).toBe(2);
   await expect(page.getByRole("button", { name: "Unmute", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByText("Return this item please.", { exact: false })).toBeVisible();
+  await expect(page.locator("#main p:visible").filter({ hasText: "Return this item please." })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Confirm your return" })).toBeVisible();
   expect(sockets).toBe(1);
   expect(messages.filter((m) => m.type === "hello")).toHaveLength(1);

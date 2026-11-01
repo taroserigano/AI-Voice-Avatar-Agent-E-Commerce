@@ -72,10 +72,6 @@ from assistant.tools import ToolContext, with_brands
 log = logging.getLogger(__name__)
 
 CACHE = Path(__file__).resolve().parents[2] / ".cache" / "fillers"
-BACKUP_VOICE_NOTICE = {
-    "type": "error",
-    "message": "Xena's usual voice isn't available right now, so she's using a backup voice.",
-}
 NOTICE = (
     "Xena is an AI assistant. Your voice is streamed to our speech providers to be turned into "
     "text and isn't stored; the transcript is saved with this conversation."
@@ -161,6 +157,12 @@ def _cache_key(settings: VoiceSettings, text: str, provider: str = "cartesia") -
     return hashlib.sha256(raw.encode()).hexdigest()[:24]
 
 
+def cartesia_keys(settings: VoiceSettings) -> list[str]:
+    return assistant_voice.ordered_cartesia_keys(
+        settings.cartesia_api_key, settings.cartesia_api_key2, settings.cartesia_preferred_key
+    )
+
+
 def make_mouth(settings: VoiceSettings, provider: str = "cartesia") -> Mouth:
     if provider == "openai":
         assert settings.openai_api_key
@@ -170,14 +172,22 @@ def make_mouth(settings: VoiceSettings, provider: str = "cartesia") -> Mouth:
             voice=settings.openai_tts_voice,
             voice_name=settings.openai_tts_voice_name,
         )
-    assert settings.cartesia_api_key
-    return CartesiaMouth(
-        settings.cartesia_api_key,
-        model=settings.cartesia_model,
-        version=settings.cartesia_version,
-        voice_id=settings.cartesia_voice_id,
-        voice_name=settings.cartesia_voice_name,
-    )
+    keys = cartesia_keys(settings)
+    if not keys:
+        raise ValueError("No Cartesia speech key is configured")
+    if settings.cartesia_preferred_key == "secondary" and not settings.cartesia_api_key2:
+        log.warning("preferred secondary Cartesia key is not configured; using the primary key")
+    mouths: list[Mouth] = [
+        CartesiaMouth(
+            key,
+            model=settings.cartesia_model,
+            version=settings.cartesia_version,
+            voice_id=settings.cartesia_voice_id,
+            voice_name=settings.cartesia_voice_name,
+        )
+        for key in keys
+    ]
+    return FallbackMouth(mouths[0], mouths[1]) if len(mouths) > 1 else mouths[0]
 
 
 def backup_ready(settings: VoiceSettings) -> bool:
@@ -199,8 +209,10 @@ async def load_fillers(
             clips[text] = FillerClip(text, pcm.read_bytes(), json.loads(meta.read_text("utf-8")))
         else:
             missing.append(text)
-    key = settings.openai_api_key if provider == "openai" else settings.cartesia_api_key
-    if missing and key:
+    configured = (
+        bool(settings.openai_api_key) if provider == "openai" else bool(cartesia_keys(settings))
+    )
+    if missing and configured:
         mouth = make_mouth(settings, provider)
         try:
             await mouth.start()
@@ -253,8 +265,7 @@ class VoiceFillers(Mapping[str, FillerClip]):
         self._backup = backup
 
     def _clips(self) -> dict[str, FillerClip]:
-        on_backup = isinstance(self._mouth, FallbackMouth) and self._mouth.on_backup
-        return self._backup if on_backup else self._primary
+        return self._backup if self._mouth.name == "openai" else self._primary
 
     def __getitem__(self, key: str) -> FillerClip:
         return self._clips()[key]
@@ -465,7 +476,7 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
             await ws.close(code=4401)
             return
         await ws.accept()
-        if not settings.openai_api_key or not (settings.cartesia_api_key or backup_ready(settings)):
+        if not settings.openai_api_key or not (cartesia_keys(settings) or backup_ready(settings)):
             await ws.send_json(
                 {
                     "type": "error",
@@ -486,20 +497,11 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
         first_name = (customer.name or "").split(" ")[0]
         session_ref: dict[str, VoiceSession] = {}
 
-        def voice_switched(reason: str) -> None:
-            # Mid-call (start-up switches are told in "ready"): say why her voice changed.
-            if "s" in session_ref:
-                task = asyncio.create_task(send_json(BACKUP_VOICE_NOTICE))
-                _background.add(task)
-                task.add_done_callback(_background.discard)
-
         mouth: Mouth
-        if not settings.cartesia_api_key:
+        if not cartesia_keys(settings):
             mouth = make_mouth(settings, "openai")
         elif backup_ready(settings):
-            mouth = FallbackMouth(
-                make_mouth(settings), make_mouth(settings, "openai"), on_switch=voice_switched
-            )
+            mouth = FallbackMouth(make_mouth(settings), make_mouth(settings, "openai"))
         else:
             mouth = make_mouth(settings)
 
@@ -639,8 +641,6 @@ def create_app(checkpointer: Any | None = None) -> FastAPI:
                 "notice": NOTICE,
             }
         )
-        if isinstance(mouth, FallbackMouth) and mouth.on_backup:
-            await send_json(BACKUP_VOICE_NOTICE)
         waiting = await brain.pending_quote()
         if waiting:
             session.quote = waiting

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img" aria-label="Illustrated portrait of Xana">
+  <defs>
+    <linearGradient id="back" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#b6a8ff"/>
+      <stop offset=".58" stop-color="#7466d8"/>
+      <stop offset="1" stop-color="#3eabd0"/>
+    </linearGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#d99770"/>
+      <stop offset=".52" stop-color="#b97153"/>
+      <stop offset="1" stop-color="#9c5b47"/>
+    </linearGradient>
+    <linearGradient id="jacket" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#302663"/>
+      <stop offset="1" stop-color="#181532"/>
+    </linearGradient>
+    <clipPath id="circle"><circle cx="160" cy="160" r="156"/></clipPath>
+  </defs>
+  <g clip-path="url(#circle)">
+    <circle cx="160" cy="160" r="156" fill="url(#back)"/>
+    <circle cx="73" cy="65" r="93" fill="#ded7ff" opacity=".24"/>
+    <circle cx="284" cy="278" r="106" fill="#47c7dc" opacity=".28"/>
+    <path d="M65 183c0-91 32-147 95-147 64 0 100 55 100 145v112H62Z" fill="#241d42"/>
+    <path d="M84 201c-5 38-26 69-35 93h224c-14-35-37-67-40-107l-39 57-77-2Z" fill="#211a3d"/>
+    <path d="M117 233c12 12 30 20 43 20 16 0 33-8 45-21v-41h-88Z" fill="url(#skin)"/>
+    <path d="M91 278c15-30 41-42 69-42 29 0 56 12 70 42l22 59H69Z" fill="#efeaff"/>
+    <path d="M20 333c4-49 26-86 63-96l36-11 41 63 41-63 38 11c38 11 58 47 62 96Z" fill="url(#jacket)"/>
+    <path d="m119 226 41 63-20 13-47-65Zm82 0-41 63 20 13 47-65Z" fill="#6658b6"/>
+    <path d="M104 123c-7-29 9-64 35-75 27-13 68-5 84 25 10 18 8 41 5 55l-12 69c-9 41-31 62-56 62-26 0-50-22-58-63Z" fill="url(#skin)"/>
+    <ellipse cx="102" cy="174" rx="12" ry="21" fill="#b57155"/>
+    <ellipse cx="218" cy="174" rx="12" ry="21" fill="#aa674f"/>
+    <path d="M103 148c-6-38 13-88 57-98 27-7 53 2 66 24 10 17 11 39 5 73-9-16-17-29-27-47-22 20-62 33-101 32Z" fill="#211a3b"/>
+    <path d="M116 88c-14 11-23 30-25 47-9-44 19-89 64-96 45-7 73 25 78 55-24-24-53-32-117-6Z" fill="#30254e"/>
+    <path d="M112 151c8-5 21-6 31-2m35 0c10-4 23-3 31 2" fill="none" stroke="#4a2e34" stroke-linecap="round" stroke-width="5"/>
+    <path d="M115 166c7 6 18 6 25 0m40 0c7 6 18 6 25 0" fill="none" stroke="#fff8f1" stroke-linecap="round" stroke-width="5"/>
+    <circle cx="128" cy="166" r="4" fill="#2d2334"/><circle cx="192" cy="166" r="4" fill="#2d2334"/>
+    <path d="M157 169c-2 8-5 17-5 23 5 4 11 4 17 0" fill="none" stroke="#8a4e44" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <path d="M141 211c11 9 27 11 39 0" fill="none" stroke="#7c3e48" stroke-linecap="round" stroke-width="4"/>
+    <path d="M86 139c-5 22-6 54 7 75" fill="none" stroke="#9c91f9" stroke-linecap="round" stroke-width="8"/>
+    <circle cx="94" cy="180" r="13" fill="#9c91f9"/><circle cx="94" cy="180" r="7" fill="#d7d5ff"/>
+    <path d="M95 193c3 20 15 35 34 42" fill="none" stroke="#9c91f9" stroke-linecap="round" stroke-width="5"/>
+    <circle cx="131" cy="236" r="6" fill="#60d4e4"/>
+    <circle cx="219" cy="202" r="4" fill="#8eebf1"/>
+  </g>
+  <circle cx="160" cy="160" r="156" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="4"/>
+</svg>

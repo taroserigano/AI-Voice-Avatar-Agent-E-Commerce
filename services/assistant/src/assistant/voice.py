@@ -52,8 +52,21 @@ def stt_provider(settings: Settings) -> SttProvider:
     return "browser"
 
 
+def ordered_cartesia_keys(
+    primary: str | None, secondary: str | None, preferred: Literal["primary", "secondary"]
+) -> list[str]:
+    keys = [primary, secondary] if preferred == "primary" else [secondary, primary]
+    return list(dict.fromkeys(key for key in keys if key))
+
+
 def tts_provider(settings: Settings) -> TtsProvider:
-    return "cartesia" if settings.cartesia_api_key else "browser"
+    return (
+        "cartesia"
+        if ordered_cartesia_keys(
+            settings.cartesia_api_key, settings.cartesia_api_key2, settings.cartesia_preferred_key
+        )
+        else "browser"
+    )
 
 
 @dataclass(frozen=True)
@@ -120,21 +133,35 @@ def speak(settings: Settings, text: str, agent: str) -> bytes:
     if tts_provider(settings) != "cartesia":
         raise VoiceError(503, "No text-to-speech provider is configured; use the browser's.")
     voice_id = settings.xana_voice_id if agent == "xana" else settings.steph_voice_id
-    resp = httpx.post(
-        "https://api.cartesia.ai/tts/bytes",
-        headers={"X-API-Key": settings.cartesia_api_key or "", "Cartesia-Version": "2025-04-16"},
-        json={
-            "model_id": settings.cartesia_model,
-            "transcript": text,
-            "voice": {"mode": "id", "id": voice_id},
-            "output_format": {"container": "mp3", "sample_rate": 44100, "bit_rate": 128000},
-            "language": "en",
-        },
-        timeout=30,
+    keys = ordered_cartesia_keys(
+        settings.cartesia_api_key, settings.cartesia_api_key2, settings.cartesia_preferred_key
     )
-    if resp.status_code != 200:
-        raise VoiceError(502, f"text-to-speech answered {resp.status_code}")
-    return resp.content
+    if settings.cartesia_preferred_key == "secondary" and not settings.cartesia_api_key2:
+        log.warning("preferred secondary Cartesia key is not configured; using the primary key")
+    failure = "text-to-speech connection failed"
+    for key in keys:
+        try:
+            resp = httpx.post(
+                "https://api.cartesia.ai/tts/bytes",
+                headers={"X-API-Key": key, "Cartesia-Version": "2025-04-16"},
+                json={
+                    "model_id": settings.cartesia_model,
+                    "transcript": text,
+                    "voice": {"mode": "id", "id": voice_id},
+                    "output_format": {"container": "mp3", "sample_rate": 44100, "bit_rate": 128000},
+                    "language": "en",
+                },
+                timeout=30,
+            )
+        except httpx.RequestError as exc:
+            log.warning("Cartesia speech connection failed: %s", type(exc).__name__)
+            failure = "text-to-speech connection failed"
+            continue
+        if resp.status_code == 200:
+            return resp.content
+        log.warning("Cartesia speech request failed: HTTP %s", resp.status_code)
+        failure = f"text-to-speech answered {resp.status_code}"
+    raise VoiceError(502, failure)
 
 
 def speakable(text: str) -> str:

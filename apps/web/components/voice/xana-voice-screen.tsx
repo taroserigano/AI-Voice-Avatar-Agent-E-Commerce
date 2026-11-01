@@ -47,7 +47,7 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
   const [confirming, setConfirming] = useState(false);
   const [confirmError, setConfirmError] = useState<string | null>(null);
   const handled = useRef<string | null>(null);
-  const stage = useRef<HTMLElement>(null);
+  const content = useRef<HTMLDivElement>(null);
 
   // A clear spoken yes (checked by the server's rule, never the model) confirms like the button.
   useEffect(() => {
@@ -74,9 +74,7 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
   const status = STATUS[state];
   const captionNow = captionFor(voice.segments);
 
-  // On short screens the newest words can fall below the fold: bring them just into view (not
-  // the whole page to the bottom, which pushed her face off the top). Once the customer scrolls
-  // themselves, leave the page where they put it until their next question.
+  // Follow new words within the conversation only, leaving the avatar in place.
   const transcript = useRef<HTMLDivElement>(null);
   // Narrow screens show the conversation panel instead of the transcript lines.
   const narrowChat = useRef<HTMLDivElement>(null);
@@ -86,10 +84,20 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
     follow.current = true;
   }, [userFinal]);
   useEffect(() => {
-    const el = stage.current;
+    const el = content.current;
     if (!follow.current || !el || el.scrollHeight <= el.clientHeight) return;
+    const target = transcript.current?.offsetParent ? transcript.current : narrowChat.current;
+    if (!target) return;
+    const bounds = el.getBoundingClientRect();
+    const item = target.getBoundingClientRect();
+    const distance = item.bottom > bounds.bottom
+      ? target === transcript.current
+        ? item.bottom - bounds.bottom
+        : Math.min(item.bottom - bounds.bottom, Math.max(0, item.top - bounds.top))
+      : Math.min(0, item.top - bounds.top);
+    if (!distance) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    (transcript.current?.offsetParent ? transcript.current : narrowChat.current)?.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
+    el.scrollBy({ top: distance, behavior: reduce ? "auto" : "smooth" });
   }, [captionNow, voice.userText, quote]);
   const stopFollowing = () => {
     follow.current = false;
@@ -140,16 +148,10 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
       <div className="flex min-h-0 flex-1">
       {/* Stage */}
       <main
-        ref={stage}
         id="main"
-        onWheel={stopFollowing}
-        onTouchMove={stopFollowing}
-        onKeyDown={(e) => {
-          if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(e.key)) stopFollowing();
-        }}
         className={cn(
-          "flex flex-1 flex-col items-center overflow-y-auto px-4 pb-6 text-center",
-          face ? "pt-3 sm:pt-4" : "pt-6 sm:pt-10",
+          "flex min-h-0 flex-1 flex-col items-center px-4 text-center",
+          live ? "overflow-hidden pt-3 sm:pt-4" : "overflow-y-auto pt-6 sm:pt-10",
         )}
       >
         {/* With her face on screen the welcome heading gives its room to the video. */}
@@ -162,7 +164,7 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
           Meet Xena
         </h1>
         <XanaProviderTabs provider={provider} disabled={confirming} />
-        <section role="tabpanel" id="avatar-provider-panel" aria-labelledby={`avatar-tab-${provider}`} className="mt-4">
+        <section role="tabpanel" id="avatar-provider-panel" aria-labelledby={`avatar-tab-${provider}`} className="mt-4 shrink-0">
         {face ? (
           <XanaAvatar
             stream={face}
@@ -189,7 +191,11 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
           className="mt-4 rounded-full sm:mt-6"
           aria-label={!live ? "Start talking to Xena" : state === "speaking" ? "Interrupt Xena" : "Xena is listening"}
         >
-          <XanaOrb state={state} level={level} />
+          <XanaOrb
+            state={state}
+            level={level}
+            className={live ? "size-[min(18rem,30vh,max(5rem,calc(100dvh-33rem)))] sm:size-[min(20rem,32vh,max(5rem,calc(100dvh-33rem)))]" : undefined}
+          />
         </button>
         )}
         {live && voice.ready && !voice.avatar.offer.available ? (
@@ -197,6 +203,21 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
         ) : null}
         </section>
 
+        <div
+          ref={content}
+          role="region"
+          aria-label="Voice conversation details"
+          tabIndex={0}
+          onWheel={stopFollowing}
+          onTouchMove={stopFollowing}
+          onKeyDown={(e) => {
+            if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(e.key)) stopFollowing();
+          }}
+          className={cn(
+            "flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto pb-6",
+            !live && "shrink-0",
+          )}
+        >
         {/* shrink-0: with a min height of its own, the column squeezed it and its steps ran
             over the transcript. */}
         <div aria-live="polite" className="mt-1 min-h-20 shrink-0">
@@ -311,6 +332,7 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
             <XanaChatPanel {...chat} className="h-[60dvh]" />
           </div>
         ) : null}
+        </div>
       </main>
 
       </div>
@@ -319,7 +341,7 @@ export function XanaVoiceScreen({ firstName, closeHref = "/support", provider = 
       <footer className="border-t border-white/10 px-4 pb-4 pt-5 text-center">
         {/* Questions to tap next: they change after every answer. */}
         {live && voice.suggestions.length ? (
-          <div role="group" aria-label="Suggested questions" className="mb-4 flex flex-wrap justify-center gap-2">
+          <div role="group" aria-label="Suggested questions" className="mb-4 flex max-h-24 flex-wrap justify-center gap-2 overflow-y-auto">
             {voice.suggestions.map((q) => (
               <button
                 key={q}

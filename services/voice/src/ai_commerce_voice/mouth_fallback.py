@@ -9,6 +9,7 @@ text. Only when both voices fail does the call go to text.
 
 from __future__ import annotations
 
+import asyncio
 import contextlib
 import logging
 from collections.abc import AsyncIterator, Callable
@@ -27,18 +28,22 @@ class _FallbackUtterance:
         self.texts: list[str] = []
         self.finished = False
         self.canceled = False
+        self.lock = asyncio.Lock()
 
     async def push(self, text: str) -> None:
-        self.texts.append(text)
-        await self.current.push(text)
+        async with self.lock:
+            self.texts.append(text)
+            await self.current.push(text)
 
     async def finish(self) -> None:
-        self.finished = True
-        await self.current.finish()
+        async with self.lock:
+            self.finished = True
+            await self.current.finish()
 
     async def cancel(self) -> None:
-        self.canceled = True
-        await self.current.cancel()
+        async with self.lock:
+            self.canceled = True
+            await self.current.cancel()
 
     async def events(self) -> AsyncIterator[SpeechEvent]:
         heard = False
@@ -53,15 +58,38 @@ class _FallbackUtterance:
                     and self.can_switch
                     and not self.canceled
                 ):
-                    self.can_switch = False
-                    self.owner._switch(ev.message)
-                    self.current = self.owner.backup.utterance()
-                    for text in self.texts:
-                        await self.current.push(text)
-                    if self.finished:
-                        await self.current.finish()
+                    failure: SpeechFailed | None = None
+                    async with self.lock:
+                        if self.canceled:
+                            return
+                        self.can_switch = False
+                        self.owner._switch(ev.message)
+                        try:
+                            await self.owner.backup.start()
+                        except Exception as exc:  # noqa: BLE001 - report failure to outer fallback
+                            log.warning("backup voice could not start: %s", type(exc).__name__)
+                            failure = SpeechFailed("Backup voice could not start.")
+                        if failure is None:
+                            self.current = self.owner.backup.utterance()
+                            for text in self.texts:
+                                await self.current.push(text)
+                            if self.finished:
+                                await self.current.finish()
+                    if failure is not None:
+                        yield failure
+                        return
                     switched = True
                     break
+                if isinstance(ev, SpeechFailed) and heard and self.can_switch and not self.canceled:
+                    async with self.lock:
+                        if not self.canceled:
+                            self.can_switch = False
+                            try:
+                                await self.owner.backup.start()
+                            except Exception as exc:  # noqa: BLE001 - preserve the original failure
+                                log.warning("backup voice could not start: %s", type(exc).__name__)
+                            else:
+                                self.owner._switch(ev.message)
                 yield ev
             if not switched:
                 return

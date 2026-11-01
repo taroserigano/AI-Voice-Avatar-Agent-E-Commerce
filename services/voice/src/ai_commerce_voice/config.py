@@ -68,6 +68,10 @@ class VoiceSettings(BaseSettings):
     cartesia_api_key: str | None = Field(
         default=None, validation_alias=AliasChoices("CARTESIA_SONIC_API_KEY", "CARTESIA_API_KEY")
     )
+    cartesia_api_key2: str | None = Field(
+        default=None, validation_alias=AliasChoices("CARTESIA_SONIC_API_KEY2", "CARTESIA_API_KEY2")
+    )
+    cartesia_preferred_key: Literal["primary", "secondary"] = "primary"
     cartesia_model: str = "sonic-3.6-2026-08-27"
     cartesia_version: str = "2026-08-14"
     cartesia_voice_id: str = SKYLAR

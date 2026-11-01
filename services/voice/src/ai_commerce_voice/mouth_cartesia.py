@@ -46,7 +46,11 @@ class CartesiaUtterance:
         if self.canceled or self.finished or not text.strip():
             return
         # Cartesia joins pieces exactly as sent: keep a space between clauses.
-        await self.mouth._send(self, f"{text.strip()} ", more=True)
+        try:
+            await self.mouth._send(self, f"{text.strip()} ", more=True)
+        except Exception as exc:  # noqa: BLE001 - report the failure to the fallback voice
+            self._fail(exc)
+            return
         self.sent_any = True
 
     async def finish(self) -> None:
@@ -57,7 +61,16 @@ class CartesiaUtterance:
             await self.queue.put(SpeechDone())
             self.mouth._forget(self)
             return
-        await self.mouth._send(self, "", more=False)
+        try:
+            await self.mouth._send(self, "", more=False)
+        except Exception as exc:  # noqa: BLE001 - report the failure to the fallback voice
+            self._fail(exc)
+
+    def _fail(self, exc: Exception) -> None:
+        log.warning("cartesia utterance connection failed: %s", type(exc).__name__)
+        self.finished = True
+        self.mouth._forget(self)
+        self.queue.put_nowait(SpeechFailed("Voice connection failed."))
 
     async def cancel(self) -> None:
         if self.canceled:

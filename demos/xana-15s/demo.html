@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meet Xana — 15-second illustrative demo</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, "Segoe UI", Arial, sans-serif; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
+    body { background: #0b1024; color: #fff; }
+    .stage {
+      position: relative; width: 1280px; height: 720px; overflow: hidden;
+      background:
+        radial-gradient(550px 500px at 73% 46%, rgba(103,64,222,.33), transparent 73%),
+        radial-gradient(460px 420px at 103% 0%, rgba(34,138,196,.17), transparent 75%),
+        linear-gradient(155deg,#0b1024 0%,#121638 62%,#0d1129 100%);
+    }
+    .stage::before { content:""; position:absolute; inset:0; opacity:.22; pointer-events:none;
+      background-image: radial-gradient(rgba(255,255,255,.24) .7px, transparent .8px);
+      background-size: 26px 26px; mask-image: linear-gradient(90deg,transparent 5%,#000 100%); }
+    .stage::after { content:""; position:absolute; inset:24px; border:1px solid rgba(255,255,255,.07); border-radius:28px; pointer-events:none; }
+    header { position:absolute; z-index:10; left:66px; right:66px; top:50px; display:flex; align-items:center; justify-content:space-between; }
+    .brand { display:flex; gap:14px; align-items:center; }
+    .brand-mark { width:46px; height:46px; display:grid; place-items:center; border-radius:15px;
+      background:linear-gradient(145deg,#a99bff,#6740de 65%); box-shadow:0 8px 30px rgba(103,64,222,.35); }
+    .brand-mark svg { width:24px; height:24px; }
+    .brand-name { font-size:21px; font-weight:850; letter-spacing:.18em; line-height:1; }
+    .brand-sub { margin-top:5px; font-size:12px; color:#c9c8df; letter-spacing:.02em; }
+    .badge { font-size:11px; font-weight:700; color:#d7d5ff; letter-spacing:.13em; text-transform:uppercase;
+      border:1px solid rgba(215,213,255,.25); background:rgba(255,255,255,.04); padding:10px 14px; border-radius:30px; }
+    .copy { position:absolute; left:86px; top:190px; width:560px; z-index:5; }
+    .eyebrow { font-size:14px; font-weight:750; text-transform:uppercase; letter-spacing:.23em; color:#bcb7ff; }
+    h1 { margin:17px 0 16px; font-size:65px; font-weight:850; letter-spacing:-.056em; line-height:1.02; }
+    .subhead { width:525px; font-size:24px; line-height:1.36; color:#d2d2e4; letter-spacing:-.018em; }
+    .emphasis { color:#bcb7ff; }
+    .scene { position:absolute; inset:0; opacity:0; transform:translateY(22px); pointer-events:none; }
+    .scene .copy { top:201px; }
+    .scene .copy h1 { font-size:57px; margin-top:15px; }
+    .scene .copy .subhead { font-size:21px; max-width:500px; }
+    .scene-one .copy { top:214px; }
+    .scene-one h1 { font-size:70px; }
+    .pill { display:inline-flex; align-items:center; gap:10px; margin-top:33px; padding:12px 17px;
+      border:1px solid rgba(215,213,255,.22); background:rgba(255,255,255,.055); border-radius:30px;
+      color:#eaeaff; font-weight:650; font-size:14px; }
+    .pill-dot { height:9px; width:9px; background:#77dfed; border-radius:50%; box-shadow:0 0 16px #77dfed; }
+    .customer { margin-top:33px; width:460px; padding:23px 25px; background:rgba(255,255,255,.095);
+      border:1px solid rgba(255,255,255,.14); border-radius:22px 22px 6px 22px;
+      font-size:24px; font-weight:550; line-height:1.34; box-shadow:0 18px 60px rgba(0,0,0,.18); }
+    .who { display:block; margin-bottom:10px; color:#bcb7ff; font-size:12px; font-weight:780; text-transform:uppercase; letter-spacing:.2em; }
+    .reply { margin-top:28px; width:477px; padding:21px 24px; border-radius:22px 22px 22px 6px;
+      background:rgba(125,100,239,.2); border:1px solid rgba(188,183,255,.32);
+      font-size:21px; line-height:1.35; color:#f6f5ff; }
+    .card { margin-top:24px; width:478px; background:#fff; color:#1b123e; border-radius:23px;
+      padding:21px 23px 22px; box-shadow:0 30px 60px rgba(0,0,0,.25); }
+    .card-top { display:flex; align-items:center; justify-content:space-between; }
+    .card-title { font-size:18px; font-weight:780; }
+    .card-badge { color:#6740de; background:#eeebff; font-size:11px; font-weight:750; padding:6px 9px; border-radius:8px; }
+    .card-rule { height:1px; background:#e7e4f1; margin:17px 0; }
+    .card-row { display:flex; justify-content:space-between; align-items:baseline; font-size:15px; color:#605a75; }
+    .card-amount { color:#1b123e; font-size:30px; font-weight:820; letter-spacing:-.05em; }
+    .card-note { margin-top:5px; font-size:12px; color:#736d83; }
+    .confirm { display:flex; justify-content:center; align-items:center; margin-top:17px; height:47px;
+      border-radius:12px; color:#fff; background:#6740de; font-size:15px; font-weight:760; }
+    .scene-three .card { margin-top:26px; }
+    .scene-three .copy { top:164px; }
+    .scene-three .copy h1 { font-size:54px; }
+    .scene-three .copy .subhead { font-size:19px; }
+    .cursor { position:absolute; left:270px; top:340px; width:35px; height:35px; opacity:0;
+      filter:drop-shadow(0 3px 6px rgba(0,0,0,.4)); }
+    .cursor svg { width:100%; height:100%; }
+    .success { display:none; margin-top:17px; padding:14px; border-radius:12px; background:#e4fbf3;
+      color:#146c4a; font-weight:760; text-align:center; }
+    .scene-four .copy { top:205px; }
+    .scene-four .copy h1 { font-size:66px; }
+    .scene-four .copy .subhead { width:520px; }
+    .cta { display:inline-block; margin-top:34px; padding:14px 22px; background:#fff; color:#432995;
+      border-radius:12px; font-size:16px; font-weight:780; }
+    .orb-wrap { position:absolute; top:165px; left:774px; width:405px; height:405px; z-index:2; }
+    .orb-halo { position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle,rgba(125,100,239,.42),rgba(125,100,239,.10) 44%,transparent 69%); }
+    .ring { position:absolute; border-radius:50%; border:1px solid rgba(255,255,255,.12); }
+    .ring.one { inset:10px; } .ring.two { inset:50px; border-color:rgba(255,255,255,.10); }
+    .mote { position:absolute; border-radius:50%; background:#c7bfff; box-shadow:0 0 13px #bcb7ff; }
+    .mote.a { width:9px; height:9px; left:304px; top:53px; }
+    .mote.b { width:7px; height:7px; left:38px; top:294px; opacity:.7; }
+    .mote.c { width:5px; height:5px; left:338px; top:305px; opacity:.7; }
+    .orb { position:absolute; width:220px; height:220px; left:93px; top:93px; border-radius:27%; overflow:hidden;
+      box-shadow:0 30px 95px rgba(103,64,222,.75), inset 0 0 0 1px rgba(255,255,255,.35);
+      background:radial-gradient(circle at 30% 80%,#fff9 0%,transparent 32%),
+        radial-gradient(circle at 38% 25%,#e5ddff 0%,transparent 57%),
+        conic-gradient(from 200deg,#7d64ef,#b8a6ff,#6c7cf5,#2fc6e0,#5b8ff0,#9c7cf9,#7d64ef); }
+    .orb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+    .orb::after { content:""; position:absolute; inset:0; border-radius:inherit;
+      background:linear-gradient(140deg,rgba(255,255,255,.12),transparent 52%,rgba(45,33,106,.10));
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.34); }
+    .orb-status { position:absolute; top:575px; width:405px; left:774px; text-align:center; color:#d7d5ff;
+      font-size:14px; font-weight:700; letter-spacing:.11em; text-transform:uppercase; }
+    .orb-status::before { content:""; display:inline-block; vertical-align:middle; width:8px; height:8px;
+      margin-right:9px; border-radius:50%; background:#9c91f9; box-shadow:0 0 15px #9c91f9; }
+    footer { position:absolute; left:86px; right:86px; bottom:48px; z-index:10;
+      display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#a8a8c2; }
+    .steps { display:flex; gap:19px; align-items:center; font-weight:690; letter-spacing:.04em; }
+    .step { display:flex; align-items:center; gap:8px; opacity:.48; }
+    .step.active { opacity:1; color:#d7d5ff; }
+    .step-num { width:21px; height:21px; display:grid; place-items:center; border:1px solid currentColor; border-radius:50%; font-size:11px; }
+    .timeline { position:absolute; bottom:0; left:0; width:100%; height:4px; background:#ffffff15; z-index:20; }
+    .timeline-fill { height:100%; width:0; background:linear-gradient(90deg,#9c91f9,#50d6e8); }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <header>
+      <div class="brand"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="m12 2 2.3 7.7L22 12l-7.7 2.3L12 22l-2.3-7.7L2 12l7.7-2.3L12 2Z" stroke-linejoin="round"/></svg></span><span><div class="brand-name">XANA</div><div class="brand-sub">Your AI voice assistant</div></span></div>
+      <span class="badge">Illustrative demo · 15 sec</span>
+    </header>
+
+    <section class="scene scene-one" id="s1"><div class="copy"><div class="eyebrow">Serigan Mart support</div><h1>Meet Xana<span class="emphasis">.</span></h1><div class="subhead">Answers for your orders, returns, and refunds—by voice or text.</div><div class="pill"><span class="pill-dot"></span> Here when you need help</div></div></section>
+    <section class="scene scene-two" id="s2"><div class="copy"><div class="eyebrow">01 / Ask naturally</div><h1>Just ask.</h1><div class="subhead">Start with a question about your order.</div><div class="customer"><span class="who">You</span>“I need to return an item from my order.”</div></div></section>
+    <section class="scene scene-quote" id="s3"><div class="copy"><div class="eyebrow">02 / See the details</div><h1>Get a clear quote.</h1><div class="reply"><span class="who">Xana</span>“I found your item. Here’s your return quote.”</div><div class="card"><div class="card-top"><span class="card-title">Return quote</span><span class="card-badge">Example</span></div><div class="card-rule"></div><div class="card-row"><span>Estimated refund</span><span class="card-amount">$24.00</span></div><div class="card-note">Shown before you decide to continue.</div></div></div></section>
+    <section class="scene scene-three" id="s4"><div class="copy"><div class="eyebrow">03 / Your choice</div><h1>You decide.</h1><div class="subhead">A return starts only after you confirm it.</div><div class="card"><div class="card-top"><span class="card-title">Return quote</span><span class="card-badge">Example</span></div><div class="card-rule"></div><div class="card-row"><span>Estimated refund</span><span class="card-amount">$24.00</span></div><div class="card-note">Refund to original payment method.</div><div class="confirm" id="confirm">Confirm return</div><div class="success" id="success">✓ Return started</div></div><div class="cursor" id="cursor"><svg viewBox="0 0 36 36"><path d="M7 3v27l7-7 5 10 5-2-5-10 10-1L7 3Z" fill="white" stroke="#22184f" stroke-width="2" stroke-linejoin="round"/></svg></div></div></section>
+    <section class="scene scene-four" id="s5"><div class="copy"><div class="eyebrow">Support on your terms</div><h1>Talk to Xana<span class="emphasis">.</span></h1><div class="subhead">Ask. Understand. Confirm when you’re ready.</div><div class="cta">Serigan Mart · /support</div></div></section>
+
+    <div class="orb-wrap" id="orbwrap"><div class="orb-halo" id="halo"></div><div class="ring one"></div><div class="ring two"></div><span class="mote a" id="motea"></span><span class="mote b" id="moteb"></span><span class="mote c" id="motec"></span><div class="orb" id="orb"><img src="../../apps/web/public/images/xana-avatar.svg" alt="Illustrated portrait of Xana"></div></div>
+    <div class="orb-status" id="orbstatus">Ready to help</div>
+    <footer><div class="steps"><span class="step" id="step1"><span class="step-num">1</span> Ask</span><span class="step" id="step2"><span class="step-num">2</span> Review</span><span class="step" id="step3"><span class="step-num">3</span> Confirm</span></div><span>Voice or text · You confirm every return</span></footer>
+    <div class="timeline"><div class="timeline-fill" id="timeline"></div></div>
+  </div>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const scenes = [$("s1"),$("s2"),$("s3"),$("s4"),$("s5")];
+    const windows = [[0,3.0],[3.0,6.0],[6.0,9.5],[9.5,12.3],[12.3,15]];
+    const smooth = (a,b,x) => { const v=Math.max(0,Math.min(1,(x-a)/(b-a))); return v*v*(3-2*v); };
+    window.render = (t) => {
+      t=Math.max(0,Math.min(15,t));
+      scenes.forEach((el,i) => {
+        const [start,end]=windows[i];
+        const enter=smooth(start,start+.42,t), leave=1-smooth(end-.42,end,t);
+        const opacity=enter*leave;
+        el.style.opacity=opacity;
+        el.style.transform=`translateY(${(1-enter)*22 - (1-leave)*14}px)`;
+      });
+      const status=t<3?"Ready to help":t<6?"Listening":t<9.5?"Explaining your quote":t<11.55?"Waiting for your choice":t<12.3?"Return started":"Here to help";
+      $("orbstatus").textContent=status;
+      const pulse=Math.sin(t*5)*.018 + (t>=3&&t<6?Math.sin(t*16)*.018:0);
+      $("orb").style.transform=`rotate(${t*4}deg) scale(${1+pulse})`;
+      $("halo").style.transform=`scale(${1+Math.sin(t*3)*.05})`;
+      $("motea").style.transform=`translate(${Math.sin(t*.9)*10}px,${Math.cos(t*.9)*10}px)`;
+      $("moteb").style.transform=`translate(${Math.cos(t*.7)*9}px,${Math.sin(t*.7)*9}px)`;
+      $("motec").style.transform=`translate(${Math.sin(t*.6)*8}px,${Math.cos(t*.6)*8}px)`;
+      $("orbwrap").style.opacity= t>12.3 ? 1-smooth(12.3,14.4,t)*.18 : 1;
+      const clickIn=smooth(10.0,10.5,t); const clickOut=smooth(11.25,11.55,t);
+      $("cursor").style.opacity=clickIn*(1-clickOut);
+      $("cursor").style.transform=`translate(${(1-clickIn)*90-clickOut*4}px,${(1-clickIn)*60-clickOut*4}px) scale(${t>11.05&&t<11.3?.85:1})`;
+      $("confirm").style.background=t>=11.25?"#5530be":"#6740de";
+      $("success").style.display=t>=11.55?"block":"none";
+      $("confirm").style.display=t>=11.55?"none":"flex";
+      [$("step1"),$("step2"),$("step3")].forEach((el,i)=>el.classList.toggle("active",t>=[0,6,9.5][i]));
+      $("timeline").style.width=`${(t/15)*100}%`;
+    };
+    window.render(0);
+  </script>
+</body>
+</html>

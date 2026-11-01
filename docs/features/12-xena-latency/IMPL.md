@@ -37,9 +37,8 @@ Cartesia ran out of credit on 2026-10-09 (`402 quota_exceeded`), and every call 
 Now `FallbackMouth` (`services/voice/src/ai_commerce_voice/mouth_fallback.py`) tries Cartesia
 first and switches to OpenAI speech (`mouth_openai.py`, `gpt-4o-mini-tts`, voice Marin) when:
 
-- Cartesia refuses the call at start. The `ready` message names the voice actually in use, and
-  the customer is told "Xena's usual voice isn't available right now, so she's using a backup
-  voice."
+- Cartesia refuses the call at start. The `ready` message names the voice actually in use.
+  The provider switch is logged, but it does not show a warning in the customer interface.
 - Cartesia fails an answer before any audio was heard. The same words are said again by the
   backup, and the rest of the call stays on the backup. A failure after audio played is shown as
   text, as before, because half an answer can't be re-said in another voice.
@@ -47,6 +46,15 @@ first and switches to OpenAI speech (`mouth_openai.py`, `gpt-4o-mini-tts`, voice
 Fillers are rendered in both voices at startup (cached in `.cache/fillers`), and a call plays
 the fillers of the voice it's using. Only when both voices fail does the call go to text.
 `VOICE_BACKUP_TTS=off` turns the backup off.
+
+An optional `CARTESIA_SONIC_API_KEY2` adds another Cartesia credential before the OpenAI
+fallback. `CARTESIA_PREFERRED_KEY=secondary` tries that credential first; the default is
+`primary`. A switch between Cartesia credentials keeps the same voice and filler clips.
+The assistant's turn-based speech endpoint uses the same key order and retries the other
+credential if the first request fails.
+If an utterance has already produced audio when a provider fails, it remains text rather
+than replaying an answer the customer partially heard. If the alternate voice starts,
+subsequent utterances use it.
 
 Measured live: OpenAI's first audio is about 0.5-0.7 s on a warm connection (Cartesia's is
 about 0.13 s). OpenAI returns no word timings, so each clause's words are spread over its

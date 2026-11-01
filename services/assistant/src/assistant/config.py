@@ -63,8 +63,12 @@ class Settings(BaseSettings):
     groq_api_key: str | None = None
     groq_stt_model: str = "whisper-large-v3-turbo"
     cartesia_api_key: str | None = Field(
-        default=None, validation_alias=AliasChoices("CARTESIA_API_KEY", "CARTESIA_SONIC_API_KEY")
+        default=None, validation_alias=AliasChoices("CARTESIA_SONIC_API_KEY", "CARTESIA_API_KEY")
     )
+    cartesia_api_key2: str | None = Field(
+        default=None, validation_alias=AliasChoices("CARTESIA_SONIC_API_KEY2", "CARTESIA_API_KEY2")
+    )
+    cartesia_preferred_key: Literal["primary", "secondary"] = "primary"
     cartesia_model: str = "sonic-3.6-2026-08-27"
     xana_voice_id: str = "9626c31c-bec5-4cca-baa8-f8ba9e84c8bc"  # "Jacqueline - Reassuring Agent"
     steph_voice_id: str = "db6b0ed5-d5d3-463d-ae85-518a07d3c2b4"  # "Skylar - Friendly Guide"

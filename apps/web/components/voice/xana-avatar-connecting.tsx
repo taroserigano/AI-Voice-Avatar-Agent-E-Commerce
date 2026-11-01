@@ -22,7 +22,7 @@ export function XanaAvatarConnecting({
   return (
     <div
       role="status"
-      className="relative aspect-video w-[min(36rem,92vw,calc((100dvh-22rem)*16/9))] overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_24px_80px_-12px_rgb(103_64_222/0.55)]"
+      className="relative aspect-video w-[min(36rem,92vw,max(10rem,calc((100dvh-31rem)*16/9)))] overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_24px_80px_-12px_rgb(103_64_222/0.55)]"
     >
       <img src={background.src} alt="" className="absolute inset-0 size-full object-cover" />
       {look ? (
