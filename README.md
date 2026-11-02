@@ -2,6 +2,7 @@
 <img width="3805" height="2160" alt="{6446EF62-9C47-4696-A8DD-DF9022660377}" src="https://github.com/user-attachments/assets/b1b88d0d-894b-497b-90b0-6cdb39ce98c2" />
 
 
+
 ### Stateful AI agents for shopping, voice support, and customer-approved returns.
 
 ![LangGraph](https://img.shields.io/badge/Agents-LangGraph-6D4AFF)
@@ -12,6 +13,10 @@
 **Serigan Mart turns a complete shopping application into a practical agentic AI system:** agents retrieve product and policy evidence, call authenticated business tools, maintain conversation state, and pause for customer approval before a return is committed.
 
 The experience combines **Steph**, a shopping assistant, with **Xena**, a voice and text support agent with optional video avatars. Behind the interface are LangGraph workflows, hybrid retrieval, streaming responses, deterministic refund calculations, and an evaluation suite covering product questions, orders, returns, and adversarial requests.
+
+Jev Intent Understanding & Safety Signals
+
+Integrated Jev to interpret customer intent and produce structured signals that guide Xena’s agent workflow. Jev also helps detect attempts to bypass return rules and can veto unsafe confirmation attempts. LangGraph coordinates tool execution, while application code enforces permissions, return eligibility, pricing, and customer approval.
 
 **Built by [Taro Serigano](https://taroserigano.com/)** · [Storefront walkthrough](demos/xena-15s-live/serigan-mart-walkthrough-40s.mp4) · [Voice and avatar demo](demos/xena-15s-live/xena-employer-demo-avatar.mp4) · [Evaluation methodology](evals/xana/README.md)
 
