@@ -1,4 +1,4 @@
-# Serigan Mart · Agentic AI Commerce
+# Agentic AI Commerce - Live Customer AI Agent
 <img width="3805" height="2160" alt="{6446EF62-9C47-4696-A8DD-DF9022660377}" src="https://github.com/user-attachments/assets/b1b88d0d-894b-497b-90b0-6cdb39ce98c2" />
 
 
