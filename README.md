@@ -239,15 +239,7 @@ Integration tests and browser tests require their supporting services. Live eval
 | [evals](evals) | Golden datasets, deterministic scoring, model judging, and evaluation export |
 | [infra](infra) | Local services, telemetry collector, and Grafana dashboard configuration |
 
-## Next enhancements
 
-- Connect Stripe test checkout and refund settlement to the existing confirmation boundaries.
-- Add Temporal-backed durable checkout and return orchestration.
-- Complete storefront integration of the DeepAgents planner, authenticated A2A transport, and resumable stream components.
-- Migrate the primary voice transport to LiveKit Agents while preserving the current tool and confirmation controls. HeyGen's LiveKit-based media integration is separate from this planned migration.
-- Extend transport-level voice tracing beyond the timings and traces exported by the evaluation harness.
-- Expand customer diversity and independently maintained evaluation sets, and publish fresh benchmark artifacts after catalog or model changes.
-- Harden authentication and operational deployment before offering access beyond the development sandbox.
 
 ---
 
